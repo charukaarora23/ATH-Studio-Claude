@@ -1,4 +1,4 @@
-# My Studio prototype (v7)
+# My Studio prototype (v8)
 
 Buildless HTML, CSS and JavaScript. Serve this folder with any static server (for example `python3 -m http.server`) and open `index.html`.
 
@@ -44,3 +44,21 @@ Run the tests with `node --test app/tests/logic.test.cjs`.
 
 - Saving the poster or the square post as an image.
 - Tone options (Warm, Formal, Bold): these need server-side generation.
+
+## v8: motion and delight
+
+- **Torchlight:** a soft pink glow follows the pointer and drifts on its own when the pointer is still.
+- **Cursor:** a ring that grows over controls and shows a label over folders and tabs (mouse only).
+- **Parallax:** light parallax on the home page, the folder and the finished page.
+- **Writing:**
+  - The header shrinks while writing so the folder has more room.
+  - Binder rings sit on the spine.
+  - Questions are smaller, with a lined writing area.
+  - The "Tip" sticker opens a note.
+  - The folded corner turns the page in 3D.
+  - Stickers ("Hi, Maya!", Halfway, Lovely work, Nearly there) are earned along the way, and the work prints are pinned beside the bio.
+- **Finished page:**
+  - Opens with "Your bio is ready, Maya." and a chime.
+  - Confetti, and a Done! sticker.
+  - "What next?" offers three paths: file it, write the other document, or make a square post.
+- **Sounds:** flip, pop, peel, stick, stamp, a soft scratch while typing, and a chime. Turning off Motion stops all movement; sounds stay off until the artist turns them on.

@@ -21,11 +21,25 @@
     g.gain.setValueAtTime(0.35 * volume, c.currentTime); g.gain.exponentialRampToValueAtTime(0.0001, c.currentTime + 0.14);
     o.connect(g).connect(c.destination); o.start(); o.stop(c.currentTime + 0.15);
   }
+  function tone(freq, dur, { type = 'triangle', gain = 0.16, delay = 0 } = {}) {
+    const c = ac(); if (!c) return; const t = c.currentTime + delay;
+    const o = c.createOscillator(); const g = c.createGain(); o.type = type; o.frequency.setValueAtTime(freq, t);
+    g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(gain * volume, t + 0.015); g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+    o.connect(g).connect(c.destination); o.start(t); o.stop(t + dur + 0.02);
+  }
+  let lastScratch = 0;
   const cues = {
     open: () => noise(0.42, { from: 1800, to: 600, gain: 0.22, attack: 0.04 }),
     turn: () => noise(0.32, { from: 3200, to: 1200, gain: 0.18, attack: 0.02 }),
+    flip: () => { noise(0.55, { from: 4200, to: 900, gain: 0.2, attack: 0.03 }); setTimeout(() => noise(0.12, { from: 900, to: 300, gain: 0.16 }), 430); },
     file: () => { noise(0.5, { from: 2200, to: 500, gain: 0.2, attack: 0.05 }); setTimeout(tap, 420); },
     tick: () => tap(),
+    pop: () => tone(880, 0.09, { type: 'sine', gain: 0.12 }),
+    peel: () => noise(0.22, { from: 1200, to: 5200, gain: 0.14, attack: 0.08 }),
+    stick: () => { tap(); tone(520, 0.12, { type: 'sine', gain: 0.08 }); },
+    stamp: () => { noise(0.08, { from: 600, to: 200, gain: 0.3 }); tap(); },
+    scratch: () => { const n = Date.now(); if (n - lastScratch < 140) return; lastScratch = n; noise(0.06, { from: 5200, to: 3600, q: 2, gain: 0.05 }); },
+    chime: () => { [523.25, 659.25, 783.99, 1046.5].forEach((f, i) => tone(f, 0.7, { gain: 0.12, delay: i * 0.09 })); },
   };
   root.StudioSound = {
     set(enabled, vol) { on = !!enabled; if (vol != null) volume = vol; if (on) ac(); },
