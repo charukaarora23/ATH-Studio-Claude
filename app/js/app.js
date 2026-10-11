@@ -17,7 +17,7 @@
   function setTheme(t) {
     html.dataset.theme = t;
     $$('[data-theme-set]').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.themeSet === t)));
-    $('meta[name="theme-color"]').content = t === 'dark' ? '#2A0A12' : '#F9ECE5';
+    const tc = $('meta[name="theme-color"]'); if (tc) tc.content = t === 'dark' ? '#2A0A12' : '#F9ECE5';
   }
   setTheme(prefs.theme || (sysDark ? 'dark' : 'light'));
   $$('[data-theme-set]').forEach((b) => b.addEventListener('click', () => { setTheme(b.dataset.themeSet); S.setPref('theme', b.dataset.themeSet); }));
@@ -441,7 +441,7 @@
       if (!w.draft.edited && r.over) h += `<div class="notice warn">Your name and practice alone need ${r.words} words, more than the ${limit} you set. Raise the limit or shorten how you describe your practice. Nothing was cut from your identity.</div>`;
       else if (!w.draft.edited && r.omitted.length) h += `<div class="notice">To fit ${limit} words, whole sentences were left out (${r.omitted.join(', ')}). <button class="btn-text btn" id="nolimit">Show the full version</button></div>`;
       notices.innerHTML = h;
-      const rb = $('#rebuild', notices); if (rb) rb.addEventListener('click', () => { if (confirm('Replace your edited text with a new draft from your notes?')) { w.draft = null; renderPage(type); } });
+      const rb = $('#rebuild', notices); if (rb) rb.addEventListener('click', () => { if (rb.dataset.armed) { w.draft = null; renderPage(type); return; } rb.dataset.armed = '1'; rb.textContent = 'Yes, replace my edits'; });
       const nl = $('#nolimit', notices); if (nl) nl.addEventListener('click', () => { a.limit = ''; w.draft = null; autosave(type); renderPage(type); renderCoverOnly(type); });
     }
     meter(); showNotices();
@@ -452,7 +452,8 @@
   }
 
   function copyText(t) { (navigator.clipboard ? navigator.clipboard.writeText(t) : Promise.reject()).then(() => toast('Copied to your clipboard')).catch(() => toast('Copy did not work here. Select the text and copy it.', true)); }
-  function downloadTxt(text, name) { const b = new Blob([text + '\n'], { type: 'text/plain' }); const u = URL.createObjectURL(b); const l = document.createElement('a'); l.href = u; l.download = name.replace(/[^\w .,-]+/g, '').trim() || 'document.txt'; document.body.appendChild(l); l.click(); l.remove(); setTimeout(() => URL.revokeObjectURL(u), 1000); }
+  function previewFallback(text, what) { navigator.clipboard && navigator.clipboard.writeText(text).catch(() => {}); toast(`${what} is blocked in this hosted preview. The text is copied instead.`); }
+  function downloadTxt(text, name) { if (window.STUDIO_PREVIEW) return previewFallback(text, 'Downloading'); const b = new Blob([text + '\n'], { type: 'text/plain' }); const u = URL.createObjectURL(b); const l = document.createElement('a'); l.href = u; l.download = name.replace(/[^\w .,-]+/g, '').trim() || 'document.txt'; document.body.appendChild(l); l.click(); l.remove(); setTimeout(() => URL.revokeObjectURL(u), 1000); }
 
   /* ---------------- filing ---------------- */
   async function openFiling(type) {
@@ -520,7 +521,7 @@
     $('#again', page).addEventListener('click', () => { const w = getWork(type); w.answers = { ...(doc.answers || w.answers) }; w.draft = { text: doc.text, edited: true, basis: sig(w.answers) }; w.step = TYPES[type].steps.length - 1; autosave(type); renderPage(type); renderTabs(type); });
     $('.q', page).focus({ preventScroll: true });
   }
-  function printDoc(doc) { const wn = window.open('', '_blank'); if (!wn) return; wn.document.write(`<title>${esc(doc.title)}</title><body style="font:19px/1.6 Georgia,serif;max-width:640px;margin:60px auto;color:#2A0A12"><p style="font:12px monospace;letter-spacing:.08em;text-transform:uppercase;color:#AA0003">${esc(doc.title)} · ${doc.words} words</p><p>${esc(doc.text)}</p></body>`); wn.document.close(); wn.focus(); wn.print(); }
+  function printDoc(doc) { if (window.STUDIO_PREVIEW) return previewFallback(doc.text, 'Printing'); const wn = window.open('', '_blank'); if (!wn) return; wn.document.write(`<title>${esc(doc.title)}</title><body style="font:19px/1.6 Georgia,serif;max-width:640px;margin:60px auto;color:#2A0A12"><p style="font:12px monospace;letter-spacing:.08em;text-transform:uppercase;color:#AA0003">${esc(doc.title)} · ${doc.words} words</p><p>${esc(doc.text)}</p></body>`); wn.document.close(); wn.focus(); wn.print(); }
 
   /* ---------------- My files ---------------- */
   let filter = 'all'; let q = '';
