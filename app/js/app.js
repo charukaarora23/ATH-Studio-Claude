@@ -470,52 +470,68 @@
     if (missing.length) { w.step = QS[type].findIndex((q) => q.k === missing[0]); autosave(type); toast(type === 'bio' ? 'Your name and practice come first.' : 'The statement needs your subjects first.'); main.innerHTML = ''; return renderWriting(type); }
     const vs = syncDrafts(type); autosave(type);
     const docs = await S.listDocuments(type);
-    const d = w.drafts[w.variant]; const name = nameFor(type, a); const first = name.split(' ')[0]; const lead = w.images[0]; const vk = voiceKey(a, type);
-    const sub = type === 'bio' ? [a.role, a.location].map((x) => L.clean(x || '')).filter(Boolean).join(' · ') : (a.series ? L.clean(a.series) : 'Artist statement');
+    const d = w.drafts[w.variant]; const name = nameFor(type, a); const imgs = w.images; const lead = imgs[0]; const vk = voiceKey(a, type); const year = new Date().getFullYear();
+    const parts = (name || T.label).split(' '); const n1 = parts.slice(0, Math.ceil(parts.length / 2)).join(' '); const n2 = parts.slice(Math.ceil(parts.length / 2)).join(' ');
+    const role = type === 'bio' ? L.clean(a.role || '') : L.clean(a.subjects || '').split(',')[0];
+    const place = L.clean(a.location || '');
+    const pill = (i, cls = '') => imgs[i] ? `<span class="epill img ${cls}"><img data-img="${imgs[i].id}" alt=""></span>` : (i === 0 ? `<span class="epill line ${cls}"></span>` : '');
     const other = type === 'bio' ? 'statement' : 'bio'; const otherLabel = other === 'bio' ? 'artist bio' : 'artist statement';
-    main.innerHTML = `<section class="final-view" data-type="${type}" style="--cv:${th.cv};--cv-ink:${th.cvInk};--cv-accent:${th.cvAccent};--btn:${th.btn};--btn-ink:${th.btnInk}">
-      <header class="fin-hero">
-        <p class="eyebrow">${esc(T.label)} · version ${docs.length + 1}</p>
-        <h1 class="fin-title" tabindex="-1"><span class="fw">Your</span> <span class="fw">${word}</span> <span class="fw">is</span> <em class="fw">ready</em>${first ? `<span class="fw">, ${esc(first)}</span>` : ''}<span class="fw">.</span></h1>
-        <p class="fin-sub">Copy it, change the length, or file it in your folder.</p>
+    main.innerHTML = `<section class="ed" data-type="${type}" style="--cv:${th.cv};--cv-ink:${th.cvInk};--cv-accent:${th.cvAccent};--btn:${th.btn};--btn-ink:${th.btnInk}">
+      <header class="ed-hero">
+        <div class="ed-meta"><span>Arts to Hearts<br><i>my studio</i></span><span>${esc(T.label)}<br>${year}</span></div>
+        <p class="ed-eyebrow">Your ${word} is ready. Copy it, or shape it below.</p>
+        <h1 class="ed-name" tabindex="-1"><span class="n1">${esc(n1)}</span>${n2 ? `<span class="n2">${esc(n2)}</span>` : ''}</h1>
+        <p class="ed-line">${role ? `<em>${esc(role)}</em>` : ''} ${pill(0, 'p0')} ${pill(1, 'p1 short')} ${place ? `<span>based in</span> ${pill(2, 'p2')} <span>${esc(place)}</span>` : `<span>${type === 'bio' ? 'artist' : 'statement'}</span> ${pill(2, 'p2')}`}</p>
+        <span class="ed-cue" aria-hidden="true">Read it ↓</span>
       </header>
-      <article class="rec-sheet">
-        <header class="rec-head">${CLIP_SVG}<span>${esc(T.label)}</span><span>${fmtDate(new Date().toISOString())}</span></header>
-        <div class="rec-body${lead ? '' : ' no-img'}">
-          <figure class="rec-img">${lead ? `<span class="tape"></span><img data-img="${lead.id}" alt="${esc(capText(lead))}">${lead.sample ? '<span class="sample-tag">Sample</span>' : ''}${capText(lead) ? `<figcaption>${esc(capText(lead))}</figcaption>` : ''}` : `<label class="rec-add" for="f-addimg" data-cursor="Add image"><input type="file" id="f-addimg" accept="image/*" multiple class="visually-hidden"><span class="drop-art" aria-hidden="true"><i></i><i></i><i></i></span><b>Add an image of your work</b><span>It sits beside your ${word}.</span></label>`}</figure>
-          <div class="rec-text">
-            <h2 class="rec-name">${esc(name || T.label)}</h2>
-            <p class="rec-sub">${esc(sub)}</p>
-            <label for="ftext" class="visually-hidden">Your ${word}, editable</label>
-            <textarea class="rec-words" id="ftext" spellcheck="true" data-cursor="Edit">${esc(d.text)}</textarea>
-            <p class="rec-note"><b id="fwc">${L.count(d.text)}</b> words · <span id="fnote">${d.edited ? 'edited by you' : LEN_NOTE[w.variant].replace(/\.$/, '').toLowerCase()}</span> <span class="f-demo" title="Prototype: template writer, not AI">Demo writer</span></p>
-            <div id="fnotice"></div>
-          </div>
+
+      <article class="ed-split rec-sheet">
+        <div class="ed-words">
+          <div class="ed-row"><span>© ${esc(T.label)}</span><span>Version ${docs.length + 1}</span></div>
+          <div class="ed-row thin"><i>In your words</i><span>${fmtDate(new Date().toISOString())}</span></div>
+          <p class="ed-note">Every fact here is one you wrote. Click the text to edit it.</p>
+          <label for="ftext" class="visually-hidden">Your ${word}, editable</label>
+          <textarea class="ed-text" id="ftext" spellcheck="true">${esc(d.text)}</textarea>
+          <div id="fnotice"></div>
         </div>
-        <span class="stamp rec-stamp" id="fstamp" hidden></span>
+        <figure class="ed-photo">
+          ${lead ? `<img data-img="${lead.id}" alt="${esc(capText(lead))}">${lead.sample ? '<span class="sample-tag">Sample</span>' : ''}` : `<label class="ed-add" for="f-addimg"><input type="file" id="f-addimg" accept="image/*" multiple class="visually-hidden"><span class="epill line big"></span><b>Add a photo of your work</b><span>It sits beside your words.</span></label>`}
+          <span class="ed-count"><i></i><b id="fwc">${L.count(d.text)}</b> words</span>
+          <button class="ed-copy" id="fcopy">Copy my<br><em>${word}</em></button>
+          ${lead && capText(lead) ? `<figcaption>${esc(capText(lead))}</figcaption>` : ''}
+        </figure>
       </article>
-      <div class="rec-controls">
-        <button class="btn btn-primary rec-copy" id="fcopy" data-cursor="Copy">Copy my ${word}</button>
-        <div class="seg rec-seg" role="group" aria-label="Length">${vs.map((v) => `<button type="button" data-var="${v.key}" aria-pressed="${v.key === w.variant}">${v.label}</button>`).join('')}</div>
-        <div class="seg rec-seg" role="group" aria-label="Voice">${[['she', 'She'], ['he', 'He'], ['they', 'They'], ['first', 'I']].map(([k, l]) => `<button type="button" data-voice="${k}" aria-pressed="${vk === k}">${l}</button>`).join('')}</div>
-      </div>
-      <div id="ffiling"></div>
-      <section class="next-steps" aria-labelledby="next-h">
-        <h2 id="next-h">What <em>next</em>?</h2>
-        <div class="next-row">
-          <button class="next-card nc-file" id="ffile" data-cursor="File it"><span class="nc-k">Keep it</span><b>File this version</b><span>Saved in your ${esc(T.short)} folder, ready to reopen.</span></button>
-          <button class="next-card nc-other" id="fother" data-cursor="Start"><span class="nc-k">Keep going</span><b>Write your ${otherLabel}</b><span>${other === 'statement' ? 'About the work itself. Seven short questions.' : 'Who you are and what you make. Nine short questions.'}</span></button>
-          <button class="next-card nc-post" id="fpost" data-cursor="Preview"><span class="nc-k">Share it</span><b>Make a square post</b><span>Your lead image with a short version of the text.</span></button>
+
+      <ol class="ed-notes">
+        <li><span class="nn">1</span><span class="nk">Length</span><span class="nv">${vs.map((v) => `<button type="button" data-var="${v.key}" aria-pressed="${v.key === w.variant}">${v.label}</button>`).join('')}</span><span class="nd" id="fnote">${d.edited ? 'Edited by you' : LEN_NOTE[w.variant]}</span></li>
+        <li><span class="nn">2</span><span class="nk">Voice</span><span class="nv">${[['she', 'She'], ['he', 'He'], ['they', 'They'], ['first', 'I']].map(([k, l]) => `<button type="button" data-voice="${k}" aria-pressed="${vk === k}">${l}</button>`).join('')}</span><span class="nd">Open calls usually want third person.</span></li>
+        <li><span class="nn">3</span><span class="nk">Take it</span><span class="nv"><button type="button" id="ftxt">Download .txt</button><button type="button" id="fpost">Square post</button><button type="button" id="fedit">Edit answers</button></span><span class="nd">Template writer · demo</span></li>
+      </ol>
+
+      <section class="ed-archive" aria-labelledby="arch-h">
+        <div class="arch-card">
+          <div class="arch-top"><span class="arch-k">Keep this version</span><b id="arch-h">archive</b></div>
+          <div class="arch-grid">
+            <div class="cell wide"><span>Name</span><i>${esc(name || '—')}</i></div>
+            <div class="cell wide"><span>${type === 'bio' ? 'Practice' : 'Subjects'}</span><i>${esc(type === 'bio' ? (a.role || '—') : (a.subjects || '—'))}</i></div>
+            <div class="cell"><span>Length</span><i>${esc(w.result.label)}</i></div>
+            <div class="cell"><span>Voice</span><i>${vk === 'first' ? 'First person' : 'Third person'}</i></div>
+          </div>
+          <div class="arch-sleeve">${CLIP_SVG}<div class="sleeve-in">${lead ? `<img data-img="${lead.id}" alt="">` : `<p>${esc(d.text.split('. ')[0])}.</p>`}</div></div>
+          <button class="arch-file" id="ffile"><b>File in your ${esc(T.short)} folder</b> →</button>
+          <span class="stamp rec-stamp" id="fstamp" hidden></span>
+          <div id="ffiling"></div>
         </div>
-        <p class="fin-links"><button class="btn-text btn" id="ftxt">Download .txt</button><button class="btn-text btn" id="fedit">Edit answers</button></p>
+        <button class="ed-next" id="fother"><span>Next</span><b>Write your <em>${otherLabel}</em> →</b></button>
       </section>
     </section>`;
-    const root = $('.final-view', main); hydrate(root);
+    const root = $('.ed', main); hydrate(root);
     const ta = $('#ftext', root); autoGrow(ta);
-    const notice = () => { const r = w.result; $('#fnotice', root).innerHTML = d.edited && d.basis !== sig(a) ? '<p class="rec-warn">Your answers changed after you edited this. <button class="btn-text btn" id="frebuild">Rebuild from answers</button></p>' : r.omitted.length && !d.edited && w.variant !== 'line' ? `<p class="rec-warn">Left out to fit: ${r.omitted.join(', ')}.</p>` : ''; const rb = $('#frebuild', root); if (rb) rb.addEventListener('click', () => { if (rb.dataset.armed) { delete w.drafts[w.variant]; renderFinal(type, { quiet: true }); return; } rb.dataset.armed = '1'; rb.textContent = 'Yes, replace my edits'; }); };
+    const notice = () => { const r = w.result; $('#fnotice', root).innerHTML = d.edited && d.basis !== sig(a) ? '<p class="ed-warn">Your answers changed after you edited this. <button class="ed-link" id="frebuild">Rebuild from answers</button></p>' : r.omitted.length && !d.edited && w.variant !== 'line' ? `<p class="ed-warn">Left out to fit: ${r.omitted.join(', ')}.</p>` : ''; const rb = $('#frebuild', root); if (rb) rb.addEventListener('click', () => { if (rb.dataset.armed) { delete w.drafts[w.variant]; renderFinal(type, { quiet: true }); return; } rb.dataset.armed = '1'; rb.textContent = 'Yes, replace my edits'; }); };
     notice();
-    ta.addEventListener('input', () => { d.text = ta.value; d.edited = true; $('#fwc', root).textContent = L.count(ta.value); $('#fnote', root).textContent = 'edited by you'; autosave(type); Snd.play('scratch'); });
-    $('#fcopy', root).addEventListener('click', () => { copyText(ta.value); Snd.play('pop'); FX.glow($('.rec-sheet', root)); });
+    ta.addEventListener('input', () => { d.text = ta.value; d.edited = true; $('#fwc', root).textContent = L.count(ta.value); $('#fnote', root).textContent = 'Edited by you'; autosave(type); Snd.play('scratch'); });
+    const split = $('.ed-split', root);
+    $('#fcopy', root).addEventListener('click', () => { copyText(ta.value); Snd.play('pop'); FX.glow(split); });
     $$('[data-var]', root).forEach((b) => b.addEventListener('click', () => { w.variant = b.dataset.var; autosave(type); Snd.play('turn'); swapText(type); }));
     $$('[data-voice]', root).forEach((b) => b.addEventListener('click', () => { const k = b.dataset.voice; if (k === 'first') a.person = 'first'; else { a.person = 'third'; a.pronouns = k; } autosave(type); Snd.play('pop'); swapText(type); }));
     $('#ftxt', root).addEventListener('click', () => downloadTxt(ta.value, (name || T.label) + ' ' + w.result.label + '.txt'));
@@ -524,28 +540,36 @@
     $('#ffile', root).addEventListener('click', () => openFiling(type));
     $('#fother', root).addEventListener('click', () => { Snd.play('open'); location.hash = '#/' + other; });
     const add = $('#f-addimg', root); if (add) add.addEventListener('change', async () => { if (await addImages(type, add.files)) renderFinal(type, { quiet: true }); });
-    const rec = $('.rec-sheet', root); tilt(rec, 2); $$('.next-card', root).forEach((c) => tilt(c, 6));
-    // scroll story: the headline drifts back as the sheet comes forward; the next steps rise in when reached
-    const hero = $('.fin-hero', root);
-    FX.onScroll((y) => { if (!motion) return; hero.style.transform = `translate3d(0, ${y * 0.35}px, 0)`; hero.style.opacity = String(Math.max(0, 1 - y / 420)); rec.style.transform = `translate3d(0, ${-Math.min(y, 300) * 0.08}px, 0)`; });
+    // scroll: the name parts drift apart, the pills slide, the photo moves slower than its frame
+    const n1e = $('.n1', root); const n2e = $('.n2', root); const line = $('.ed-line', root); const ph = $('.ed-photo img', root);
+    FX.onScroll((y) => {
+      if (!motion) return; const k = Math.min(y, 700);
+      n1e.style.transform = `translate3d(${-k * 0.25}px, 0, 0)`; if (n2e) n2e.style.transform = `translate3d(${k * 0.25}px, 0, 0)`;
+      line.style.transform = `translate3d(${k * 0.1}px, ${-k * 0.05}px, 0)`;
+      if (ph) { const r = ph.parentElement.getBoundingClientRect(); ph.style.transform = `translate3d(0, ${(r.top - innerHeight / 2) * -0.08}px, 0) scale(1.12)`; }
+    });
     if (motion && 'IntersectionObserver' in window) {
-      const io = new IntersectionObserver((es) => es.forEach((e) => { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } }), { threshold: 0.2 });
-      $$('.next-card, .next-steps h2', root).forEach((el, i) => { el.classList.add('rise'); el.style.transitionDelay = (i * 90) + 'ms'; io.observe(el); });
+      const io = new IntersectionObserver((es) => es.forEach((e) => { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } }), { threshold: 0.15 });
+      $$('.ed-notes li, .arch-card, .ed-next', root).forEach((el, i) => { el.classList.add('rise'); el.style.transitionDelay = (i % 3) * 90 + 'ms'; io.observe(el); });
     }
     if (!opts.quiet) {
-      $('.fin-title', root).focus({ preventScroll: true }); scrollTo(0, 0);
+      $('.ed-name', root).focus({ preventScroll: true }); scrollTo(0, 0);
       if (opts.celebrate) { document.body.classList.add('lit'); await FX.lightsOn(); }
       if (motion) {
-        $$('.fin-title .fw', root).forEach((el, i) => anim(el, [{ opacity: 0, transform: 'translateY(50%)', filter: 'blur(8px)' }, { opacity: 1, transform: 'none', filter: 'blur(0)' }], { duration: 900, delay: 120 + i * 110, easing: 'cubic-bezier(.16,1,.3,1)' }));
-        anim($('.fin-sub', root), [{ opacity: 0 }, { opacity: 1 }], { duration: 700, delay: 600 });
-        anim(rec, [{ opacity: 0, transform: 'perspective(1600px) rotateX(16deg) translateY(140px)' }, { opacity: 1, transform: 'none' }], { duration: 1100, delay: 300, easing: 'cubic-bezier(.16,1,.3,1)' }).then(() => rec.getAnimations().forEach((x) => x.cancel()));
+        // the poster assembles: the name halves slide in from opposite edges, the line follows, the pills open with the work inside
+        anim(n1e, [{ opacity: 0, transform: 'translateX(-30vw)' }, { opacity: 1, transform: 'none' }], { duration: 1100, easing: 'cubic-bezier(.16,1,.3,1)' });
+        if (n2e) anim(n2e, [{ opacity: 0, transform: 'translateX(30vw)' }, { opacity: 1, transform: 'none' }], { duration: 1100, delay: 120, easing: 'cubic-bezier(.16,1,.3,1)' });
+        $$('.ed-line > *', root).forEach((el, i) => anim(el, [{ opacity: 0, transform: 'translateY(30px)' }, { opacity: 1, transform: 'none' }], { duration: 700, delay: 500 + i * 80, easing: 'cubic-bezier(.16,1,.3,1)' }));
+        $$('.ed-line .epill', root).forEach((el, i) => anim(el, [{ clipPath: 'inset(0 50% 0 50% round 999px)' }, { clipPath: 'inset(0 0 0 0 round 999px)' }], { duration: 900, delay: 800 + i * 140, easing: 'cubic-bezier(.65,0,.35,1)' }));
+        anim($('.ed-eyebrow', root), [{ opacity: 0, letterSpacing: '.4em' }, { opacity: 1, letterSpacing: '.14em' }], { duration: 1000, delay: 300, easing: 'ease-out' });
+        anim($('.ed-meta', root), [{ opacity: 0 }, { opacity: 1 }], { duration: 800, delay: 900 });
       }
     }
   }
   async function swapText(type) {
-    const ta = $('#ftext'); if (motion && ta) await anim(ta, [{ opacity: 1, transform: 'none' }, { opacity: 0, transform: 'perspective(900px) rotateX(-14deg) translateY(-8px)' }], { duration: 160, easing: 'ease-in' });
+    const ta = $('#ftext'); if (motion && ta) await anim(ta, [{ opacity: 1, transform: 'none' }, { opacity: 0, transform: 'translateY(-10px)' }], { duration: 160, easing: 'ease-in' });
     const y = scrollY; await renderFinal(type, { quiet: true }); scrollTo(0, y);
-    anim($('#ftext'), [{ opacity: 0, transform: 'perspective(900px) rotateX(14deg) translateY(8px)' }, { opacity: 1, transform: 'none' }], { duration: 380, easing: 'cubic-bezier(.16,1,.3,1)' });
+    anim($('#ftext'), [{ opacity: 0, transform: 'translateY(10px)' }, { opacity: 1, transform: 'none' }], { duration: 380, easing: 'cubic-bezier(.16,1,.3,1)' });
   }
 
   function postHTML(type, text, images, a) {
@@ -596,7 +620,7 @@
       catch (err) { $('#fdo', box).disabled = false; toast('Could not save on this device. Copy your text to keep it.', true); return; }
       Snd.play('file'); box.innerHTML = '';
       await flyToTab(type);
-      Snd.play('stamp'); FX.glow($('.rec-sheet')); const fb = $('#ffile'); if (fb) { fb.classList.add('done'); $('b', fb).textContent = 'Filed ✓'; }
+      Snd.play('stamp'); FX.glow($('.arch-card') || $('.rec-sheet')); const fb = $('#ffile'); if (fb) { fb.classList.add('done'); $('b', fb).textContent = 'Filed ✓'; }
       const st = $('#fstamp'); if (st) { st.hidden = false; st.innerHTML = `Filed ${fmtDate(new Date().toISOString())}<br>${esc(title)}`; anim(st, [{ opacity: 0, transform: 'rotate(-6deg) scale(1.4)' }, { opacity: 1, transform: 'rotate(-6deg) scale(1)' }], { duration: 340, easing: 'cubic-bezier(.2,1.4,.4,1)' }); }
       const n = (await S.listDocuments(type)).length;
       toast(`Filed in ${T.label} as version ${n}`, false, { label: 'Undo', run: async () => { await S.removeDocument(doc.id); toast('Filing undone.'); } });
