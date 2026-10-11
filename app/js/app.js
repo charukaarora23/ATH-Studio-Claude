@@ -45,11 +45,11 @@
   const TYPES = {
     bio: {
       label: 'Artist bio', short: 'Bio', idx: '01', titleHTML: 'Artist <em>bio</em>', line: 'Who you are, where you work and what you make.',
-      theme: { back: ['#770409', '#5D060C'], front: ['#BA2F30', '#AA0003', '#900206'], edge: '#5D060C', ink: '#FFD6DE', sub: '#FFF3B2', rim: '#FFA1C2', tabInk: '#FFD6DE' },
+      theme: { cv: '#AA0003', cvInk: '#FFD6DE', cvAccent: '#FFF3B2', spine: ['#3A0614', '#440818'], btn: '#AA0003', btnInk: '#FFD6DE', back: ['#770409', '#5D060C'], front: ['#BA2F30', '#AA0003', '#900206'], edge: '#5D060C', ink: '#FFD6DE', sub: '#FFF3B2', rim: '#FFA1C2', tabInk: '#FFD6DE' },
     },
     statement: {
       label: 'Artist statement', short: 'Statement', idx: '02', titleHTML: 'Artist <em>statement</em>', line: 'The work itself: subjects, materials, process and why.',
-      theme: { back: ['#02464A', '#01363A'], front: ['#0B6468', '#025054', '#02464A'], edge: '#012C2F', ink: '#F9ECE5', sub: '#D0D996', rim: '#D0D996', tabInk: '#F9ECE5' },
+      theme: { cv: '#025054', cvInk: '#F9ECE5', cvAccent: '#D0D996', spine: ['#012427', '#01363A'], btn: '#025054', btnInk: '#F9ECE5', back: ['#02464A', '#01363A'], front: ['#0B6468', '#025054', '#02464A'], edge: '#012C2F', ink: '#F9ECE5', sub: '#D0D996', rim: '#D0D996', tabInk: '#F9ECE5' },
     },
   };
   TYPES.files = { label: 'My files', theme: { back: ['#FEB0C9', '#FCCAD5'], front: ['#FBDDE8', '#FAD2E1', '#F3C3D5'], edge: '#D4839F', ink: '#6A0620', sub: '#AA0003', rim: '#FFFFFF', tabInk: '#6A0620' } };
@@ -78,7 +78,8 @@
     ],
   };
   // Poster colours alternate per question: light (tint ground) and dark (section ground). Same pairs every time, so each section is recognisable.
-  const POSTER = {
+  const POSTER = { // used by the square post
+
     bio: { light: { bg: '#FAD2E1', ink: '#6A0620', soft: '#8A2C45', ribbon: '#AA0003', band: '#6A0620', sheet: '#FBF6EF', btn: '#6A0620', btnInk: '#FAD2E1' },
            dark: { bg: '#6A0620', ink: '#FAD2E1', soft: '#F0B9CB', ribbon: '#FFA1C2', band: '#AA0003', sheet: '#FAD2E1', btn: '#FAD2E1', btnInk: '#6A0620' } },
     statement: { light: { bg: '#E3E8BE', ink: '#01363A', soft: '#2B5A5C', ribbon: '#025054', band: '#025054', sheet: '#FBF6EF', btn: '#025054', btnInk: '#F9ECE5' },
@@ -159,7 +160,7 @@
     const from = current; current = r;
     if (r === 'home') await renderHome(from);
     else if (r === 'files') await renderFiles();
-    else await renderWriting(r);
+    else { main.innerHTML = ''; await renderWriting(r, { fromHome: from === 'home' }); }
     if (from !== null) main.focus({ preventScroll: true });
   }
   window.addEventListener('hashchange', go);
@@ -223,93 +224,137 @@
     $$('.polaroid:not(.empty)', main).forEach((p) => tilt(p, 8));
   }
 
-  /* ---------------- poster: one question per screen ---------------- */
-  const RIBBONS = [
-    'M-80 760 C 260 420, 640 180, 900 360 S 760 860, 1060 640 S 1460 260, 1720 200',
-    'M520 -60 C 860 80, 1020 420, 780 560 S 420 320, 700 140 S 1320 520, 1720 380',
-    'M-120 520 C 220 180, 640 180, 860 400 S 920 820, 1240 640 S 1520 180, 1720 300',
-    'M180 980 C 300 620, 720 240, 1040 300 S 1320 720, 1720 660',
-  ];
-  const ribbonSVG = (i, color) => `<svg class="ribbon" viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid slice" aria-hidden="true"><path d="M0 900 L0 840 L980 740 L1060 900 Z" fill="var(--p-band)"/><path class="rb" d="${RIBBONS[i % RIBBONS.length]}" fill="none" stroke="${color}" stroke-width="16" stroke-linecap="round" vector-effect="non-scaling-stroke" pathLength="1"/></svg>`;
+  /* ---------------- writing: the open folder, one question per page ---------------- */
+  // Tabs group the questions so the folder edge stays calm: one tab per chapter, not per question.
+  const GROUPS = {
+    bio: [['You', 0], ['The work', 3], ['Story', 6], ['Images', 8], ['Your bio', 9]],
+    statement: [['The work', 0], ['Process', 2], ['Why', 4], ['Images', 6], ['Statement', 7]],
+  };
+  const TAB_TINTS = ['#FFD6DE', '#FFF3B2', '#D0D996', '#B7D9FF', '#FAD2E1'];
+  const groupOf = (type, step) => { const g = GROUPS[type]; let i = 0; g.forEach(([, s], n) => { if (step >= s) i = n; }); return i; };
+  const CLIP_SVG = '<svg class="clip" viewBox="0 0 18 52" aria-hidden="true"><defs><linearGradient id="wire6" x1="0" x2="1"><stop offset="0" stop-color="#8E8E92"/><stop offset=".45" stop-color="#F2F2F4"/><stop offset="1" stop-color="#77777C"/></linearGradient></defs><path d="M5 44 V9 a5 5 0 0 1 10 0 V40 a2.6 2.6 0 0 1 -5.2 0 V14" fill="none" stroke="rgba(42,10,18,.25)" stroke-width="2.4" transform="translate(.8 1.2)"/><path d="M5 44 V9 a5 5 0 0 1 10 0 V40 a2.6 2.6 0 0 1 -5.2 0 V14" fill="none" stroke="url(#wire6)" stroke-width="1.6" stroke-linecap="round"/></svg>';
 
   async function renderWriting(type, opts = {}) {
     const w = getWork(type);
     if (w.step >= QS[type].length) return renderFinal(type, opts);
-    const Q = QS[type]; const q = Q[w.step]; const a = w.answers; const P = POSTER[type][w.step % 2 === 0 ? 'light' : 'dark'];
-    const style = `--p-bg:${P.bg};--p-ink:${P.ink};--p-soft:${P.soft};--p-band:${P.band};--p-sheet:${P.sheet};--p-btn:${P.btn};--p-btn-ink:${P.btnInk}`;
-    const vk = voiceKey(a, type);
-    let control;
+    const T = TYPES[type]; const th = T.theme; const docs = await S.listDocuments(type);
+    const fresh = !$(`.spread-view[data-type="${type}"]`, main);
+    if (fresh) {
+      main.innerHTML = `<section class="spread-view" data-type="${type}" style="--btn:${th.btn};--btn-ink:${th.btnInk}">
+        <div class="crumbs"><a href="#/">← Studio</a><span class="mono">${docs.length} filed · saved on this device</span></div>
+        <div class="spread" style="--cv:${th.cv};--cv-ink:${th.cvInk};--cv-accent:${th.cvAccent};--spine-a:${th.spine[0]};--spine-b:${th.spine[1]}">
+          <span class="floor"></span>
+          <aside class="cover-in" aria-label="Your ${type === 'bio' ? 'bio' : 'statement'} so far"><span class="thumb"></span>
+            <p class="eyebrow">${T.idx} · ${esc(T.label)}</p>
+            <div class="bio-sheet">${CLIP_SVG}<div class="bs-head"><span>Your ${type === 'bio' ? 'bio' : 'statement'} so far</span><span id="bswc"></span></div><p class="sofar" id="sofar" aria-live="polite"></p><div class="bs-pin" id="bspin"></div></div>
+          </aside>
+          <div class="spine" aria-hidden="true"></div>
+          <div class="back">
+            <svg class="board" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true"><defs><linearGradient id="bk6" x1="0" x2="1"><stop offset="0" stop-color="${th.back[1]}"/><stop offset=".08" stop-color="${th.back[0]}"/><stop offset="1" stop-color="${th.back[1]}"/></linearGradient></defs><rect x="0" y="0" width="88.5" height="100" fill="url(#bk6)"/></svg>
+            <div class="stage"><span class="stack s1"></span><span class="stack s2"></span><article class="page" id="page"></article></div>
+            <div class="tabs" role="tablist" aria-label="Chapters" aria-orientation="vertical"></div>
+          </div>
+        </div></section>`;
+      const board = $('.board rect', main); const back = $('.back', main);
+      const fit = () => { const bw = back.clientWidth; if (bw) board.setAttribute('width', ((bw - 44) / bw * 100).toFixed(2)); };
+      fit(); new ResizeObserver(fit).observe(back);
+    }
+    renderTabs6(type); renderPage6(type, opts); drawSoFar(type, QS[type][w.step].k);
+    if (fresh) {
+      if (opts.fromHome && motion && innerWidth > 860) await openFlap6(type);
+      else anim($('.spread', main), [{ opacity: 0, transform: 'translateY(12px)' }, { opacity: 1, transform: 'none' }], { duration: 420, easing: 'cubic-bezier(.16,1,.3,1)' }).then(() => { const s = $('.spread', main); s && s.getAnimations().forEach((x) => x.cancel()); });
+    }
+  }
+
+  function renderTabs6(type) {
+    const w = getWork(type); const box = $('.tabs', main); const cur = groupOf(type, w.step);
+    box.innerHTML = GROUPS[type].map(([l, s], i) => `<button class="tab${i < cur ? ' done' : ''}" role="tab" aria-selected="${i === cur}" tabindex="${i === cur ? 0 : -1}" data-s="${s}" style="--tint:${TAB_TINTS[i]}"><span>${l}</span></button>`).join('');
+    $$('.tab', box).forEach((b, i, all) => {
+      b.addEventListener('click', () => stepTo(type, +b.dataset.s, +b.dataset.s < w.step));
+      b.addEventListener('keydown', (e) => { const j = e.key === 'ArrowDown' ? i + 1 : e.key === 'ArrowUp' ? i - 1 : null; if (j !== null && all[j]) { e.preventDefault(); all[j].focus(); } });
+    });
+  }
+
+  function renderPage6(type, opts = {}) {
+    const w = getWork(type); const Q = QS[type]; const q = Q[w.step]; const a = w.answers; const page = $('#page', main);
+    const vk = voiceKey(a, type); const v = a[q.k] || '';
+    let control = '';
     if (q.images) control = imagesPanelHTML(w);
     else {
-      const v = a[q.k] || '';
-      control = q.area
-        ? `<textarea class="p-input" id="pq" data-k="${q.k}" rows="2" placeholder="${esc(q.ph || 'Write here')}">${esc(v)}</textarea>`
+      control = q.area ? `<textarea class="p-input" id="pq" data-k="${q.k}" rows="2" placeholder="${esc(q.ph || 'Write here')}">${esc(v)}</textarea>`
         : `<input class="p-input" id="pq" data-k="${q.k}" type="text" value="${esc(v)}" placeholder="${esc(q.ph || '')}" autocomplete="off">`;
       if (q.second) control += `<input class="p-input p-second" data-k="${q.second.k}" type="text" value="${esc(a[q.second.k] || '')}" placeholder="${esc(q.second.ph)}" aria-label="${esc(q.second.ph)}" autocomplete="off">`;
     }
-    main.innerHTML = `<section class="poster" data-type="${type}" style="${style}">
-        ${ribbonSVG(w.step, P.ribbon)}
-        <p class="p-word" aria-hidden="true">${q.word}</p>
-        <div class="p-sheet" aria-live="polite"><div class="p-sheet-in"><p class="p-sheet-k">Your ${type === 'bio' ? 'bio' : 'statement'} so far</p><p class="p-sheet-t" id="sofar"></p></div></div>
-        <form class="p-panel" id="pform" novalidate>
-          <div class="p-meta"><span>Question ${w.step + 1} of ${Q.length}</span><span>${q.tab}${q.opt ? ' · optional' : ''}</span></div>
-          <div class="p-rule"><i style="width:${((w.step + 1) / Q.length) * 100}%"></i></div>
-          <h1 class="p-q" tabindex="-1"><label for="pq">${q.q}</label></h1>
-          <p class="p-help">${q.help}</p>
-          ${control}
-          ${q.voice ? `<p class="p-k">Write about me as</p><div class="p-chips" role="group" aria-label="Write about me as">${VOICES.map(([k, l]) => `<button type="button" class="p-chip" data-voice="${k}" aria-pressed="${vk === k}">${l}</button>`).join('')}</div><p class="p-note">Open calls usually want third person. Your own website can use I.</p>` : ''}
-          ${q.how ? `<details class="p-how"><summary>How to answer?</summary><p>${q.how}</p></details>` : ''}
-          ${q.tryList ? `<p class="p-k">Try</p><div class="p-chips">${q.tryList.map((t) => `<button type="button" class="p-chip" data-try="${t}" aria-pressed="${L.clean(a[q.k] || '').toLowerCase() === t}">${t}</button>`).join('')}</div>` : ''}
-          <div class="p-nav">${w.step > 0 ? '<button type="button" class="p-back" id="pback">← Back</button>' : '<a class="p-back" href="#/">← Studio</a>'}
-            <button type="submit" class="p-next">${w.step === Q.length - 1 ? `See my ${type === 'bio' ? 'bio' : 'statement'}` : q.opt && !answeredQ(q, a, w) ? 'Skip' : 'Next question'} →</button></div>
-        </form>
-      </section>`;
-    const poster = $('.poster', main);
-    drawSoFar(type, q.k);
-    bindPoster(type, poster, q);
-    // entrance: the word slides up, the ribbon draws, the sheet settles, the panel fades in
-    if (motion) {
-      anim($('.p-word', poster), [{ transform: 'translateY(30%)', opacity: 0 }, { transform: 'none', opacity: 1 }], { duration: 700, easing: 'cubic-bezier(.16,1,.3,1)' });
-      anim($('.rb', poster), [{ strokeDashoffset: 1 }, { strokeDashoffset: 0 }], { duration: 1400, easing: 'cubic-bezier(.65,0,.35,1)' });
-      $('.rb', poster).style.strokeDasharray = 1;
-      anim($('.p-sheet', poster), [{ transform: `translateY(${opts.back ? -40 : 60}px) rotate(-14deg)`, opacity: .4 }, { transform: 'rotate(-8deg)', opacity: 1 }], { duration: 800, easing: 'cubic-bezier(.16,1,.3,1)' }).then(() => { const s = $('.p-sheet', poster); s && s.getAnimations().forEach((x) => x.cancel()); });
-      anim($('.p-panel', poster), [{ transform: `translateX(${opts.back ? -24 : 24}px)`, opacity: 0 }, { transform: 'none', opacity: 1 }], { duration: 520, delay: 80, easing: 'cubic-bezier(.16,1,.3,1)' });
-    }
-    const first = $('#pq', poster) || $('.p-q', poster);
-    if (opts.focus !== false) setTimeout(() => first.focus({ preventScroll: true }), motion ? 300 : 0);
+    const last = w.step === Q.length - 1;
+    page.style.setProperty('--tint', TAB_TINTS[groupOf(type, w.step)]);
+    page.innerHTML = `<div class="ptop"><span class="chapter"><i></i>Question ${w.step + 1} of ${Q.length} · ${q.tab}</span><span>${q.opt ? 'Optional' : ''}</span></div>
+      <div class="qwrap">
+        <h1 class="q" tabindex="-1"><label for="pq">${esc(q.q)}</label></h1>
+        <p class="q-help">${q.help}</p>
+        ${control}
+        ${q.voice ? `<p class="p-k">Write about me as</p><div class="p-chips" role="group" aria-label="Write about me as">${VOICES.map(([k, l]) => `<button type="button" class="p-chip" data-voice="${k}" aria-pressed="${vk === k}">${l}</button>`).join('')}</div><p class="p-note">Open calls usually want third person. Your own website can use I.</p>` : ''}
+        ${q.tryList ? `<p class="p-k">Try</p><div class="p-chips">${q.tryList.map((t) => `<button type="button" class="p-chip" data-try="${t}" aria-pressed="${L.clean(v).toLowerCase() === t}">${t}</button>`).join('')}</div>` : ''}
+        ${q.how ? `<details class="p-how"><summary>How to answer?</summary><p>${q.how}</p></details>` : ''}
+      </div>
+      <div class="pfoot">${w.step > 0 ? '<button type="button" class="btn btn-line" id="pback">← Back</button>' : '<span></span>'}<button type="button" class="btn btn-primary" id="pnext"></button></div>`;
+    const next = $('#pnext', page);
+    const label = () => { next.textContent = (last ? `See my ${type === 'bio' ? 'bio' : 'statement'}` : q.opt && !answeredQ(q, a, w) ? 'Skip for now' : 'Next question') + ' →'; };
+    label();
+    $$('.p-input[data-k]', page).forEach((el) => {
+      el.addEventListener('input', () => { a[el.dataset.k] = el.value; autosave(type); drawSoFar(type, q.k); label(); $$('[data-try]', page).forEach((c) => c.setAttribute('aria-pressed', String(L.clean(el.value).toLowerCase() === c.dataset.try))); });
+      if (el.tagName === 'TEXTAREA') autoGrow(el); else el.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); next.click(); } });
+    });
+    $$('[data-try]', page).forEach((c) => c.addEventListener('click', () => { const inp = $('#pq', page); inp.value = c.dataset.try; inp.dispatchEvent(new Event('input')); inp.focus(); Snd.play('tick'); }));
+    $$('[data-voice]', page).forEach((c) => c.addEventListener('click', () => { const k = c.dataset.voice; if (k === 'first') a.person = 'first'; else { a.person = 'third'; a.pronouns = k; } $$('[data-voice]', page).forEach((x) => x.setAttribute('aria-pressed', String(x === c))); autosave(type); drawSoFar(type, q.k); Snd.play('tick'); }));
+    if (q.images) bindImagesPanel(type, page);
+    next.addEventListener('click', () => stepTo(type, w.step + 1));
+    const back = $('#pback', page); if (back) back.addEventListener('click', () => stepTo(type, w.step - 1, true));
+    if (opts.focus !== false) { const f = $('#pq', page) || $('.q', page); setTimeout(() => f.focus({ preventScroll: true }), motion ? 120 : 0); }
   }
   const answeredQ = (q, a, w) => (q.images ? w.images.length > 0 : !!L.clean(a[q.k] || ''));
 
+  // The bio sheet on the inside cover: every sentence so far, with the one you are writing now in italic.
   function drawSoFar(type, currentKey) {
     const w = getWork(type); const el = $('#sofar'); if (!el) return;
     const r = L.compose(w.answers, type);
-    if (!r.parts.length) { el.innerHTML = '<span class="p-ghost">Start typing. Your ' + (type === 'bio' ? 'bio' : 'statement') + ' appears here as you answer.</span>'; el.style.fontSize = ''; return; }
-    el.innerHTML = r.parts.map((p) => `<span class="${p.key === currentKey ? 'p-fresh' : ''}">${esc(p.text)}</span>`).join(' ');
-    el.style.fontSize = r.words > 90 ? 'clamp(15px,1.3vw,19px)' : r.words > 55 ? 'clamp(17px,1.6vw,24px)' : r.words > 25 ? 'clamp(19px,1.9vw,28px)' : '';
+    $('#bswc').textContent = r.words ? r.words + ' words' : '';
+    if (!r.parts.length) { el.innerHTML = `<span class="ghost">Answer the questions on the right. Your ${type === 'bio' ? 'bio' : 'statement'} is written here as you go, only from what you type.</span>`; }
+    else el.innerHTML = r.parts.map((p) => `<span class="${p.key === currentKey ? 'fresh' : ''}">${esc(p.text)}</span>`).join(' ');
+    el.style.fontSize = r.words > 110 ? '17px' : r.words > 70 ? '19px' : '';
+    const pin = $('#bspin'); const lead = w.images[0];
+    if (pin) { pin.innerHTML = lead ? `<figure class="polaroid small" style="--r:4deg"><span class="tape"></span><img data-img="${lead.id}" alt=""></figure>` : ''; hydrate(pin); }
   }
 
-  function bindPoster(type, poster, q) {
-    const w = getWork(type); const a = w.answers;
-    const nextLabel = () => { const b = $('.p-next', poster); if (!b) return; const last = w.step === QS[type].length - 1; b.textContent = (last ? `See my ${type === 'bio' ? 'bio' : 'statement'}` : q.opt && !answeredQ(q, a, w) ? 'Skip' : 'Next question') + ' →'; };
-    $$('.p-input', poster).forEach((el) => { el.addEventListener('input', () => { a[el.dataset.k] = el.value; autosave(type); drawSoFar(type, q.k); nextLabel(); $$('[data-try]', poster).forEach((c) => c.setAttribute('aria-pressed', String(L.clean(el.value).toLowerCase() === c.dataset.try))); }); if (el.tagName === 'TEXTAREA') autoGrow(el); });
-    $$('[data-try]', poster).forEach((c) => c.addEventListener('click', () => { const inp = $('#pq', poster); inp.value = c.dataset.try; inp.dispatchEvent(new Event('input')); inp.focus(); Snd.play('tick'); }));
-    $$('[data-voice]', poster).forEach((c) => c.addEventListener('click', () => { const k = c.dataset.voice; if (k === 'first') { a.person = 'first'; } else { a.person = 'third'; a.pronouns = k; } $$('[data-voice]', poster).forEach((x) => x.setAttribute('aria-pressed', String(x === c))); autosave(type); drawSoFar(type, q.k); Snd.play('tick'); }));
-    if (q.images) bindImagesPanel(type, poster);
-    $('#pform', poster).addEventListener('submit', (e) => { e.preventDefault(); stepTo(type, w.step + 1); });
-    const back = $('#pback', poster); if (back) back.addEventListener('click', () => stepTo(type, w.step - 1, true));
-    // 3D: the paper sheet leans toward the pointer
-    const sheet = $('.p-sheet', poster);
-    poster.addEventListener('pointermove', (e) => { if (!motion || e.pointerType !== 'mouse' || innerWidth <= 860) return; const x = e.clientX / innerWidth - 0.5; const y = e.clientY / innerHeight - 0.5; sheet.style.transform = `perspective(1400px) rotate(-8deg) rotateY(${x * 10}deg) rotateX(${-y * 8}deg) translateZ(0)`; });
-    poster.addEventListener('pointerleave', () => { sheet.style.transform = ''; });
-  }
-
+  // Page turn: the old page lifts away in 3D while the new one settles underneath.
   async function stepTo(type, i, back) {
-    const w = getWork(type); const n = QS[type].length;
-    if (i < 0) return;
-    const poster = $('.poster', main);
-    if (poster && motion) await anim($('.p-panel', poster), [{ opacity: 1, transform: 'none' }, { opacity: 0, transform: `translateX(${back ? 24 : -24}px)` }], { duration: 180, easing: 'ease-in' });
-    w.step = Math.min(i, n); autosave(type); Snd.play('turn');
-    await renderWriting(type, { back });
+    const w = getWork(type); const n = QS[type].length; if (i < 0) return;
+    const page = $('#page', main); const stage = $('.stage', main);
+    if (i >= n) { w.step = n; autosave(type); Snd.play('open'); return renderFinal(type); }
+    let ghost = null;
+    if (motion && page && stage) { ghost = page.cloneNode(true); ghost.removeAttribute('id'); ghost.inert = true; $$('[id]', ghost).forEach((x) => x.removeAttribute('id')); ghost.style.zIndex = 4; stage.appendChild(ghost); }
+    w.step = i; autosave(type); Snd.play('turn');
+    await renderWriting(type);
+    if (ghost) {
+      ghost.style.transformOrigin = back ? '100% 100%' : '0% 100%';
+      anim($('#page', main), [{ opacity: .4, transform: 'translateY(6px) scale(.992)' }, { opacity: 1, transform: 'none' }], { duration: 520, delay: 80, easing: 'cubic-bezier(.16,1,.3,1)' });
+      await anim(ghost, [{ transform: 'perspective(1600px) rotateY(0deg)', opacity: 1 }, { transform: `perspective(1600px) rotateY(${back ? 28 : -28}deg) translateX(${back ? 40 : -40}px)`, opacity: 0 }], { duration: 480, easing: 'cubic-bezier(.45,0,.2,1)' });
+      ghost.remove();
+    }
+  }
+
+  // Opening from the shelf: the front cover swings open on its spine.
+  async function openFlap6(type) {
+    const T = TYPES[type]; const th = T.theme; const spread = $('.spread', main); const back = $('.back', main); const cover = $('.cover-in', main);
+    const sr = spread.getBoundingClientRect(); const br = back.getBoundingClientRect();
+    const flap = document.createElement('div'); flap.className = 'flap';
+    flap.style.cssText = `left:${br.left - sr.left}px;width:${br.width - 44}px;--cv:${th.cv};--cv-ink:${th.cvInk}`;
+    flap.innerHTML = `<div class="face out"><span class="eyebrow" style="color:${th.cvAccent}">${T.idx} · ${esc(T.label)}</span><b>${T.titleHTML}</b></div><div class="face in"></div>`;
+    spread.appendChild(flap); cover.style.opacity = 0; $('#page', main).style.opacity = 0;
+    Snd.play('open');
+    await anim(flap, [{ transform: 'rotateY(0deg)' }, { transform: 'rotateY(-180deg)' }], { duration: 800, easing: 'cubic-bezier(.65,.05,.25,1)' });
+    cover.style.opacity = ''; flap.remove(); const pg = $('#page', main); pg.style.opacity = '';
+    anim(pg, [{ opacity: 0, transform: 'translateY(10px)' }, { opacity: 1, transform: 'none' }], { duration: 380, easing: 'cubic-bezier(.16,1,.3,1)' });
+    anim($('.bio-sheet', main), [{ opacity: 0, transform: 'translateY(30px) rotate(-3deg)' }, { opacity: 1, transform: 'rotate(-1deg)' }], { duration: 560, delay: 80, easing: 'cubic-bezier(.16,1,.3,1)' }).then(() => { const b = $('.bio-sheet', main); b && b.getAnimations().forEach((x) => x.cancel()); });
   }
 
   /* ---------------- images (question 'work' and the final page) ---------------- */
@@ -334,7 +379,7 @@
     return true;
   }
   function bindImagesPanel(type, poster) {
-    const w = getWork(type); const rerender = () => renderWriting(type, { focus: false }).then(() => { const p = $('.p-panel'); p && p.getAnimations().forEach((x) => x.finish()); });
+    const w = getWork(type); const rerender = () => renderWriting(type, { focus: false });
     hydrate(poster);
     const input = $('#f-images', poster); const drop = $('.p-drop', poster);
     input.addEventListener('change', async () => { if (await addImages(type, input.files)) { selImg = w.images.length - 1; rerender(); } });
@@ -360,7 +405,7 @@
     return c.toDataURL('image/jpeg', 0.85);
   }
 
-  /* ---------------- final page ---------------- */
+  /* ---------------- the finished record sheet ---------------- */
   const sig = (a) => JSON.stringify(a);
   const nameFor = (type, a) => L.clean(a.name || ((S.loadDraft('bio') || {}).answers || {}).name || '');
   const LEN_NOTE = { full: 'Everything you wrote.', short: 'Fits a 100-word limit.', brief: 'Fits a 50-word limit.', line: 'One sentence, for captions and profiles.' };
@@ -372,61 +417,60 @@
     return vs;
   }
   async function renderFinal(type, opts = {}) {
-    const T = TYPES[type]; const w = getWork(type); const a = w.answers; const word = type === 'bio' ? 'bio' : 'statement';
+    const T = TYPES[type]; const th = T.theme; const w = getWork(type); const a = w.answers; const word = type === 'bio' ? 'bio' : 'statement';
     const missing = (type === 'bio' ? ['name', 'role'] : ['subjects']).filter((k) => !L.clean(a[k]));
-    if (missing.length) { const i = QS[type].findIndex((q) => q.k === missing[0]); w.step = i; autosave(type); toast(type === 'bio' ? 'Your name and practice come first.' : 'The statement needs your subjects first.'); return renderWriting(type); }
+    if (missing.length) { w.step = QS[type].findIndex((q) => q.k === missing[0]); autosave(type); toast(type === 'bio' ? 'Your name and practice come first.' : 'The statement needs your subjects first.'); return renderWriting(type); }
     const vs = syncDrafts(type); autosave(type);
-    const d = w.drafts[w.variant]; const name = nameFor(type, a); const lead = w.images[0]; const vk = voiceKey(a, type); const year = new Date().getFullYear();
-    const roleLine = type === 'bio' ? [a.role ? L.sentence(L.clean(a.role)) : '', a.location ? 'Based in ' + esc(L.clean(a.location)) : ''].filter(Boolean).join('<br>') : (a.series ? esc(L.clean(a.series)) : 'Artist statement');
-    main.innerHTML = `<section class="final" data-type="${type}">
-      <svg class="ribbon f-ribbon" viewBox="0 0 1600 1800" preserveAspectRatio="xMidYMin slice" aria-hidden="true"><path class="rb" d="M260 -40 C 420 380, 1300 420, 1500 120 S 900 420, 900 560 S 1400 900, 1560 1300 S 900 1500, 560 1300 S 120 1100, 80 1400 S 300 1700, 460 1820" fill="none" stroke="var(--f-ribbon)" stroke-width="14" stroke-linecap="round" vector-effect="non-scaling-stroke" pathLength="1"/></svg>
-      <div class="f-top"><span>${esc(T.label)}</span><span>${year}</span></div>
-      <p class="f-eyebrow">Your ${word} is ready. Copy it, or change the length below.</p>
-      <h1 class="f-name" tabindex="-1">${esc(name || T.label)}</h1>
-      <p class="f-role">${roleLine}</p>
-      <figure class="f-img">${lead ? `<img data-img="${lead.id}" alt="${esc(capText(lead))}">${lead.sample ? '<span class="sample-tag">Sample</span>' : ''}` : `<label class="f-add" for="f-addimg"><input type="file" id="f-addimg" accept="image/*" multiple class="visually-hidden"><b>Add your work</b><span>An image makes the page</span></label>`}
-        ${lead && capText(lead) ? `<figcaption>${esc(capText(lead))}</figcaption>` : ''}</figure>
-      ${w.images.length > 1 ? `<div class="f-thumbs">${w.images.slice(1, 5).map((i) => `<figure><img data-img="${i.id}" alt="${esc(capText(i))}"></figure>`).join('')}</div>` : ''}
-      <label for="ftext" class="visually-hidden">Your ${word}, editable</label>
-      <textarea class="f-text" id="ftext" spellcheck="true">${esc(d.text)}</textarea>
-      <p class="f-count"><b id="fwc">${L.count(d.text)}</b> words. <span id="fnote">${d.edited ? 'Edited by you.' : LEN_NOTE[w.variant]}</span> <span class="f-demo" title="Prototype: template writer, not AI">Demo writer</span></p>
-      <div id="fnotice"></div>
-      <button class="f-copy" id="fcopy">Copy my ${word}</button>
-      <div class="f-controls">
-        <div class="f-seg" role="group" aria-label="Length">${vs.map((v) => `<button type="button" data-var="${v.key}" aria-pressed="${v.key === w.variant}">${v.label}</button>`).join('')}</div>
-        <div class="f-seg" role="group" aria-label="Voice">${[['she', 'She'], ['he', 'He'], ['they', 'They'], ['first', 'I']].map(([k, l]) => `<button type="button" data-voice="${k}" aria-pressed="${vk === k}">${l}</button>`).join('')}</div>
+    const docs = await S.listDocuments(type);
+    const d = w.drafts[w.variant]; const name = nameFor(type, a); const lead = w.images[0]; const vk = voiceKey(a, type);
+    const sub = type === 'bio' ? [a.role, a.location].map((x) => L.clean(x || '')).filter(Boolean).join(' · ') : (a.series ? L.clean(a.series) : 'Artist statement');
+    main.innerHTML = `<section class="final-view" data-type="${type}" style="--cv:${th.cv};--cv-ink:${th.cvInk};--cv-accent:${th.cvAccent};--btn:${th.btn};--btn-ink:${th.btnInk}">
+      <div class="crumbs"><a href="#/">← Studio</a><button class="btn-text btn" id="fedit">Edit answers</button></div>
+      <article class="rec-sheet">
+        <header class="rec-head">${CLIP_SVG}<span>${esc(T.label)} · Version ${docs.length + 1}</span><span>${fmtDate(new Date().toISOString())}</span></header>
+        <div class="rec-body${lead ? '' : ' no-img'}">
+          <figure class="rec-img">${lead ? `<img data-img="${lead.id}" alt="${esc(capText(lead))}">${lead.sample ? '<span class="sample-tag">Sample</span>' : ''}${capText(lead) ? `<figcaption>${esc(capText(lead))}</figcaption>` : ''}` : `<label class="rec-add" for="f-addimg"><input type="file" id="f-addimg" accept="image/*" multiple class="visually-hidden"><span class="drop-art" aria-hidden="true"><i></i><i></i><i></i></span><b>Add an image of your work</b><span>It sits beside your ${word}.</span></label>`}</figure>
+          <div class="rec-text">
+            <h1 class="rec-name" tabindex="-1">${esc(name || T.label)}</h1>
+            <p class="rec-sub">${esc(sub)}</p>
+            <label for="ftext" class="visually-hidden">Your ${word}, editable</label>
+            <textarea class="rec-words" id="ftext" spellcheck="true">${esc(d.text)}</textarea>
+            <p class="rec-note"><span id="fnote">${d.edited ? 'Edited by you.' : LEN_NOTE[w.variant]}</span> <span class="f-demo" title="Prototype: template writer, not AI">Demo writer</span></p>
+            <div id="fnotice"></div>
+          </div>
+        </div>
+        <div class="cells rec-cells"><div><span class="k">Length</span><div class="v">${esc(w.result.label)}</div></div><div><span class="k">Words</span><div class="v" id="fwc">${L.count(d.text)}</div></div><div><span class="k">Voice</span><div class="v">${vk === 'first' ? 'First person' : 'Third person'}</div></div><div><span class="k">Images</span><div class="v">${w.images.length || 'None'}</div></div></div>
+        <span class="stamp rec-stamp" id="fstamp" hidden></span>
+      </article>
+      <div class="rec-controls">
+        <button class="btn btn-primary rec-copy" id="fcopy">Copy my ${word}</button>
+        <div class="seg rec-seg" role="group" aria-label="Length">${vs.map((v) => `<button type="button" data-var="${v.key}" aria-pressed="${v.key === w.variant}">${v.label}</button>`).join('')}</div>
+        <div class="seg rec-seg" role="group" aria-label="Voice">${[['she', 'She'], ['he', 'He'], ['they', 'They'], ['first', 'I']].map(([k, l]) => `<button type="button" data-voice="${k}" aria-pressed="${vk === k}">${l}</button>`).join('')}</div>
       </div>
-      <div class="f-links"><button class="f-link" id="ffile">File this version</button><button class="f-link" id="fpost">Square post</button><button class="f-link" id="ftxt">Download .txt</button><button class="f-link" id="fedit">Edit answers</button></div>
+      <div class="rec-links"><button class="btn-text btn" id="ffile">File this version</button><button class="btn-text btn" id="fpost">Square post</button><button class="btn-text btn" id="ftxt">Download .txt</button></div>
       <div id="ffiling"></div>
-      <p class="f-meta">${[name, type === 'bio' ? a.role : 'Artist statement', a.location, year].map((x) => L.clean(String(x || ''))).filter(Boolean).map(esc).join(' · ')}</p>
     </section>`;
-    const root = $('.final', main); hydrate(root);
+    const root = $('.final-view', main); hydrate(root);
     const ta = $('#ftext', root); autoGrow(ta);
-    const notice = () => { const r = w.result; $('#fnotice', root).innerHTML = d.edited && d.basis !== sig(a) ? '<p class="f-warn">Your answers changed after you edited this. <button class="f-link" id="frebuild">Rebuild from answers</button></p>' : r.omitted.length && !d.edited && w.variant !== 'line' ? `<p class="f-quiet">Left out to fit: ${r.omitted.join(', ')}.</p>` : ''; const rb = $('#frebuild', root); if (rb) rb.addEventListener('click', () => { if (rb.dataset.armed) { delete w.drafts[w.variant]; renderFinal(type, { focus: false }); return; } rb.dataset.armed = '1'; rb.textContent = 'Yes, replace my edits'; }); };
+    const notice = () => { const r = w.result; $('#fnotice', root).innerHTML = d.edited && d.basis !== sig(a) ? '<p class="rec-warn">Your answers changed after you edited this. <button class="btn-text btn" id="frebuild">Rebuild from answers</button></p>' : r.omitted.length && !d.edited && w.variant !== 'line' ? `<p class="rec-warn">Left out to fit: ${r.omitted.join(', ')}.</p>` : ''; const rb = $('#frebuild', root); if (rb) rb.addEventListener('click', () => { if (rb.dataset.armed) { delete w.drafts[w.variant]; renderFinal(type, { quiet: true }); return; } rb.dataset.armed = '1'; rb.textContent = 'Yes, replace my edits'; }); };
     notice();
     ta.addEventListener('input', () => { d.text = ta.value; d.edited = true; $('#fwc', root).textContent = L.count(ta.value); $('#fnote', root).textContent = 'Edited by you.'; autosave(type); });
     $('#fcopy', root).addEventListener('click', () => copyText(ta.value));
     $$('[data-var]', root).forEach((b) => b.addEventListener('click', () => { w.variant = b.dataset.var; autosave(type); Snd.play('turn'); swapText(type); }));
     $$('[data-voice]', root).forEach((b) => b.addEventListener('click', () => { const k = b.dataset.voice; if (k === 'first') a.person = 'first'; else { a.person = 'third'; a.pronouns = k; } autosave(type); Snd.play('tick'); swapText(type); }));
     $('#ftxt', root).addEventListener('click', () => downloadTxt(ta.value, (name || T.label) + ' ' + w.result.label + '.txt'));
-    $('#fedit', root).addEventListener('click', () => { w.step = 0; autosave(type); renderWriting(type); });
+    $('#fedit', root).addEventListener('click', () => { w.step = 0; autosave(type); main.innerHTML = ''; renderWriting(type); });
     $('#fpost', root).addEventListener('click', () => openPost(type));
     $('#ffile', root).addEventListener('click', () => openFiling(type));
-    const add = $('#f-addimg', root); if (add) add.addEventListener('change', async () => { if (await addImages(type, add.files)) renderFinal(type, { focus: false }); });
-    const fig = $('.f-img', root); if (fig && lead) tilt(fig, 6);
-    if (motion && !opts.quiet) {
-      $('.rb', root).style.strokeDasharray = 1;
-      anim($('.rb', root), [{ strokeDashoffset: 1 }, { strokeDashoffset: 0 }], { duration: 2200, easing: 'cubic-bezier(.65,0,.35,1)' });
-      anim($('.f-name', root), [{ opacity: 0, transform: 'translateY(30px)', letterSpacing: '.02em' }, { opacity: 1, transform: 'none', letterSpacing: '-.035em' }], { duration: 900, easing: 'cubic-bezier(.16,1,.3,1)' });
-      anim(fig, [{ opacity: 0, transform: 'perspective(1200px) rotateX(18deg) translateY(30px)' }, { opacity: 1, transform: 'none' }], { duration: 900, delay: 200, easing: 'cubic-bezier(.16,1,.3,1)' }).then(() => fig.getAnimations().forEach((x) => x.cancel()));
-    }
-    if (opts.focus !== false) $('.f-name', root).focus({ preventScroll: true });
+    const add = $('#f-addimg', root); if (add) add.addEventListener('change', async () => { if (await addImages(type, add.files)) renderFinal(type, { quiet: true }); });
+    const rec = $('.rec-sheet', root); tilt(rec, 2);
+    if (motion && !opts.quiet) anim(rec, [{ opacity: 0, transform: 'perspective(1600px) rotateX(14deg) translateY(60px)' }, { opacity: 1, transform: 'none' }], { duration: 760, easing: 'cubic-bezier(.16,1,.3,1)' }).then(() => rec.getAnimations().forEach((x) => x.cancel()));
+    if (!opts.quiet) $('.rec-name', root).focus({ preventScroll: true });
   }
-  // Length or voice changed: re-render the text and controls in place, with a soft paper flip.
   async function swapText(type) {
     const ta = $('#ftext'); if (motion && ta) await anim(ta, [{ opacity: 1, transform: 'none' }, { opacity: 0, transform: 'perspective(900px) rotateX(-12deg) translateY(-6px)' }], { duration: 160, easing: 'ease-in' });
-    const y = scrollY; await renderFinal(type, { focus: false, quiet: true }); scrollTo(0, y);
-    const nt = $('#ftext'); anim(nt, [{ opacity: 0, transform: 'perspective(900px) rotateX(12deg) translateY(6px)' }, { opacity: 1, transform: 'none' }], { duration: 360, easing: 'cubic-bezier(.16,1,.3,1)' });
+    const y = scrollY; await renderFinal(type, { quiet: true }); scrollTo(0, y);
+    anim($('#ftext'), [{ opacity: 0, transform: 'perspective(900px) rotateX(12deg) translateY(6px)' }, { opacity: 1, transform: 'none' }], { duration: 360, easing: 'cubic-bezier(.16,1,.3,1)' });
   }
 
   function postHTML(type, text, images, a) {
@@ -477,6 +521,7 @@
       catch (err) { $('#fdo', box).disabled = false; toast('Could not save on this device. Copy your text to keep it.', true); return; }
       Snd.play('file'); box.innerHTML = '';
       await flyToTab(type);
+      const st = $('#fstamp'); if (st) { st.hidden = false; st.innerHTML = `Filed ${fmtDate(new Date().toISOString())}<br>${esc(title)}`; anim(st, [{ opacity: 0, transform: 'rotate(-6deg) scale(1.4)' }, { opacity: 1, transform: 'rotate(-6deg) scale(1)' }], { duration: 340, easing: 'cubic-bezier(.2,1.4,.4,1)' }); }
       const n = (await S.listDocuments(type)).length;
       toast(`Filed in ${T.label} as version ${n}`, false, { label: 'Undo', run: async () => { await S.removeDocument(doc.id); toast('Filing undone.'); } });
     });
