@@ -82,7 +82,25 @@
     return { text, words, omitted, over: !!max && words > max, used: chosen.map((p) => p.key) };
   }
 
-  const api = { clean, count, sentence, list, compose, thirdS };
+
+  // Outcome variations: the same facts at different lengths. Whole optional sentences are dropped, never rewritten.
+  const VARIANTS = {
+    bio: [['full', 'Full', 0], ['short', 'Short', 100], ['brief', 'Brief', 50], ['line', 'One line', 1]],
+    statement: [['full', 'Full', 0], ['short', 'Short', 150], ['brief', 'Brief', 75], ['line', 'One line', 1]],
+  };
+  function variants(answers, type) {
+    const a = answers || {}; const list = VARIANTS[type === 'statement' ? 'statement' : 'bio'];
+    const out = []; let prev = null;
+    for (const [key, label, lim] of list) {
+      const limit = key === 'full' ? (Number(a.limit) || 0) : lim;
+      const r = compose({ ...a, limit }, type);
+      out.push({ key, label, limit: key === 'line' ? 0 : limit, ...r, over: key === 'line' ? false : r.over, same: !!prev && prev.text === r.text });
+      prev = r;
+    }
+    return out;
+  }
+
+  const api = { clean, count, sentence, list, compose, thirdS, variants };
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
   else root.StudioLogic = api;
 })(typeof globalThis !== 'undefined' ? globalThis : this);

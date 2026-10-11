@@ -1,6 +1,6 @@
 const { test } = require('node:test');
 const assert = require('node:assert/strict');
-const { compose, count, list } = require('../js/logic.js');
+const L = require('../js/logic.js'); const { compose, count, list } = L;
 
 const sana = {
   name: 'Sana Iqbal', role: 'textile artist', pronouns: 'she', person: 'third',
@@ -66,4 +66,14 @@ test('helpers', () => {
   assert.equal(count(' one  two\nthree '), 3);
   assert.equal(list('a, b, c'), 'a, b and c');
   assert.equal(list('a and b'), 'a and b');
+});
+
+test('variants: same facts, shorter lengths, one line keeps only the identity sentence', () => {
+  const a = { name: 'Maya Rao', role: 'textile artist', location: 'Leeds', subjects: 'weather, inherited furniture', materials: 'linen, rust dye', detail: 'Each piece is left outside for a season.', background: 'Studied weaving in Bradford.', series: 'Salt Rooms', person: 'third' };
+  const v = L.variants(a, 'bio');
+  assert.deepStrictEqual(v.map((x) => x.key), ['full', 'short', 'brief', 'line']);
+  assert.ok(v[0].words >= v[2].words && v[2].words >= v[3].words);
+  assert.strictEqual(v[3].used.length, 1);
+  assert.strictEqual(v[3].over, false);
+  for (const x of v) assert.ok(a.name && x.text.includes('Maya Rao'));
 });

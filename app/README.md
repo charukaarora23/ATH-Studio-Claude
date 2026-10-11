@@ -1,33 +1,35 @@
-# My Studio prototype (v3)
+# My Studio prototype (v4)
 
-Buildless HTML, CSS and JavaScript. Serve this folder with any static server, for example `python3 -m http.server`, and open `index.html`.
+Buildless HTML, CSS and JavaScript. Serve this folder with any static server (for example `python3 -m http.server`) and open `index.html`.
 
-## Design rules in this version
+v4 keeps the v2 paper folder experience and builds on it.
 
-- **Space.** One focal object per screen (a 3D folder) and one column of questions. Spacing follows an 8px scale, with 64 to 128px between sections.
-- **Two typefaces.** Hanken Grotesk for the interface (it stands in for Nord and Proxima Nova until the licensed files arrive). Newsreader only for the artist's own words: answers, drafts and filed text.
-- **One colour per section.** The same colour is used for the section's nav dot, its 3D folder, its buttons and its file cards.
-  - Bio: Chilli `#AA0003`, with Ballet sheets.
-  - Statement: Petrol `#025054`, with Pistachio sheets.
-  - My files: Peony pink `#F7C3D6` with Burgundy text, and Lemon sheets.
-- **Light and dark.** The choice is in Settings. It starts from the system setting.
+## What v4 adds
+
+- **More space.** Wider margins, larger gaps between sections, roomier pages and notes, and one Desk menu in the header for theme, sound and motion.
+- **3D paper.**
+  - Folders on the shelf lean toward the pointer, and their front cover opens on its hinge when you hover.
+  - The draft, the press page and the filed outcome tilt slightly toward the pointer.
+  - Filing sends the page into the pocket in 3D.
+  - Turning off "Motion and 3D" in the Desk menu stops all of this.
+- **Images of the work.**
+  - A new Images page, before the outcome, takes up to 8 photos by drag and drop or file picker.
+  - Each photo is downscaled on the device and taped to a card with a title, year and medium. Captions are only what the artist writes.
+  - The first photo is the lead image. Images are pinned on the inside cover, shown on the "On the wall" section of the home page, and appear on file sleeves.
+  - "Try sample images" adds generated placeholders that are labelled Sample.
+- **Outcome variations.** The final page offers four lengths: Full, Short, Brief and One line. Each length uses the same facts and drops whole optional sentences. Each length can be edited separately.
+- **Outcome layouts.** Each length can be seen as Text, as a Press page (lead image, name, practice, text, captions and an image strip) or as a 1:1 Square post.
+- **Filing.** Filing keeps the chosen length, its layout and the images.
+- **Colour per section.** Bio is Chilli, Statement is Petrol and My files is Peony. Each colour is carried through the index tab, the folder, the cover, the buttons and the dialog.
 
 ## Files
 
 | Path | What it does |
 | --- | --- |
-| `js/logic.js` | The writing rules: compose, word count, fitting a limit. Tested in `tests/`. |
-| `js/service.js` | A mock service that stores data on this device. Replace it with real API calls that use the same method shapes. No secrets belong in the frontend. |
-| `js/scene3d.js` | The 3D folders, built with Three.js. They are decorative: every action also exists as a normal button, and the canvas is hidden from screen readers. If WebGL is not available, flat CSS folders are shown instead. |
+| `js/logic.js` | The writing rules: `compose()` and `variants()`. Tested in `tests/`. |
+| `js/service.js` | The mock service. Documents and drafts are kept in `localStorage`, and images in IndexedDB. Replace it with real API calls that use the same method shapes. Never put secrets in the frontend. |
 | `js/app.js` | Views and interactions. |
-| `js/sound.js` | Optional paper sounds, synthesised in the browser. They are placeholders. |
-| `vendor/three.min.js` | Three.js r149 (MIT licence, see `three-LICENSE`). |
-| `tools/bundle.cjs` | Builds one self-contained HTML file for hosted previews. |
-
-## 3D interactions
-
-- **Home:** the folders lean toward the pointer. Hovering over a folder, or focusing its label, lifts it and opens its cover. Clicking opens the cover fully and the camera moves in.
-- **Writing view:** drag the folder to turn it. More sheets appear as you answer. When you file, the page flies into the folder, the cover closes and the folder hops.
-- **Reduced motion:** turning motion off in Settings, or a reduced-motion setting on the device, stops the idle movement and the camera moves.
+| `js/sound.js` | Optional paper sounds. These are placeholders. |
+| `tools/bundle.cjs` | Builds a single HTML file for hosted previews. |
 
 Run the tests with `node --test app/tests/logic.test.cjs`.
