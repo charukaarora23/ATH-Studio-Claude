@@ -119,6 +119,16 @@
       SERIES_Q, IMAGES_Q,
     ],
   };
+  const SUGGEST = {
+    location: { pick: ['London', 'New York', 'Lagos', 'Mumbai', 'Berlin'] },
+    subjects: { multi: true, pick: ['memory', 'home', 'the body', 'landscape', 'ritual', 'migration', 'family'] },
+    materials: { pick: ['oil on canvas', 'natural dye', 'found objects', 'clay', 'film photography', 'textile'] },
+    detail: { start: ['Every piece begins with ', 'I only work ', 'Each work takes '] },
+    background: { start: ['I studied ', 'My work has been shown at ', 'I am self-taught and '] },
+    series: { pick: [] },
+    question: { start: ['What happens when ', 'Why do we ', 'How does a place '] },
+    motivation: { start: ['I keep coming back to this because ', 'Making by hand lets me ', 'I want people to '] },
+  };
   // Poster colours alternate per question: light (tint ground) and dark (section ground). Same pairs every time, so each section is recognisable.
   const POSTER = { // used by the square post
 
@@ -316,6 +326,10 @@
       if (q.second) control += `<input class="answer second" data-k="${q.second.k}" type="text" value="${esc(a[q.second.k] || '')}" placeholder="${esc(q.second.ph)}" aria-label="${esc(q.second.ph)}" autocomplete="off">`;
     }
     const last = w.step === Q.length - 1;
+    const sg = SUGGEST[q.k] || {};
+    const cur = L.clean(v).toLowerCase(); const curList = cur.split(',').map((x) => x.trim());
+    const sgHTML = sg.start ? sg.start.map((t) => `<button type="button" data-start="${esc(t)}">${esc(t.trim())}…</button>`).join('')
+      : (sg.pick || []).map((t) => `<button type="button" data-pick="${esc(t)}" aria-pressed="${sg.multi ? curList.includes(t) : cur === t}">${esc(t)}</button>`).join('');
     const opts2 = q.voice ? VOICES.map(([k, l]) => `<button type="button" data-voice="${k}" aria-pressed="${vk === k}">${l}</button>`).join('')
       : q.tryList ? q.tryList.map((t) => `<button type="button" data-try="${t}" aria-pressed="${L.clean(v).toLowerCase() === t}">${t}</button>`).join('') : '';
     page.innerHTML = `<div class="qm"><span>© ${esc(T.label)}</span><span>${pad2(w.step + 1)} / ${pad2(Q.length)}</span></div>
@@ -324,19 +338,41 @@
         <h1 class="q" tabindex="-1"><label for="pq">${esc(q.q)}</label></h1>
         <p class="qnote">${q.help}</p>
         ${control}
+        ${q.images ? '' : '<p class="qframe" id="qframe"></p>'}
         ${opts2 ? `<div class="qopts"><span>${q.voice ? 'Write about me as' : 'Or pick one'}</span><div>${opts2}</div></div>` : ''}
+        ${sgHTML ? `<div class="qopts sg"><span>${sg.start ? 'Start with' : sg.multi ? 'Add one or more' : 'Suggestions'}</span><div>${sgHTML}</div></div>` : ''}
         ${q.how ? `<details class="how"><summary>How to answer</summary><p>${esc(q.how)}</p></details>` : ''}
       </div>
       <div class="qnav">${w.step > 0 ? '<button type="button" class="qback" id="pback">← Back</button>' : '<a class="qback" href="#/">← Studio</a>'}<button type="button" class="qnext" id="pnext"></button></div>`;
     const next = $('#pnext', page);
+    // fill in the blank: the sentence this answer becomes, with the answer (or a blank) in place
+    const FK = { name: 'role', location: 'role', seriesLine: 'series' };
+    const frame = () => {
+      const el = $('#qframe', page); if (!el) return;
+      const val = L.clean(a[q.k] || ''); const BL = '\u2009____________\u2009';
+      const r = L.compose({ ...a, [q.k]: val || BL }, type);
+      const part = r.parts.find((x) => x.key === (FK[q.k] || q.k)); if (!part) { el.innerHTML = ''; return; }
+      let h = esc(part.text);
+      h = val ? h.replace(esc(val), `<b>${esc(val)}</b>`) : h.replace(BL, '<span class="blank"></span>');
+      el.innerHTML = `<span class="qf-k">It reads</span> “${h}”`;
+    };
+    frame();
+    $$('[data-pick]', page).forEach((c) => c.addEventListener('click', () => {
+      const inp = $('#pq', page); const t = c.dataset.pick;
+      if (sg.multi) { let list = L.clean(inp.value).split(',').map((x) => x.trim()).filter(Boolean); list = list.includes(t) ? list.filter((x) => x !== t) : [...list, t]; inp.value = list.join(', '); }
+      else inp.value = t;
+      inp.dispatchEvent(new Event('input')); inp.focus(); Snd.play('pop');
+      $$('[data-pick]', page).forEach((b) => b.setAttribute('aria-pressed', String(sg.multi ? inp.value.split(',').map((x) => x.trim()).includes(b.dataset.pick) : inp.value === b.dataset.pick)));
+    }));
+    $$('[data-start]', page).forEach((c) => c.addEventListener('click', () => { const inp = $('#pq', page); inp.value = c.dataset.start; inp.dispatchEvent(new Event('input')); inp.focus(); inp.setSelectionRange(inp.value.length, inp.value.length); Snd.play('pop'); }));
     const label = () => { next.innerHTML = `${last ? `See my ${type === 'bio' ? 'bio' : 'statement'}` : q.opt && !answeredQ(q, a, w) ? 'Skip' : 'Next'} <span>→</span>`; };
     label();
     $$('.answer[data-k]', page).forEach((el) => {
-      el.addEventListener('input', () => { a[el.dataset.k] = el.value; autosave(type); drawSoFar(type, q.k); label(); Snd.play('scratch'); $$('[data-try]', page).forEach((c) => c.setAttribute('aria-pressed', String(L.clean(el.value).toLowerCase() === c.dataset.try))); });
+      el.addEventListener('input', () => { a[el.dataset.k] = el.value; autosave(type); drawSoFar(type, q.k); label(); frame(); Snd.play('scratch'); $$('[data-try]', page).forEach((c) => c.setAttribute('aria-pressed', String(L.clean(el.value).toLowerCase() === c.dataset.try))); });
       if (el.tagName === 'TEXTAREA') autoGrow(el); else el.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); next.click(); } });
     });
     $$('[data-try]', page).forEach((c) => c.addEventListener('click', () => { const inp = $('#pq', page); inp.value = c.dataset.try; inp.dispatchEvent(new Event('input')); inp.focus(); Snd.play('pop'); }));
-    $$('[data-voice]', page).forEach((c) => c.addEventListener('click', () => { const k = c.dataset.voice; if (k === 'first') a.person = 'first'; else { a.person = 'third'; a.pronouns = k; } $$('[data-voice]', page).forEach((x) => x.setAttribute('aria-pressed', String(x === c))); autosave(type); drawSoFar(type, q.k); Snd.play('pop'); }));
+    $$('[data-voice]', page).forEach((c) => c.addEventListener('click', () => { const k = c.dataset.voice; if (k === 'first') a.person = 'first'; else { a.person = 'third'; a.pronouns = k; } $$('[data-voice]', page).forEach((x) => x.setAttribute('aria-pressed', String(x === c))); autosave(type); drawSoFar(type, q.k); frame(); Snd.play('pop'); }));
     if (q.images) bindImagesPanel(type, page);
     next.addEventListener('click', () => stepTo(type, w.step + 1));
     const back = $('#pback', page); if (back) back.addEventListener('click', () => stepTo(type, w.step - 1, true));
@@ -517,19 +553,18 @@
     $('#fpost', root).addEventListener('click', () => openPost(type));
     $('#ffile', root).addEventListener('click', () => openFiling(type));
     $('#fother', root).addEventListener('click', () => { Snd.play('open'); location.hash = '#/' + other; });
-    // scroll: the document rises out of the folder and stops fully out, then the page moves on to the next steps
-    const sc = $('.fin-scroll', root);
-    const rise = () => { const rr = sc.getBoundingClientRect(); const span = Math.max(1, rr.height - innerHeight); const p = Math.min(1, Math.max(0, -rr.top / span)); root.style.setProperty('--p', p.toFixed(3)); };
-    const big = innerWidth > 860 && motion;
-    FX.onScroll(big ? rise : null); root.style.setProperty('--p', big ? '0' : '1'); root.classList.toggle('scrolly', big);
-    if (!opts.quiet) {
+    // the paper rises out of the folder on its own once the light is on
+    const big = innerWidth > 860;
+    root.classList.toggle('scrolly', big);
+    const riseTo = (to, dur) => new Promise((res) => { if (!motion) { root.style.setProperty('--p', String(to)); return res(); } const from = parseFloat(root.style.getPropertyValue('--p')) || 0; const t0 = performance.now(); (function st(t) { const k = Math.min(1, (t - t0) / dur); const e = k < .5 ? 4 * k * k * k : 1 - Math.pow(-2 * k + 2, 3) / 2; root.style.setProperty('--p', (from + (to - from) * e).toFixed(4)); if (k < 1) requestAnimationFrame(st); else res(); })(t0); });
+    if (opts.quiet || !big) root.style.setProperty('--p', '1');
+    else {
+      root.style.setProperty('--p', '0');
       $('.fin-title', root).focus({ preventScroll: true }); scrollTo(0, 0);
       if (opts.celebrate) await FX.lightsOn();
-      if (motion) {
-        anim($('.fin-title', root), [{ opacity: 0, transform: 'translateY(20px)' }, { opacity: 1, transform: 'none' }], { duration: 900, easing: 'cubic-bezier(.16,1,.3,1)' });
-        anim($('.fin-folder', root), [{ opacity: 0, transform: 'translateY(60px)' }, { opacity: 1, transform: 'none' }], { duration: 1000, delay: 120, easing: 'cubic-bezier(.16,1,.3,1)' });
-        if (big) anim(doc, [{ translate: '0 0' }, { translate: '0 -36px', offset: .5 }, { translate: '0 0' }], { duration: 1300, delay: 1100, easing: 'cubic-bezier(.45,0,.2,1)' });
-      }
+      if (motion) anim($('.fin-title', root), [{ opacity: 0, transform: 'translateY(20px)' }, { opacity: 1, transform: 'none' }], { duration: 800, easing: 'cubic-bezier(.16,1,.3,1)' });
+      await wait(450); Snd.play('file');
+      await riseTo(1, 1800);
     }
   }
   async function swapText(type) {

@@ -1124,3 +1124,20 @@ body.writing { overflow: hidden; } @media (max-width: 860px) { body.writing { ov
 .fin.scrolly .fin-doc { position: absolute; left: 4%; right: 4%; bottom: 110px; margin: 0; padding-bottom: 32px; transform: translateY(calc((1 - var(--p)) * (100% - 90px))); }
 .fin.scrolly .ff-front { height: 130px; }
 .fin.scrolly .fin-doc .rec-stamp { bottom: 40px; }
+
+/* ================= v15: fill in the blank, paper rises on its own ================= */
+.qframe { margin-top: 2.4vh; font: italic 400 clamp(17px, 1.25vw, 20px)/1.45 var(--f-soft); color: var(--burgundy); opacity: .85; min-height: 1.45em; }
+.qframe .qf-k { margin-right: 8px; font: 400 10px/1 var(--f-mono); font-style: normal; letter-spacing: .14em; text-transform: uppercase; color: var(--chilli); vertical-align: 2px; }
+.qframe b { font-weight: 400; color: var(--chilli); background: linear-gradient(transparent 62%, rgba(255, 214, 222, .9) 62%); }
+.qframe .blank { display: inline-block; width: 7em; height: 1px; border-bottom: 1.5px solid var(--chilli); vertical-align: -2px; animation: blink 1.4s ease-in-out infinite; }
+@keyframes blink { 50% { opacity: .35; } }
+.qopts.sg { margin-top: 2.2vh; }
+.qopts.sg button { font-size: 17px; }
+.qopts.sg [data-start] { font-style: italic; }
+html[data-theme="dark"] .qframe { color: var(--peony); } html[data-theme="dark"] .qframe b, html[data-theme="dark"] .qframe .qf-k { color: var(--hot-rose); }
+/* finish: the stage is one screen; no scroll needed to bring the paper out */
+.fin.scrolly .fin-scroll { height: calc(100dvh - 52px); }
+.fin.scrolly .fin-stage { position: relative; top: 0; }
+.fin.scrolly .fin-cue { display: none; }
+.fin.scrolly .fin-title { opacity: 1; }
+@media (min-width: 861px) and (max-height: 760px) { .qframe { margin-top: 1.4vh; font-size: 16px; } .qopts.sg { margin-top: 1.4vh; } .qopts.sg button { font-size: 16px; } }
