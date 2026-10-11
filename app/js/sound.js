@@ -39,7 +39,7 @@
     stick: () => { tap(); tone(520, 0.12, { type: 'sine', gain: 0.08 }); },
     stamp: () => { noise(0.08, { from: 600, to: 200, gain: 0.3 }); tap(); },
     scratch: () => { const n = Date.now(); if (n - lastScratch < 140) return; lastScratch = n; noise(0.06, { from: 5200, to: 3600, q: 2, gain: 0.05 }); },
-    lights: () => { tone(2600, 0.02, { type: 'square', gain: 0.05 }); tap(); [261.63, 329.63, 392, 523.25].forEach((f, i) => tone(f, 2.2, { type: 'sine', gain: 0.06, delay: 0.3 + i * 0.12 })); },
+    lights: () => { tone(2600, 0.02, { type: 'square', gain: 0.05 }); tap(); [261.63, 329.63, 392, 523.25].forEach((f, i) => tone(f, 2.6, { type: 'sine', gain: 0.07, delay: 0.25 + i * 0.1 })); [523.25, 659.25, 783.99, 1046.5, 1318.5].forEach((f, i) => tone(f, 0.9, { type: 'triangle', gain: 0.09, delay: 0.7 + i * 0.12 })); },
     chime: () => { [523.25, 659.25, 783.99, 1046.5].forEach((f, i) => tone(f, 0.7, { gain: 0.12, delay: i * 0.09 })); },
   };
   root.StudioSound = {

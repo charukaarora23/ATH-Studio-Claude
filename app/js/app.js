@@ -67,15 +67,15 @@
       // depth layers: positive numbers move against the pointer, so near things move more than far things
       parallax(list) { layers = list.filter(([el]) => el); if (!motion) layers.forEach(([el]) => { el.style.translate = ''; }); },
       // a warm light washing over an element: the quiet reward for copy and file
-      glow(el) { if (!motion || !el) return; anim(el, [{ boxShadow: '0 0 0 0 rgba(255,161,194,0)' }, { boxShadow: '0 0 80px 24px rgba(255,161,194,.5)', offset: .35 }, { boxShadow: '0 0 0 0 rgba(255,161,194,0)' }], { duration: 1200, easing: 'ease-out' }).then(() => el.getAnimations().forEach((x) => x.cancel())); },
+      glow(el) { if (!motion || !el) return; anim(el, [{ boxShadow: '0 0 0 0 rgba(255,236,150,0)' }, { boxShadow: '0 0 110px 36px rgba(255,236,150,.75)', offset: .35 }, { boxShadow: '0 0 0 0 rgba(255,236,150,0)' }], { duration: 1200, easing: 'ease-out' }).then(() => el.getAnimations().forEach((x) => x.cancel())); },
       // the finish: the room is in burgundy shadow, a switch clicks, and warm light opens out from above
       lightsOn() {
         Snd.play('lights');
         if (!motion) return Promise.resolve();
         const el = document.createElement('div'); el.className = 'lights'; document.body.appendChild(el);
         return new Promise((res) => {
-          const t0 = performance.now(); const D = 1300; let done = false;
-          (function step(t) { const k = Math.max(0, Math.min(1, (t - t0 - 280) / D)); const e = 1 - Math.pow(1 - k, 3); el.style.setProperty('--r', (e * 150) + 'vmax'); if (k > 0.55 && !done) { done = true; res(); } if (k < 1) requestAnimationFrame(step); else el.remove(); })(t0);
+          const t0 = performance.now(); const D = 1900; let done = false;
+          (function step(t) { const k = Math.max(0, Math.min(1, (t - t0 - 280) / D)); const e = 1 - Math.pow(1 - k, 3); el.style.setProperty('--r', (e * 90) + 'vmax'); el.style.opacity = k < .45 ? 1 : String(Math.max(0, 1 - (k - .45) / .55)); if (k > 0.55 && !done) { done = true; res(); } if (k < 1) requestAnimationFrame(step); else el.remove(); })(t0);
         });
       },
       onScroll(fn) { scrollFn = fn; if (fn) fn(scrollY); },
@@ -305,7 +305,7 @@
   }
 
   function renderPage6(type, opts = {}) {
-    const w = getWork(type); const Q = QS[type]; const q = Q[w.step]; const a = w.answers; const page = $('#page', main);
+    const T = TYPES[type]; const w = getWork(type); const Q = QS[type]; const q = Q[w.step]; const a = w.answers; const page = $('#page', main);
     const vk = voiceKey(a, type); const v = a[q.k] || '';
     let control = '';
     if (q.images) control = imagesPanelHTML(w);
@@ -315,20 +315,20 @@
       if (q.second) control += `<input class="answer second" data-k="${q.second.k}" type="text" value="${esc(a[q.second.k] || '')}" placeholder="${esc(q.second.ph)}" aria-label="${esc(q.second.ph)}" autocomplete="off">`;
     }
     const last = w.step === Q.length - 1;
-    page.innerHTML = `<div class="ptop"><span>Question ${w.step + 1} of ${Q.length}</span><span>${q.tab}${q.opt ? ' · optional' : ''}</span></div>
-      <div class="prule"><i style="width:${((w.step + 1) / Q.length) * 100}%"></i></div>
-      <div class="qwrap">
+    const opts2 = q.voice ? VOICES.map(([k, l]) => `<button type="button" data-voice="${k}" aria-pressed="${vk === k}">${l}</button>`).join('')
+      : q.tryList ? q.tryList.map((t) => `<button type="button" data-try="${t}" aria-pressed="${L.clean(v).toLowerCase() === t}">${t}</button>`).join('') : '';
+    page.innerHTML = `<div class="qm"><span>© ${esc(T.label)}</span><span>${pad2(w.step + 1)} / ${pad2(Q.length)}</span></div>
+      <div class="qbody">
+        <div class="qrule"><i>${esc(q.tab)}</i><span>${q.opt ? 'Optional' : ''}</span></div>
         <h1 class="q" tabindex="-1"><label for="pq">${esc(q.q)}</label></h1>
-        <p class="q-help">${q.help}</p>
+        <p class="qnote">${q.help}</p>
         ${control}
-        ${q.voice ? `<p class="p-k">Write about me as</p><div class="p-chips" role="group" aria-label="Write about me as">${VOICES.map(([k, l]) => `<button type="button" class="p-chip" data-voice="${k}" aria-pressed="${vk === k}">${l}</button>`).join('')}</div>` : ''}
-        ${q.tryList ? `<p class="p-k">Try</p><div class="p-chips">${q.tryList.map((t) => `<button type="button" class="p-chip" data-try="${t}" aria-pressed="${L.clean(v).toLowerCase() === t}">${t}</button>`).join('')}</div>` : ''}
-        ${q.how ? `<details class="how"><summary>How to answer?</summary><p>${esc(q.how)}</p></details>` : ''}
+        ${opts2 ? `<div class="qopts"><span>${q.voice ? 'Write about me as' : 'Or pick one'}</span><div>${opts2}</div></div>` : ''}
+        ${q.how ? `<details class="how"><summary>How to answer</summary><p>${esc(q.how)}</p></details>` : ''}
       </div>
-      <div class="pnav">${w.step > 0 ? '<button type="button" class="pback" id="pback">← Back</button>' : '<span></span>'}<button type="button" class="pnext" id="pnext"></button></div>
-      <span class="corner" aria-hidden="true"></span>`;
+      <div class="qnav">${w.step > 0 ? '<button type="button" class="qback" id="pback">← Back</button>' : '<a class="qback" href="#/">← Studio</a>'}<button type="button" class="qnext" id="pnext"></button></div>`;
     const next = $('#pnext', page);
-    const label = () => { next.textContent = (last ? `See my ${type === 'bio' ? 'bio' : 'statement'}` : q.opt && !answeredQ(q, a, w) ? 'Skip' : 'Next question') + ' →'; };
+    const label = () => { next.innerHTML = `${last ? `See my ${type === 'bio' ? 'bio' : 'statement'}` : q.opt && !answeredQ(q, a, w) ? 'Skip' : 'Next'} <span>→</span>`; };
     label();
     $$('.answer[data-k]', page).forEach((el) => {
       el.addEventListener('input', () => { a[el.dataset.k] = el.value; autosave(type); drawSoFar(type, q.k); label(); Snd.play('scratch'); $$('[data-try]', page).forEach((c) => c.setAttribute('aria-pressed', String(L.clean(el.value).toLowerCase() === c.dataset.try))); });
@@ -336,7 +336,6 @@
     });
     $$('[data-try]', page).forEach((c) => c.addEventListener('click', () => { const inp = $('#pq', page); inp.value = c.dataset.try; inp.dispatchEvent(new Event('input')); inp.focus(); Snd.play('pop'); }));
     $$('[data-voice]', page).forEach((c) => c.addEventListener('click', () => { const k = c.dataset.voice; if (k === 'first') a.person = 'first'; else { a.person = 'third'; a.pronouns = k; } $$('[data-voice]', page).forEach((x) => x.setAttribute('aria-pressed', String(x === c))); autosave(type); drawSoFar(type, q.k); Snd.play('pop'); }));
-    const how = $('.how', page); if (how) how.addEventListener('toggle', () => Snd.play('peel'));
     if (q.images) bindImagesPanel(type, page);
     next.addEventListener('click', () => stepTo(type, w.step + 1));
     const back = $('#pback', page); if (back) back.addEventListener('click', () => stepTo(type, w.step - 1, true));
@@ -464,112 +463,80 @@
     w.result = vs.find((v) => v.key === w.variant); w.vs = vs;
     return vs;
   }
+  // The finish: the document slides up out of its folder as you scroll, then one row of next steps.
   async function renderFinal(type, opts = {}) {
     const T = TYPES[type]; const th = T.theme; const w = getWork(type); const a = w.answers; const word = type === 'bio' ? 'bio' : 'statement';
     const missing = (type === 'bio' ? ['name', 'role'] : ['subjects']).filter((k) => !L.clean(a[k]));
     if (missing.length) { w.step = QS[type].findIndex((q) => q.k === missing[0]); autosave(type); toast(type === 'bio' ? 'Your name and practice come first.' : 'The statement needs your subjects first.'); main.innerHTML = ''; return renderWriting(type); }
     const vs = syncDrafts(type); autosave(type);
     const docs = await S.listDocuments(type);
-    const d = w.drafts[w.variant]; const name = nameFor(type, a); const imgs = w.images; const lead = imgs[0]; const vk = voiceKey(a, type); const year = new Date().getFullYear();
-    const parts = (name || T.label).split(' '); const n1 = parts.slice(0, Math.ceil(parts.length / 2)).join(' '); const n2 = parts.slice(Math.ceil(parts.length / 2)).join(' ');
-    const role = type === 'bio' ? L.clean(a.role || '') : L.clean(a.subjects || '').split(',')[0];
-    const place = L.clean(a.location || '');
-    const pill = (i, cls = '') => imgs[i] ? `<span class="epill img ${cls}"><img data-img="${imgs[i].id}" alt=""></span>` : (i === 0 ? `<span class="epill line ${cls}"></span>` : '');
+    const d = w.drafts[w.variant]; const name = nameFor(type, a); const first = name.split(' ')[0]; const vk = voiceKey(a, type);
     const other = type === 'bio' ? 'statement' : 'bio'; const otherLabel = other === 'bio' ? 'artist bio' : 'artist statement';
-    main.innerHTML = `<section class="ed" data-type="${type}" style="--cv:${th.cv};--cv-ink:${th.cvInk};--cv-accent:${th.cvAccent};--btn:${th.btn};--btn-ink:${th.btnInk}">
-      <header class="ed-hero">
-        <div class="ed-meta"><span>Arts to Hearts<br><i>my studio</i></span><span>${esc(T.label)}<br>${year}</span></div>
-        <p class="ed-eyebrow">Your ${word} is ready. Copy it, or shape it below.</p>
-        <h1 class="ed-name" tabindex="-1"><span class="n1">${esc(n1)}</span>${n2 ? `<span class="n2">${esc(n2)}</span>` : ''}</h1>
-        <p class="ed-line">${role ? `<em>${esc(role)}</em>` : ''} ${pill(0, 'p0')} ${pill(1, 'p1 short')} ${place ? `<span>based in</span> ${pill(2, 'p2')} <span>${esc(place)}</span>` : `<span>${type === 'bio' ? 'artist' : 'statement'}</span> ${pill(2, 'p2')}`}</p>
-        <span class="ed-cue" aria-hidden="true">Read it ↓</span>
-      </header>
-
-      <article class="ed-split rec-sheet">
-        <div class="ed-words">
-          <div class="ed-row"><span>© ${esc(T.label)}</span><span>Version ${docs.length + 1}</span></div>
-          <div class="ed-row thin"><i>In your words</i><span>${fmtDate(new Date().toISOString())}</span></div>
-          <p class="ed-note">Every fact here is one you wrote. Click the text to edit it.</p>
-          <label for="ftext" class="visually-hidden">Your ${word}, editable</label>
-          <textarea class="ed-text" id="ftext" spellcheck="true">${esc(d.text)}</textarea>
-          <div id="fnotice"></div>
-        </div>
-        <figure class="ed-photo">
-          ${lead ? `<img data-img="${lead.id}" alt="${esc(capText(lead))}">${lead.sample ? '<span class="sample-tag">Sample</span>' : ''}` : `<label class="ed-add" for="f-addimg"><input type="file" id="f-addimg" accept="image/*" multiple class="visually-hidden"><span class="epill line big"></span><b>Add a photo of your work</b><span>It sits beside your words.</span></label>`}
-          <span class="ed-count"><i></i><b id="fwc">${L.count(d.text)}</b> words</span>
-          <button class="ed-copy" id="fcopy">Copy my<br><em>${word}</em></button>
-          ${lead && capText(lead) ? `<figcaption>${esc(capText(lead))}</figcaption>` : ''}
-        </figure>
-      </article>
-
-      <ol class="ed-notes">
-        <li><span class="nn">1</span><span class="nk">Length</span><span class="nv">${vs.map((v) => `<button type="button" data-var="${v.key}" aria-pressed="${v.key === w.variant}">${v.label}</button>`).join('')}</span><span class="nd" id="fnote">${d.edited ? 'Edited by you' : LEN_NOTE[w.variant]}</span></li>
-        <li><span class="nn">2</span><span class="nk">Voice</span><span class="nv">${[['she', 'She'], ['he', 'He'], ['they', 'They'], ['first', 'I']].map(([k, l]) => `<button type="button" data-voice="${k}" aria-pressed="${vk === k}">${l}</button>`).join('')}</span><span class="nd">Open calls usually want third person.</span></li>
-        <li><span class="nn">3</span><span class="nk">Take it</span><span class="nv"><button type="button" id="ftxt">Download .txt</button><button type="button" id="fpost">Square post</button><button type="button" id="fedit">Edit answers</button></span><span class="nd">Template writer · demo</span></li>
-      </ol>
-
-      <section class="ed-archive" aria-labelledby="arch-h">
-        <div class="arch-card">
-          <div class="arch-top"><span class="arch-k">Keep this version</span><b id="arch-h">archive</b></div>
-          <div class="arch-grid">
-            <div class="cell wide"><span>Name</span><i>${esc(name || '—')}</i></div>
-            <div class="cell wide"><span>${type === 'bio' ? 'Practice' : 'Subjects'}</span><i>${esc(type === 'bio' ? (a.role || '—') : (a.subjects || '—'))}</i></div>
-            <div class="cell"><span>Length</span><i>${esc(w.result.label)}</i></div>
-            <div class="cell"><span>Voice</span><i>${vk === 'first' ? 'First person' : 'Third person'}</i></div>
+    main.innerHTML = `<section class="fin" data-type="${type}" style="--cv:${th.cv};--cv-ink:${th.cvInk};--cv-accent:${th.cvAccent}">
+      <div class="fin-bar"><button class="fin-edit" id="fedit">← Edit answers</button><span>${esc(T.label)} · version ${docs.length + 1}</span></div>
+      <div class="fin-scroll">
+        <div class="fin-stage">
+          <h1 class="fin-title" tabindex="-1">Your ${word} is <em>ready</em>${first ? `, ${esc(first)}` : ''}.</h1>
+          <div class="fin-folder">
+            <span class="ff-back"></span>
+            <article class="fin-doc">
+              <div class="qm"><span>© ${esc(T.label)}</span><span>${fmtDate(new Date().toISOString())}</span></div>
+              <div class="qrule"><i>In your words</i><span id="fwc">${L.count(d.text)} words</span></div>
+              <label for="ftext" class="visually-hidden">Your ${word}, editable</label>
+              <textarea class="fin-text" id="ftext" spellcheck="true">${esc(d.text)}</textarea>
+              <div id="fnotice"></div>
+              <div class="fin-opts">
+                <div><span>Length</span>${vs.map((v) => `<button type="button" data-var="${v.key}" aria-pressed="${v.key === w.variant}">${v.label}</button>`).join('')}</div>
+                <div><span>Voice</span>${[['she', 'She'], ['he', 'He'], ['they', 'They'], ['first', 'I']].map(([k, l]) => `<button type="button" data-voice="${k}" aria-pressed="${vk === k}">${l}</button>`).join('')}</div>
+              </div>
+              <button class="fin-copy" id="fcopy">Copy my ${word}</button>
+              <span class="stamp rec-stamp" id="fstamp" hidden></span>
+            </article>
+            <span class="ff-front"><b>${T.titleHTML}</b></span>
           </div>
-          <div class="arch-sleeve">${CLIP_SVG}<div class="sleeve-in">${lead ? `<img data-img="${lead.id}" alt="">` : `<p>${esc(d.text.split('. ')[0])}.</p>`}</div></div>
-          <button class="arch-file" id="ffile"><b>File in your ${esc(T.short)} folder</b> →</button>
-          <span class="stamp rec-stamp" id="fstamp" hidden></span>
-          <div id="ffiling"></div>
         </div>
-        <button class="ed-next" id="fother"><span>Next</span><b>Write your <em>${otherLabel}</em> →</b></button>
-      </section>
+      </div>
+      <div class="fin-next">
+        <button class="fn-row" id="ffile"><span>01</span><b>File this version</b><i>In your ${esc(T.short)} folder</i><em>→</em></button>
+        <button class="fn-row" id="fother"><span>02</span><b>Write your ${otherLabel}</b><i>${other === 'statement' ? '7 short questions' : '9 short questions'}</i><em>→</em></button>
+        <div id="ffiling"></div>
+        <p class="fin-links"><button id="ftxt">Download .txt</button><button id="fpost">Square post</button><span class="f-demo">Template writer · demo</span></p>
+      </div>
     </section>`;
-    const root = $('.ed', main); hydrate(root);
+    const root = $('.fin', main);
     const ta = $('#ftext', root); autoGrow(ta);
-    const notice = () => { const r = w.result; $('#fnotice', root).innerHTML = d.edited && d.basis !== sig(a) ? '<p class="ed-warn">Your answers changed after you edited this. <button class="ed-link" id="frebuild">Rebuild from answers</button></p>' : r.omitted.length && !d.edited && w.variant !== 'line' ? `<p class="ed-warn">Left out to fit: ${r.omitted.join(', ')}.</p>` : ''; const rb = $('#frebuild', root); if (rb) rb.addEventListener('click', () => { if (rb.dataset.armed) { delete w.drafts[w.variant]; renderFinal(type, { quiet: true }); return; } rb.dataset.armed = '1'; rb.textContent = 'Yes, replace my edits'; }); };
-    notice();
-    ta.addEventListener('input', () => { d.text = ta.value; d.edited = true; $('#fwc', root).textContent = L.count(ta.value); $('#fnote', root).textContent = 'Edited by you'; autosave(type); Snd.play('scratch'); });
-    const split = $('.ed-split', root);
-    $('#fcopy', root).addEventListener('click', () => { copyText(ta.value); Snd.play('pop'); FX.glow(split); });
+    const r = w.result;
+    $('#fnotice', root).innerHTML = d.edited && d.basis !== sig(a) ? '<p class="fin-warn">Your answers changed after you edited this. <button id="frebuild">Rebuild from answers</button></p>' : r.omitted.length && !d.edited && w.variant !== 'line' ? `<p class="fin-warn">Left out to fit: ${r.omitted.join(', ')}.</p>` : '';
+    const rb = $('#frebuild', root); if (rb) rb.addEventListener('click', () => { if (rb.dataset.armed) { delete w.drafts[w.variant]; renderFinal(type, { quiet: true }); return; } rb.dataset.armed = '1'; rb.textContent = 'Yes, replace my edits'; });
+    ta.addEventListener('input', () => { d.text = ta.value; d.edited = true; $('#fwc', root).textContent = L.count(ta.value) + ' words'; autosave(type); Snd.play('scratch'); });
+    const doc = $('.fin-doc', root);
+    $('#fcopy', root).addEventListener('click', () => { copyText(ta.value); Snd.play('chime'); FX.glow(doc); });
     $$('[data-var]', root).forEach((b) => b.addEventListener('click', () => { w.variant = b.dataset.var; autosave(type); Snd.play('turn'); swapText(type); }));
     $$('[data-voice]', root).forEach((b) => b.addEventListener('click', () => { const k = b.dataset.voice; if (k === 'first') a.person = 'first'; else { a.person = 'third'; a.pronouns = k; } autosave(type); Snd.play('pop'); swapText(type); }));
-    $('#ftxt', root).addEventListener('click', () => downloadTxt(ta.value, (name || T.label) + ' ' + w.result.label + '.txt'));
+    $('#ftxt', root).addEventListener('click', () => downloadTxt(ta.value, (name || T.label) + ' ' + r.label + '.txt'));
     $('#fedit', root).addEventListener('click', () => { w.step = 0; autosave(type); main.innerHTML = ''; renderWriting(type); });
     $('#fpost', root).addEventListener('click', () => openPost(type));
     $('#ffile', root).addEventListener('click', () => openFiling(type));
     $('#fother', root).addEventListener('click', () => { Snd.play('open'); location.hash = '#/' + other; });
-    const add = $('#f-addimg', root); if (add) add.addEventListener('change', async () => { if (await addImages(type, add.files)) renderFinal(type, { quiet: true }); });
-    // scroll: the name parts drift apart, the pills slide, the photo moves slower than its frame
-    const n1e = $('.n1', root); const n2e = $('.n2', root); const line = $('.ed-line', root); const ph = $('.ed-photo img', root);
-    FX.onScroll((y) => {
-      if (!motion) return; const k = Math.min(y, 700);
-      n1e.style.transform = `translate3d(${-k * 0.25}px, 0, 0)`; if (n2e) n2e.style.transform = `translate3d(${k * 0.25}px, 0, 0)`;
-      line.style.transform = `translate3d(${k * 0.1}px, ${-k * 0.05}px, 0)`;
-      if (ph) { const r = ph.parentElement.getBoundingClientRect(); ph.style.transform = `translate3d(0, ${(r.top - innerHeight / 2) * -0.08}px, 0) scale(1.12)`; }
-    });
-    if (motion && 'IntersectionObserver' in window) {
-      const io = new IntersectionObserver((es) => es.forEach((e) => { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } }), { threshold: 0.15 });
-      $$('.ed-notes li, .arch-card, .ed-next', root).forEach((el, i) => { el.classList.add('rise'); el.style.transitionDelay = (i % 3) * 90 + 'ms'; io.observe(el); });
-    }
+    // scroll: the document rises out of the folder; the folder sinks away
+    const sc = $('.fin-scroll', root); const front = $('.ff-front', root); const back = $('.ff-back', root);
+    const rise = () => { const rr = sc.getBoundingClientRect(); const span = Math.max(1, rr.height - innerHeight); const p = Math.min(1, Math.max(0, -rr.top / span)); root.style.setProperty('--p', p.toFixed(3)); };
+    FX.onScroll(motion ? rise : null); if (!motion) root.style.setProperty('--p', '1');
     if (!opts.quiet) {
-      $('.ed-name', root).focus({ preventScroll: true }); scrollTo(0, 0);
-      if (opts.celebrate) { document.body.classList.add('lit'); await FX.lightsOn(); }
+      $('.fin-title', root).focus({ preventScroll: true }); scrollTo(0, 0);
+      if (opts.celebrate) await FX.lightsOn();
       if (motion) {
-        // the poster assembles: the name halves slide in from opposite edges, the line follows, the pills open with the work inside
-        anim(n1e, [{ opacity: 0, transform: 'translateX(-30vw)' }, { opacity: 1, transform: 'none' }], { duration: 1100, easing: 'cubic-bezier(.16,1,.3,1)' });
-        if (n2e) anim(n2e, [{ opacity: 0, transform: 'translateX(30vw)' }, { opacity: 1, transform: 'none' }], { duration: 1100, delay: 120, easing: 'cubic-bezier(.16,1,.3,1)' });
-        $$('.ed-line > *', root).forEach((el, i) => anim(el, [{ opacity: 0, transform: 'translateY(30px)' }, { opacity: 1, transform: 'none' }], { duration: 700, delay: 500 + i * 80, easing: 'cubic-bezier(.16,1,.3,1)' }));
-        $$('.ed-line .epill', root).forEach((el, i) => anim(el, [{ clipPath: 'inset(0 50% 0 50% round 999px)' }, { clipPath: 'inset(0 0 0 0 round 999px)' }], { duration: 900, delay: 800 + i * 140, easing: 'cubic-bezier(.65,0,.35,1)' }));
-        anim($('.ed-eyebrow', root), [{ opacity: 0, letterSpacing: '.4em' }, { opacity: 1, letterSpacing: '.14em' }], { duration: 1000, delay: 300, easing: 'ease-out' });
-        anim($('.ed-meta', root), [{ opacity: 0 }, { opacity: 1 }], { duration: 800, delay: 900 });
+        anim($('.fin-title', root), [{ opacity: 0, transform: 'translateY(24px)' }, { opacity: 1, transform: 'none' }], { duration: 900, easing: 'cubic-bezier(.16,1,.3,1)' });
+        anim($('.fin-folder', root), [{ opacity: 0, transform: 'translateY(80px)' }, { opacity: 1, transform: 'none' }], { duration: 1000, delay: 150, easing: 'cubic-bezier(.16,1,.3,1)' });
+        // a first peek: the document lifts a little on its own, so you know to scroll
+        anim(doc, [{ translate: '0 0' }, { translate: '0 -40px', offset: .5 }, { translate: '0 0' }], { duration: 1400, delay: 1100, easing: 'cubic-bezier(.45,0,.2,1)' });
       }
     }
   }
   async function swapText(type) {
-    const ta = $('#ftext'); if (motion && ta) await anim(ta, [{ opacity: 1, transform: 'none' }, { opacity: 0, transform: 'translateY(-10px)' }], { duration: 160, easing: 'ease-in' });
+    const ta = $('#ftext'); if (motion && ta) await anim(ta, [{ opacity: 1 }, { opacity: 0 }], { duration: 140 });
     const y = scrollY; await renderFinal(type, { quiet: true }); scrollTo(0, y);
-    anim($('#ftext'), [{ opacity: 0, transform: 'translateY(10px)' }, { opacity: 1, transform: 'none' }], { duration: 380, easing: 'cubic-bezier(.16,1,.3,1)' });
+    anim($('#ftext'), [{ opacity: 0, transform: 'translateY(8px)' }, { opacity: 1, transform: 'none' }], { duration: 360, easing: 'cubic-bezier(.16,1,.3,1)' });
   }
 
   function postHTML(type, text, images, a) {
@@ -620,7 +587,7 @@
       catch (err) { $('#fdo', box).disabled = false; toast('Could not save on this device. Copy your text to keep it.', true); return; }
       Snd.play('file'); box.innerHTML = '';
       await flyToTab(type);
-      Snd.play('stamp'); FX.glow($('.arch-card') || $('.rec-sheet')); const fb = $('#ffile'); if (fb) { fb.classList.add('done'); $('b', fb).textContent = 'Filed ✓'; }
+      Snd.play('stamp'); FX.glow($('.fin-doc')); const fb = $('#ffile'); if (fb) { fb.classList.add('done'); $('b', fb).textContent = 'Filed ✓'; }
       const st = $('#fstamp'); if (st) { st.hidden = false; st.innerHTML = `Filed ${fmtDate(new Date().toISOString())}<br>${esc(title)}`; anim(st, [{ opacity: 0, transform: 'rotate(-6deg) scale(1.4)' }, { opacity: 1, transform: 'rotate(-6deg) scale(1)' }], { duration: 340, easing: 'cubic-bezier(.2,1.4,.4,1)' }); }
       const n = (await S.listDocuments(type)).length;
       toast(`Filed in ${T.label} as version ${n}`, false, { label: 'Undo', run: async () => { await S.removeDocument(doc.id); toast('Filing undone.'); } });
