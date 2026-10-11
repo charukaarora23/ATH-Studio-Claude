@@ -1,4 +1,4 @@
-# My Studio prototype (v8)
+# My Studio prototype (v9)
 
 Buildless HTML, CSS and JavaScript. Serve this folder with any static server (for example `python3 -m http.server`) and open `index.html`.
 
@@ -62,3 +62,19 @@ Run the tests with `node --test app/tests/logic.test.cjs`.
   - Confetti, and a Done! sticker.
   - "What next?" offers three paths: file it, write the other document, or make a square post.
 - **Sounds:** flip, pop, peel, stick, stamp, a soft scratch while typing, and a chime. Turning off Motion stops all movement; sounds stay off until the artist turns them on.
+
+## v9: hand-drawn and lights on
+
+- **Hand-drawn kit:**
+  - The ATH heart is drawn with a rough SVG filter.
+  - Notes, stickers and the "What next" cards use Caveat, a provisional stand-in for ATH hand-lettering (OFL licence, in `assets/fonts`).
+- **Portfolio collage:** "Your work" is an open pink folder. Images are taped in at angles, with handwritten captions, a heart doodle and a squiggle, and each one moves at its own parallax depth.
+- **Torch:**
+  - A spotlight: the room dims away from the hand, and a warm core glows under it.
+- **Finish:**
+  - The room goes dark, a switch clicks, and light opens out from a lamp.
+  - The lead photo fills the screen and settles from a blur. The artist's name is set very large over it, and the photo parallaxes as you scroll.
+  - The record sheet rises over the photo. A heart "done!" sticker lands on it.
+  - Hand-drawn "so, what next?" cards follow.
+  - A warm glow on the sheet replaces confetti.
+- **Sounds:** paper rustle with flutter, a pencil scratch, kalimba plucks, a sticker thump, a stamp, and a light switch followed by a warm chord.
