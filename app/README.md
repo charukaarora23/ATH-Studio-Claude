@@ -1,4 +1,4 @@
-# My Studio prototype (v8)
+# My Studio prototype (v10)
 
 Buildless HTML, CSS and JavaScript. Serve this folder with any static server (for example `python3 -m http.server`) and open `index.html`.
 
