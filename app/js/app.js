@@ -45,21 +45,21 @@
   const TYPES = {
     bio: {
       label: 'Artist bio', short: 'Bio', idx: '01', titleHTML: 'Artist <em>bio</em>', line: 'Who you are, where you work and what you make.',
-      theme: { cv: '#AA0003', cvInk: '#FFD6DE', cvAccent: '#FFF3B2', spine: ['#3A0614', '#440818'], btn: '#AA0003', btnInk: '#FFD6DE', back: ['#770409', '#5D060C'], front: ['#BA2F30', '#AA0003', '#900206'], edge: '#5D060C', ink: '#FFD6DE', sub: '#FFF3B2', rim: '#FFA1C2', tabInk: '#FFD6DE' },
+      theme: { cv: '#6A0620', cvInk: '#FAD2E1', cvAccent: '#FFA1C2', sheet: '#FAD2E1', spine: ['#2A0410', '#440818'], btn: '#6A0620', btnInk: '#FAD2E1', back: ['#50081A', '#3E0716'], front: ['#7E1634', '#6A0620', '#5A061C'], edge: '#3A0614', ink: '#FAD2E1', sub: '#FFA1C2', rim: '#FFA1C2', tabInk: '#FAD2E1' },
     },
     statement: {
       label: 'Artist statement', short: 'Statement', idx: '02', titleHTML: 'Artist <em>statement</em>', line: 'The work itself: subjects, materials, process and why.',
-      theme: { cv: '#025054', cvInk: '#F9ECE5', cvAccent: '#D0D996', spine: ['#012427', '#01363A'], btn: '#025054', btnInk: '#F9ECE5', back: ['#02464A', '#01363A'], front: ['#0B6468', '#025054', '#02464A'], edge: '#012C2F', ink: '#F9ECE5', sub: '#D0D996', rim: '#D0D996', tabInk: '#F9ECE5' },
+      theme: { cv: '#AA0003', cvInk: '#FFD6DE', cvAccent: '#FFD6DE', sheet: '#FFD6DE', spine: ['#4A050A', '#770409'], btn: '#AA0003', btnInk: '#FFD6DE', back: ['#8A0307', '#6E0409'], front: ['#BD2326', '#AA0003', '#930206'], edge: '#5D060C', ink: '#FFD6DE', sub: '#FFD6DE', rim: '#FFA1C2', tabInk: '#FFD6DE' },
     },
   };
-  TYPES.files = { label: 'My files', theme: { back: ['#FEB0C9', '#FCCAD5'], front: ['#FBDDE8', '#FAD2E1', '#F3C3D5'], edge: '#D4839F', ink: '#6A0620', sub: '#AA0003', rim: '#FFFFFF', tabInk: '#6A0620' } };
+  TYPES.files = { label: 'My files', titleHTML: 'My <em>files</em>', theme: { back: ['#F7B5CB', '#F2A7BF'], front: ['#FBDDE8', '#FAD2E1', '#F3C3D5'], edge: '#D4839F', ink: '#6A0620', sub: '#AA0003', rim: '#FFFFFF', tabInk: '#6A0620' } };
 
   /* One question per screen. "word" is the big poster word for that question. */
   const SERIES_Q = { k: 'series', word: 'now', tab: 'Now', q: 'What are you working on right now?', help: 'The title of a current series, and one line about it.', ph: 'Series title', second: { k: 'seriesLine', ph: 'In one line, what it is' }, opt: true };
   const IMAGES_Q = { k: 'images', word: 'work', tab: 'Images', q: 'Show the work.', help: 'Add up to 8 images. The first one leads your page.', images: true, opt: true };
   const QS = {
     bio: [
-      { k: 'name', word: 'name', tab: 'Name', q: 'What name do you exhibit under?', help: 'Curators and editors search for you by this name.', ph: 'e.g. Amara Okafor', voice: true, required: true },
+      { k: 'name', word: 'name', tab: 'Name', q: 'What name do you exhibit under?', help: 'Curators and editors search for you by this name.', ph: 'e.g. Amara Okafor', voice: true, required: true, how: 'Open calls usually want third person (she, he or they). Your own website can use I.' },
       { k: 'role', word: 'make', tab: 'Practice', q: 'What kind of artist are you?', help: 'This is the first thing a reader needs: what will they see?', ph: 'e.g. painter and textile artist', tryList: ['painter', 'photographer', 'sculptor', 'ceramicist', 'printmaker'], how: 'Use the words you would say at an opening. One or two roles is plenty.', required: true },
       { k: 'location', word: 'where', tab: 'Place', q: 'Where are you based?', help: 'A city is enough. Leave it blank if you would rather not say.', ph: 'e.g. Leeds', opt: true },
       { k: 'subjects', word: 'about', tab: 'Subjects', q: 'What does your work keep returning to?', help: 'Two or three subjects, separated with commas.', ph: 'e.g. memory, home, tides', how: 'Name what is in the work, not how it should make people feel.' },
@@ -82,8 +82,7 @@
 
     bio: { light: { bg: '#FAD2E1', ink: '#6A0620', soft: '#8A2C45', ribbon: '#AA0003', band: '#6A0620', sheet: '#FBF6EF', btn: '#6A0620', btnInk: '#FAD2E1' },
            dark: { bg: '#6A0620', ink: '#FAD2E1', soft: '#F0B9CB', ribbon: '#FFA1C2', band: '#AA0003', sheet: '#FAD2E1', btn: '#FAD2E1', btnInk: '#6A0620' } },
-    statement: { light: { bg: '#E3E8BE', ink: '#01363A', soft: '#2B5A5C', ribbon: '#025054', band: '#025054', sheet: '#FBF6EF', btn: '#025054', btnInk: '#F9ECE5' },
-                 dark: { bg: '#025054', ink: '#EEF1D2', soft: '#C9D3A4', ribbon: '#D0D996', band: '#01363A', sheet: '#EEF1D2', btn: '#D0D996', btnInk: '#01363A' } },
+    statement: { light: { bg: '#FFD6DE', ink: '#AA0003' }, dark: { bg: '#AA0003', ink: '#FFD6DE', ribbon: '#FFA1C2' } },
   };
   const VOICES = [['she', 'She'], ['he', 'He'], ['they', 'They'], ['first', 'I (first person)']];
 
@@ -109,45 +108,41 @@
   const pct = (v, of) => (v / of * 100).toFixed(3) + '%';
   const CLIP = '<svg class="clip" viewBox="0 0 18 52" aria-hidden="true"><defs><linearGradient id="wire" x1="0" x2="1"><stop offset="0" stop-color="#8E8E92"/><stop offset=".45" stop-color="#F2F2F4"/><stop offset="1" stop-color="#77777C"/></linearGradient></defs><path d="M5 44 V9 a5 5 0 0 1 10 0 V40 a2.6 2.6 0 0 1 -5.2 0 V14" fill="none" stroke="rgba(42,10,18,.25)" stroke-width="2.4" transform="translate(.8 1.2)"/><path d="M5 44 V9 a5 5 0 0 1 10 0 V40 a2.6 2.6 0 0 1 -5.2 0 V14" fill="none" stroke="url(#wire)" stroke-width="1.6" stroke-linecap="round"/></svg>';
 
+  // A folder on the shelf: the artist's own images peek out like prints; the front carries one title and one count.
   function folderHTML(type, docs, opts = {}) {
     const T = TYPES[type]; const th = T.theme; const id = 'f' + type;
     const tx = { bio: 44, statement: 132, files: 236 }[type]; const tw = type === 'statement' ? 150 : 132;
     const fh = H - FT; const cx = W - 150, cw = 96;
-    const n = Math.max(1, Math.min(docs.length, 4)); const shown = docs.slice(-n);
+    const imgs = (opts.images || []).slice(0, 3);
+    const PAPERS = ['#FBF6EF', '#FFD6DE', '#FAD2E1'];
     let sheets = '';
-    for (let i = 0; i < n; i++) {
-      const d = shown[i]; const inset = 16 + i * 2; const top = TH + 22 + i * 7; const rot = [-0.9, 0.5, -0.35, 0.2][i]; const dx = [3, -2, 1, 0][i];
-      const tint = d ? SLIP_TINTS[(docs.indexOf(d)) % SLIP_TINTS.length] : '#FBF6EF';
-      const tag = d ? (type === 'files' ? (d.type === 'bio' ? 'Bio' : 'Stmt') : 'V' + (docs.indexOf(d) + 1)) : '';
-      sheets += `<div class="sheet" style="--r:${rot}deg;left:${pct(inset + dx, W)};right:${pct(inset - dx, W)};top:${pct(top, H)};bottom:3%;background-color:${tint};transform:rotate(${rot}deg)">${d ? `<span class="vt" style="left:${24 + i * 70}px">${tag}</span>` : ''}<span class="margin"></span>${i === n - 1 ? `<span class="st">${d ? esc(d.title) + ' · ' + d.words + ' words' : 'Blank page'}</span>` : ''}</div>`;
+    if (imgs.length) {
+      const pos = [[9, 13, -6], [35, 6, 3], [60, 15, -2]];
+      imgs.forEach((im, i) => { const [l, t, r] = pos[i]; sheets += `<figure class="print" style="--r:${r}deg;left:${l}%;top:${t}%;transform:rotate(${r}deg)"><img data-img="${im.id}" alt=""></figure>`; });
+    } else {
+      [0, 1].forEach((i) => { sheets += `<div class="sheet" style="--r:${[-0.9, 0.6][i]}deg;left:${pct(16 + i * 4, W)};right:${pct(16 - i * 4, W)};top:${pct(TH + 22 + i * 9, H)};bottom:3%;background-color:${PAPERS[i + (type === 'files' ? 0 : 1)]};transform:rotate(${[-0.9, 0.6][i]}deg)"></div>`; });
     }
-    const last = docs[docs.length - 1];
     const grainPat = `<pattern id="g${id}" width="192" height="192" patternUnits="userSpaceOnUse"><image href="assets/grain.png" width="192" height="192"/></pattern>`;
     const back = backPath(W, H, tx, tw, TH); const front = frontPath(W, fh, cx, cw, 15);
-    const label = type === 'files' ? 'My files' : T.short;
+    const n = docs.length; const count = type === 'files' ? `${n} ${n === 1 ? 'document' : 'documents'}` : `${n} ${n === 1 ? 'version' : 'versions'}`;
     return `
       <span class="shadow"></span>
       <svg viewBox="0 0 ${W} ${H + 4}" aria-hidden="true" preserveAspectRatio="none">
         <defs>${grainPat}<linearGradient id="b${id}" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="${th.back[0]}"/><stop offset="1" stop-color="${th.back[1]}"/></linearGradient></defs>
         <path class="ring" d="${backPath(W, H + 3, tx, tw, TH)}" fill="none" stroke="#FFA1C2" stroke-width="10" stroke-linejoin="round"/>
-        <path d="${back}" fill="url(#b${id})"/><path d="${back}" fill="url(#g${id})" opacity=".55" style="mix-blend-mode:overlay"/>
-        <path d="${back}" fill="none" stroke="${th.rim}" stroke-opacity=".35"/>
+        <path d="${back}" fill="url(#b${id})"/><path d="${back}" fill="url(#g${id})" opacity=".5" style="mix-blend-mode:overlay"/>
+        <path d="${back}" fill="none" stroke="${th.rim}" stroke-opacity=".3"/>
       </svg>
-      <span class="tablabel" style="left:${pct(tx + 10, W)};width:${pct(tw - 20, W)};color:${th.tabInk}">${type === 'files' ? '03' : T.idx} ${label}</span>
       <div class="sheets" style="inset:0">${sheets}</div>
       <div class="front" style="top:${pct(FT, H)}">
         <svg viewBox="0 0 ${W} ${fh + 3}" preserveAspectRatio="none" aria-hidden="true" style="top:3px"><path d="${front}" fill="${th.edge}"/></svg>
         <svg viewBox="0 0 ${W} ${fh}" preserveAspectRatio="none" aria-hidden="true"><defs><linearGradient id="fr${id}" x1="0" y1="0" x2=".9" y2="1"><stop offset="0" stop-color="${th.front[0]}"/><stop offset=".55" stop-color="${th.front[1]}"/><stop offset="1" stop-color="${th.front[2]}"/></linearGradient></defs>
-          <path d="${front}" fill="url(#fr${id})"/><path d="${front}" fill="url(#g${id})" opacity=".55" style="mix-blend-mode:overlay"/>
-          <path d="M6 1.5 L${cx} 1.5 M${cx + cw} 1.5 L${W - 6} 1.5" stroke="${th.rim}" stroke-opacity=".55"/>
-          <path d="M14 ${fh - 11} L${W - 14} ${fh - 11}" stroke="${th.ink}" stroke-opacity=".4" stroke-dasharray="5 4" stroke-linecap="round"/></svg>
+          <path d="${front}" fill="url(#fr${id})"/><path d="${front}" fill="url(#g${id})" opacity=".5" style="mix-blend-mode:overlay"/>
+          <path d="M6 1.5 L${cx} 1.5 M${cx + cw} 1.5 L${W - 6} 1.5" stroke="${th.rim}" stroke-opacity=".5"/></svg>
         <div class="front-inner" style="color:${th.ink}">
-          <span class="count" style="color:${th.sub}">${String(docs.length).padStart(2, '0')} ${docs.length === 1 ? 'version' : 'versions'} filed</span>
-          <span class="ftitle">${type === 'files' ? 'My <em>files</em>' : T.titleHTML}</span>
-          <span class="fline">${esc(type === 'files' ? 'Every filed document. Search, reopen and export.' : T.line)}</span>
-          <span class="fmeta" style="color:${th.sub}"><span>${last ? 'Last filed ' + fmtDate(last.date) : 'Nothing filed yet'}</span><span>Open folder</span></span>
+          <span class="ftitle">${T.titleHTML}</span>
+          <span class="fmeta"><span style="color:${th.sub}">${count}</span><span class="fgo" aria-hidden="true">→</span></span>
         </div>
-        ${last && opts.clip !== false ? `${CLIP}<span class="clip-slip">Latest · ${type === 'files' ? (last.type === 'bio' ? 'Bio' : 'Statement') : 'V' + docs.length}<b>${esc(last.title)}</b></span>` : ''}
       </div>`;
   }
 
@@ -168,6 +163,12 @@
   /* ---------------- home ---------------- */
   const firstName = () => { const n = L.clean(((S.loadDraft('bio') || {}).answers || {}).name || ''); return n.split(' ')[0]; };
   const greeting = () => { const h = new Date().getHours(); return h < 12 ? 'Good morning' : h < 18 ? 'Good afternoon' : 'Good evening'; };
+  function imagesOf(type, docs) {
+    const seen = new Set(); const out = [];
+    const drafts = type ? [type] : ['bio', 'statement'];
+    [...drafts.flatMap((t) => (S.loadDraft(t) || {}).images || []), ...docs.slice().reverse().flatMap((d) => d.images || [])].forEach((i) => { if (!seen.has(i.id)) { seen.add(i.id); out.push(i); } });
+    return out;
+  }
   async function renderHome() {
     const all = await S.listDocuments(); const bio = all.filter((d) => d.type === 'bio'); const st = all.filter((d) => d.type === 'statement');
     const recent = all.slice().sort((a, b) => b.date.localeCompare(a.date)).slice(0, 4);
@@ -182,7 +183,6 @@
             <h1 class="display" style="margin-top:14px">${greeting()}${firstName() ? `, <em>${esc(firstName())}</em>.` : ', <em>artist</em>.'}</h1>
           </div>
           <div>
-            <p class="lede">Open a folder to write a bio or an artist statement. Every version you file stays in its folder, ready to reopen.</p>
             <div class="stats">
               <div class="stat"><b>${String(bio.length).padStart(2, '0')}</b><span>Bios filed</span></div>
               <div class="stat"><b>${String(st.length).padStart(2, '0')}</b><span>Statements</span></div>
@@ -191,9 +191,9 @@
           </div>
         </div>
         <div class="shelf">
-          <button class="folder" data-open="bio" aria-label="Open Artist bio folder, ${bio.length} versions filed">${folderHTML('bio', bio)}</button>
-          <button class="folder" data-open="statement" aria-label="Open Artist statement folder, ${st.length} versions filed">${folderHTML('statement', st)}</button>
-          <button class="folder" data-open="files" aria-label="Open My files, ${all.length} documents">${folderHTML('files', all)}</button>
+          <button class="folder" data-open="bio" aria-label="Open Artist bio folder, ${bio.length} versions filed">${folderHTML('bio', bio, { images: imagesOf('bio', bio) })}</button>
+          <button class="folder" data-open="statement" aria-label="Open Artist statement folder, ${st.length} versions filed">${folderHTML('statement', st, { images: imagesOf('statement', st) })}</button>
+          <button class="folder" data-open="files" aria-label="Open My files, ${all.length} documents">${folderHTML('files', all, { images: imagesOf(null, all) })}</button>
         </div>
         <section class="wall" aria-labelledby="wall-h">
           <div class="record-head"><h2 class="h2" id="wall-h">On the <em>wall</em></h2><span class="mono" style="color:var(--on-desk-2)">Images from your bio and statement</span></div>
@@ -230,7 +230,6 @@
     bio: [['You', 0], ['The work', 3], ['Story', 6], ['Images', 8], ['Your bio', 9]],
     statement: [['The work', 0], ['Process', 2], ['Why', 4], ['Images', 6], ['Statement', 7]],
   };
-  const TAB_TINTS = ['#FFD6DE', '#FFF3B2', '#D0D996', '#B7D9FF', '#FAD2E1'];
   const groupOf = (type, step) => { const g = GROUPS[type]; let i = 0; g.forEach(([, s], n) => { if (step >= s) i = n; }); return i; };
   const CLIP_SVG = '<svg class="clip" viewBox="0 0 18 52" aria-hidden="true"><defs><linearGradient id="wire6" x1="0" x2="1"><stop offset="0" stop-color="#8E8E92"/><stop offset=".45" stop-color="#F2F2F4"/><stop offset="1" stop-color="#77777C"/></linearGradient></defs><path d="M5 44 V9 a5 5 0 0 1 10 0 V40 a2.6 2.6 0 0 1 -5.2 0 V14" fill="none" stroke="rgba(42,10,18,.25)" stroke-width="2.4" transform="translate(.8 1.2)"/><path d="M5 44 V9 a5 5 0 0 1 10 0 V40 a2.6 2.6 0 0 1 -5.2 0 V14" fill="none" stroke="url(#wire6)" stroke-width="1.6" stroke-linecap="round"/></svg>';
 
@@ -242,7 +241,7 @@
     if (fresh) {
       main.innerHTML = `<section class="spread-view" data-type="${type}" style="--btn:${th.btn};--btn-ink:${th.btnInk}">
         <div class="crumbs"><a href="#/">← Studio</a><span class="mono">${docs.length} filed · saved on this device</span></div>
-        <div class="spread" style="--cv:${th.cv};--cv-ink:${th.cvInk};--cv-accent:${th.cvAccent};--spine-a:${th.spine[0]};--spine-b:${th.spine[1]}">
+        <div class="spread" style="--cv:${th.cv};--cv-ink:${th.cvInk};--cv-accent:${th.cvAccent};--sheet:${th.sheet};--spine-a:${th.spine[0]};--spine-b:${th.spine[1]}">
           <span class="floor"></span>
           <aside class="cover-in" aria-label="Your ${type === 'bio' ? 'bio' : 'statement'} so far"><span class="thumb"></span>
             <p class="eyebrow">${T.idx} · ${esc(T.label)}</p>
@@ -268,7 +267,7 @@
 
   function renderTabs6(type) {
     const w = getWork(type); const box = $('.tabs', main); const cur = groupOf(type, w.step);
-    box.innerHTML = GROUPS[type].map(([l, s], i) => `<button class="tab${i < cur ? ' done' : ''}" role="tab" aria-selected="${i === cur}" tabindex="${i === cur ? 0 : -1}" data-s="${s}" style="--tint:${TAB_TINTS[i]}"><span>${l}</span></button>`).join('');
+    box.innerHTML = GROUPS[type].map(([l, s], i) => `<button class="tab${i < cur ? ' done' : ''}" role="tab" aria-selected="${i === cur}" tabindex="${i === cur ? 0 : -1}" data-s="${s}" ><span>${l}</span></button>`).join('');
     $$('.tab', box).forEach((b, i, all) => {
       b.addEventListener('click', () => stepTo(type, +b.dataset.s, +b.dataset.s < w.step));
       b.addEventListener('keydown', (e) => { const j = e.key === 'ArrowDown' ? i + 1 : e.key === 'ArrowUp' ? i - 1 : null; if (j !== null && all[j]) { e.preventDefault(); all[j].focus(); } });
@@ -286,17 +285,16 @@
       if (q.second) control += `<input class="p-input p-second" data-k="${q.second.k}" type="text" value="${esc(a[q.second.k] || '')}" placeholder="${esc(q.second.ph)}" aria-label="${esc(q.second.ph)}" autocomplete="off">`;
     }
     const last = w.step === Q.length - 1;
-    page.style.setProperty('--tint', TAB_TINTS[groupOf(type, w.step)]);
-    page.innerHTML = `<div class="ptop"><span class="chapter"><i></i>Question ${w.step + 1} of ${Q.length} · ${q.tab}</span><span>${q.opt ? 'Optional' : ''}</span></div>
+    page.innerHTML = `<div class="ptop"><span>Question ${w.step + 1} of ${Q.length}</span><span>${q.tab}${q.opt ? ' · optional' : ''}</span></div><div class="prule"><i style="width:${((w.step + 1) / Q.length) * 100}%"></i></div>
       <div class="qwrap">
         <h1 class="q" tabindex="-1"><label for="pq">${esc(q.q)}</label></h1>
         <p class="q-help">${q.help}</p>
         ${control}
-        ${q.voice ? `<p class="p-k">Write about me as</p><div class="p-chips" role="group" aria-label="Write about me as">${VOICES.map(([k, l]) => `<button type="button" class="p-chip" data-voice="${k}" aria-pressed="${vk === k}">${l}</button>`).join('')}</div><p class="p-note">Open calls usually want third person. Your own website can use I.</p>` : ''}
+        ${q.voice ? `<p class="p-k">Write about me as</p><div class="p-chips" role="group" aria-label="Write about me as">${VOICES.map(([k, l]) => `<button type="button" class="p-chip" data-voice="${k}" aria-pressed="${vk === k}">${l}</button>`).join('')}</div>` : ''}
         ${q.tryList ? `<p class="p-k">Try</p><div class="p-chips">${q.tryList.map((t) => `<button type="button" class="p-chip" data-try="${t}" aria-pressed="${L.clean(v).toLowerCase() === t}">${t}</button>`).join('')}</div>` : ''}
         ${q.how ? `<details class="p-how"><summary>How to answer?</summary><p>${q.how}</p></details>` : ''}
       </div>
-      <div class="pfoot">${w.step > 0 ? '<button type="button" class="btn btn-line" id="pback">← Back</button>' : '<span></span>'}<button type="button" class="btn btn-primary" id="pnext"></button></div>`;
+      <div class="pfoot">${w.step > 0 ? '<button type="button" class="pback" id="pback">← Back</button>' : '<span></span>'}<button type="button" class="pnext" id="pnext"></button></div>`;
     const next = $('#pnext', page);
     const label = () => { next.textContent = (last ? `See my ${type === 'bio' ? 'bio' : 'statement'}` : q.opt && !answeredQ(q, a, w) ? 'Skip for now' : 'Next question') + ' →'; };
     label();
@@ -567,9 +565,9 @@
     const d = await S.getDocument(id); if (!d) return;
     const all = await S.listDocuments(d.type); const v = all.findIndex((x) => x.id === id) + 1;
     const bio = d.type === 'bio';
-    dlg.style.setProperty('--tint', bio ? '#AA0003' : '#025054'); dlg.style.setProperty('--dh-ink', bio ? '#FFD6DE' : '#F9ECE5');
+    dlg.style.setProperty('--tint', bio ? '#6A0620' : '#AA0003'); dlg.style.setProperty('--dh-ink', bio ? '#FAD2E1' : '#FFD6DE');
     delete dlg.dataset.kind;
-    dlg.innerHTML = `<div class="dh"><div><p class="mono" style="color:${bio ? '#FFF3B2' : '#D0D996'}">${bio ? 'Artist bio' : 'Statement'} · V${v}${d.sample ? ' · Sample' : ''}</p><h2 id="doc-title" style="margin-top:8px">${esc(d.title)}</h2></div><button class="x" id="dclose" aria-label="Close">×</button></div>
+    dlg.innerHTML = `<div class="dh"><div><p class="mono" style="color:${bio ? '#FFA1C2' : '#FFD6DE'}">${bio ? 'Artist bio' : 'Statement'} · V${v}${d.sample ? ' · Sample' : ''}</p><h2 id="doc-title" style="margin-top:8px">${esc(d.title)}</h2></div><button class="x" id="dclose" aria-label="Close">×</button></div>
       <div class="db"><div class="cells"><div><span class="k">Words</span><div class="v">${d.words}</div></div><div><span class="k">For</span><div class="v">${esc(d.purpose || '—')}</div></div><div><span class="k">Filed</span><div class="v">${fmtDate(d.date)}</div></div><div><span class="k">Kept</span><div class="v">This device</div></div></div>
       ${d.images && d.images.length ? `<figure class="d-img"><img data-img="${d.images[0].id}" alt="${esc(capText(d.images[0]))}"></figure>` : ''}<p class="read-text">${esc(d.text)}</p>
       <div class="acts"><button class="btn btn-line" id="dcopy">Copy</button><button class="btn btn-line" id="dtxt">Download .txt</button><button class="btn btn-primary" id="dopen">Edit as new version</button><button class="btn btn-text" id="ddel" style="margin-left:auto">Delete</button></div></div>`;

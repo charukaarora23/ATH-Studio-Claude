@@ -1,10 +1,10 @@
-# My Studio prototype (v6)
+# My Studio prototype (v7)
 
 Buildless HTML, CSS and JavaScript. Serve this folder with any static server (for example `python3 -m http.server`) and open `index.html`.
 
 ## How it works
 
-- **Home:** three paper folders: Bio (Chilli), Statement (Petrol) and My files (Peony).
+- **Home:** three paper folders: Bio (Burgundy), Statement (Chilli) and My files (Peony).
   - They lean toward the pointer, and the front cover opens on hover.
   - Below them are "On the wall" (the artist's images) and "Recently filed".
 - **Writing:** our open folder, one question per page.
