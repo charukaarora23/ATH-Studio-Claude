@@ -48,8 +48,7 @@
     const torch = $('#torch'); const ring = $('#cursor'); const label = ring && $('span', ring);
     const fine = mq('(pointer: fine)');
     const p = { x: innerWidth * 0.5, y: innerHeight * 0.35, tx: innerWidth * 0.5, ty: innerHeight * 0.35, cx: 0, cy: 0, last: performance.now() };
-    let layers = []; let scrollFn = null;
-    addEventListener('scroll', () => { if (scrollFn) scrollFn(scrollY); }, { passive: true });
+    let layers = [];
     addEventListener('pointermove', (e) => { p.tx = e.clientX; p.ty = e.clientY; p.last = performance.now(); }, { passive: true });
     addEventListener('touchstart', (e) => { const t = e.touches[0]; if (t) { p.tx = t.clientX; p.ty = t.clientY; p.last = performance.now(); } }, { passive: true });
     function frame(t) {
@@ -72,34 +71,22 @@
     return {
       // depth layers: positive numbers move against the pointer, so near things move more than far things
       parallax(list) { layers = list.filter(([el]) => el); if (!motion) layers.forEach(([el]) => { el.style.translate = ''; }); },
-      // a quick warm light washing over an element (used for copy, file and stickers instead of confetti)
-      glow(el) { if (!motion || !el) return; anim(el, [{ boxShadow: '0 0 0 0 rgba(255,161,194,0)', filter: 'brightness(1)' }, { boxShadow: '0 0 90px 30px rgba(255,161,194,.55)', filter: 'brightness(1.08)', offset: .3 }, { boxShadow: '0 0 0 0 rgba(255,161,194,0)', filter: 'brightness(1)' }], { duration: 1100, easing: 'ease-out' }).then(() => el.getAnimations().forEach((x) => x.cancel())); },
-      // the room is dark, the switch clicks, and light pours out from the lamp
-      lightsOn() {
-        Snd.play('lights');
-        if (!motion) return Promise.resolve();
-        const L2 = document.createElement('div'); L2.className = 'lights'; L2.innerHTML = '<span class="lamp"></span>'; document.body.appendChild(L2);
-        return new Promise((res) => {
-          const t0 = performance.now(); const D = 1500;
-          (function step(t) { const k = Math.min(1, (t - t0 - 250) / D); const e = k < 0 ? 0 : 1 - Math.pow(1 - k, 3); L2.style.setProperty('--r', (e * 160) + 'vmax'); L2.style.opacity = k < .7 ? 1 : 1 - (k - .7) / .3; if (k < 1) requestAnimationFrame(step); else { L2.remove(); res(); } })(t0);
-          setTimeout(res, 650);
-        });
+      confetti(n = 90, origin) {
+        if (!motion) return;
+        const c = document.createElement('canvas'); c.className = 'confetti'; c.width = innerWidth * devicePixelRatio; c.height = innerHeight * devicePixelRatio; document.body.appendChild(c);
+        const g = c.getContext('2d'); g.scale(devicePixelRatio, devicePixelRatio);
+        const cols = ['#AA0003', '#6A0620', '#FAD2E1', '#FFA1C2', '#FFF3B2', '#FFD6DE'];
+        const ox = origin ? origin.x : innerWidth / 2; const oy = origin ? origin.y : innerHeight * 0.35;
+        const bits = Array.from({ length: n }, () => ({ x: ox, y: oy, vx: (Math.random() - 0.5) * 14, vy: -Math.random() * 13 - 4, r: Math.random() * 6.28, vr: (Math.random() - 0.5) * 0.4, w: 6 + Math.random() * 9, h: 4 + Math.random() * 6, c: cols[(Math.random() * cols.length) | 0] }));
+        const t0 = performance.now();
+        (function step(t) {
+          g.clearRect(0, 0, innerWidth, innerHeight);
+          bits.forEach((b) => { b.vy += 0.38; b.vx *= 0.985; b.x += b.vx; b.y += b.vy; b.r += b.vr; g.save(); g.translate(b.x, b.y); g.rotate(b.r); g.scale(1, Math.cos(b.r * 2)); g.fillStyle = b.c; g.fillRect(-b.w / 2, -b.h / 2, b.w, b.h); g.restore(); });
+          if (t - t0 < 2600) requestAnimationFrame(step); else c.remove();
+        })(t0);
       },
-      onScroll(fn) { scrollFn = fn; },
     };
   })();
-
-  /* ---------------- hand-drawn kit: the ATH heart and a few doodles ---------------- */
-  const HEART_D = 'M51 86 C 33 74, 9 57, 6 35 C 3 17, 16 5, 30 6 C 41 7, 48 15, 51 24 C 54 13, 63 4, 75 4 C 90 5, 98 18, 95 35 C 92 56, 70 73, 51 86';
-  const HEART_SVG = (mode, cls = '') => mode === 'fill'
-    ? `<svg class="heart ${cls}" viewBox="0 0 100 92" aria-hidden="true"><path d="${HEART_D} Z" fill="var(--hc, #FFA1C2)" filter="url(#rough2)"/><path d="${HEART_D} C 49 88, 46 90, 43 91" fill="none" stroke="var(--hi, #6A0620)" stroke-width="2.4" stroke-linecap="round" filter="url(#rough)" opacity=".85"/></svg>`
-    : `<svg class="heart ${cls}" viewBox="0 0 100 92" aria-hidden="true"><path d="${HEART_D} C 49 88, 45 90, 41 92" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" filter="url(#rough)" pathLength="1"/></svg>`;
-  const DOODLE = {
-    folder: '<svg viewBox="0 0 64 52" aria-hidden="true"><path d="M4 12 L4 46 L60 46 L60 16 L30 16 L25 8 L6 8 Z" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linejoin="round" filter="url(#rough)"/><path d="M4 22 L60 22" fill="none" stroke="currentColor" stroke-width="2" filter="url(#rough)"/></svg>',
-    frame: '<svg viewBox="0 0 60 60" aria-hidden="true"><rect x="6" y="6" width="48" height="48" fill="none" stroke="currentColor" stroke-width="2.6" filter="url(#rough)"/><path d="M12 44 L24 30 L32 38 L40 28 L50 44" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linejoin="round" filter="url(#rough)"/><circle cx="20" cy="18" r="4" fill="none" stroke="currentColor" stroke-width="2.2"/></svg>',
-    arrow: '<svg viewBox="0 0 120 60" aria-hidden="true"><path d="M6 46 C 30 10, 74 6, 104 22 M92 12 L106 23 L92 32" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" filter="url(#rough)"/></svg>',
-    squiggle: '<svg viewBox="0 0 200 20" aria-hidden="true" preserveAspectRatio="none"><path d="M3 12 C 20 2, 30 18, 48 9 S 78 3, 96 11 S 128 18, 146 8 S 180 4, 197 11" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" filter="url(#rough)"/></svg>',
-  };
 
   /* ---------------- content model ---------------- */
   const SLIP_TINTS = ['#FFF3B2', '#FFD6DE', '#E6EBC4', '#D9EAFB', '#FBF6EF']; // derived pale tints (provisional)
@@ -215,7 +202,7 @@
     $$('.ix').forEach((a) => (a.dataset.route === r ? a.setAttribute('aria-current', 'page') : a.removeAttribute('aria-current')));
     const from = current; current = r;
     document.body.classList.toggle('writing', r === 'bio' || r === 'statement');
-    FX.parallax([]); FX.onScroll(null);
+    FX.parallax([]);
     if (r === 'home') await renderHome(from);
     else if (r === 'files') await renderFiles();
     else { main.innerHTML = ''; await renderWriting(r, { fromHome: from === 'home' }); }
@@ -226,21 +213,6 @@
   /* ---------------- home ---------------- */
   const firstName = () => { const n = L.clean(((S.loadDraft('bio') || {}).answers || {}).name || ''); return n.split(' ')[0]; };
   const greeting = () => { const h = new Date().getHours(); return h < 12 ? 'Good morning' : h < 18 ? 'Good afternoon' : 'Good evening'; };
-  // The portfolio collage: the artist's images taped into an open folder, with hand-written captions and doodles.
-  function collageHTML(imgs) {
-    const SLOTS = [[3, 10, 27, -4, 'w'], [28, 4, 21, 3, 'p'], [47, 16, 25, -2, 'w'], [71, 6, 20, 5, 'p'], [12, 54, 18, 6, 's'], [80, 52, 17, -6, 's']];
-    const tapes = ['#FFF3B2', '#FFA1C2', '#FFD6DE'];
-    if (!imgs.length) return `<div class="collage empty">
-        ${[0, 1, 2].map((i) => `<button class="cl-item cl-empty" data-addimg style="left:${[8, 37, 66][i]}%;top:${[16, 8, 18][i]}%;--r:${[-4, 2, 5][i]}deg"><span class="tape" style="background:${tapes[i]}"></span><span class="cl-frame">${i === 1 ? HEART_SVG('line') : ''}</span><span class="hand">${['a finished piece', 'your best work', 'a detail'][i]}</span></button>`).join('')}
-        <p class="cl-note hand cl-doodle">your work goes here. add images as you write your bio</p>
-        <span class="cl-arrow cl-doodle">${DOODLE.arrow}</span>
-      </div>`;
-    return `<div class="collage">
-      ${imgs.map((im, i) => { const [l, t, wd, r, shape] = SLOTS[i]; return `<figure class="cl-item cl-${shape}" style="left:${l}%;top:${t}%;width:${wd}%;--r:${r}deg"><span class="tape" style="background:${tapes[i % 3]}"></span><img data-img="${im.id}" alt="${esc(capText(im))}"><figcaption class="hand">${esc(capText(im) || 'untitled')}${im.sample ? ' (sample)' : ''}</figcaption></figure>`; }).join('')}
-      <span class="cl-heart cl-doodle">${HEART_SVG('line')}</span>
-      <span class="cl-squig cl-doodle">${DOODLE.squiggle}</span>
-    </div>`;
-  }
   function imagesOf(type, docs) {
     const seen = new Set(); const out = [];
     const drafts = type ? [type] : ['bio', 'statement'];
@@ -251,7 +223,7 @@
     const all = await S.listDocuments(); const bio = all.filter((d) => d.type === 'bio'); const st = all.filter((d) => d.type === 'statement');
     const recent = all.slice().sort((a, b) => b.date.localeCompare(a.date)).slice(0, 4);
     const seen = new Set(); const wall = [];
-    [...['bio', 'statement'].flatMap((t) => (S.loadDraft(t) || {}).images || []), ...all.slice().reverse().flatMap((d) => d.images || [])].forEach((i) => { if (!seen.has(i.id) && wall.length < 6) { seen.add(i.id); wall.push(i); } });
+    [...['bio', 'statement'].flatMap((t) => (S.loadDraft(t) || {}).images || []), ...all.slice().reverse().flatMap((d) => d.images || [])].forEach((i) => { if (!seen.has(i.id) && wall.length < 5) { seen.add(i.id); wall.push(i); } });
     const inProgress = ['bio', 'statement'].filter((t) => { const w = S.loadDraft(t); return w && Object.values(w.answers || {}).some(Boolean); }).length;
     const wb = S.loadDraft('bio'); const wsd = S.loadDraft('statement');
     const inBio = wb && Object.values(wb.answers || {}).some(Boolean); const bioStep = wb ? Math.min(wb.step || 0, QS.bio.length) : 0;
@@ -260,7 +232,7 @@
       : !bio.length || !inBio ? `<a class="hero-btn" href="#/bio" data-cursor="Start"><span>Start your bio</span><small>9 short questions · about 4 minutes</small></a>`
       : `<a class="hero-btn" href="#/statement" data-cursor="Start"><span>Write your statement</span><small>7 short questions</small></a>`;
     main.innerHTML = `
-      ${prefs.sound || S.prefs().sound ? '' : `<button class="heart-sticker sound-sticker" id="soundst" style="--hc:#FFA1C2;--hi:#6A0620;--rot:8deg" aria-label="Turn on studio sounds">${HEART_SVG('fill')}<span class="hand">sound on?</span></button>`}
+      ${prefs.sound || S.prefs().sound ? '' : '<button class="sticker st-round st-rose sound-sticker" id="soundst" aria-label="Turn on studio sounds"><span>Sound on?</span></button>'}
       <section class="view home">
         <div class="home-hero">
           <div>
@@ -281,13 +253,9 @@
           <button class="folder" data-cursor="Open" data-open="statement" aria-label="Open Artist statement folder, ${st.length} versions filed">${folderHTML('statement', st, { images: imagesOf('statement', st) })}</button>
           <button class="folder" data-cursor="Open" data-open="files" aria-label="Open My files, ${all.length} documents">${folderHTML('files', all, { images: imagesOf(null, all) })}</button>
         </div>
-        <section class="portfolio" aria-labelledby="pf-h">
-          <div class="pf-folder">
-            <span class="pf-tab"><span class="hand" id="pf-h">your work</span></span>
-            <div class="pf-inside">
-              ${collageHTML(wall)}
-            </div>
-          </div>
+        <section class="wall" aria-labelledby="wall-h">
+          <div class="record-head"><h2 class="h2" id="wall-h">On the <em>wall</em></h2><span class="mono" style="color:var(--on-desk-2)">Images from your bio and statement</span></div>
+          <div class="wall-row">${wall.length ? wall.map((i, n) => `<figure class="polaroid" style="--r:${[-2.5, 1.8, -1.2, 2.4, -1.6, 1][n % 6]}deg"><span class="tape"></span><img data-img="${i.id}" alt="${esc(capText(i))}">${i.sample ? '<span class="sample-tag">Sample</span>' : ''}<figcaption>${esc(capText(i) || 'Untitled')}</figcaption></figure>`).join('') : [0, 1, 2].map((n) => `<button class="polaroid empty" data-addimg style="--r:${[-2, 1.5, -1][n]}deg"><span class="tape"></span><span class="ph"><span class="drop-art" aria-hidden="true"><i></i><i></i><i></i></span></span><figcaption>${n === 1 ? 'Add images of your work' : ''}</figcaption></button>`).join('')}</div>
         </section>
         <section class="record" aria-labelledby="rec-h">
           <div class="record-head"><h2 class="h2" id="rec-h">Recently <em>filed</em></h2><span class="mono" style="color:var(--on-desk-2)">Saved on this device</span></div>
@@ -308,13 +276,13 @@
     hydrate(main);
     const ss = $('#soundst'); if (ss) ss.addEventListener('click', () => { $('#sound-on').checked = true; $('#sound-on').dispatchEvent(new Event('change')); Snd.play('chime'); anim(ss, [{ transform: 'rotate(8deg) scale(1)' }, { transform: 'rotate(30deg) scale(0)', opacity: 0 }], { duration: 420, easing: 'ease-in' }).then(() => ss.remove()); });
     $$('.folder', main).forEach((f) => f.addEventListener('pointerenter', () => Snd.play('tick')));
-    FX.parallax([[$('.home-hero h1', main), 8], [$('.hero-cta', main), 4], [$('.shelf', main), -10], [$('.pf-inside', main), -6], ...$$('.cl-item', main).map((el, i) => [el, [-14, 10, -20, 8, -12, 16][i % 6]]), ...$$('.cl-doodle', main).map((el) => [el, 22])]);
+    FX.parallax([[$('.home-hero h1', main), 8], [$('.hero-cta', main), 4], [$('.shelf', main), -10], [$('.wall-row', main), -16]]);
     // 3D: folders lean toward the pointer
     $$('.folder', main).forEach((f) => {
       f.addEventListener('pointermove', (e) => { if (!motion || e.pointerType !== 'mouse') return; const r = f.getBoundingClientRect(); f.style.setProperty('--ry', ((e.clientX - r.left) / r.width - 0.5) * 10 + 'deg'); f.style.setProperty('--rx', (-(e.clientY - r.top) / r.height + 0.5) * 8 + 'deg'); });
       f.addEventListener('pointerleave', () => { f.style.removeProperty('--rx'); f.style.removeProperty('--ry'); });
     });
-    $$('.cl-item', main).forEach((p) => { p.addEventListener('pointerenter', () => Snd.play('tick')); });
+    $$('.polaroid:not(.empty)', main).forEach((p) => tilt(p, 8));
   }
 
   /* ---------------- writing: the open folder, one question per page ---------------- */
@@ -330,14 +298,13 @@
   function earnedStickers(type) {
     const w = getWork(type); const a = w.answers; const n = QS[type].length; const out = [];
     const first = L.clean(a.name || '').split(' ')[0];
-    if (type === 'bio' ? first : L.clean(a.subjects || '')) out.push({ id: 'hello', text: type === 'bio' ? `hi ${first.toLowerCase()}!` : 'good start', shape: 'burst', col: 'lemon' });
-    if (w.step >= Math.floor(n / 2)) out.push({ id: 'half', text: 'halfway!', shape: 'round', col: 'rose' });
-    if (w.images.length) out.push({ id: 'imgs', text: 'lovely work', shape: 'scallop', col: 'ballet' });
-    if (w.step >= n - 1) out.push({ id: 'near', text: 'nearly there', shape: 'tag', col: 'chilli' });
+    if (type === 'bio' ? first : L.clean(a.subjects || '')) out.push({ id: 'hello', text: type === 'bio' ? `Hi, ${first}!` : 'Good start', shape: 'burst', col: 'lemon' });
+    if (w.step >= Math.floor(n / 2)) out.push({ id: 'half', text: 'Halfway', shape: 'round', col: 'rose' });
+    if (w.images.length) out.push({ id: 'imgs', text: 'Lovely work', shape: 'scallop', col: 'ballet' });
+    if (w.step >= n - 1) out.push({ id: 'near', text: 'Nearly there', shape: 'tag', col: 'chilli' });
     return out;
   }
-  const HCOL = { lemon: ['#FFF3B2', '#6A0620'], rose: ['#FFA1C2', '#6A0620'], ballet: ['#FFD6DE', '#AA0003'], chilli: ['#AA0003', '#FFD6DE'] };
-  function stickerHTML(s, i) { const [c, k] = HCOL[s.col]; return `<button type="button" class="heart-sticker sticker" data-st="${s.id}" style="--i:${i};--hc:${c};--hi:${k}" aria-label="Sticker: ${esc(s.text)}">${HEART_SVG('fill')}<span class="hand">${esc(s.text)}</span></button>`; }
+  function stickerHTML(s, i) { return `<button type="button" class="sticker st-${s.shape} st-${s.col}" data-st="${s.id}" style="--i:${i}" aria-label="Sticker: ${esc(s.text)}"><span>${esc(s.text)}</span></button>`; }
 
   async function renderWriting(type, opts = {}) {
     const w = getWork(type);
@@ -395,7 +362,7 @@
     page.innerHTML = `<span class="holes" aria-hidden="true"><i></i><i></i><i></i></span>
       <div class="ptop"><span>${pad2(w.step + 1)} / ${pad2(Q.length)}</span><span>${q.tab}${q.opt ? ' · optional' : ''}</span></div>
       <div class="prule"><i style="width:${((w.step + 1) / Q.length) * 100}%"></i></div>
-      ${q.how ? `<div class="tip" id="tip"><button type="button" class="tip-btn" aria-expanded="false" aria-controls="tipcard" data-cursor="Open tip">${HEART_SVG('fill')}<span class="hand">tip</span></button><div class="tip-card" id="tipcard" role="note" hidden><span class="tape"></span><p class="hand">${esc(q.how)}</p></div></div>` : ''}
+      ${q.how ? `<div class="tip" id="tip"><button type="button" class="tip-btn" aria-expanded="false" aria-controls="tipcard" data-cursor="Open tip"><span>Tip</span></button><div class="tip-card" id="tipcard" role="note" hidden><span class="tape"></span><p>${esc(q.how)}</p></div></div>` : ''}
       <div class="qwrap">
         <h1 class="q" tabindex="-1"><label for="pq">${esc(q.q)}</label></h1>
         <p class="q-help">${q.help}</p>
@@ -552,21 +519,17 @@
     const sub = type === 'bio' ? [a.role, a.location].map((x) => L.clean(x || '')).filter(Boolean).join(' · ') : (a.series ? L.clean(a.series) : 'Artist statement');
     const other = type === 'bio' ? 'statement' : 'bio'; const otherLabel = other === 'bio' ? 'artist bio' : 'artist statement';
     main.innerHTML = `<section class="final-view" data-type="${type}" style="--cv:${th.cv};--cv-ink:${th.cvInk};--cv-accent:${th.cvAccent};--btn:${th.btn};--btn-ink:${th.btnInk}">
-      <header class="fin-stage${lead ? '' : ' no-photo'}">
-        <div class="fin-photo">${lead ? `<img data-img="${lead.id}" alt="${esc(capText(lead))}">` : `<span class="fin-bigheart">${HEART_SVG('fill')}</span>`}</div>
-        <div class="fin-shade"></div>
-        <div class="fin-words">
-          <p class="hand fin-hand">${first ? `you did it, ${esc(first)}` : 'you did it'} ${HEART_SVG('line', 'inline-heart')}</p>
-          <h1 class="fin-name" tabindex="-1">${esc(name || T.label)}</h1>
-          <p class="fin-sub"><span>Your ${word} is <em>ready</em>.</span>${lead && capText(lead) ? `<span class="fin-cap">${esc(capText(lead))}${lead.sample ? ' · sample' : ''}</span>` : ''}</p>
-        </div>
-        <span class="scroll-cue hand" aria-hidden="true">read it ↓</span>
+      <header class="fin-hero">
+        <p class="eyebrow">${esc(T.label)} · version ${docs.length + 1}</p>
+        <h1 class="fin-title" tabindex="-1">Your ${word} is <em>ready</em>${first ? `, ${esc(first)}` : ''}.</h1>
+        <p class="fin-sub">Copy it, change the length, or file it in your folder.</p>
       </header>
       <article class="rec-sheet">
-        <header class="rec-head">${CLIP_SVG}<span>${esc(T.label)} · version ${docs.length + 1}</span><span>${fmtDate(new Date().toISOString())}</span></header>
+        <header class="rec-head">${CLIP_SVG}<span>${esc(T.label)}</span><span>${fmtDate(new Date().toISOString())}</span></header>
         <div class="rec-body${lead ? '' : ' no-img'}">
-          ${lead ? '' : `<figure class="rec-img"><label class="rec-add" for="f-addimg" data-cursor="Add image"><input type="file" id="f-addimg" accept="image/*" multiple class="visually-hidden"><span class="doodle-frame">${HEART_SVG('line')}</span><b class="hand">add a photo of your work</b><span>It opens this page.</span></label></figure>`}
+          <figure class="rec-img">${lead ? `<span class="tape"></span><img data-img="${lead.id}" alt="${esc(capText(lead))}">${lead.sample ? '<span class="sample-tag">Sample</span>' : ''}${capText(lead) ? `<figcaption>${esc(capText(lead))}</figcaption>` : ''}` : `<label class="rec-add" for="f-addimg" data-cursor="Add image"><input type="file" id="f-addimg" accept="image/*" multiple class="visually-hidden"><span class="drop-art" aria-hidden="true"><i></i><i></i><i></i></span><b>Add an image of your work</b><span>It sits beside your ${word}.</span></label>`}</figure>
           <div class="rec-text">
+            <h2 class="rec-name">${esc(name || T.label)}</h2>
             <p class="rec-sub">${esc(sub)}</p>
             <label for="ftext" class="visually-hidden">Your ${word}, editable</label>
             <textarea class="rec-words" id="ftext" spellcheck="true" data-cursor="Edit">${esc(d.text)}</textarea>
@@ -574,7 +537,7 @@
             <div id="fnotice"></div>
           </div>
         </div>
-        <button type="button" class="heart-sticker big done-sticker" style="--hc:var(--hot-rose);--hi:var(--burgundy);--rot:10deg" aria-label="Sticker: done">${HEART_SVG('fill')}<span class="hand">done!</span></button>
+        <button type="button" class="sticker st-burst st-lemon done-sticker" aria-label="Sticker: Done"><span>Done!</span></button>
         <span class="stamp rec-stamp" id="fstamp" hidden></span>
       </article>
       <div class="rec-controls">
@@ -584,12 +547,11 @@
       </div>
       <div id="ffiling"></div>
       <section class="next-steps" aria-labelledby="next-h">
-        <h2 id="next-h" class="hand">so, what next?</h2>
-        <svg class="next-arrow" viewBox="0 0 120 60" aria-hidden="true"><path d="M6 10 C 40 4, 80 14, 98 44 M86 40 L99 47 L102 32" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" filter="url(#rough)"/></svg>
+        <h2 id="next-h">What <em>next</em>?</h2>
         <div class="next-row">
-          <button class="next-card" id="ffile" data-cursor="File it"><span class="nc-doodle">${DOODLE.folder}</span><b class="hand">file it</b><span>Keep this version in your ${esc(T.short)} folder.</span></button>
-          <button class="next-card nc-other" id="fother" data-cursor="Start"><span class="nc-doodle">${HEART_SVG('line')}</span><b class="hand">write your ${otherLabel}</b><span>${other === 'statement' ? 'About the work itself. 7 short questions.' : 'Who you are and what you make. 9 short questions.'}</span></button>
-          <button class="next-card" id="fpost" data-cursor="Preview"><span class="nc-doodle">${DOODLE.frame}</span><b class="hand">make a square post</b><span>Your photo and a short line, ready to share.</span></button>
+          <button class="next-card nc-file" id="ffile" data-cursor="File it"><span class="nc-k">Keep it</span><b>File this version</b><span>Saved in your ${esc(T.short)} folder, ready to reopen.</span></button>
+          <button class="next-card nc-other" id="fother" data-cursor="Start"><span class="nc-k">Keep going</span><b>Write your ${otherLabel}</b><span>${other === 'statement' ? 'About the work itself. Seven short questions.' : 'Who you are and what you make. Nine short questions.'}</span></button>
+          <button class="next-card nc-post" id="fpost" data-cursor="Preview"><span class="nc-k">Share it</span><b>Make a square post</b><span>Your lead image with a short version of the text.</span></button>
         </div>
         <p class="fin-links"><button class="btn-text btn" id="ftxt">Download .txt</button><button class="btn-text btn" id="fedit">Edit answers</button></p>
       </section>
@@ -599,8 +561,7 @@
     const notice = () => { const r = w.result; $('#fnotice', root).innerHTML = d.edited && d.basis !== sig(a) ? '<p class="rec-warn">Your answers changed after you edited this. <button class="btn-text btn" id="frebuild">Rebuild from answers</button></p>' : r.omitted.length && !d.edited && w.variant !== 'line' ? `<p class="rec-warn">Left out to fit: ${r.omitted.join(', ')}.</p>` : ''; const rb = $('#frebuild', root); if (rb) rb.addEventListener('click', () => { if (rb.dataset.armed) { delete w.drafts[w.variant]; renderFinal(type, { quiet: true }); return; } rb.dataset.armed = '1'; rb.textContent = 'Yes, replace my edits'; }); };
     notice();
     ta.addEventListener('input', () => { d.text = ta.value; d.edited = true; $('#fwc', root).textContent = L.count(ta.value); $('#fnote', root).textContent = 'edited by you'; autosave(type); Snd.play('scratch'); });
-    const rec = $('.rec-sheet', root);
-    $('#fcopy', root).addEventListener('click', () => { copyText(ta.value); Snd.play('pop'); FX.glow(rec); });
+    $('#fcopy', root).addEventListener('click', (e) => { copyText(ta.value); Snd.play('pop'); const r = e.currentTarget.getBoundingClientRect(); FX.confetti(26, { x: r.left + r.width / 2, y: r.top }); });
     $$('[data-var]', root).forEach((b) => b.addEventListener('click', () => { w.variant = b.dataset.var; autosave(type); Snd.play('turn'); swapText(type); }));
     $$('[data-voice]', root).forEach((b) => b.addEventListener('click', () => { const k = b.dataset.voice; if (k === 'first') a.person = 'first'; else { a.person = 'third'; a.pronouns = k; } autosave(type); Snd.play('pop'); swapText(type); }));
     $('#ftxt', root).addEventListener('click', () => downloadTxt(ta.value, (name || T.label) + ' ' + w.result.label + '.txt'));
@@ -608,24 +569,19 @@
     $('#fpost', root).addEventListener('click', () => openPost(type));
     $('#ffile', root).addEventListener('click', () => openFiling(type));
     $('#fother', root).addEventListener('click', () => { Snd.play('open'); location.hash = '#/' + other; });
-    $('.done-sticker', root).addEventListener('click', (e) => { Snd.play('chime'); const b = e.currentTarget; anim(b, [{ transform: 'rotate(10deg) scale(1)' }, { transform: 'rotate(-6deg) scale(1.18)' }, { transform: 'rotate(10deg) scale(1)' }], { duration: 520, easing: 'cubic-bezier(.2,1.6,.4,1)' }); FX.glow(rec); });
+    $('.done-sticker', root).addEventListener('click', (e) => { Snd.play('chime'); const r = e.currentTarget.getBoundingClientRect(); FX.confetti(40, { x: r.left + r.width / 2, y: r.top + r.height / 2 }); });
     const add = $('#f-addimg', root); if (add) add.addEventListener('change', async () => { if (await addImages(type, add.files)) renderFinal(type, { quiet: true }); });
-    tilt(rec, 1.5); $$('.next-card', root).forEach((c) => tilt(c, 7));
-    // scroll parallax: the photo drifts slower than the page and the words lift away
-    const photo = $('.fin-photo', root); const words = $('.fin-words', root);
-    FX.onScroll((y) => { if (!motion) return; photo.style.transform = `translate3d(0, ${y * 0.45}px, 0) scale(${1.04 + Math.min(y, 600) / 6000})`; words.style.transform = `translate3d(0, ${y * -0.18}px, 0)`; words.style.opacity = Math.max(0, 1 - y / 520); });
+    const rec = $('.rec-sheet', root); tilt(rec, 2); $$('.next-card', root).forEach((c) => tilt(c, 6));
+    FX.parallax([[$('.fin-hero', root), 10], [rec, -4]]);
     if (!opts.quiet) {
-      $('.fin-name', root).focus({ preventScroll: true }); scrollTo(0, 0);
-      if (opts.celebrate) await FX.lightsOn();
+      $('.fin-title', root).focus({ preventScroll: true });
       if (motion) {
-        anim(photo, [{ transform: 'scale(1.35)', filter: 'brightness(.4) blur(6px)' }, { transform: 'scale(1.04)', filter: 'brightness(1) blur(0)' }], { duration: 1600, easing: 'cubic-bezier(.16,1,.3,1)' }).then(() => photo.getAnimations().forEach((x) => x.cancel()));
-        anim($('.fin-name', root), [{ opacity: 0, transform: 'translateY(60px)', letterSpacing: '.04em' }, { opacity: 1, transform: 'none', letterSpacing: '-.045em' }], { duration: 1200, delay: 250, easing: 'cubic-bezier(.16,1,.3,1)' });
-        anim($('.fin-hand', root), [{ opacity: 0, transform: 'rotate(-8deg) translateY(10px)' }, { opacity: 1, transform: 'rotate(-4deg)' }], { duration: 700, delay: 900, easing: 'cubic-bezier(.2,1.4,.4,1)' });
-        const hp = $('.fin-hand .inline-heart path', root); if (hp) { hp.style.strokeDasharray = 1; anim(hp, [{ strokeDashoffset: 1 }, { strokeDashoffset: 0 }], { duration: 900, delay: 1300, easing: 'ease-out' }); }
-        anim($('.fin-sub', root), [{ opacity: 0 }, { opacity: 1 }], { duration: 700, delay: 700 });
-        const ds = $('.done-sticker', root); anim(ds, [{ opacity: 0, transform: 'scale(2.4) rotate(-30deg)' }, { opacity: 1, transform: 'scale(.92) rotate(12deg)', offset: .75 }, { opacity: 1, transform: 'scale(1) rotate(10deg)' }], { duration: 620, delay: 1500, easing: 'cubic-bezier(.2,1.2,.4,1)' }).then(() => ds.getAnimations().forEach((x) => x.cancel()));
-        if (opts.celebrate) setTimeout(() => Snd.play('stick'), 1550);
+        anim($('.fin-title', root), [{ opacity: 0, transform: 'translateY(30px)', letterSpacing: '.02em' }, { opacity: 1, transform: 'none', letterSpacing: '-.04em' }], { duration: 900, easing: 'cubic-bezier(.16,1,.3,1)' });
+        anim(rec, [{ opacity: 0, transform: 'perspective(1600px) rotateX(24deg) translateY(120px) scale(.94)' }, { opacity: 1, transform: 'none' }], { duration: 1000, delay: 150, easing: 'cubic-bezier(.16,1,.3,1)' }).then(() => rec.getAnimations().forEach((x) => x.cancel()));
+        const ds = $('.done-sticker', root); anim(ds, [{ opacity: 0, transform: 'scale(2.2) rotate(-40deg)' }, { opacity: 1, transform: 'scale(.9) rotate(12deg)', offset: .75 }, { opacity: 1, transform: 'scale(1) rotate(10deg)' }], { duration: 600, delay: 900, easing: 'cubic-bezier(.2,1.2,.4,1)' }).then(() => ds.getAnimations().forEach((x) => x.cancel()));
+        $$('.next-card', root).forEach((c, i) => anim(c, [{ opacity: 0, transform: 'translateY(30px)' }, { opacity: 1, transform: 'none' }], { duration: 640, delay: 700 + i * 110, easing: 'cubic-bezier(.16,1,.3,1)' }).then(() => c.getAnimations().forEach((x) => x.cancel())));
       }
+      if (opts.celebrate) { setTimeout(() => { Snd.play('chime'); FX.confetti(110); }, motion ? 450 : 0); setTimeout(() => Snd.play('stick'), motion ? 950 : 0); }
     }
   }
   async function swapText(type) {
@@ -682,7 +638,7 @@
       catch (err) { $('#fdo', box).disabled = false; toast('Could not save on this device. Copy your text to keep it.', true); return; }
       Snd.play('file'); box.innerHTML = '';
       await flyToTab(type);
-      Snd.play('stamp'); FX.glow($('.rec-sheet')); const fb = $('#ffile'); if (fb) { fb.classList.add('done'); $('b', fb).textContent = 'Filed ✓'; }
+      Snd.play('stamp'); FX.confetti(60); const fb = $('#ffile'); if (fb) { fb.classList.add('done'); $('b', fb).textContent = 'Filed ✓'; }
       const st = $('#fstamp'); if (st) { st.hidden = false; st.innerHTML = `Filed ${fmtDate(new Date().toISOString())}<br>${esc(title)}`; anim(st, [{ opacity: 0, transform: 'rotate(-6deg) scale(1.4)' }, { opacity: 1, transform: 'rotate(-6deg) scale(1)' }], { duration: 340, easing: 'cubic-bezier(.2,1.4,.4,1)' }); }
       const n = (await S.listDocuments(type)).length;
       toast(`Filed in ${T.label} as version ${n}`, false, { label: 'Undo', run: async () => { await S.removeDocument(doc.id); toast('Filing undone.'); } });
