@@ -195,7 +195,7 @@
     const r = route();
     $$('.ix').forEach((a) => (a.dataset.route === r ? a.setAttribute('aria-current', 'page') : a.removeAttribute('aria-current')));
     const from = current; current = r;
-    document.body.classList.toggle('writing', r === 'bio' || r === 'statement');
+    document.body.classList.remove('writing');
     FX.parallax([]); FX.onScroll(null); document.body.classList.remove('lit');
     if (r === 'home') await renderHome(from);
     else if (r === 'files') await renderFiles();
@@ -264,7 +264,8 @@
 
   async function renderWriting(type, opts = {}) {
     const w = getWork(type);
-    if (w.step >= QS[type].length) return renderFinal(type, opts);
+    if (w.step >= QS[type].length) { document.body.classList.remove('writing'); return renderFinal(type, opts); }
+    document.body.classList.add('writing');
     const T = TYPES[type]; const th = T.theme; const docs = await S.listDocuments(type);
     const fresh = !$(`.spread-view[data-type="${type}"]`, main);
     if (fresh) {
@@ -357,36 +358,22 @@
     el.style.fontSize = r.words > 110 ? '16px' : r.words > 70 ? '18px' : '';
     sofarLast = r.text;
     const pin = $('#bspin'); const lead = w.images[0];
-    if (pin) { pin.innerHTML = lead ? `<figure class="print p0"><img data-img="${lead.id}" alt=""></figure>` : ''; hydrate(pin); }
+    if (pin) { const had = pin.dataset.id; pin.innerHTML = lead ? `<figure class="bs-work"><img data-img="${lead.id}" alt=""><figcaption>${esc(capText(lead) || 'Your work')}</figcaption></figure>` : ''; pin.dataset.id = lead ? lead.id : ''; hydrate(pin); const f = $('.bs-work', pin); if (f && had !== lead.id && motion) anim(f, [{ opacity: 0, transform: 'translateY(12px)' }, { opacity: 1, transform: 'none' }], { duration: 700, easing: 'cubic-bezier(.16,1,.3,1)' }); }
     const cov = $('.cover-in', main); if (cov) cov.classList.toggle('has-prints', !!lead);
   }
 
   // Page turn: the page swings over the rings in 3D, with a shadow sweeping across it.
+  // Page change: the question content slides gently out and the next one settles in. Quiet, quick.
   async function stepTo(type, i, back) {
     const w = getWork(type); const n = QS[type].length; if (i < 0) return;
-    const page = $('#page', main); const stage = $('.stage', main);
-    if (i >= n) { w.step = n; autosave(type); Snd.play('flip'); if (motion && page) await anim(page, [{ transform: 'perspective(1800px) rotateY(0)', opacity: 1 }, { transform: 'perspective(1800px) rotateY(-100deg)', opacity: .2 }], { duration: 520, easing: 'cubic-bezier(.5,0,.2,1)' }); return renderFinal(type, { celebrate: true }); }
-    const phone = innerWidth <= 860;
-    let ghost = null;
-    if (motion && page && stage && !back) { ghost = page.cloneNode(true); ghost.removeAttribute('id'); ghost.inert = true; $$('[id]', ghost).forEach((x) => x.removeAttribute('id')); ghost.classList.add('ghost-page'); stage.appendChild(ghost); }
-    const oldGroup = groupOf(type, w.step);
-    w.step = i; autosave(type); Snd.play('flip');
+    const body = $('#page .qbody', main);
+    const dx = back ? 1 : -1;
+    if (motion && body) await anim(body, [{ opacity: 1, transform: 'none' }, { opacity: 0, transform: `translateX(${dx * 24}px)` }], { duration: 200, easing: 'ease-in' });
+    if (i >= n) { w.step = n; autosave(type); Snd.play('turn'); return renderFinal(type, { celebrate: true }); }
+    w.step = i; autosave(type); Snd.play('turn');
     await renderWriting(type);
-    // a new chapter gets its own beat: the sheet lifts off the cover and settles, and the chapter tab slides out
-    if (motion && groupOf(type, i) !== oldGroup) {
-      const sh = $('.bio-sheet', main); if (sh) anim(sh, [{ transform: 'translateY(0) rotate(-1.6deg)' }, { transform: 'translateY(-22px) rotate(-3.5deg)', offset: .4 }, { transform: 'translateY(0) rotate(-1.6deg)' }], { duration: 900, easing: 'cubic-bezier(.3,1.3,.4,1)' }).then(() => sh.getAnimations().forEach((x) => x.cancel()));
-      const tb = $('.tab[aria-selected="true"]', main); if (tb) anim(tb, [{ transform: 'translateX(-18px)' }, { transform: 'none' }], { duration: 600, easing: 'cubic-bezier(.16,1,.3,1)' });
-    }
-    const np = $('#page', main);
-    if (!motion) return;
-    if (phone) { anim(np, [{ transform: `translateX(${back ? -40 : 40}px)`, opacity: 0 }, { transform: 'none', opacity: 1 }], { duration: 420, easing: 'cubic-bezier(.16,1,.3,1)' }); if (ghost) ghost.remove(); return; }
-    if (ghost) {
-      await anim(ghost, [{ transform: 'perspective(1800px) rotateY(0deg)', filter: 'brightness(1)' }, { transform: 'perspective(1800px) rotateY(-92deg)', filter: 'brightness(.82)', offset: .55 }, { transform: 'perspective(1800px) rotateY(-178deg)', filter: 'brightness(.7)', opacity: 0 }], { duration: 820, easing: 'cubic-bezier(.45,.05,.25,1)' });
-      ghost.remove();
-    } else {
-      await anim(np, [{ transform: 'perspective(1800px) rotateY(-150deg)', opacity: 0, filter: 'brightness(.75)' }, { transform: 'perspective(1800px) rotateY(0deg)', opacity: 1, filter: 'brightness(1)' }], { duration: 760, easing: 'cubic-bezier(.3,.1,.2,1)' });
-      np.getAnimations().forEach((x) => x.cancel());
-    }
+    const nb = $('#page .qbody', main);
+    if (motion && nb) { await anim(nb, [{ opacity: 0, transform: `translateX(${-dx * 24}px)` }, { opacity: 1, transform: 'none' }], { duration: 420, easing: 'cubic-bezier(.16,1,.3,1)' }); nb.getAnimations().forEach((x) => x.cancel()); }
   }
 
   // Opening from the shelf: the front cover swings open on its spine.
@@ -465,6 +452,7 @@
   }
   // The finish: the light comes on and the document rises out of its folder, carrying everything.
   async function renderFinal(type, opts = {}) {
+    document.body.classList.remove('writing');
     const T = TYPES[type]; const th = T.theme; const w = getWork(type); const a = w.answers; const word = type === 'bio' ? 'bio' : 'statement';
     const missing = (type === 'bio' ? ['name', 'role'] : ['subjects']).filter((k) => !L.clean(a[k]));
     if (missing.length) { w.step = QS[type].findIndex((q) => q.k === missing[0]); autosave(type); toast(type === 'bio' ? 'Your name and practice come first.' : 'The statement needs your subjects first.'); main.innerHTML = ''; return renderWriting(type); }
@@ -475,7 +463,9 @@
     const other = type === 'bio' ? 'statement' : 'bio'; const otherLabel = other === 'bio' ? 'artist bio' : 'artist statement';
     main.innerHTML = `<section class="fin" data-type="${type}" style="--cv:${th.cv};--cv-ink:${th.cvInk}">
       <div class="fin-bar"><button class="fin-edit" id="fedit">← Edit answers</button><span>${esc(T.label)} · version ${docs.length + 1}</span></div>
+      <div class="fin-scroll"><div class="fin-stage">
       <h1 class="fin-title" tabindex="-1">Your ${word} is <em>ready</em>${first ? `, ${esc(first)}` : ''}.</h1>
+      <p class="fin-cue">Scroll to take it out ↓</p>
       <div class="fin-folder">
         <span class="ff-back"></span>
         <article class="fin-doc">
@@ -502,6 +492,7 @@
         </article>
         <span class="ff-front"><b>${T.titleHTML}</b></span>
       </div>
+      </div></div>
       <div class="fin-next">
         <button class="fn-row" id="ffile"><span>01</span><b>File this version</b><i>In your ${esc(T.short)} folder</i><em>→</em></button>
         <button class="fn-row" id="fagain"><span>02</span><b>Write another version</b><i>Same answers, a fresh start</i><em>→</em></button>
@@ -526,15 +517,18 @@
     $('#fpost', root).addEventListener('click', () => openPost(type));
     $('#ffile', root).addEventListener('click', () => openFiling(type));
     $('#fother', root).addEventListener('click', () => { Snd.play('open'); location.hash = '#/' + other; });
+    // scroll: the document rises out of the folder and stops fully out, then the page moves on to the next steps
+    const sc = $('.fin-scroll', root);
+    const rise = () => { const rr = sc.getBoundingClientRect(); const span = Math.max(1, rr.height - innerHeight); const p = Math.min(1, Math.max(0, -rr.top / span)); root.style.setProperty('--p', p.toFixed(3)); };
+    const big = innerWidth > 860 && motion;
+    FX.onScroll(big ? rise : null); root.style.setProperty('--p', big ? '0' : '1'); root.classList.toggle('scrolly', big);
     if (!opts.quiet) {
       $('.fin-title', root).focus({ preventScroll: true }); scrollTo(0, 0);
+      if (opts.celebrate) await FX.lightsOn();
       if (motion) {
-        doc.style.transform = 'translateY(78%)';
-        if (opts.celebrate) await FX.lightsOn();
         anim($('.fin-title', root), [{ opacity: 0, transform: 'translateY(20px)' }, { opacity: 1, transform: 'none' }], { duration: 900, easing: 'cubic-bezier(.16,1,.3,1)' });
-        Snd.play('file');
-        await anim(doc, [{ transform: 'translateY(78%)' }, { transform: 'translateY(-3%)', offset: .82 }, { transform: 'translateY(0)' }], { duration: 1500, delay: 250, easing: 'cubic-bezier(.3,.1,.2,1)' });
-        doc.getAnimations().forEach((x) => x.cancel()); doc.style.transform = '';
+        anim($('.fin-folder', root), [{ opacity: 0, transform: 'translateY(60px)' }, { opacity: 1, transform: 'none' }], { duration: 1000, delay: 120, easing: 'cubic-bezier(.16,1,.3,1)' });
+        if (big) anim(doc, [{ translate: '0 0' }, { translate: '0 -36px', offset: .5 }, { translate: '0 0' }], { duration: 1300, delay: 1100, easing: 'cubic-bezier(.45,0,.2,1)' });
       }
     }
   }
