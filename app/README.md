@@ -1,35 +1,47 @@
-# My Studio prototype (v4)
+# My Studio prototype (v5)
 
 Buildless HTML, CSS and JavaScript. Serve this folder with any static server (for example `python3 -m http.server`) and open `index.html`.
 
-v4 keeps the v2 paper folder experience and builds on it.
+## How it works
 
-## What v4 adds
+- **Home:** three paper folders: Bio (Chilli), Statement (Petrol) and My files (Peony).
+  - They lean toward the pointer, and the front cover opens on hover.
+  - Below them are "On the wall" (the artist's images) and "Recently filed".
+- **Writing:** one question per screen, following the founder's earlier ATH Bio Poster.
+  - Each screen has a big poster word, a ribbon line and a calm question panel.
+  - A tilted paper sheet shows the text building up, and the newest sentence is set in italic.
+  - Screens alternate between the section's light and dark colours.
+  - The panel fits without scrolling at 1440×900 and at 1280×720.
+  - Bio has 9 questions; Statement has 7. The last question in each is "Show the work", where the artist adds up to 8 images with their own captions.
+- **Final page:** a spacious poster.
+  - It shows the name set large, the practice and place, and the lead image or an "Add your work" drop target.
+  - The text can be edited in place.
+  - Controls: Copy, Length (Full, Short, Brief, One line) and Voice (She, He, They, I).
+  - Links: File this version, Square post, Download .txt and Edit answers.
+  - Each length can be edited separately.
+- **Filing:** a paper copy of the text flies into the section's tab, and the message that appears has Undo. My files lists every version, with its lead image.
+- **Settings:** the Desk menu has Paper and Ink themes, Motion and 3D, and Sounds.
 
-- **More space.** Wider margins, larger gaps between sections, roomier pages and notes, and one Desk menu in the header for theme, sound and motion.
-- **3D paper.**
-  - Folders on the shelf lean toward the pointer, and their front cover opens on its hinge when you hover.
-  - The draft, the press page and the filed outcome tilt slightly toward the pointer.
-  - Filing sends the page into the pocket in 3D.
-  - Turning off "Motion and 3D" in the Desk menu stops all of this.
-- **Images of the work.**
-  - A new Images page, before the outcome, takes up to 8 photos by drag and drop or file picker.
-  - Each photo is downscaled on the device and taped to a card with a title, year and medium. Captions are only what the artist writes.
-  - The first photo is the lead image. Images are pinned on the inside cover, shown on the "On the wall" section of the home page, and appear on file sleeves.
-  - "Try sample images" adds generated placeholders that are labelled Sample.
-- **Outcome variations.** The final page offers four lengths: Full, Short, Brief and One line. Each length uses the same facts and drops whole optional sentences. Each length can be edited separately.
-- **Outcome layouts.** Each length can be seen as Text, as a Press page (lead image, name, practice, text, captions and an image strip) or as a 1:1 Square post.
-- **Filing.** Filing keeps the chosen length, its layout and the images.
-- **Colour per section.** Bio is Chilli, Statement is Petrol and My files is Peony. Each colour is carried through the index tab, the folder, the cover, the buttons and the dialog.
+## Rules kept
+
+- The writer only uses what the artist typed.
+- Fictional examples are marked "e.g.", and sample images are labelled Sample.
+- Image titles start from the file names, and the artist is asked to check them.
+- Generation is a template writer, labelled Demo writer. Production generation must run on the server; never put secrets in the frontend.
 
 ## Files
 
 | Path | What it does |
 | --- | --- |
-| `js/logic.js` | The writing rules: `compose()` and `variants()`. Tested in `tests/`. |
-| `js/service.js` | The mock service. Documents and drafts are kept in `localStorage`, and images in IndexedDB. Replace it with real API calls that use the same method shapes. Never put secrets in the frontend. |
+| `js/logic.js` | The writing rules: `compose()` (sentence parts, word limits) and `variants()`. Tested in `tests/`. |
+| `js/service.js` | The mock service. Documents and drafts are kept in `localStorage`, and images in IndexedDB. Replace it with real API calls that use the same method shapes. |
 | `js/app.js` | Views and interactions. |
 | `js/sound.js` | Optional paper sounds. These are placeholders. |
 | `tools/bundle.cjs` | Builds a single HTML file for hosted previews. |
 
 Run the tests with `node --test app/tests/logic.test.cjs`.
+
+## Not built yet
+
+- Saving the poster or the square post as an image.
+- Tone options (Warm, Formal, Bold): these need server-side generation.

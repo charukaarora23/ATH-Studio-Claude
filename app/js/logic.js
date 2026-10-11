@@ -79,7 +79,7 @@
     }
     const text = join(chosen);
     const words = count(text);
-    return { text, words, omitted, over: !!max && words > max, used: chosen.map((p) => p.key) };
+    return { text, words, omitted, over: !!max && words > max, used: chosen.map((p) => p.key), parts: chosen.map((p) => ({ key: p.key, text: p.text })) };
   }
 
 
