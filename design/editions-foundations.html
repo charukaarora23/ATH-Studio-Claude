@@ -1,0 +1,456 @@
+<title>ATH Editions Foundations</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600;700&display=swap">
+<style>
+/* Layout: a printed spec book. Left index rail, one reading column, specimens laid flat on cream like proofs on a desk. */
+:root {
+  --cream-100: #F9EEE5; --cream-50: #FDF8F3; --cream-200: #F1E2D6;
+  --burgundy-500: #850020; --burgundy-800: #3E0712; --red-700: #AA0003; --red-500: #FF0000;
+  --peony: #FAD2E1; --sky-300: #B7D9FF; --lemon: #FFF3B2; --petrol: #025054;
+  --ink-900: #1C1310; --ink-700: #4A3A33; --ink-500: #7A6A63;
+  --bg: var(--cream-100); --raised: var(--cream-50); --sunk: var(--cream-200);
+  --text: var(--ink-900); --muted: var(--ink-700); --faint: var(--ink-500);
+  --accent: var(--burgundy-500); --rule: rgba(28, 19, 16, .14); --inverse: var(--burgundy-800); --on-inverse: var(--cream-100);
+  --serif: 'Instrument Serif', 'Times New Roman', Georgia, serif;
+  --ui: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #140C0A; --raised: #1C1310; --sunk: #0F0907; --text: var(--cream-100); --muted: #D8C7BD; --faint: #A8968D;
+  --accent: #E77F95; --rule: rgba(249, 238, 229, .16); --inverse: #2A050D; --on-inverse: var(--cream-100); color-scheme: dark; } }
+:root[data-theme="dark"] { --bg: #140C0A; --raised: #1C1310; --sunk: #0F0907; --text: var(--cream-100); --muted: #D8C7BD; --faint: #A8968D;
+  --accent: #E77F95; --rule: rgba(249, 238, 229, .16); --inverse: #2A050D; --on-inverse: var(--cream-100); color-scheme: dark; }
+
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--text); font: 400 16px/1.6 var(--ui); padding-inline: clamp(16px, 4vw, 56px); }
+a { color: var(--accent); }
+.wrap { display: grid; grid-template-columns: 220px minmax(0, 1fr); gap: 64px; max-width: 1240px; margin: 0 auto; padding-block: 56px 120px; }
+nav.rail { position: sticky; top: 24px; align-self: start; font-size: 13px; }
+nav.rail p { margin: 0 0 14px; font-weight: 600; letter-spacing: .14em; text-transform: uppercase; font-size: 11px; color: var(--faint); }
+nav.rail ol { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; counter-reset: s; }
+nav.rail li { counter-increment: s; }
+nav.rail a { color: var(--muted); text-decoration: none; }
+nav.rail a::before { content: counter(s, decimal-leading-zero) "  "; color: var(--faint); font-variant-numeric: tabular-nums; }
+nav.rail a:hover { color: var(--accent); }
+main { min-width: 0; }
+.over { font: 600 11px/1 var(--ui); letter-spacing: .16em; text-transform: uppercase; color: var(--accent); }
+h1 { margin: 14px 0 0; font: 400 clamp(44px, 6vw, 76px)/1 var(--serif); letter-spacing: -.02em; text-wrap: balance; }
+h1 em, h2 em { font-style: italic; color: var(--accent); }
+.lead { max-width: 62ch; margin: 22px 0 0; font-size: 19px; line-height: 1.55; color: var(--muted); }
+section { padding-top: 88px; scroll-margin-top: 24px; }
+h2 { margin: 10px 0 0; font: 400 clamp(32px, 3.6vw, 46px)/1.08 var(--serif); letter-spacing: -.01em; text-wrap: balance; }
+h3 { margin: 40px 0 0; font: 600 17px/1.3 var(--ui); }
+p { max-width: 68ch; }
+.sub { color: var(--muted); max-width: 64ch; }
+table { width: 100%; border-collapse: collapse; margin-top: 18px; font-size: 14.5px; }
+.tw { overflow-x: auto; }
+th { text-align: left; font: 600 11px/1.2 var(--ui); letter-spacing: .12em; text-transform: uppercase; color: var(--faint); padding: 0 16px 10px 0; border-bottom: 1px solid var(--rule); }
+td { padding: 12px 16px 12px 0; border-bottom: 1px solid var(--rule); vertical-align: top; }
+td:first-child { font-weight: 600; white-space: nowrap; }
+code { font: 500 13px/1 ui-monospace, 'SF Mono', Menlo, monospace; background: var(--sunk); padding: 2px 6px; border-radius: 4px; }
+ul.rules { margin: 18px 0 0; padding: 0; list-style: none; display: grid; gap: 12px; max-width: 70ch; }
+ul.rules li { padding-left: 22px; position: relative; }
+ul.rules li::before { content: ''; position: absolute; left: 0; top: .62em; width: 10px; height: 2px; background: var(--accent); }
+
+/* principle list */
+.principles { display: grid; gap: 0; margin-top: 24px; border-top: 1px solid var(--rule); }
+.principles div { display: grid; grid-template-columns: 56px minmax(0, 1fr); gap: 16px; padding: 22px 0; border-bottom: 1px solid var(--rule); }
+.principles b { font: 400 34px/1 var(--serif); color: var(--accent); }
+.principles h4 { margin: 0; font: 400 24px/1.2 var(--serif); }
+.principles p { margin: 6px 0 0; color: var(--muted); }
+
+/* audit */
+.audit { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(300px, 100%), 1fr)); gap: 18px; margin-top: 24px; }
+.issue { background: var(--raised); border: 1px solid var(--rule); border-radius: 12px; padding: 20px; }
+.issue .where { font: 600 11px/1 var(--ui); letter-spacing: .12em; text-transform: uppercase; color: var(--faint); }
+.issue h4 { margin: 10px 0 0; font: 600 16px/1.35 var(--ui); }
+.issue p { margin: 8px 0 0; font-size: 14.5px; color: var(--muted); }
+.issue .fix { margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--rule); font-size: 14px; color: var(--text); }
+.issue .fix::before { content: 'Rule: '; font-weight: 600; color: var(--accent); }
+
+/* IA tree */
+.tree { margin-top: 22px; display: grid; gap: 10px; }
+.node { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: baseline; gap: 16px; padding: 14px 18px; background: var(--raised); border: 1px solid var(--rule); border-radius: 12px; }
+.node b { font: 400 22px/1.2 var(--serif); }
+.node span { font-size: 13px; color: var(--faint); }
+.node.l2 { margin-left: 28px; } .node.l3 { margin-left: 56px; } .node.l4 { margin-left: 84px; }
+
+/* swatches */
+.sw { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(170px, 100%), 1fr)); gap: 14px; margin-top: 22px; }
+.chip { border-radius: 12px; overflow: hidden; border: 1px solid var(--rule); background: var(--raised); }
+.chip i { display: block; height: 76px; }
+.chip div { padding: 10px 12px 12px; font-size: 13px; }
+.chip b { display: block; font-weight: 600; }
+.chip span { color: var(--faint); font-variant-numeric: tabular-nums; }
+.ratio { display: grid; grid-template-columns: 60fr 25fr 10fr 5fr; height: 34px; border-radius: 8px; overflow: hidden; margin-top: 18px; border: 1px solid var(--rule); }
+
+/* type specimens */
+.spec { margin-top: 22px; border-top: 1px solid var(--rule); }
+.spec .row { display: grid; grid-template-columns: 170px minmax(0, 1fr); gap: 24px; align-items: baseline; padding: 18px 0; border-bottom: 1px solid var(--rule); }
+.spec .meta { font-size: 12.5px; color: var(--faint); line-height: 1.45; }
+.spec .meta b { display: block; color: var(--text); font-size: 13px; }
+
+/* component sketches: drawn with the real tokens */
+.board { margin-top: 22px; background: var(--sunk); border-radius: 16px; padding: clamp(16px, 3vw, 32px); display: grid; gap: 18px; }
+.demo-header { display: flex; align-items: center; gap: 24px; height: 72px; padding: 0 24px; background: var(--cream-100); border-bottom: 1px solid rgba(28,19,16,.12); border-radius: 10px; color: var(--ink-900); overflow: hidden; }
+.demo-header .logo { font: 400 22px/1 var(--serif); white-space: nowrap; }
+.demo-header .logo small { display: block; font: 600 9px/1 var(--ui); letter-spacing: .16em; color: var(--burgundy-500); margin-top: 3px; }
+.demo-header nav { display: flex; gap: 22px; margin-left: auto; font-size: 14px; font-weight: 500; white-space: nowrap; }
+.demo-header nav a { color: var(--ink-700); text-decoration: none; }
+.demo-header nav a.on { color: var(--burgundy-500); box-shadow: 0 2px 0 var(--burgundy-500); }
+.demo-btn { display: inline-flex; align-items: center; height: 44px; padding: 0 20px; border-radius: 12px; font: 600 15px/1 var(--ui); white-space: nowrap; }
+.demo-btn.p { background: var(--burgundy-500); color: var(--cream-100); }
+.demo-btn.s { box-shadow: inset 0 0 0 2px var(--burgundy-500); color: var(--burgundy-500); }
+.demo-btn.i { background: var(--cream-100); color: var(--burgundy-500); }
+.demo-link { color: var(--burgundy-500); font: 600 15px/1 var(--ui); text-decoration: underline; text-underline-offset: 5px; text-decoration-thickness: 2px; }
+.btnrow { display: flex; flex-wrap: wrap; gap: 14px; align-items: center; padding: 20px; background: var(--cream-100); border-radius: 10px; }
+.btnrow.dark { background: var(--burgundy-800); }
+.drawer-demo { display: grid; grid-template-columns: minmax(0, 1fr) min(360px, 60%); min-height: 260px; border-radius: 10px; overflow: hidden; background: rgba(28,19,16,.45); }
+.drawer-demo .panel { background: var(--cream-50); color: var(--ink-900); padding: 22px; display: grid; gap: 12px; align-content: start; }
+.drawer-demo .panel b { font: 400 26px/1.1 var(--serif); }
+.drawer-demo .line { display: flex; justify-content: space-between; font-size: 14px; padding: 8px 0; border-bottom: 1px solid rgba(28,19,16,.12); }
+.foot-demo { background: var(--burgundy-800); color: var(--cream-100); border-radius: 10px; padding: 28px; display: grid; grid-template-columns: 1.6fr repeat(3, 1fr); gap: 24px; font-size: 13px; }
+.foot-demo h5 { margin: 0 0 10px; font: 600 10.5px/1 var(--ui); letter-spacing: .16em; color: var(--peony); text-transform: uppercase; }
+.foot-demo b { font: 400 28px/1.1 var(--serif); }
+.foot-demo b em { color: var(--peony); }
+.foot-demo p { margin: 4px 0; opacity: .85; }
+.cards-demo { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+.ecard { background: var(--cream-50); border-radius: 12px; padding: 12px 12px 16px; color: var(--ink-900); border: 1px solid rgba(28,19,16,.1); }
+.ecard i { display: block; aspect-ratio: 4 / 5; border-radius: 6px; background: linear-gradient(160deg, #7a1a2a, #3E0712); }
+.ecard:nth-child(2) i { background: linear-gradient(160deg, #B7D9FF, #6f8fb8); }
+.ecard:nth-child(3) i { background: linear-gradient(160deg, #FAD2E1, #c98aa1); }
+.ecard .k { margin-top: 12px; font: 600 10.5px/1 var(--ui); letter-spacing: .14em; text-transform: uppercase; color: var(--burgundy-500); }
+.ecard b { display: block; margin-top: 6px; font: 400 22px/1.15 var(--serif); }
+.ecard span { font-size: 13px; color: var(--ink-500); }
+.cap { font-size: 12.5px; color: var(--faint); margin-top: -8px; }
+
+/* decisions */
+.decide { margin-top: 24px; display: grid; gap: 14px; }
+.q { display: grid; grid-template-columns: 40px minmax(0, 1fr); gap: 14px; padding: 18px 20px; border-radius: 12px; background: var(--raised); border: 1px solid var(--rule); }
+.q b { font: 400 30px/1 var(--serif); color: var(--accent); }
+.q h4 { margin: 0; font: 600 16px/1.35 var(--ui); }
+.q p { margin: 6px 0 0; font-size: 14.5px; color: var(--muted); }
+.q p strong { color: var(--text); }
+
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 4px; }
+@media (max-width: 900px) {
+  .wrap { grid-template-columns: 1fr; gap: 24px; padding-block: 32px 80px; }
+  nav.rail { position: static; }
+  nav.rail ol { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .spec .row { grid-template-columns: 1fr; gap: 6px; }
+  .demo-header nav { display: none; }
+  .foot-demo { grid-template-columns: 1fr 1fr; }
+  .cards-demo { grid-template-columns: 1fr; }
+  .drawer-demo { grid-template-columns: 0 1fr; }
+  .node.l2 { margin-left: 14px; } .node.l3 { margin-left: 28px; } .node.l4 { margin-left: 42px; }
+}
+</style>
+
+<div class="wrap">
+  <nav class="rail" aria-label="Sections">
+    <p>ATH Editions</p>
+    <ol>
+      <li><a href="#product">The product</a></li>
+      <li><a href="#principles">Principles</a></li>
+      <li><a href="#audit">Current screens</a></li>
+      <li><a href="#ia">Structure</a></li>
+      <li><a href="#colour">Colour</a></li>
+      <li><a href="#type">Type</a></li>
+      <li><a href="#layout">Layout</a></li>
+      <li><a href="#shell">Header and menus</a></li>
+      <li><a href="#actions">Buttons and calls to action</a></li>
+      <li><a href="#drawers">Drawers</a></li>
+      <li><a href="#cards">Cards and sections</a></li>
+      <li><a href="#footer">Footer</a></li>
+      <li><a href="#motion">Motion and imagery</a></li>
+      <li><a href="#words">Words</a></li>
+      <li><a href="#decide">Your decisions</a></li>
+    </ol>
+  </nav>
+
+  <main>
+    <p class="over">Product foundations · draft 1 · 12 Oct 2026</p>
+    <h1>ATH <em>Editions</em></h1>
+    <p class="lead">The rules every Editions screen follows before it is redesigned: what the product is for, who it serves, and the colours, type, header, menus, drawers, footer and words it is built from. These sit under the Arts to Hearts Project design system and only add what Editions needs. Where the master system already decides something, this page points to it.</p>
+
+    <section id="product">
+      <p class="over">01 · The product</p>
+      <h2>A shelf you can <em>walk into</em></h2>
+      <p class="sub">Editions is where ATH shows its published books: every series, every volume, and the artists inside them. In the master system's language it is the <strong>Shelf</strong> side of "Studio &amp; Shelf": the collector's view of finished work.</p>
+      <div class="tw"><table>
+        <thead><tr><th>Who</th><th>What they came to do</th><th>The one action we want</th></tr></thead>
+        <tbody>
+          <tr><td>Collector</td><td>Understand a volume, see the artists, decide if it's worth owning.</td><td>Buy this edition</td></tr>
+          <tr><td>Artist</td><td>See what being featured looks like and whether their work belongs.</td><td>Submit for the next volume</td></tr>
+          <tr><td>Featured artist</td><td>Find their page and share it.</td><td>Share your page</td></tr>
+          <tr><td>Curator, press</td><td>Find artists and credits quickly.</td><td>View artist</td></tr>
+        </tbody>
+      </table></div>
+      <h3>What Editions is not</h3>
+      <ul class="rules">
+        <li>Not the open-call site. It links to the next open call; it never runs the submission form itself.</li>
+        <li>Not a competition results page. Recognition (cover artist, winners) is shown as editorial credit, not as a podium.</li>
+        <li>Not a general blog. Every section is about a specific series, volume or artist.</li>
+      </ul>
+      <h3>How we'll know it works</h3>
+      <ul class="rules">
+        <li>Edition page: share of visitors who open the purchase drawer, then complete it.</li>
+        <li>Series page: share of visitors who open a volume.</li>
+        <li>Both: clicks on "Submit for Vol. 8" that reach the open-call page.</li>
+      </ul>
+    </section>
+
+    <section id="principles">
+      <p class="over">02 · Principles</p>
+      <h2>Five rules that <em>decide</em> arguments</h2>
+      <div class="principles">
+        <div><b>1</b><section style="padding:0"><h4>The book is the hero.</h4><p>Real covers and real spreads lead every page. Type and colour frame the object; they never compete with it.</p></section></div>
+        <div><b>2</b><section style="padding:0"><h4>One job per screen, one primary button.</h4><p>A screen exists to sell this edition, or to open a volume, or to show an artist. Everything else is a secondary button or a link.</p></section></div>
+        <div><b>3</b><section style="padding:0"><h4>Quiet register.</h4><p>Editions speaks in the soft voice of the master system: Instrument Serif and Inter. The loud Archivo Black voice belongs to campaigns and open calls, not to the shelf.</p></section></div>
+        <div><b>4</b><section style="padding:0"><h4>Structure tells the truth.</h4><p>Numbers, labels and breadcrumbs only appear when they mean something. A section number means a real sequence; a label names what is actually below it.</p></section></div>
+        <div><b>5</b><section style="padding:0"><h4>Honest and specific.</h4><p>Real names, real prices, real page counts, real ship dates. No placeholder text ships, and no fake urgency.</p></section></div>
+      </div>
+    </section>
+
+    <section id="audit">
+      <p class="over">03 · Current screens</p>
+      <h2>What the guardrails <em>fix</em></h2>
+      <p class="sub">From the two screens you shared, the Studio Visit Book Vol. 7 page and the Studio Visit Books series page. Each problem becomes a rule.</p>
+      <div class="audit">
+        <div class="issue"><span class="where">Vol. 7 · sections</span><h4>Section numbers run 01, 02, 04, 02, 03, 05.</h4><p>Numbers repeat and skip, so they read as noise instead of order.</p><div class="fix">Number sections only on a real sequence. Product pages use named eyebrows without numbers.</div></div>
+        <div class="issue"><span class="where">Vol. 7 · labels</span><h4>"Two ways to hold this collection" sits above "Selected artists".</h4><p>The eyebrow describes a different section from the one below it.</p><div class="fix">An eyebrow names its own section in two to four words.</div></div>
+        <div class="issue"><span class="where">Vol. 7 · calls to action</span><h4>Five competing calls to action.</h4><p>Purchase $120, Be in the next one, Submit your work for Vol. 0, pink arrow pills, View all.</p><div class="fix">One primary per screen. Edition pages: "Buy this edition · $120". Everything else is secondary or a link.</div></div>
+        <div class="issue"><span class="where">Vol. 7 · content</span><h4>Placeholder text and repeated names.</h4><p>"Lorem ipsum" in the cover-artist quote; "Abigail Cruz" three times; "Vol. 0".</p><div class="fix">No screen ships with placeholder copy. Missing content hides its section.</div></div>
+        <div class="issue"><span class="where">Vol. 7 · recognition</span><h4>A sports podium with 1st, 2nd and 3rd.</h4><p>Gold rings and rank numbers turn a book into a contest.</p><div class="fix">Recognition is shown as editorial credit: "Cover artist", "Featured", with a portrait and one line.</div></div>
+        <div class="issue"><span class="where">Both · buttons</span><h4>Pill buttons, square buttons and arrow chips mixed.</h4><p>The master system says 12px corners and never pills.</p><div class="fix">Three button shapes only: primary, secondary, link. All 12px radius.</div></div>
+        <div class="issue"><span class="where">Both · dark bands</span><h4>Three to four burgundy bands per page.</h4><p>The hero, a ticker, a mid band and the footer all go dark, so nothing stands out.</p><div class="fix">At most one dark band between the header and the footer.</div></div>
+        <div class="issue"><span class="where">Both · navigation</span><h4>The header links differ from the master site.</h4><p>"The full story, Collections, Awards, Your journey, Your next 5 years, FAQ" against the master's "Open calls, Books, Artists, Magazine, Podcast, Shop".</p><div class="fix">One header across ATH. Editions lives under "Books". See decision 1.</div></div>
+        <div class="issue"><span class="where">Both · small text</span><h4>Grey 11–12px body text in long paragraphs.</h4><p>Much of the reading copy is tiny, centred and low-contrast.</p><div class="fix">Body 16px minimum, left-aligned, measure 68 characters, <code>ink-700</code> or darker.</div></div>
+      </div>
+    </section>
+
+    <section id="ia">
+      <p class="over">04 · Structure</p>
+      <h2>Four page types, <em>one path</em></h2>
+      <div class="tree">
+        <div class="node"><b>Books</b><span>All series on one shelf · menu item</span></div>
+        <div class="node l2"><b>Series</b><span>e.g. Studio Visit Books · its volumes, story, cover artists</span></div>
+        <div class="node l3"><b>Edition</b><span>e.g. Studio Visit Book Vol. 7 · buy, look inside, artists</span></div>
+        <div class="node l4"><b>Artist</b><span>A drawer or page · work, quote, which volumes they appear in</span></div>
+      </div>
+      <h3>Edition page, in this order</h3>
+      <div class="tw"><table>
+        <thead><tr><th>Block</th><th>Job</th><th>Rule</th></tr></thead>
+        <tbody>
+          <tr><td>Hero</td><td>Cover, title, price, Buy</td><td>The one dark band. Cover photographed, never a flat mockup.</td></tr>
+          <tr><td>Look inside</td><td>Real spreads</td><td>Flip or carousel of 4–8 real spreads. No stock "hands holding book" unless it is this book.</td></tr>
+          <tr><td>The story</td><td>Why this volume exists</td><td>Under 90 words. One serif headline, one paragraph.</td></tr>
+          <tr><td>Cover artist</td><td>Who is on the cover</td><td>Portrait, name, one real quote, 3 works.</td></tr>
+          <tr><td>Artists in this volume</td><td>Everyone featured</td><td>Grid of artist cards, all opening the artist drawer.</td></tr>
+          <tr><td>The details</td><td>Facts</td><td>Pages, format, size, paper, ships to, price. A table, not tiles.</td></tr>
+          <tr><td>Next volume</td><td>Artist call to action</td><td>One light band: "Submit for Vol. 8", deadline, link out to open calls.</td></tr>
+          <tr><td>More from the series</td><td>Keep browsing</td><td>Spine row of the other volumes.</td></tr>
+        </tbody>
+      </table></div>
+    </section>
+
+    <section id="colour">
+      <p class="over">05 · Colour</p>
+      <h2>Cream ground, <em>burgundy</em> lead</h2>
+      <p class="sub">Only master-system tokens. Editions uses the light theme, follows the master 60 / 25 / 10 / 5 split, and keeps red for one small moment per page.</p>
+      <div class="sw">
+        <div class="chip"><i style="background:#F9EEE5"></i><div><b>cream-100</b><span>#F9EEE5 · page ground</span></div></div>
+        <div class="chip"><i style="background:#850020"></i><div><b>burgundy-500</b><span>#850020 · buttons, links, lead</span></div></div>
+        <div class="chip"><i style="background:#3E0712"></i><div><b>burgundy-800</b><span>the one dark band, footer</span></div></div>
+        <div class="chip"><i style="background:#1C1310"></i><div><b>ink-900</b><span>#1C1310 · text</span></div></div>
+        <div class="chip"><i style="background:#FAD2E1"></i><div><b>peony</b><span>#FAD2E1 · light bands, tags</span></div></div>
+        <div class="chip"><i style="background:#AA0003"></i><div><b>red-700</b><span>#AA0003 · price, "New" (the pop)</span></div></div>
+      </div>
+      <div class="ratio" aria-label="Colour proportions: 60 cream, 25 burgundy, 10 peony, 5 red"><i style="background:#F9EEE5"></i><i style="background:#850020"></i><i style="background:#FAD2E1"></i><i style="background:#AA0003"></i></div>
+      <p class="cap" style="margin-top:8px">60 cream · 25 burgundy · 10 peony · 5 red</p>
+      <h3>Rules</h3>
+      <ul class="rules">
+        <li>Each series may add one series colour from the master palette (for example sky for The Big Book). Studio Visit Books has none assigned yet: see decision 3.</li>
+        <li>Text on photography sits on a solid band or the master cover scrim, never directly on the image.</li>
+        <li><code>red-500</code> never appears in Editions UI. The pop is <code>red-700</code>, at most one per screen.</li>
+        <li>The dark burgundy in your current screens is close to <code>burgundy-800</code>; use the token, not a new value.</li>
+      </ul>
+    </section>
+
+    <section id="type">
+      <p class="over">06 · Type</p>
+      <h2>Two families, <em>six</em> sizes</h2>
+      <p class="sub">The quiet register: Instrument Serif for titles and voices, Inter for everything you read or click. Proxima Nova replaces Inter for long body text where the licence is in place.</p>
+      <div class="spec">
+        <div class="row"><div class="meta"><b>Display</b>Serif 72 / 72 · −0.02em<br>desktop · 48 mobile</div><div style="font:400 clamp(44px,6vw,72px)/1 var(--serif);letter-spacing:-.02em">Studio Visit Book <em style="color:var(--accent)">Vol. 7</em></div></div>
+        <div class="row"><div class="meta"><b>Heading</b>Serif 44 / 48 · 32 mobile</div><div style="font:400 clamp(30px,3.6vw,44px)/1.1 var(--serif)">The wall lies. The studio tells the truth.</div></div>
+        <div class="row"><div class="meta"><b>Voice</b>Serif italic 24 / 32<br>quotes, artist names</div><div style="font:italic 400 24px/1.35 var(--serif);color:var(--accent)">"Some emotions need layers before they become visible."</div></div>
+        <div class="row"><div class="meta"><b>Lead</b>Inter 19 / 30 · ink-700</div><div style="font-size:19px;line-height:1.55;color:var(--muted)">Seven volumes documenting artists, their spaces and the work behind the work.</div></div>
+        <div class="row"><div class="meta"><b>Body</b>Inter 16 / 26</div><div>Each volume combines studio photography with long-form conversations about how the work gets made.</div></div>
+        <div class="row"><div class="meta"><b>Label</b>Inter 600 11 / 16<br>+0.16em · uppercase</div><div class="over">Cover artist · Oil on canvas</div></div>
+      </div>
+      <ul class="rules">
+        <li>Headings and body align left. Centre only a single short line of display type.</li>
+        <li>Book titles and artist names are always in the serif. Prices, sizes and dates are always in Inter with tabular figures.</li>
+        <li>No other fonts: the condensed light serif in the current screens is replaced by Instrument Serif.</li>
+      </ul>
+    </section>
+
+    <section id="layout">
+      <p class="over">07 · Layout</p>
+      <h2>The master grid, <em>with room</em></h2>
+      <div class="tw"><table>
+        <thead><tr><th>Width</th><th>Columns</th><th>Gutter</th><th>Margin</th><th>Section gap</th></tr></thead>
+        <tbody>
+          <tr><td>Phone &lt; 768</td><td>4</td><td>16</td><td>16</td><td>48</td></tr>
+          <tr><td>Tablet 768–1023</td><td>8</td><td>24</td><td>32</td><td>64</td></tr>
+          <tr><td>Desktop ≥ 1024</td><td>12</td><td>24</td><td>48 · container 1240</td><td>96</td></tr>
+        </tbody>
+      </table></div>
+      <ul class="rules">
+        <li>Spacing only from the master scale: 4, 8, 12, 16, 24, 32, 48, 64, 96, 128.</li>
+        <li>Corners: 12px for buttons, cards and drawers; 4px for photographs; book covers keep their real square corners.</li>
+        <li>One shadow, the master <code>shadow-paper</code>, on raised cards only. Book objects may use a soft cast shadow.</li>
+        <li>At least 30% of every screen is quiet space.</li>
+      </ul>
+    </section>
+
+    <section id="shell">
+      <p class="over">08 · Header and menus</p>
+      <h2>One header for <em>all of ATH</em></h2>
+      <div class="board">
+        <div class="demo-header"><span class="logo">arts to hearts<small>PROJECT</small></span><nav aria-label="Example"><a href="#shell">Open calls</a><a class="on" href="#shell">Books</a><a href="#shell">Artists</a><a href="#shell">Magazine</a><a href="#shell">Podcast</a><a href="#shell">Shop</a></nav><span class="demo-btn p" style="height:38px;font-size:14px">Submit your work</span></div>
+      </div>
+      <p class="cap" style="margin-top:10px">The master NavBar, with Editions under Books.</p>
+      <div class="tw"><table>
+        <thead><tr><th>Part</th><th>Rule</th></tr></thead>
+        <tbody>
+          <tr><td>Header</td><td>Master NavBar: 72–80px, cream, hairline bottom, sticky. Max six links. The active link gets a 2px burgundy underline.</td></tr>
+          <tr><td>Books menu</td><td>On hover or click, a mega-menu panel lists each series as a small spine, with "All books" first. The panel closes on Escape and on leaving.</td></tr>
+          <tr><td>Breadcrumb</td><td>On series, edition and artist pages, under the header: Books / Studio Visit Books / Vol. 7. Inter 13px, the last item not linked.</td></tr>
+          <tr><td>Phone menu</td><td>The menu icon opens a full-height drawer from the right with the six links as large serif words, plus the Submit button at the bottom.</td></tr>
+          <tr><td>Announcement</td><td>Optional, master announcement bar only, one sentence and one link. It replaces the scrolling ticker.</td></tr>
+        </tbody>
+      </table></div>
+    </section>
+
+    <section id="actions">
+      <p class="over">09 · Buttons and calls to action</p>
+      <h2>Three shapes, <em>fixed words</em></h2>
+      <div class="board">
+        <div class="btnrow"><span class="demo-btn p">Buy this edition · $120</span><span class="demo-btn s">Look inside</span><a class="demo-link" href="#actions">See all artists →</a></div>
+        <div class="btnrow dark"><span class="demo-btn i">Buy this edition · $120</span><a class="demo-link" style="color:var(--peony)" href="#actions">Look inside →</a></div>
+      </div>
+      <div class="tw"><table>
+        <thead><tr><th>Moment</th><th>Words</th><th>Type</th></tr></thead>
+        <tbody>
+          <tr><td>Buy</td><td>Buy this edition · $120</td><td>Primary (inverse on the dark band)</td></tr>
+          <tr><td>Preview</td><td>Look inside</td><td>Secondary</td></tr>
+          <tr><td>Open a volume</td><td>See Vol. 6</td><td>Link</td></tr>
+          <tr><td>Artist call</td><td>Submit for Vol. 8</td><td>Primary in its own band only</td></tr>
+          <tr><td>Artist</td><td>View artist</td><td>Link (opens the artist drawer)</td></tr>
+        </tbody>
+      </table></div>
+      <ul class="rules"><li>No pills, no arrow chips. Carousel controls are two 44px square buttons with 12px corners and arrow icons.</li><li>Not allowed: "Click here", "Learn more", "Be in the next one".</li></ul>
+    </section>
+
+    <section id="drawers">
+      <p class="over">10 · Drawers</p>
+      <h2>Stay on the shelf, <em>slide in</em> the detail</h2>
+      <div class="board">
+        <div class="drawer-demo"><span></span><div class="panel"><span class="over" style="color:var(--burgundy-500)">Your order</span><b>Studio Visit Book Vol. 7</b><div class="line"><span>Print, 250 pages</span><span>$120</span></div><div class="line"><span>Shipping to United Kingdom</span><span>$18</span></div><div class="line" style="font-weight:600"><span>Total</span><span>$138</span></div><span class="demo-btn p" style="justify-content:center">Pay $138</span></div></div>
+      </div>
+      <div class="tw"><table>
+        <thead><tr><th>Drawer</th><th>Opens from</th><th>Holds</th></tr></thead>
+        <tbody>
+          <tr><td>Purchase</td><td>Right · 440px · full height on phone</td><td>Format (print or digital), quantity, shipping country, total, Pay. Pay shows the exact amount.</td></tr>
+          <tr><td>Artist</td><td>Right · 520px</td><td>Portrait, name, practice, quote, 3–6 works, the volumes they appear in, link to their website.</td></tr>
+          <tr><td>Look inside</td><td>Full screen overlay</td><td>Spreads at full size, arrows, Escape to close.</td></tr>
+          <tr><td>Filters</td><td>Bottom sheet on phone, left panel on desktop</td><td>Only on Books and Artists lists: series, year, medium.</td></tr>
+        </tbody>
+      </table></div>
+      <ul class="rules"><li>All drawers: scrim <code>ink-900</code> at 45%, 12px inner corners, focus trapped, Escape and the scrim close them, focus returns to the opener.</li><li>Opening uses the master <code>duration-base</code> with <code>ease-out</code>; closing is faster.</li></ul>
+    </section>
+
+    <section id="cards">
+      <p class="over">11 · Cards and sections</p>
+      <h2>Same edges, <em>same order</em></h2>
+      <div class="board"><div class="cards-demo">
+        <div class="ecard"><i></i><p class="k">Vol. 7 · 2026</p><b>Studio Visit Book</b><span>Cover artist Cindy Bernhard</span></div>
+        <div class="ecard"><i></i><p class="k">Vol. 6 · 2026</p><b>Studio Visit Book</b><span>Cover artist Sabrina Bockleft</span></div>
+        <div class="ecard"><i></i><p class="k">Vol. 5 · 2025</p><b>Studio Visit Book</b><span>Cover artist Lisa Noon</span></div>
+      </div></div>
+      <p class="cap" style="margin-top:10px">Edition card. Coloured blocks stand in for the real covers. Names are from your current screen; check the spellings before launch.</p>
+      <div class="tw"><table>
+        <thead><tr><th>Card</th><th>Order inside, top to bottom</th></tr></thead>
+        <tbody>
+          <tr><td>Edition</td><td>Cover 4:5 · label "Vol. 7 · 2026" · serif title · cover artist · (price only on Shop)</td></tr>
+          <tr><td>Artist</td><td>Portrait 1:1 · serif name · practice in Inter · one-line quote in serif italic · "View artist"</td></tr>
+          <tr><td>Artwork</td><td>Image at its own ratio · title in serif italic · medium, year, size in Inter 13px</td></tr>
+          <tr><td>Spine</td><td>For series rows: real spine photo, or burgundy spine with title in Inter caps, rotated</td></tr>
+        </tbody>
+      </table></div>
+      <h3>Section header</h3>
+      <ul class="rules"><li>Label (Inter caps, burgundy) · serif heading · optional lead. Left-aligned, 40px above the content.</li><li>Carousels show a partial next card at the edge; arrows sit top right of the section, never centred above it.</li></ul>
+    </section>
+
+    <section id="footer">
+      <p class="over">12 · Footer</p>
+      <h2>The master footer, <em>unchanged</em></h2>
+      <div class="board"><div class="foot-demo">
+        <div><b>Merit, <em>not network.</em></b><p style="margin-top:12px">Newsletter field and Subscribe button</p></div>
+        <div><h5>Platform</h5><p>Open calls</p><p>Books</p><p>Artists</p></div>
+        <div><h5>Community</h5><p>Magazine</p><p>Podcast</p><p>Fine Art Prize</p></div>
+        <div><h5>Company</h5><p>About</p><p>Press</p><p>Contact</p></div>
+      </div></div>
+      <ul class="rules"><li>Burgundy, scalloped top edge, brand line in serif with a peony italic phrase, three link columns, legal row.</li><li>The addresses and email in the current footer move to Contact; the footer keeps one email.</li></ul>
+    </section>
+
+    <section id="motion">
+      <p class="over">13 · Motion and imagery</p>
+      <h2>Paper settles, <em>books lift</em></h2>
+      <div class="tw"><table>
+        <thead><tr><th>Moment</th><th>Motion (master tokens)</th></tr></thead>
+        <tbody>
+          <tr><td>Section entrance</td><td>Paper settle: rise 16px, fade, 480ms, stagger 60ms. Once per section.</td></tr>
+          <tr><td>Book cover hover</td><td>Book lift: up 4px, tilt −1°.</td></tr>
+          <tr><td>Hero</td><td>Parallax: cover at 1.1× scroll, background at 0.85×. Off with reduced motion.</td></tr>
+          <tr><td>Look inside</td><td>Page turn, 400ms, no sound by default.</td></tr>
+        </tbody>
+      </table></div>
+      <h3>Photography</h3>
+      <ul class="rules"><li>Books are photographed in real light on real surfaces: tables, shelves, hands. One consistent warm grade across the series.</li><li>Artwork is shown flat and uncropped, with credit. Never placed in fake frames.</li><li>Portraits are real artist photos at 1:1, in the same crop across a volume.</li></ul>
+    </section>
+
+    <section id="words">
+      <p class="over">14 · Words</p>
+      <h2>How Editions <em>talks</em></h2>
+      <div class="tw"><table>
+        <thead><tr><th>Thing</th><th>Write</th><th>Not</th></tr></thead>
+        <tbody>
+          <tr><td>Volume name</td><td>Studio Visit Book Vol. 7</td><td>Studio Visit Books Vol 7, SVB7</td></tr>
+          <tr><td>Series name</td><td>Studio Visit Books</td><td>Series-Studio Visit Books</td></tr>
+          <tr><td>Recognition</td><td>Cover artist · Featured artist</td><td>Winner, 1st runner-up</td></tr>
+          <tr><td>Facts</td><td>250 pages · Print and digital</td><td>250+ pages per volume</td></tr>
+          <tr><td>Artist call</td><td>Submit for Vol. 8 · Deadline 30 Nov</td><td>Be in the next one</td></tr>
+        </tbody>
+      </table></div>
+      <p class="sub" style="margin-top:16px">The voice follows the master section on voice and tone: warm, direct, specific. Sentence case everywhere except labels.</p>
+    </section>
+
+    <section id="decide">
+      <p class="over">15 · Your decisions</p>
+      <h2>Six things <em>only you</em> can settle</h2>
+      <p class="sub">My recommendation is in bold. Everything else on this page follows from these.</p>
+      <div class="decide">
+        <div class="q"><b>1</b><div><h4>Which header does the site use?</h4><p>The current screens use "The full story, Collections, Awards, Your journey…". The master system uses "Open calls, Books, Artists, Magazine, Podcast, Shop". <strong>Recommend the master header, with Editions under Books.</strong></p></div></div>
+        <div class="q"><b>2</b><div><h4>Is Editions allowed the quiet register?</h4><p>The master system pairs one loud font with one soft font in every piece. Editions would use Instrument Serif with Inter and no Archivo Black. <strong>Recommend yes, as a written exception for the Shelf side.</strong></p></div></div>
+        <div class="q"><b>3</b><div><h4>What is the Studio Visit Books series colour?</h4><p>The master book table has no entry for this series. <strong>Recommend burgundy-500 with peony as its accent</strong>, matching what the current screens already lean towards.</p></div></div>
+        <div class="q"><b>4</b><div><h4>Do winners stay on edition pages?</h4><p>The podium suggests a contest. <strong>Recommend showing them as "Cover artist" and "Featured artists"</strong>, with prizes on the Fine Art Prize pages.</p></div></div>
+        <div class="q"><b>5</b><div><h4>Where does buying happen?</h4><p>A purchase drawer on the edition page, or a jump to the Shop. <strong>Recommend the drawer</strong>, so the collector never leaves the book.</p></div></div>
+        <div class="q"><b>6</b><div><h4>Do the My Studio colours move to the master tokens?</h4><p>The My Studio prototype uses burgundy #6A0620 and chilli #AA0003; the master burgundy is #850020. <strong>Recommend moving My Studio to the master tokens</strong> so both products feel like one ATH.</p></div></div>
+      </div>
+      <p class="sub" style="margin-top:28px">Next: send the reference images for the redesign. I'll apply these rules to the series and edition pages, then build them as Figma frames, desktop and phone.</p>
+    </section>
+  </main>
+</div>
