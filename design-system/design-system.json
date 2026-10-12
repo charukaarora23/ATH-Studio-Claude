@@ -1,0 +1,173 @@
+{
+  "v": 3,
+  "layout": "files",
+  "createdOnFiles": {
+    "v": 1,
+    "at": "2026-10-07T13:09:36Z"
+  },
+  "title": "Arts to Hearts Project",
+  "namespace": "ATH",
+  "libraries": [],
+  "sections": {},
+  "groups": [
+    "Logos",
+    "Textures",
+    "Elements"
+  ],
+  "assetGroups": {
+    "Logos": {
+      "name": "Logos",
+      "tile": "l",
+      "order": [
+        "ath-logo-current.jpg"
+      ],
+      "files": {
+        "ath-logo-current.jpg": {
+          "name": "ath-logo-current.jpg",
+          "blob": "3abc3eb289d508f6879da4356ef1ac86",
+          "size": 41647,
+          "type": "image/jpeg"
+        }
+      }
+    },
+    "Textures": {
+      "name": "Textures",
+      "tile": "l",
+      "order": [
+        "paint-burgundy.svg",
+        "paint-sky.svg",
+        "paint-peony.svg",
+        "paint-garden.svg",
+        "paint-dabs.svg",
+        "grain.svg"
+      ],
+      "files": {
+        "paint-burgundy.svg": {
+          "name": "paint-burgundy.svg",
+          "blob": "8af44c65af05155393d9d84cbf58b0c0",
+          "size": 4652,
+          "type": "image/svg+xml"
+        },
+        "paint-sky.svg": {
+          "name": "paint-sky.svg",
+          "blob": "aebdbcfba10d97a1464fd095fc7ad433",
+          "size": 4410,
+          "type": "image/svg+xml"
+        },
+        "paint-peony.svg": {
+          "name": "paint-peony.svg",
+          "blob": "1a54dcd75d09eefe6a1b0f4d5f351871",
+          "size": 4295,
+          "type": "image/svg+xml"
+        },
+        "paint-garden.svg": {
+          "name": "paint-garden.svg",
+          "blob": "2e67fdd35a46d1d6f6b66e05a5766e3f",
+          "size": 4906,
+          "type": "image/svg+xml"
+        },
+        "paint-dabs.svg": {
+          "name": "paint-dabs.svg",
+          "blob": "cbbcd4dff811e4fa47311027f5fc53a9",
+          "size": 8615,
+          "type": "image/svg+xml"
+        },
+        "grain.svg": {
+          "name": "grain.svg",
+          "blob": "fa7b2351b6f04696c3e67bcd6502e706",
+          "size": 388,
+          "type": "image/svg+xml"
+        }
+      }
+    },
+    "Elements": {
+      "name": "Elements",
+      "tile": "m",
+      "order": [
+        "sticker-red.svg",
+        "sticker-sky.svg",
+        "sticker-lemon.svg",
+        "tape-hot-rose.svg",
+        "tape-lemon.svg",
+        "tape-sky.svg",
+        "stamp-frame.svg",
+        "scallop-edge-burgundy.svg",
+        "scallop-edge-sky.svg",
+        "scallop-edge-cream.svg"
+      ],
+      "files": {
+        "sticker-red.svg": {
+          "name": "sticker-red.svg",
+          "blob": "e04c207d6a9eaf0e3a60cc1dfcb7caf3",
+          "size": 883,
+          "type": "image/svg+xml"
+        },
+        "sticker-sky.svg": {
+          "name": "sticker-sky.svg",
+          "blob": "8cd4295dbea13f5f68a0b23b0b9dd0ab",
+          "size": 883,
+          "type": "image/svg+xml"
+        },
+        "sticker-lemon.svg": {
+          "name": "sticker-lemon.svg",
+          "blob": "a30068ca1405a185dada0cffa75ab04a",
+          "size": 883,
+          "type": "image/svg+xml"
+        },
+        "tape-hot-rose.svg": {
+          "name": "tape-hot-rose.svg",
+          "blob": "c96648c4cec6d8650dbfad88ad287257",
+          "size": 292,
+          "type": "image/svg+xml"
+        },
+        "tape-lemon.svg": {
+          "name": "tape-lemon.svg",
+          "blob": "65d1af5e3e819c092de3587dbbf36b88",
+          "size": 292,
+          "type": "image/svg+xml"
+        },
+        "tape-sky.svg": {
+          "name": "tape-sky.svg",
+          "blob": "7950d80e97607fe058fcd654ea16af80",
+          "size": 292,
+          "type": "image/svg+xml"
+        },
+        "stamp-frame.svg": {
+          "name": "stamp-frame.svg",
+          "blob": "8b48b3069f5f860fa8826b54e88ed92e",
+          "size": 2052,
+          "type": "image/svg+xml"
+        },
+        "scallop-edge-burgundy.svg": {
+          "name": "scallop-edge-burgundy.svg",
+          "blob": "8e2c86be2f69ecf7e7d1dd92a3310118",
+          "size": 632,
+          "type": "image/svg+xml"
+        },
+        "scallop-edge-sky.svg": {
+          "name": "scallop-edge-sky.svg",
+          "blob": "554c65f9ace17242ce79907b5d0592ac",
+          "size": 632,
+          "type": "image/svg+xml"
+        },
+        "scallop-edge-cream.svg": {
+          "name": "scallop-edge-cream.svg",
+          "blob": "1ee0c8a09911030d4382eef307a019c4",
+          "size": 632,
+          "type": "image/svg+xml"
+        }
+      }
+    }
+  },
+  "blobs": {},
+  "docs": {
+    "readme": "project/README.md",
+    "sections": []
+  },
+  "lastChange": {
+    "by": "Rabia Khan",
+    "at": "2026-10-08T09:53:04Z",
+    "via": "Claude",
+    "note": "Full brand ecosystem: 18 guideline sections, 24 components, colour scales and themes, fonts, textures and brand elements."
+  }
+}
