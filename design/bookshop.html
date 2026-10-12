@@ -1,0 +1,883 @@
+<title>The ATH Bookshop</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600&display=swap">
+<style>
+/* Layout: one room of the ATH house. Scrolling is walking in: window, shelves, table, the artist, the counter, the door. */
+:root{
+  color-scheme: light;
+  /* colour: master ATH tokens. Paper 60 · cream and pinks 25 · burgundy 10 · red 5 */
+  --paper:#FDF8F3; --cream:#F9EEE5; --cream-2:#F1E2D6; --wood:#E9D6C6;
+  --ink:#1C1310; --ink-7:#4A3A33; --ink-5:#7A6A63; --rule:#E2D0C4;
+  --burgundy:#850020; --burgundy-8:#3E0712; --peony:#FAD2E1; --ballet:#F6DCE0; --red:#AA0003; --sky:#B7D9FF;
+  /* type */
+  --serif:"Instrument Serif", "Iowan Old Style", Georgia, serif;
+  --sans:"Inter", "Helvetica Neue", Arial, system-ui, sans-serif;
+  /* space: 4px scale; sections breathe */
+  --gut:clamp(16px, 4vw, 56px); --sec:clamp(96px, 14vw, 200px); --max:1240px;
+  --r:12px;
+  --ease:cubic-bezier(.2,.7,.2,1); --settle:cubic-bezier(.3,1.35,.5,1);
+  --fibre:url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMAAAADACAYAAABS3GwHAAAGp0lEQVR42u3d227bOBhF4Vw5cR3Heby5nMeYx28KxIHHlWTJ4vn/NkAgQAtZJNeiqBP18lIg//37z/FlgHzV4/NFeuuz17vyef8fTrcF/OAPIEU23oeEf0U9z7CSqvB//d7h5u+LHpAw8E9JIDLcfG3NnI0EQhoSCAlIICQggZBAK2Rr219LRQuRQNL033lt6W60IEHVPrl/TOBVqzgSiMSQ4OvvjzVFq4kjwZPTPq0t0WUjQeMd9H4tWoMEI/M9VbQQCUTynl9cLy+SQEKeXN9eXyeBhIL/XoCMv+8mlrQHf0k4SVCuw09rSoSOXXNPoeT+k6ARQbRCPShHl6CLu/MkqAskCUgQWgASkCC8AEu/PcqTsbslKPFs/ogSbGmv2iPx/e+P9lj4kgTNvLVWQoKpFzxyvvTR002tm7vRQ74TYTrUwZEg8lQsY50OJJj+nc9IEjx6H/YKymgS3B/RSPBSZyXnliUY+VXQmYcP40pQcxnzFiUY/T3oP/WbYimkBC2s4d+SBEHgv5bT9e/kEnxt6G2qtCSBD1jEmfYsnASfeq3ECfzpoYjw4Y6Jk+BYEoA/5shf4/zyZ16Vay2drTsOfvBXkaCFHX8GfotebTvvI0GjO27kB3/YQxj4wR9WAvCDX0REREREJNzJsAgBRAggQoDW9/2iB5O25ysBwE+AgSt4HKQe4CdA2E7y7SkChO2gCwHyCrD2vWvPjlWa9uQSoPT0sEWAth4BSFBhzk+A5vqGBCOc8BJAXcLCTwD1CQ0/AdTpZ37dwifva1znJ8C+E2Lpf/QiwP/377ylIIgA5sxCAAIIAQggIiK3I362ZfBFmgZfK0gLIB4I0E9nfc4VrdMP/ASQ0PATQKqC76MWIiINjs5eapfN0HyAX8APfgE/+AX84MdBrf05TRXwZ4R/7m21Ft5gMxiqrJEfF2kr2fs7meAnAfjzbPvXXCEB+IUE/cPvASoJI4GRXzbyMs4SJeAXRoNfwC8Cfum/Tw8Ff+sCfgkpQdeLB4M/rgQpIKo58qeUwGq6wSToHf5k9QB/PAlGgX+3BOBvFtRjbglGO+Hd3GbgjyfAdbt7JGj5as/qdssJv7Vv2hTgfpvP9FMPlzoftl3ukZ8A7Qkwt71R+2q2/UpMe0YXoNB19WOpbRmwCFC1flOPEKcSYO12Fu4TvA/Ub2cCBDwCPFuvUV/mDylAymfWCwlwrtxe4HcEiCnA91Iu+dfZAYj6/Zn/z5RzLfgRLCGPAOCXVSCOKAD4pbXR+Ax+CS0B+GVoCeY+VD1RLuCX0EeC1BKAX8JLIEICERJIJGjfSCAEIEG0fvccUy4BakrQWdv/0gr7G/GwpZQSQEjQReMSgAQEeLCNR0VLr+6PDxI0JMD10QItVRd+MQUCf8Wda+6L5qmer18rgCNBLPhr811Mgi1HAAKY9nQjwVo5tp5YkQD8zUuw5cjwzJUFEoB/T8VPj8oeCbZOi569tJZCgqG+lQv+Ps8J9lxbdiSQ5uAvdQQggYQ9ByCBND/tGXmlOV/olOEhFwG/CPhFwF+zvT2CXKnhp5b/Plz/1kLSE8yXpWIkG6KPrRrnMP7ze2cSLP6/yfVMkTrQyE8CCX8CR4Kk27RGT49zfmv/gD8s/CQAf3j4STA4/HMdW+OsPjX8qa9UkAD84Ub+XBJ4IhT8w7Ud+MEv4Ae/gD80/F/bO94XbT82/M2f9Br5wW/krwR/roenergsCX4pKjX45S9Obl9KAb8MCvrHXDHyi4BfBPySpi+a++AK+GVP+3rfGvwk0ApCAhESjFep3V9wERI0tH+XR4zjXYaUoNRCbCLNwQd+CSsA+GUKiqLPvtSCEPwS4gjwtf3P2wJ+CT0F6gr+77X/FwuEqvTLW0ggRVJLcBXAHWMJKcHtEYAEEno6RAJZC8mJBO3uvwwC/5YTVBKU2ckj+Iv8zvkZCUznSDDKyH9+9kjQO3Df60u9LpQDCQaf80+9MRdNggf/fqj+dfYoEtQ44V1Y9Y8Ef5lAgqHgXxKABCQYHv5HAjgxriTB9Um+CBLUvs6/ZtUMEhSUYAn+OQl6XUyphZtca5eN8SBbAQnWwD+KBK3c4d2ybhIJMkqwBf6Fbbwn3J9jhC/VbF04rMIz/efhJUgBf+/ToV4EaE2CpeVMii1tskeClPCTYMARduQjQQ74SUBWIQEJhAQkGKfCRxLM1u1tqUSVYE/dc07NN59XbCmOBJKIu2YEOCbeHgmkDwFy3XQqLUEzo4n002ej3HEFv34Dv+g78EvP/fcbBQTcL5ShnKsAAAAASUVORK5CYII=");
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;overflow-x:clip}
+body{margin:0;background:var(--paper);color:var(--ink);font:400 16px/1.6 var(--sans);-webkit-font-smoothing:antialiased;overflow-x:clip}
+a{color:inherit}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer;padding:0}
+:focus-visible{outline:2px solid var(--red);outline-offset:3px;border-radius:4px}
+.wrap{max-width:var(--max);margin-inline:auto;padding-inline:var(--gut)}
+.label{font:500 11px/1.2 var(--sans);letter-spacing:.14em;text-transform:uppercase;color:var(--ink-5)}
+.serif{font-family:var(--serif);font-weight:400}
+h1,h2,h3{font-family:var(--serif);font-weight:400;margin:0;text-wrap:balance;letter-spacing:-.01em}
+h1{font-size:clamp(48px,7.4vw,112px);line-height:.95}
+h2{font-size:clamp(36px,4.8vw,68px);line-height:1}
+h3{font-size:clamp(24px,2.4vw,32px);line-height:1.1}
+em{font-style:italic}
+p{margin:0}
+.lede{font-size:clamp(17px,1.4vw,19px);color:var(--ink-7);max-width:44ch}
+.btn{display:inline-flex;align-items:center;gap:10px;height:48px;padding:0 22px;border-radius:var(--r);font:500 15px/1 var(--sans);text-decoration:none;transition:transform .3s var(--ease),background .3s}
+.btn-solid{background:var(--burgundy);color:var(--paper)}
+.btn-solid:hover{background:var(--burgundy-8)}
+.btn-line{box-shadow:inset 0 0 0 1px var(--ink);}
+.btn-line:hover{background:var(--cream)}
+.link{font:500 15px/1 var(--sans);text-decoration:none;border-bottom:1px solid currentColor;padding-bottom:4px}
+.arrow::after{content:"→";margin-left:8px;transition:margin .3s var(--ease)}
+.arrow:hover::after{margin-left:14px}
+.sec{padding-block:var(--sec) 0}
+.sec-head{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:24px 48px;align-items:end;margin-bottom:clamp(48px,6vw,88px)}
+.sec-head .lede{justify-self:end}
+@media (max-width:760px){.sec-head{grid-template-columns:minmax(0,1fr)}.sec-head .lede{justify-self:start}}
+
+/* ---------- Floating menu ---------- */
+.bar{position:fixed;z-index:40;top:calc(env(safe-area-inset-top,0px) + 14px);left:50%;transform:translateX(-50%);width:min(calc(100% - 28px),1180px);
+  display:flex;align-items:center;gap:16px;height:60px;padding:0 10px 0 22px;background:var(--ballet);border-radius:var(--r);
+  box-shadow:0 1px 0 rgba(133,0,32,.08),0 18px 40px -24px rgba(62,7,18,.35);transition:transform .5s var(--ease)}
+.bar.tuck{transform:translate(-50%,-90px)}
+.logo{display:flex;align-items:baseline;gap:6px;text-decoration:none;color:var(--burgundy);white-space:nowrap}
+.logo b{font:italic 400 24px/1 var(--serif)}
+.logo i{font:600 8px/1 var(--sans);letter-spacing:.2em;font-style:normal;color:var(--red);transform:translateY(-1px)}
+.nav{display:flex;gap:26px;margin-inline:auto}
+.nav a{font:500 14px/1 var(--sans);text-decoration:none;color:var(--burgundy-8);opacity:.72;transition:opacity .2s}
+.nav a:hover,.nav a[aria-current]{opacity:1}
+.nav a[aria-current]{text-decoration:underline;text-underline-offset:6px;text-decoration-thickness:1px}
+.bar-tools{display:flex;gap:4px;align-items:center;margin-left:auto}
+.nav + .bar-tools{margin-left:0}
+.tool{height:40px;padding:0 14px;border-radius:8px;font:500 14px/1 var(--sans);color:var(--burgundy-8);display:inline-flex;align-items:center;gap:8px}
+.tool:hover{background:rgba(255,255,255,.55)}
+.tool .n{min-width:20px;height:20px;border-radius:6px;background:var(--burgundy);color:var(--paper);font-size:11px;display:inline-grid;place-items:center;padding:0 5px}
+.tool.menu{background:var(--burgundy);color:var(--paper)}
+.tool.menu:hover{background:var(--burgundy-8)}
+@media (max-width:980px){.nav{display:none}}
+@media (max-width:520px){.tool.sound,.tool.notes{display:none}.logo i{display:none}.bar{padding-left:16px}}
+
+/* ---------- Drawers ---------- */
+.scrim{position:fixed;inset:0;z-index:60;background:rgba(28,19,16,.32);opacity:0;pointer-events:none;transition:opacity .4s var(--ease)}
+.scrim.on{opacity:1;pointer-events:auto}
+.drawer{position:fixed;z-index:61;top:0;right:0;bottom:0;width:min(520px,100%);background:var(--paper);display:flex;flex-direction:column;
+  transform:translateX(104%);visibility:hidden;transition:transform .55s var(--ease),visibility 0s .55s;box-shadow:-30px 0 60px -40px rgba(62,7,18,.5);
+  padding:calc(env(safe-area-inset-top,0px) + 24px) clamp(20px,4vw,40px) calc(env(safe-area-inset-bottom,0px) + 24px)}
+.drawer.on{transform:none;visibility:visible;transition:transform .55s var(--ease)}
+.drawer.house{background:var(--burgundy-8);color:var(--paper);width:min(720px,100%)}
+.d-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:40px}
+.d-close{height:40px;padding:0 14px;border-radius:8px;box-shadow:inset 0 0 0 1px currentColor;font-size:14px}
+.d-body{flex:1;overflow:auto;min-height:0}
+.rooms{list-style:none;margin:0;padding:0;display:grid;gap:4px}
+.rooms a{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:baseline;gap:16px;text-decoration:none;padding:10px 0;border-bottom:1px solid rgba(250,210,225,.16)}
+.rooms .nm{font:400 clamp(34px,5vw,52px)/1 var(--serif);color:var(--peony);transition:color .25s,padding .35s var(--ease)}
+.rooms a:hover .nm,.rooms a[aria-current] .nm{font-style:italic;color:var(--paper);padding-left:12px}
+.rooms .what{font-size:13px;color:rgba(249,238,229,.6)}
+.rooms .here{font:500 10px/1 var(--sans);letter-spacing:.16em;text-transform:uppercase;color:var(--peony);margin-left:12px;vertical-align:middle}
+.house-foot{display:flex;flex-wrap:wrap;gap:12px 28px;padding-top:28px;font-size:14px;color:rgba(249,238,229,.7)}
+.house-foot a{text-decoration:none}
+.note-list{list-style:none;margin:0 0 28px;padding:0;display:grid;gap:12px}
+.note-list li{display:grid;grid-template-columns:64px minmax(0,1fr) auto;gap:16px;align-items:center;padding:12px;background:var(--cream);border-radius:var(--r)}
+.note-list canvas{width:64px;height:48px;border-radius:6px;display:block}
+.note-list .t{font:400 20px/1.1 var(--serif)}
+.note-list .s{font-size:13px;color:var(--ink-5)}
+.note-list button{font-size:13px;color:var(--ink-5);text-decoration:underline}
+.empty{padding:28px;border:1px dashed var(--rule);border-radius:var(--r);color:var(--ink-5);font-size:15px;margin-bottom:28px}
+textarea{width:100%;min-height:120px;border:0;border-bottom:1px solid var(--ink);background:transparent;font:400 22px/1.4 var(--serif);color:var(--ink);resize:vertical;padding:8px 0}
+textarea:focus{outline:none;border-bottom-color:var(--red)}
+.bag-item{display:grid;grid-template-columns:96px minmax(0,1fr);gap:20px;align-items:start;padding-bottom:28px;border-bottom:1px solid var(--rule)}
+.qty{display:inline-flex;align-items:center;gap:14px;margin-top:14px;box-shadow:inset 0 0 0 1px var(--rule);border-radius:8px;padding:4px}
+.qty button{width:32px;height:32px;border-radius:6px}
+.qty button:hover{background:var(--cream)}
+.sum{display:flex;justify-content:space-between;padding:20px 0;font-size:15px}
+.d-act{display:grid;gap:10px;padding-top:20px}
+.d-act .btn{justify-content:center}
+.fine{font-size:13px;color:var(--ink-5)}
+
+/* ---------- Covers, spines, artwork ---------- */
+.art{display:block;width:100%;height:100%;border-radius:inherit}
+.cover{position:relative;aspect-ratio:3/4;border-radius:3px 8px 8px 3px;background:var(--cv,var(--burgundy)) var(--fibre);color:var(--ct,var(--peony));
+  padding:9% 9% 8%;display:flex;flex-direction:column;container-type:inline-size;overflow:hidden;
+  box-shadow:inset 6px 0 0 rgba(0,0,0,.12),inset 7px 0 0 rgba(255,255,255,.08),0 30px 50px -28px rgba(28,19,16,.55),0 2px 4px rgba(28,19,16,.12)}
+.cover .ck{font:600 3.6cqw/1 var(--sans);letter-spacing:.2em;text-transform:uppercase;opacity:.8}
+.cover .ct{font:400 12cqw/.92 var(--serif);margin-top:6cqw}
+.cover .ct em{display:block}
+.cover .win{flex:1;margin:7cqw 0 6cqw;border-radius:2px;overflow:hidden;min-height:0}
+.cover .cb{display:flex;justify-content:space-between;align-items:baseline;font:500 3.6cqw/1 var(--sans);letter-spacing:.06em}
+.cover .cb .v{font:italic 400 7cqw/1 var(--serif);letter-spacing:0}
+
+.shelf-wrap{position:relative}
+.shelf{display:flex;align-items:flex-end;gap:clamp(4px,.7vw,10px);padding:0 4px;height:var(--sh,380px);border-bottom:3px solid var(--ink);position:relative}
+.shelf::after{content:"";position:absolute;left:0;right:0;bottom:-15px;height:12px;background:linear-gradient(rgba(28,19,16,.14),transparent)}
+.spine{--h:330px;--w:58px;position:relative;width:var(--w);height:var(--h);flex:none;border-radius:3px 3px 0 0;background:var(--sc) var(--fibre);color:var(--st);
+  display:flex;flex-direction:column;align-items:center;justify-content:space-between;padding:14px 0 16px;transform-origin:bottom left;
+  transition:transform .45s var(--settle),box-shadow .45s var(--ease);cursor:pointer;box-shadow:inset 3px 0 0 rgba(255,255,255,.14),inset -3px 0 0 rgba(0,0,0,.1)}
+.spine:hover,.spine:focus-visible,.spine.out{transform:translateY(-22px) rotate(var(--lean,0deg));box-shadow:inset 3px 0 0 rgba(255,255,255,.14),inset -3px 0 0 rgba(0,0,0,.1),0 24px 30px -18px rgba(28,19,16,.5)}
+.spine.lean{transform:rotate(var(--lean))}
+.spine .sk{font:600 9px/1 var(--sans);letter-spacing:.18em}
+.spine .stt{writing-mode:vertical-rl;font:400 22px/1 var(--serif);white-space:nowrap;letter-spacing:.01em}
+.spine .stt.caps{font:500 13px/1 var(--sans);letter-spacing:.2em;text-transform:uppercase}
+.spine .stt.box{border:1px solid currentColor;padding:12px 6px}
+.spine .sv{font:italic 400 19px/1 var(--serif)}
+.spine .new{position:absolute;top:-1px;right:8px;width:12px;height:22px;background:var(--red);clip-path:polygon(0 0,100% 0,100% 100%,50% 75%,0 100%)}
+.spine.ghost{background:repeating-linear-gradient(-45deg,transparent 0 8px,rgba(133,0,32,.06) 8px 9px);color:var(--ink-5);box-shadow:none;border:1px dashed var(--ink-5);border-bottom:0;text-decoration:none}
+.shelf-cap{display:flex;justify-content:space-between;align-items:baseline;gap:20px;padding-top:28px;min-height:76px;flex-wrap:wrap}
+.shelf-cap .t{font:400 28px/1.1 var(--serif)}
+.shelf-cap .s{font-size:14px;color:var(--ink-5)}
+@media (max-width:640px){.shelf{--sh:300px}.spine{--h:calc(var(--h0)*.8);--w:calc(var(--w0)*.6)}.spine .sk{font-size:7px}.spine .stt{font-size:17px}.spine .stt.caps{font-size:11px}.spine .sv{font-size:15px}}
+
+/* ---------- Home: window display ---------- */
+.window{padding-top:calc(env(safe-area-inset-top,0px) + 150px);display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,.9fr);gap:48px;align-items:center}
+.window h1 em{color:var(--burgundy)}
+.window .acts{display:flex;gap:12px;flex-wrap:wrap;margin-top:40px}
+.plinth{position:relative;justify-self:center;width:min(380px,80%);perspective:1200px;padding-bottom:60px}
+.plinth .cover{transform:rotateY(-14deg) rotateX(3deg);transition:transform .8s var(--ease);will-change:transform}
+.plinth::before{content:"";position:absolute;left:-20%;right:-20%;bottom:0;height:140px;background:radial-gradient(50% 40% at 50% 60%,rgba(250,210,225,.9),transparent 70%);z-index:-1}
+.plinth::after{content:"";position:absolute;left:8%;right:8%;bottom:44px;height:24px;background:radial-gradient(50% 50%,rgba(28,19,16,.28),transparent 70%);z-index:-1}
+.plinth .tag{position:absolute;bottom:0;left:0;right:0;text-align:center}
+@media (max-width:860px){.window{grid-template-columns:minmax(0,1fr);padding-top:calc(env(safe-area-inset-top,0px) + 120px)}.plinth{width:min(300px,76%)}}
+
+/* ---------- Home: the table ---------- */
+.table{position:relative;display:grid;grid-template-columns:minmax(0,.55fr) minmax(0,2fr) minmax(0,.62fr);gap:clamp(24px,3.4vw,48px);align-items:end;padding:72px clamp(16px,4vw,56px) 0}
+.table::after{content:"";position:absolute;left:0;right:0;bottom:-28px;height:28px;background:var(--wood) var(--fibre);border-radius:2px;box-shadow:0 20px 30px -20px rgba(28,19,16,.35)}
+.stack{display:flex;flex-direction:column-reverse;align-items:center}
+.flat{width:var(--w,92%);height:var(--h,34px);background:var(--sc) var(--fibre);color:var(--st);border-radius:2px 6px 6px 2px;display:flex;align-items:center;justify-content:space-between;padding:0 14px;
+  font:400 16px/1 var(--serif);white-space:nowrap;overflow:hidden;transform:translateX(var(--x,0)) rotate(var(--rot,0deg));transition:transform .5s var(--settle);cursor:pointer;
+  box-shadow:inset 0 3px 0 rgba(255,255,255,.12),0 2px 0 rgba(0,0,0,.08)}
+.flat em{font-size:14px;margin-left:10px}.flat span{overflow:hidden;text-overflow:ellipsis;flex:1;margin-left:10px}
+.flat small{font:500 9px/1 var(--sans);letter-spacing:.16em;text-transform:uppercase;opacity:.8}
+.stack:hover .flat:last-child{transform:translate(calc(var(--x,0px) + 18px),-14px) rotate(-2deg)}
+.stack .cap{margin-top:20px;text-align:center}
+.mini-book{container-type:inline-size}
+.note-card{background:var(--paper);border-radius:4px;padding:22px;transform:rotate(2.5deg);box-shadow:0 18px 30px -20px rgba(28,19,16,.45),0 1px 2px rgba(28,19,16,.08);margin-bottom:16px}
+.note-card .from{display:flex;gap:12px;align-items:center;margin-bottom:14px}
+.note-card .avatar{width:40px;height:40px;border-radius:50%;overflow:hidden;flex:none}
+.note-card p{font:italic 400 21px/1.25 var(--serif)}
+@media (max-width:900px){.table{grid-template-columns:minmax(0,1fr);align-items:center;justify-items:center}.table>*{width:min(560px,100%)}.stack{order:2}.note-card{order:3}}
+
+/* ---------- Book viewer (flip) ---------- */
+.reader{container-type:inline-size}
+.book{position:relative;width:100%;aspect-ratio:2/1.32;perspective:2600px;margin-inline:auto}
+.book .base{position:absolute;inset:0;display:grid;grid-template-columns:1fr 1fr}
+.book .base>div{background:var(--paper);box-shadow:0 30px 60px -30px rgba(28,19,16,.45)}
+.book .base>div:first-child{border-radius:6px 0 0 6px;background:linear-gradient(90deg,var(--paper) 90%,#EADBD0)}
+.book .base>div:last-child{border-radius:0 6px 6px 0;background:linear-gradient(270deg,var(--paper) 90%,#EADBD0)}
+.book{transition:transform 1s cubic-bezier(.45,.05,.2,1)}.book.closed{transform:translateX(-25%)}.book.closed .base>div:first-child{opacity:0}
+.book .base>div{transition:opacity .4s}
+.leaf{position:absolute;top:0;bottom:0;left:50%;width:50%;transform-origin:left center;transform-style:preserve-3d;transition:transform 1s cubic-bezier(.45,.05,.2,1)}
+.leaf.turned{transform:rotateY(-180deg)}
+.face{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;overflow:hidden;background:var(--paper) var(--fibre)}
+.face.front{border-radius:0 6px 6px 0}
+.face.back{transform:rotateY(180deg);border-radius:6px 0 0 6px}
+.face.front::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(28,19,16,.12),transparent 8%);pointer-events:none}
+.face.back::after{content:"";position:absolute;inset:0;background:linear-gradient(270deg,rgba(28,19,16,.12),transparent 8%);pointer-events:none}
+.pg{position:absolute;inset:0;padding:7cqw 5.5cqw 5cqw;display:flex;flex-direction:column}
+.pg.bleed{padding:0}
+.pg .fol{position:absolute;bottom:2.2cqw;font:500 .9cqw/1 var(--sans);letter-spacing:.14em;color:var(--ink-5)}
+.face.front .fol{right:3cqw}.face.back .fol{left:3cqw}
+.pg .k{font:500 .95cqw/1.2 var(--sans);letter-spacing:.16em;text-transform:uppercase;color:var(--ink-5)}
+.pg .q{font:400 3.2cqw/1.08 var(--serif);margin-top:3cqw;text-wrap:balance}
+.pg .q em{color:var(--burgundy)}
+.pg .b{font:400 1.25cqw/1.6 var(--sans);color:var(--ink-7);margin-top:auto;columns:2;column-gap:2.4cqw}
+.pg .cap{position:absolute;left:3cqw;bottom:2.4cqw;font:500 .95cqw/1.3 var(--sans);color:var(--paper);letter-spacing:.04em}
+.pg .title-pg{margin:auto 0;text-align:center}
+.pg .title-pg .t{font:400 5cqw/.95 var(--serif)}
+.pg .plate{margin:auto;width:62%;aspect-ratio:4/5;box-shadow:0 1.4cqw 2.4cqw -1.2cqw rgba(28,19,16,.4)}
+.pg .plate-cap{text-align:center;margin-top:2cqw;font:400 1.7cqw/1.2 var(--serif)}
+.pg .plate-cap small{display:block;font:500 .9cqw/1.4 var(--sans);letter-spacing:.1em;text-transform:uppercase;color:var(--ink-5);margin-top:.6cqw}
+.reader-bar{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-top:36px;flex-wrap:wrap}
+.pager{display:flex;align-items:center;gap:8px}
+.pager button{width:48px;height:48px;border-radius:var(--r);box-shadow:inset 0 0 0 1px var(--rule);font-size:18px}
+.pager button:hover{background:var(--cream)}
+.pager button:disabled{opacity:.3;cursor:default;background:none}
+.pager .count{font:500 13px/1 var(--sans);letter-spacing:.08em;min-width:96px;text-align:center;font-variant-numeric:tabular-nums;color:var(--ink-5)}
+.hint{font-size:13px;color:var(--ink-5)}
+@media (max-width:640px){.book{aspect-ratio:2/1.45}.pg .b{columns:1;font-size:1.6cqw}.pg .q{font-size:3.6cqw}}
+
+/* ---------- Artist voice ---------- */
+.voice{display:grid;grid-template-columns:minmax(0,.8fr) minmax(0,1.2fr);gap:clamp(40px,7vw,120px);align-items:center}
+.portrait{aspect-ratio:4/5;border-radius:var(--r);overflow:hidden;position:relative}
+.portrait .ph-cap{position:absolute;left:16px;bottom:14px;font:500 11px/1 var(--sans);letter-spacing:.12em;text-transform:uppercase;color:var(--paper);opacity:.85}
+.quote{font:400 clamp(30px,3.6vw,50px)/1.12 var(--serif);text-wrap:balance}
+.quote .w{transition:color .3s,opacity .3s;opacity:.3}
+.quote .w.said{opacity:1}
+.quote .w.now{color:var(--burgundy)}
+.player{display:flex;align-items:center;gap:18px;margin-top:44px;padding:12px 18px 12px 12px;background:var(--cream);border-radius:var(--r);max-width:520px}
+.play{width:52px;height:52px;border-radius:10px;background:var(--burgundy);color:var(--paper);display:grid;place-items:center;flex:none}
+.play svg{width:18px;height:18px;fill:currentColor}
+.wave{display:flex;align-items:center;gap:3px;height:40px;flex:1;min-width:0;overflow:hidden}
+.wave i{display:block;width:3px;border-radius:2px;background:var(--ink-5);opacity:.35;flex:none;transition:opacity .2s,background .2s}
+.wave i.on{opacity:1;background:var(--burgundy)}
+.player .time{font:500 12px/1 var(--sans);color:var(--ink-5);font-variant-numeric:tabular-nums}
+.voice .who{margin-top:28px;display:flex;gap:10px;align-items:baseline;flex-wrap:wrap}
+.voice .who b{font:400 22px/1 var(--serif)}
+@media (max-width:860px){.voice{grid-template-columns:minmax(0,1fr)}.portrait{max-width:420px}}
+
+/* ---------- Open call band ---------- */
+.call{margin-top:var(--sec);background:var(--peony);border-radius:0}
+.call .wrap{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:40px;align-items:end;padding-block:clamp(80px,10vw,140px)}
+.call h2 em{color:var(--burgundy)}
+@media (max-width:760px){.call .wrap{grid-template-columns:minmax(0,1fr)}}
+
+/* ---------- Footer ---------- */
+.foot{position:relative;margin-top:var(--sec);background:var(--burgundy);color:var(--cream);padding-top:clamp(80px,9vw,120px);overflow:hidden}
+.foot::before{content:"";position:absolute;top:-1px;left:0;right:0;height:14px;
+  background:radial-gradient(circle at 14px 0,var(--paper) 13px,transparent 14px) 0 0/28px 14px repeat-x}
+.call + .foot::before{background-image:radial-gradient(circle at 14px 0,var(--peony) 13px,transparent 14px)}
+.call + .foot{margin-top:0}
+.foot-grid{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,2fr);gap:48px;align-items:end}
+.pile{display:flex;flex-direction:column-reverse;align-items:flex-start;gap:0;width:min(380px,100%)}
+.pile .flat{cursor:default;--h:30px;font-size:15px}
+.cols{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:24px}
+.cols h4{margin:0 0 14px;font:500 11px/1 var(--sans);letter-spacing:.16em;text-transform:uppercase;color:var(--peony)}
+.cols a{display:block;text-decoration:none;font-size:14px;line-height:2;color:rgba(249,238,229,.82)}
+.cols a:hover{color:var(--paper)}
+.wordmark{font:italic 400 clamp(72px,19.6vw,300px)/.8 var(--serif);color:var(--peony);letter-spacing:-.035em;white-space:nowrap;margin:clamp(56px,7vw,96px) 0 0;text-align:center;transform:translateY(.12em)}
+.legal{display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px 24px;font-size:12px;color:rgba(249,238,229,.6);padding:20px 0 calc(env(safe-area-inset-bottom,0px) + 20px);border-top:1px solid rgba(250,210,225,.18);position:relative;z-index:1;background:var(--burgundy)}
+@media (max-width:860px){.foot-grid{grid-template-columns:minmax(0,1fr)}.cols{grid-template-columns:repeat(2,minmax(0,1fr))}}
+
+/* ---------- Book page ---------- */
+.crumb{padding-top:calc(env(safe-area-inset-top,0px) + 112px);font-size:13px;color:var(--ink-5);display:flex;gap:8px;flex-wrap:wrap}
+.crumb a{text-decoration:none}.crumb a:hover{color:var(--ink)}
+.bk-hero{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:clamp(40px,7vw,120px);align-items:center;padding-top:56px}
+.bk-hero .plinth{width:min(420px,86%)}
+.facts{list-style:none;margin:40px 0 0;padding:0;border-top:1px solid var(--ink)}
+.facts li{display:grid;grid-template-columns:140px minmax(0,1fr);gap:16px;padding:14px 0;border-bottom:1px solid var(--rule);font-size:15px}
+.facts li span:first-child{color:var(--ink-5)}
+.price{display:flex;align-items:center;gap:20px;flex-wrap:wrap;margin-top:36px}
+.price .amt{font:400 34px/1 var(--serif)}
+@media (max-width:860px){.bk-hero{grid-template-columns:minmax(0,1fr)}}
+.works{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:clamp(24px,4vw,64px);align-items:end}
+.frame{--s:11px;padding:calc(var(--s)*2.2);background:var(--fc,var(--burgundy-8));
+  -webkit-mask:radial-gradient(var(--s) at var(--s) var(--s),#000 97%,#0000) round calc(-1*var(--s)) calc(-1*var(--s))/calc(2*var(--s)) calc(2*var(--s)),linear-gradient(#000 0 0) content-box padding-box;
+  mask:radial-gradient(var(--s) at var(--s) var(--s),#000 97%,#0000) round calc(-1*var(--s)) calc(-1*var(--s))/calc(2*var(--s)) calc(2*var(--s)),linear-gradient(#000 0 0) content-box padding-box;
+  transition:transform .6s var(--settle)}
+.frame:hover{transform:translateY(-8px) rotate(-1deg)}
+.frame .in{aspect-ratio:var(--ar,4/5);overflow:hidden;position:relative}
+.work figcaption{text-align:center;margin-top:20px}
+.work figcaption b{display:block;font:400 22px/1.2 var(--serif)}
+.work figcaption span{font-size:13px;color:var(--ink-5)}
+.work{margin:0}
+@media (max-width:760px){.works{grid-template-columns:minmax(0,1fr)}.work{max-width:360px;justify-self:center;width:100%}}
+.honours{list-style:none;margin:0;padding:0;border-top:1px solid var(--ink)}
+.honours li{display:grid;grid-template-columns:200px minmax(0,1fr) auto;gap:24px;align-items:baseline;padding:26px 0;border-bottom:1px solid var(--rule)}
+.honours .nm{font:400 clamp(28px,3.2vw,44px)/1 var(--serif);transition:padding .4s var(--ease)}
+.honours li:hover .nm{font-style:italic;padding-left:12px}
+.honours .pl{font-size:14px;color:var(--ink-5)}
+@media (max-width:700px){.honours li{grid-template-columns:minmax(0,1fr)}}
+
+/* ---------- Brief ---------- */
+.brief{padding-top:calc(env(safe-area-inset-top,0px) + 150px)}
+.brief .intro{max-width:880px}
+.brief .intro p.lede{max-width:56ch;margin-top:36px}
+.chapter{display:grid;grid-template-columns:minmax(0,280px) minmax(0,1fr);gap:24px clamp(32px,6vw,96px);padding-block:clamp(64px,8vw,112px) 0}
+.chapter>header .label{color:var(--burgundy)}
+.chapter>header h2{font-size:clamp(32px,3.6vw,48px);margin-top:14px}
+.prose{max-width:66ch;display:grid;gap:18px;color:var(--ink-7)}
+.prose strong{color:var(--ink);font-weight:500}
+.rows{list-style:none;margin:0;padding:0;border-top:1px solid var(--ink)}
+.rows li{display:grid;grid-template-columns:minmax(0,200px) minmax(0,1fr);gap:20px;padding:18px 0;border-bottom:1px solid var(--rule)}
+.rows li b{font:400 22px/1.15 var(--serif)}
+.rows li span{color:var(--ink-7);font-size:15px}
+.visit{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1px;background:var(--rule);border:1px solid var(--rule);border-radius:var(--r);overflow:hidden}
+.visit li{background:var(--paper);padding:28px 24px 32px;display:grid;gap:10px;align-content:start}
+.visit .step{font:italic 400 34px/1 var(--serif);color:var(--burgundy)}
+.visit b{font:500 15px/1.3 var(--sans)}
+.visit span{font-size:14px;color:var(--ink-7)}
+.swatches{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+.sw{border-radius:var(--r);padding:16px;min-height:120px;display:flex;flex-direction:column;justify-content:flex-end;font-size:12px;gap:2px}
+.sw b{font:400 20px/1 var(--serif)}
+.ratio{display:flex;height:14px;border-radius:4px;overflow:hidden;margin-top:16px}
+.typespec{display:grid;gap:22px}
+.typespec .row{display:grid;grid-template-columns:120px minmax(0,1fr);gap:20px;align-items:baseline;border-bottom:1px solid var(--rule);padding-bottom:18px}
+.typespec .row span{font-size:12px;color:var(--ink-5)}
+.parts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px}
+.part{background:var(--cream);border-radius:var(--r);padding:24px;display:grid;gap:14px;align-content:start}
+.part b{font:400 24px/1.1 var(--serif)}
+.part span{font-size:14px;color:var(--ink-7)}
+.part .demo{background:var(--paper);border-radius:8px;min-height:120px;position:relative;overflow:hidden}
+.demo-bar{position:absolute;top:14px;left:14px;right:14px;height:28px;background:var(--ballet);border-radius:6px;display:flex;align-items:center;gap:10px;padding:0 10px;font:italic 400 13px/1 var(--serif);color:var(--burgundy)}
+.demo-bar i{flex:1}.demo-bar u{width:18px;height:16px;border-radius:3px;background:var(--burgundy);text-decoration:none}
+.demo-drawer{position:absolute;top:0;right:0;bottom:0;width:46%;background:var(--burgundy-8);padding:14px;display:grid;gap:6px;align-content:start}
+.demo-drawer i{display:block;height:9px;border-radius:2px;background:var(--peony);opacity:.7}
+.demo-foot{position:absolute;left:0;right:0;bottom:0;height:62%;background:var(--burgundy);display:flex;align-items:flex-end;padding:0 14px 8px;gap:4px}
+.demo-foot b{font:italic 400 28px/1 var(--serif);color:var(--peony);margin-left:auto}
+.rules{counter-reset:r;list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 48px}
+.rules li{counter-increment:r;display:grid;grid-template-columns:40px minmax(0,1fr);gap:12px;padding:18px 0;border-bottom:1px solid var(--rule);font-size:15px;color:var(--ink-7)}
+.rules li::before{content:counter(r,decimal-leading-zero);font:italic 400 20px/1.1 var(--serif);color:var(--burgundy)}
+.rules li b{color:var(--ink);font-weight:500}
+@media (max-width:860px){.chapter{grid-template-columns:minmax(0,1fr)}.visit{grid-template-columns:minmax(0,1fr)}.parts,.rules{grid-template-columns:minmax(0,1fr)}.swatches{grid-template-columns:repeat(2,minmax(0,1fr))}.rows li,.typespec .row{grid-template-columns:minmax(0,1fr);gap:6px}}
+
+/* ---------- Toast, proto switch ---------- */
+.toast{visibility:hidden;position:fixed;z-index:70;left:50%;bottom:calc(env(safe-area-inset-bottom,0px) + 24px);transform:translate(-50%,140%);background:var(--ink);color:var(--paper);padding:14px 20px;border-radius:var(--r);font-size:14px;transition:transform .5s var(--settle);display:flex;gap:16px;align-items:center;max-width:calc(100% - 32px)}
+.toast.on{transform:translate(-50%,0);visibility:visible}
+.toast button{color:var(--peony);text-decoration:underline;font-size:14px}
+.view[hidden]{display:none!important}
+.reveal{transition:transform 1s var(--ease)}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{transition-duration:.01ms!important;animation-duration:.01ms!important;scroll-behavior:auto!important}}
+</style>
+
+<!-- ============ Floating menu ============ -->
+<header class="bar" id="bar">
+  <a class="logo" href="#shop" aria-label="Arts to Hearts Project, the Bookshop"><b>arts to hearts</b><i>PROJECT</i></a>
+  <nav class="nav" aria-label="Main">
+    <a href="#brief">Open calls</a>
+    <a href="#shop" data-books aria-current="page">Books</a>
+    <a href="#brief">Artists</a>
+    <a href="#brief">Magazine</a>
+    <a href="#brief">Podcast</a>
+    <a href="#brief">Shop</a>
+  </nav>
+  <div class="bar-tools">
+    <button class="tool sound" id="soundBtn" aria-pressed="false">Sound off</button>
+    <button class="tool notes" data-open="notes"><span class="t">Notes</span> <span class="n" id="noteN">0</span></button>
+    <button class="tool" data-open="bag" aria-label="Bag"><span>Bag</span> <span class="n" id="bagN">0</span></button>
+    <button class="tool menu" data-open="house">Menu</button>
+  </div>
+</header>
+
+<div class="scrim" id="scrim"></div>
+
+<aside class="drawer house" id="d-house" aria-label="The house" aria-hidden="true">
+  <div class="d-top"><span class="label" style="color:var(--peony)">The Arts to Hearts house</span><button class="d-close" data-close>Close</button></div>
+  <div class="d-body">
+    <ul class="rooms">
+      <li><a href="#brief"><span class="nm">Gallery</span><span class="what">Exhibitions and awards</span></a></li>
+      <li><a href="#brief"><span class="nm">Studio</span><span class="what">Write your bio and statement</span></a></li>
+      <li><a href="#shop" aria-current="page"><span class="nm">Bookshop<span class="here">You are here</span></span><span class="what">Our books and series</span></a></li>
+      <li><a href="#brief"><span class="nm">Café</span><span class="what">Podcast and conversations</span></a></li>
+      <li><a href="#brief"><span class="nm">Reading room</span><span class="what">The magazine</span></a></li>
+      <li><a href="#brief"><span class="nm">Open calls</span><span class="what">Get your work into print</span></a></li>
+    </ul>
+  </div>
+  <div class="house-foot"><button data-open="notes" style="color:inherit;font-size:14px">Your notes</button><a href="#brief">About</a><a href="#brief">FAQ</a><a href="#brief">Contact</a><a href="#brief">Read the brief</a></div>
+</aside>
+
+<aside class="drawer" id="d-notes" aria-label="Your notes" aria-hidden="true">
+  <div class="d-top"><h3>Your notes</h3><button class="d-close" data-close>Close</button></div>
+  <div class="d-body">
+    <p class="label" style="margin-bottom:16px">Pages you kept</p>
+    <ul class="note-list" id="noteList"></ul>
+    <div class="empty" id="noteEmpty">No pages kept yet. While you read, choose “Keep this page” and it waits for you here.</div>
+    <label class="label" for="noteText" style="display:block;margin-bottom:6px">A note to yourself</label>
+    <textarea id="noteText" placeholder="What stayed with you?"></textarea>
+    <p class="fine" style="margin-top:10px">Saved on this device only.</p>
+  </div>
+</aside>
+
+<aside class="drawer" id="d-bag" aria-label="Your bag" aria-hidden="true">
+  <div class="d-top"><h3>Your bag</h3><button class="d-close" data-close>Close</button></div>
+  <div class="d-body" id="bagBody"></div>
+</aside>
+
+<main>
+<!-- ============ BOOKSHOP (home) ============ -->
+<section class="view" id="v-shop">
+  <div class="wrap window">
+    <div>
+      <p class="label">The Bookshop at Arts to Hearts</p>
+      <h1 style="margin-top:28px">Come in.<br><em>Take a book off the shelf.</em></h1>
+      <p class="lede" style="margin-top:32px">Every book we make is a visit to an artist’s studio. Browse the shelves, turn the pages, and hear the artists talk about their work.</p>
+      <div class="acts"><a class="btn btn-solid arrow" href="#shelves">Browse the shelves</a><a class="btn btn-line" href="#book-7">Open the new volume</a></div>
+    </div>
+    <div class="plinth" id="heroPlinth"><div class="cover" data-cover="7"></div><p class="tag label">New · Studio Visit Book, Vol. 7</p></div>
+  </div>
+
+  <div class="wrap sec" id="shelves">
+    <div class="sec-head">
+      <div><p class="label">The shelves</p><h2 style="margin-top:20px">Studio Visit <em>Books</em></h2></div>
+      <p class="lede">Seven volumes of artists in the rooms where they work. Lift a spine to see it, and choose it to open the book.</p>
+    </div>
+    <div class="shelf-wrap"><div class="shelf" id="shelf"></div>
+      <div class="shelf-cap" id="shelfCap" aria-live="polite"><span class="t">Seven volumes, one shelf.</span><span class="s">The empty slot is Vol. 8. It has room for you.</span></div>
+    </div>
+  </div>
+
+  <div class="wrap sec">
+    <div class="sec-head">
+      <div><p class="label">On the table</p><h2 style="margin-top:20px">This month we are <em>reading</em> Vol. 7</h2></div>
+      <p class="lede">Turn the pages the way you would in the shop. Drag a page, tap its edge, or use the arrow keys.</p>
+    </div>
+    <div class="table">
+      <div class="stack" id="tableStack"></div>
+      <div class="reader" id="tableReader"></div>
+      <div class="note-card"><div class="from"><div class="avatar"><canvas class="art" data-paint="portrait" width="80" height="80"></canvas></div><div><p class="label" style="font-size:10px">A note from</p><b class="serif" style="font-size:18px">Cindy Bernhard</b></div></div><p>“Turn to page 42. That is the corner where every painting starts.”</p></div>
+    </div>
+  </div>
+
+  <div class="wrap sec">
+    <div class="voice">
+      <div class="portrait"><canvas class="art" data-paint="studio" width="600" height="750"></canvas><span class="ph-cap">Studio photograph to come</span></div>
+      <div>
+        <p class="label">In the artist’s words</p>
+        <p class="quote" id="quote" style="margin-top:28px">I paint water because it never holds still. The studio is the one place where I let it.</p>
+        <div class="player"><button class="play" id="play" aria-label="Play voice note"><svg viewBox="0 0 20 20"><path d="M5 3l12 7-12 7z"/></svg></button><div class="wave" id="wave"></div><span class="time" id="vtime">0:00 / 0:14</span></div>
+        <div class="who"><b>Cindy Bernhard</b><span class="fine">Cover artist, Vol. 7 · Voice note to be recorded, transcript shown</span></div>
+      </div>
+    </div>
+  </div>
+
+  <section class="call">
+    <div class="wrap">
+      <div><p class="label">Open call · Vol. 8</p><h2 style="margin-top:20px">The next volume is being made. <em>Your page in it is still empty.</em></h2></div>
+      <a class="btn btn-solid arrow" href="#brief">Apply by 30 Nov</a>
+    </div>
+  </section>
+</section>
+
+<!-- ============ BOOK (edition) ============ -->
+<section class="view" id="v-book" hidden>
+  <div class="wrap">
+    <nav class="crumb" aria-label="Breadcrumb"><a href="#shop">Books</a><span>/</span><a href="#shop">Studio Visit Books</a><span>/</span><span id="crumbV">Vol. 7</span></nav>
+    <div class="bk-hero">
+      <div class="plinth" id="bookPlinth"><div class="cover" id="bookCover"></div></div>
+      <div>
+        <p class="label" id="bkKick">Studio Visit Books · Vol. 7 · 2026</p>
+        <h1 style="margin-top:24px;font-size:clamp(44px,6vw,88px)" id="bkTitle">A visual journey through the studios of <em>artists</em></h1>
+        <ul class="facts" id="bkFacts"></ul>
+        <div class="price"><span class="amt" id="bkPrice">$120</span><button class="btn btn-solid" id="addBag">Add to bag</button><button class="link arrow" id="lookBtn">Look inside</button></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="wrap sec" id="look">
+    <div class="sec-head">
+      <div><p class="label">Look inside</p><h2 style="margin-top:20px">Turn the <em>pages</em></h2></div>
+      <p class="lede">Twelve of the book’s spreads, as printed. Keep any page in your notes.</p>
+    </div>
+    <div class="reader" id="bookReader"></div>
+  </div>
+
+  <div class="wrap sec">
+    <div class="sec-head">
+      <div><p class="label">The cover artist</p><h2 style="margin-top:20px" id="caName">Cindy <em>Bernhard</em></h2></div>
+      <p class="lede">Three works from her studio visit. Each one has its own page in the book.</p>
+    </div>
+    <div class="works" id="works"></div>
+  </div>
+
+  <div class="wrap sec">
+    <div class="sec-head">
+      <div><p class="label">Recognised in this volume</p><h2 style="margin-top:20px">The Studio Visit <em>awards</em></h2></div>
+      <p class="lede">Chosen by the jury from every artist in the book. Each artist has a full studio feature inside.</p>
+    </div>
+    <ul class="honours">
+      <li><span class="label" style="color:var(--burgundy)">Winner</span><span class="nm">Sarah Jenkins</span><span class="pl">Brooklyn, United States</span></li>
+      <li><span class="label">First runner-up</span><span class="nm">Marcus Sterling</span><span class="pl">Gdańsk, Poland</span></li>
+      <li><span class="label">Second runner-up</span><span class="nm">Elena Rostova</span><span class="pl">Concord, United States</span></li>
+    </ul>
+  </div>
+
+  <div class="wrap sec">
+    <div class="sec-head">
+      <div><p class="label">Back on the shelf</p><h2 style="margin-top:20px">The rest of the <em>series</em></h2></div>
+      <p class="lede">The book you are reading is pulled forward.</p>
+    </div>
+    <div class="shelf-wrap"><div class="shelf" id="shelf2" style="--sh:340px"></div><div class="shelf-cap" id="shelfCap2"><span class="t">&nbsp;</span></div></div>
+  </div>
+</section>
+
+<!-- ============ BRIEF ============ -->
+<section class="view" id="v-brief" hidden>
+  <div class="wrap brief">
+    <div class="intro">
+      <p class="label">Creative brief · ATH website redesign · Foundation</p>
+      <h1 style="margin-top:28px">Arts to Hearts is a <em>house</em>. This is its bookshop.</h1>
+      <p class="lede">ATH is becoming an art centre you can walk through: a gallery, an artist’s studio, a bookshop, a café, a reading room and the open calls that bring new artists in. Each product is a room. Every room shares one front door, one corridor and one way out, so the whole house feels like one place. The Bookshop is the first room we build on that foundation.</p>
+    </div>
+
+    <div class="chapter">
+      <header><p class="label">The feeling</p><h2>Walking into a good bookshop</h2></header>
+      <div class="prose">
+        <p>You step in from the street and the noise drops. Spines line the walls. A few books lie open on a low table, face-up, with their best spread showing. You pick one up, feel the weight, turn a page, and hear it. A handwritten card from the bookseller says why this one matters.</p>
+        <p>That is the experience we design for. <strong>Images lead, because books are about images.</strong> The pages turn and sound like pages. The artists speak to you from their own books. Nothing on screen asks for more than one decision at a time, and every room has a lot of air in it.</p>
+        <p>The old Editions pages showed the same content in five places, in many type styles, with no order to the visit. The fix is a story with a beginning, a middle and an end, told with the objects of a bookshop.</p>
+      </div>
+    </div>
+
+    <div class="chapter">
+      <header><p class="label">Who walks in</p><h2>Three visitors, one action each</h2></header>
+      <ul class="rows">
+        <li><b>The collector</b><span>Wants a beautiful object and the story behind it. Leaves with a book in the bag.</span></li>
+        <li><b>The artist</b><span>Wants to see what being in the book looks like. Leaves with an application to the next open call.</span></li>
+        <li><b>The reader</b><span>Curious about artists and how they work. Leaves having listened to an artist and kept a page in their notes, and comes back.</span></li>
+      </ul>
+    </div>
+
+    <div class="chapter">
+      <header><p class="label">The visit</p><h2>Scrolling is walking in</h2></header>
+      <ol class="visit">
+        <li><span class="step">i.</span><b>The window</b><span>One book, face out, under a soft light. One sentence. One way in.</span></li>
+        <li><span class="step">ii.</span><b>The shelves</b><span>Each series is a shelf of spines. Lift one to read it, choose it to open the book. The empty slot is the next open call.</span></li>
+        <li><span class="step">iii.</span><b>The table</b><span>The book of the month lies open. Drag the pages, hear them turn, see the stack beside it.</span></li>
+        <li><span class="step">iv.</span><b>The artist</b><span>A voice note and its words, read along as the artist speaks. A card in their own words.</span></li>
+        <li><span class="step">v.</span><b>The counter</b><span>A side drawer, not a new page. Price, one button, done.</span></li>
+        <li><span class="step">vi.</span><b>The door</b><span>The footer: the books you looked at stack up, and the house name says goodbye.</span></li>
+      </ol>
+    </div>
+
+    <div class="chapter">
+      <header><p class="label">The senses</p><h2>What makes it feel real</h2></header>
+      <ul class="rows">
+        <li><b>Sight</b><span>Full-bleed images and spreads. Real covers, real spines, real studio photographs. Never stock photos, never lorem ipsum.</span></li>
+        <li><b>Touch</b><span>Spines lift. Covers tilt toward the pointer. Pages follow a drag. Stacks shift when you reach for the top book.</span></li>
+        <li><b>Sound</b><span>Off until the visitor turns it on. Then: a page turn, a book sliding off a shelf, a soft stack thud. Nothing loops, nothing plays on its own.</span></li>
+        <li><b>Voice</b><span>Artists speak in short voice notes, with the transcript shown so nobody needs headphones.</span></li>
+        <li><b>Paper</b><span>Warm paper ground and a faint fibre texture on covers and pages. It stands in for the smell of books.</span></li>
+      </ul>
+    </div>
+
+    <div class="chapter">
+      <header><p class="label">Shared parts</p><h2>The house infrastructure</h2></header>
+      <div class="parts">
+        <div class="part"><div class="demo"><div class="demo-bar">arts to hearts<i></i><u></u></div></div><b>Floating menu</b><span>A solid ballet-pink bar that floats 14px below the top edge. Logo, six links, Sound, Notes, Bag and Menu. It tucks away as you scroll down and returns when you scroll up. On phones it keeps the logo, Bag and Menu.</span></div>
+        <div class="part"><div class="demo"><div class="demo-drawer"><i style="width:70%"></i><i style="width:50%"></i><i style="width:64%"></i><i style="width:40%"></i></div></div><b>Side drawers</b><span>One drawer that slides in from the right for every side task. Menu shows the rooms of the house. Notes keeps pages you saved. Bag is the counter. Each closes with Esc, the scrim or Close.</span></div>
+        <div class="part"><div class="demo"><div class="demo-foot"><span style="width:40px;height:8px;background:var(--peony)"></span><span style="width:30px;height:8px;background:var(--cream)"></span><b>arts to hearts</b></div></div><b>Footer</b><span>Burgundy with the scalloped edge. A stack of books settles one by one as you arrive, then the house name runs edge to edge. Link columns stay short.</span></div>
+        <div class="part"><div class="demo" style="display:flex;align-items:flex-end;gap:5px;padding:16px 16px 0;border-bottom:2px solid var(--ink)"><span style="width:16px;height:80px;background:var(--burgundy)"></span><span style="width:12px;height:70px;background:var(--peony)"></span><span style="width:18px;height:90px;background:var(--ink)"></span><span style="width:14px;height:76px;background:var(--cream-2)"></span><span style="width:14px;height:84px;border:1px dashed var(--ink-5)"></span></div><b>Bookshop objects</b><span>Cover, spine, shelf, stack, open book, note card, scalloped frame, voice note. Every Bookshop page is made from these and nothing else.</span></div>
+      </div>
+    </div>
+
+    <div class="chapter">
+      <header><p class="label">Colour</p><h2>Paper first, burgundy for weight</h2></header>
+      <div>
+        <div class="swatches">
+          <div class="sw" style="background:var(--paper);box-shadow:inset 0 0 0 1px var(--rule)"><b>Paper</b>Ground · 60%</div>
+          <div class="sw" style="background:var(--ballet)"><b>Ballet</b>Menu, highlights</div>
+          <div class="sw" style="background:var(--peony)"><b>Peony</b>Open call, spines</div>
+          <div class="sw" style="background:var(--cream-2)"><b>Cream</b>Panels, table · 25%</div>
+          <div class="sw" style="background:var(--burgundy);color:var(--peony)"><b>Burgundy</b>Buttons, footer · 10%</div>
+          <div class="sw" style="background:var(--burgundy-8);color:var(--peony)"><b>Burgundy 800</b>Menu drawer</div>
+          <div class="sw" style="background:var(--red);color:var(--paper)"><b>Chilli red</b>New marker, focus · 5%</div>
+          <div class="sw" style="background:var(--ink);color:var(--paper)"><b>Ink</b>Text, shelf line</div>
+        </div>
+        <div class="ratio" aria-hidden="true"><span style="flex:60;background:var(--cream)"></span><span style="flex:25;background:var(--peony)"></span><span style="flex:10;background:var(--burgundy)"></span><span style="flex:5;background:var(--red)"></span></div>
+      </div>
+    </div>
+
+    <div class="chapter">
+      <header><p class="label">Type</p><h2>Two faces, used <em>gently</em></h2></header>
+      <div class="typespec">
+        <div class="row"><span>Display<br>Instrument Serif</span><span class="serif" style="font-size:64px;line-height:1">Take a book <em>off the shelf</em></span></div>
+        <div class="row"><span>Heading<br>Instrument Serif</span><span class="serif" style="font-size:32px;line-height:1.1">Studio Visit Books, Vol. 7</span></div>
+        <div class="row"><span>Body<br>Inter 16 / 1.6</span><span style="color:var(--ink-7)">Every book we make is a visit to an artist’s studio.</span></div>
+        <div class="row"><span>Label<br>Inter 11 caps</span><span class="label">The shelves · On the table</span></div>
+        <p class="fine">Italic is the only emphasis: one or two words per headline. No third typeface, no hand-drawn fonts, no bold serif.</p>
+      </div>
+    </div>
+
+    <div class="chapter">
+      <header><p class="label">Guardrails</p><h2>Rules every page keeps</h2></header>
+      <ol class="rules">
+        <li><span><b>One message per screen.</b> One headline, one line, one action.</span></li>
+        <li><span><b>Breathe.</b> At least 160px between sections on desktop and 96px on phones.</span></li>
+        <li><span><b>Images lead.</b> Text sits beside an image, never on top of a busy one.</span></li>
+        <li><span><b>Real objects only.</b> Covers, spines, stacks and pages. No sports podiums, no badges.</span></li>
+        <li><span><b>Fixed words.</b> Add to bag. Look inside. Keep this page. Apply by date.</span></li>
+        <li><span><b>Motion is physical.</b> Lift, settle, turn. Under 600ms, one bigger moment per page.</span></li>
+        <li><span><b>Sound is opt-in.</b> Off by default, remembered once chosen.</span></li>
+        <li><span><b>Square corners, softly.</b> 12px radius. Never pill buttons.</span></li>
+        <li><span><b>Same parts everywhere.</b> Menu, drawers and footer never change between rooms.</span></li>
+        <li><span><b>Phones first-class.</b> Shelves scale, drawers become full-screen, pages still turn.</span></li>
+      </ol>
+    </div>
+
+    <div class="chapter">
+      <header><p class="label">Next</p><h2>Room by room</h2></header>
+      <ul class="rows">
+        <li><b>Now</b><span>Agree this foundation: the menu, drawers, footer, colour, type and the Bookshop objects.</span></li>
+        <li><b>Then</b><span>Design the Bookshop’s pages one use case at a time: series, single book, artist, gift and checkout. Build each as Figma frames for desktop and phone.</span></li>
+        <li><b>After</b><span>Gallery, Café and Reading room reuse the same house parts with their own objects: frames on walls, cups and tables, magazines.</span></li>
+      </ul>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer class="foot">
+  <div class="wrap">
+    <div class="foot-grid">
+      <div><p class="label" style="color:var(--peony);margin-bottom:24px">On your way out</p><div class="pile" id="pile"></div></div>
+      <div class="cols">
+        <div><h4>Visit</h4><a href="#shop">Bookshop</a><a href="#brief">Gallery</a><a href="#brief">Studio</a><a href="#brief">Café</a></div>
+        <div><h4>Artists</h4><a href="#brief">Open calls</a><a href="#brief">Awards</a><a href="#brief">Your journey</a><a href="#brief">FAQ</a></div>
+        <div><h4>Read</h4><a href="#brief">Magazine</a><a href="#brief">Podcast</a><a href="#brief">Interviews</a></div>
+        <div><h4>House</h4><a href="#brief">About</a><a href="#brief">Contact</a><a href="#brief">Instagram</a></div>
+      </div>
+    </div>
+    <p class="wordmark" aria-hidden="true">arts to hearts</p>
+  </div>
+  <div class="wrap legal"><span>© 2026 Arts to Hearts Project</span><span>Prototype · artworks and photographs are placeholders</span></div>
+</footer>
+
+<div class="toast" id="toast" role="status" aria-live="polite"><span id="toastT"></span><button id="toastB" hidden></button></div>
+
+<script>
+(() => {
+const $ = (s, r = document) => r.querySelector(s), $$ = (s, r = document) => [...r.querySelectorAll(s)];
+const calm = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const store = { get(k, d) { try { const v = localStorage.getItem('ath-bookshop-' + k); return v == null ? d : JSON.parse(v); } catch { return d; } },
+                set(k, v) { try { localStorage.setItem('ath-bookshop-' + k, JSON.stringify(v)); } catch {} } };
+
+/* ---------- data ---------- */
+const VOLS = [
+  { n:1, sc:'#F1E2D6', st:'#850020', style:'serif', h:300, w:52, artist:null },
+  { n:2, sc:'#FAD2E1', st:'#3E0712', style:'caps',  h:332, w:46, artist:null },
+  { n:3, sc:'#3E0712', st:'#FAD2E1', style:'serif', h:318, w:62, artist:'Iryna Makaymova' },
+  { n:4, sc:'#F6DCE0', st:'#850020', style:'box',   h:340, w:54, artist:'Tiffany Bouelle' },
+  { n:5, sc:'#1C1310', st:'#F9EEE5', style:'caps',  h:310, w:58, artist:'Lisa Noein', year:2025 },
+  { n:6, sc:'#F9EEE5', st:'#1C1310', style:'serif', h:326, w:50, artist:'Sabrina Bockleff', year:2026 },
+  { n:7, sc:'#850020', st:'#FAD2E1', style:'serif', h:350, w:66, artist:'Cindy Bernhard', year:2026, isNew:true },
+];
+const PAL = { // painterly placeholder palettes
+  river:['#0B2A4A','#1D5D8C','#5FB3D9','#CDEAF2','#F2E6C9'], vase:['#1C1310','#3E2A12','#B8862B','#E9C46A','#7A1E1E'],
+  serpent:['#0E3B3A','#2F7D6D','#A9D3B7','#2C3E73','#E8D9A8'], studio:['#3B2A24','#6E5244','#B89A83','#E9D6C6','#850020'],
+  portrait:['#4A3A33','#B89A83','#F1E2D6','#850020','#E77F95'], cover7:['#1D3F66','#5FB3D9','#F2E6C9','#FAD2E1','#850020'],
+  dusk:['#3E0712','#850020','#E77F95','#FAD2E1','#F9EEE5'], ink:['#1C1310','#4A3A33','#7A6A63','#F1E2D6','#AA0003']
+};
+
+/* ---------- painterly canvas (placeholder artworks) ---------- */
+function rng(seed){ let s = 0; for (const c of String(seed)) s = (s * 31 + c.charCodeAt(0)) >>> 0; return () => ((s = (s * 1664525 + 1013904223) >>> 0) / 4294967296); }
+function paint(cv, key, seed){
+  const pal = PAL[key] || PAL.dusk, r = rng(key + (seed||'')), g = cv.getContext('2d'), W = cv.width, H = cv.height, U = Math.min(W, H);
+  const gr = g.createLinearGradient(0, 0, W*.3, H); gr.addColorStop(0, pal[0]); gr.addColorStop(1, pal[1]); g.fillStyle = gr; g.fillRect(0,0,W,H);
+  const f1 = 2 + r()*4, f2 = 2 + r()*4, ph = r()*6; g.lineCap = 'round';
+  const n = Math.min(2600, Math.round(W*H/180));
+  for (let i = 0; i < n; i++){
+    const x = r()*W, y = r()*H, a = Math.sin(x/W*f1 + ph)*Math.cos(y/H*f2)*Math.PI + (r()-.5)*.5, L = U*(.02 + r()*.05);
+    const ci = r() < .45 ? 1 + Math.floor(r()*2) : 1 + Math.floor(r()*(pal.length-1));
+    g.strokeStyle = pal[ci]; g.globalAlpha = .35 + r()*.5; g.lineWidth = U*(.006 + r()*.018);
+    g.beginPath(); g.moveTo(x, y); g.lineTo(x + Math.cos(a)*L, y + Math.sin(a)*L); g.stroke();
+  }
+  g.globalAlpha = 1;
+}
+function canvasFor(key, w, h, seed){ const c = document.createElement('canvas'); c.width = w; c.height = h; c.className = 'art'; paint(c, key, seed); return c; }
+$$('canvas[data-paint]').forEach(c => paint(c, c.dataset.paint));
+
+/* ---------- covers ---------- */
+function fillCover(el, n){
+  const v = VOLS[n-1];
+  el.style.setProperty('--cv', v.sc); el.style.setProperty('--ct', v.st);
+  el.innerHTML = `<span class="ck">Arts to Hearts Project</span><span class="ct">Studio Visit <em>Book</em></span><div class="win"></div><div class="cb"><span>${v.artist ? v.artist.toUpperCase() : 'COVER ARTIST TBC'}</span><span class="v">Vol. ${n}</span></div>`;
+  $('.win', el).append(canvasFor(n === 7 ? 'cover7' : ['dusk','studio','serpent','portrait','ink','river'][n-1], 360, 300, 'c' + n));
+}
+$$('[data-cover]').forEach(el => fillCover(el, +el.dataset.cover));
+
+/* ---------- sound (synthesised, opt-in) ---------- */
+let AC = null, soundOn = store.get('sound', false);
+function ac(){ if (!AC) { try { AC = new (window.AudioContext || window.webkitAudioContext)(); } catch { AC = null; } } return AC; }
+function noise(dur, f0, f1, q, vol){
+  if (!soundOn || !ac()) return; const c = AC, t = c.currentTime, len = Math.floor(c.sampleRate*dur), b = c.createBuffer(1, len, c.sampleRate), d = b.getChannelData(0);
+  for (let i = 0; i < len; i++) d[i] = (Math.random()*2-1) * (1 - i/len);
+  const s = c.createBufferSource(); s.buffer = b; const f = c.createBiquadFilter(); f.type = 'bandpass'; f.Q.value = q;
+  f.frequency.setValueAtTime(f0, t); f.frequency.exponentialRampToValueAtTime(f1, t + dur);
+  const g = c.createGain(); g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(vol, t + dur*.15); g.gain.exponentialRampToValueAtTime(.001, t + dur);
+  s.connect(f).connect(g).connect(c.destination); s.start(t);
+}
+function thud(){ if (!soundOn || !ac()) return; const c = AC, t = c.currentTime, o = c.createOscillator(), g = c.createGain();
+  o.frequency.setValueAtTime(120, t); o.frequency.exponentialRampToValueAtTime(55, t + .18); g.gain.setValueAtTime(.25, t); g.gain.exponentialRampToValueAtTime(.001, t + .22);
+  o.connect(g).connect(c.destination); o.start(t); o.stop(t + .25); noise(.08, 900, 300, .8, .12); }
+const sfx = { flip(){ noise(.42, 3200, 500, .7, .22); }, slide(){ noise(.3, 500, 900, 1.2, .14); }, stack: thud, tick(){ noise(.05, 4000, 3000, 2, .05); } };
+const sBtn = $('#soundBtn');
+function paintSound(){ sBtn.textContent = soundOn ? 'Sound on' : 'Sound off'; sBtn.setAttribute('aria-pressed', soundOn); }
+sBtn.onclick = () => { soundOn = !soundOn; store.set('sound', soundOn); paintSound(); if (soundOn) { ac()?.resume(); sfx.flip(); } };
+paintSound();
+
+/* ---------- toast ---------- */
+let tT; function toast(msg, act, fn){ $('#toastT').textContent = msg; const b = $('#toastB'); b.hidden = !act; if (act) { b.textContent = act; b.onclick = () => { fn(); $('#toast').classList.remove('on'); }; }
+  $('#toast').classList.add('on'); clearTimeout(tT); tT = setTimeout(() => $('#toast').classList.remove('on'), 3600); }
+
+/* ---------- drawers ---------- */
+let openD = null, lastFocus = null;
+function openDrawer(id){ closeDrawer(true); const d = $('#d-' + id); if (!d) return; lastFocus = document.activeElement;
+  if (id === 'bag') renderBag(); if (id === 'notes') renderNotes();
+  d.classList.add('on'); d.setAttribute('aria-hidden','false'); $('#scrim').classList.add('on'); openD = d; sfx.slide(); setTimeout(() => $('[data-close]', d)?.focus(), 60); }
+function closeDrawer(quiet){ if (!openD) return; openD.classList.remove('on'); openD.setAttribute('aria-hidden','true'); $('#scrim').classList.remove('on'); openD = null; if (!quiet) lastFocus?.focus?.(); }
+document.addEventListener('click', e => { const o = e.target.closest('[data-open]'); if (o) openDrawer(o.dataset.open); if (e.target.closest('[data-close]')) closeDrawer();
+  const a = e.target.closest('.drawer a[href^="#"]'); if (a) closeDrawer(true); });
+$('#scrim').onclick = () => closeDrawer(); addEventListener('keydown', e => { if (e.key === 'Escape') closeDrawer(); });
+
+/* ---------- notes ---------- */
+let notes = store.get('notes', []);
+function renderNotes(){ const ul = $('#noteList'); ul.innerHTML = ''; $('#noteEmpty').hidden = notes.length > 0;
+  notes.forEach((n, i) => { const li = document.createElement('li'); li.append(canvasFor(n.paint, 128, 96, n.seed));
+    li.insertAdjacentHTML('beforeend', `<div><div class="t">${n.title}</div><div class="s">${n.where}</div></div><button data-rm="${i}">Remove</button>`); ul.append(li); });
+  $('#noteN').textContent = notes.length; }
+$('#noteList').addEventListener('click', e => { const b = e.target.closest('[data-rm]'); if (b) { notes.splice(+b.dataset.rm, 1); store.set('notes', notes); renderNotes(); } });
+const nt = $('#noteText'); nt.value = store.get('note', ''); nt.oninput = () => store.set('note', nt.value);
+renderNotes();
+
+/* ---------- bag ---------- */
+let bag = store.get('bag', {});
+function bagCount(){ return Object.values(bag).reduce((a, b) => a + b, 0); }
+function renderBag(){ const body = $('#bagBody'); $('#bagN').textContent = bagCount(); const ks = Object.keys(bag).filter(k => bag[k] > 0);
+  if (!ks.length) { body.innerHTML = `<div class="empty">Your bag is empty. Every book in the shop has an “Add to bag” button beside its price.</div><a class="btn btn-line" href="#shelves">Browse the shelves</a>`; return; }
+  body.innerHTML = ks.map(k => `<div class="bag-item"><div class="cover" data-c="${k}"></div><div><p class="label">Print edition · 250+ pages</p><h3 style="margin-top:8px">Studio Visit Book, Vol. ${k}</h3><div class="qty"><button data-q="${k}" data-d="-1" aria-label="One less">−</button><span>${bag[k]}</span><button data-q="${k}" data-d="1" aria-label="One more">+</button></div></div></div>`).join('')
+    + `<div class="sum"><span>Subtotal</span><b>$${ks.reduce((a, k) => a + bag[k]*120, 0)}</b></div><p class="fine">Ships worldwide. Shipping is added at checkout.</p><div class="d-act"><button class="btn btn-solid" id="checkout">Go to checkout</button><button class="btn btn-line" data-close>Keep browsing</button></div>`;
+  $$('[data-c]', body).forEach(el => fillCover(el, +el.dataset.c));
+  $('#checkout').onclick = () => toast('Checkout opens in the ATH Shop. Not part of this prototype.'); }
+$('#bagBody').addEventListener('click', e => { const b = e.target.closest('[data-q]'); if (!b) return; bag[b.dataset.q] = Math.max(0, (bag[b.dataset.q]||0) + +b.dataset.d); store.set('bag', bag); renderBag(); });
+$('#bagN').textContent = bagCount();
+
+/* ---------- shelves ---------- */
+function spineEl(v, onPick){
+  const b = document.createElement('button'); b.className = 'spine'; b.style.cssText = `--sc:${v.sc};--st:${v.st};--h0:${v.h}px;--w0:${v.w}px;--h:${v.h}px;--w:${v.w}px`;
+  b.setAttribute('aria-label', `Studio Visit Book, Vol. ${v.n}` + (v.artist ? `, cover artist ${v.artist}` : ''));
+  const title = v.style === 'caps' ? '<span class="stt caps">Studio Visit Book</span>' : v.style === 'box' ? '<span class="stt box">Studio Visit</span>' : '<span class="stt">Studio Visit Book</span>';
+  b.innerHTML = `<span class="sk">ATH</span>${title}<span class="sv">${v.n}</span>${v.isNew ? '<span class="new" title="New"></span>' : ''}`;
+  b.onclick = () => onPick(v, b); return b;
+}
+function buildShelf(el, cap, current){
+  el.innerHTML = '';
+  VOLS.forEach(v => { const s = spineEl(v, (v, b) => { b.classList.add('out'); sfx.slide(); setTimeout(() => { location.hash = 'book-' + v.n; }, calm ? 0 : 260); });
+    if (v.n === current) s.classList.add('out');
+    const show = () => { sfx.tick(); cap.innerHTML = `<span class="t">Studio Visit Book, Vol. ${v.n}</span><span class="s">${v.artist ? 'Cover artist ' + v.artist : 'Cover artist to confirm'}${v.year ? ' · ' + v.year : ''} · Open the book →</span>`; };
+    s.addEventListener('mouseenter', show); s.addEventListener('focus', show); el.append(s); });
+  const g = document.createElement('a'); g.href = '#brief'; g.className = 'spine ghost'; g.style.cssText = '--h0:330px;--w0:56px;--h:330px;--w:56px';
+  g.setAttribute('aria-label', 'Vol. 8, open call'); g.innerHTML = '<span class="sk">8</span><span class="stt caps">Your page here</span><span class="sv">?</span>';
+  g.addEventListener('mouseenter', () => cap.innerHTML = '<span class="t">Vol. 8 is still being made.</span><span class="s">Apply to the open call by 30 Nov →</span>');
+  el.append(g);
+  const lean = document.createElement('div'); lean.style.flex = '1'; el.append(lean); // empty end of shelf
+}
+buildShelf($('#shelf'), $('#shelfCap'));
+
+/* ---------- table stack ---------- */
+const STACK = [ {t:'Studio Visit', v:'Vol. 6', sc:'#F9EEE5', st:'#1C1310', w:'96%', x:'-6px'}, {t:'Studio Visit', v:'Vol. 5', sc:'#1C1310', st:'#F9EEE5', w:'88%', x:'8px', rot:'-1deg'},
+  {t:'Studio Visit', v:'Vol. 4', sc:'#F6DCE0', st:'#850020', w:'92%', x:'-2px'}, {t:'Studio Visit', v:'Vol. 3', sc:'#3E0712', st:'#FAD2E1', w:'84%', x:'10px', rot:'1.5deg'} ];
+function flatEl(s){ const d = document.createElement('div'); d.className = 'flat'; d.style.cssText = `--sc:${s.sc};--st:${s.st};--w:${s.w};--x:${s.x||0};--rot:${s.rot||'0deg'}`;
+  d.innerHTML = `<small>ATH</small><span>${s.t}</span><em>${s.v}</em>`; return d; }
+(() => { const st = $('#tableStack'); STACK.forEach(s => { const f = flatEl(s); f.onclick = () => location.hash = 'book-' + s.v.slice(-1); st.append(f); });
+  const cap = document.createElement('p'); cap.className = 'cap label'; cap.textContent = 'Earlier volumes'; st.prepend(cap); })();
+
+/* ---------- flip book ---------- */
+function spreads(n){
+  const v = VOLS[n-1], who = v.artist || 'The cover artist';
+  return [
+    { k:'cover' },
+    { left:{ type:'title' }, right:{ type:'plate', paint:'studio', cap:'The studio, morning', sub:'Photograph' } },
+    { left:{ type:'text', k:'Studio visit · ' + who, q:'“I paint water because it <em>never holds still.</em>”', b:'The studio sits at the top of a narrow stair, with one long window facing north. Canvases lean three deep against the wall. The work starts in the corner by the sink, where the light is steadiest and the floor has taken years of spilled blue.' },
+      right:{ type:'bleed', paint:'river', cap:'River, 2026 · Oil on canvas · 18 × 14 in' } },
+    { left:{ type:'bleed', paint:'vase', cap:'When the Eternal Breaks · Oil on canvas · 72 × 60 in' }, right:{ type:'text', k:'On process', q:'“A painting is finished when it <em>stops arguing</em> with me.”', b:'Each work begins as a pencil map on brown paper, pinned at eye level. The colour comes later and quickly. She works on three canvases at once and lets two of them rest while the third is wet.' } },
+    { left:{ type:'plate', paint:'serpent', cap:'The Serpent', sub:'Oil on canvas · 16 × 14 in' }, right:{ type:'bleed', paint:'portrait', cap:'Cindy Bernhard in her studio' } },
+    { left:{ type:'text', k:'Also in this volume', q:'Twenty-four artists, <em>twenty-four rooms.</em>', b:'From a converted garage in Gdańsk to a rooftop shed in Brooklyn, every studio in this book was visited, photographed and recorded in conversation.' }, right:{ type:'plate', paint:'dusk', cap:'Studio Visit Book, Vol. ' + n, sub:'250+ pages · Print and digital' } },
+  ];
+}
+function pageHTML(p, folio){
+  if (!p) return '';
+  if (p.type === 'title') return `<div class="pg"><div class="title-pg"><p class="k">Arts to Hearts Project</p><p class="t" style="margin-top:2cqw">Studio Visit<br><em>Book</em></p></div><span class="fol">${folio}</span></div>`;
+  if (p.type === 'text') return `<div class="pg"><p class="k">${p.k}</p><p class="q">${p.q}</p><p class="b">${p.b}</p><span class="fol">${folio}</span></div>`;
+  if (p.type === 'plate') return `<div class="pg"><div class="plate" data-p="${p.paint}"></div><p class="plate-cap">${p.cap}<small>${p.sub}</small></p><span class="fol">${folio}</span></div>`;
+  if (p.type === 'bleed') return `<div class="pg bleed" data-p="${p.paint}"><span class="cap">${p.cap}</span></div>`;
+}
+function makeReader(root, n, opts = {}){
+  const sp = spreads(n); root.innerHTML = '';
+  const book = document.createElement('div'); book.className = 'book'; book.innerHTML = '<div class="base"><div></div><div></div></div>';
+  // leaves: leaf i front = right page of spread i, back = left page of spread i+1
+  const leaves = [];
+  for (let i = 0; i < sp.length; i++){
+    const L = document.createElement('div'); L.className = 'leaf'; L.style.zIndex = sp.length - i;
+    const front = i === 0 ? `<div class="cover" style="position:absolute;inset:0;aspect-ratio:auto;border-radius:0 6px 6px 0" data-cv="${n}"></div>` : pageHTML(sp[i].right, i*2 + 1);
+    const back = sp[i+1] ? pageHTML(sp[i+1].left, (i+1)*2) : '<div class="pg" style="background:var(--cream-2) var(--fibre)"></div>';
+    L.innerHTML = `<div class="face front">${front}</div><div class="face back">${back}</div>`; book.append(L); leaves.push(L);
+  }
+  $$('[data-cv]', book).forEach(el => fillCover(el, n));
+  $$('[data-p]', book).forEach((el, i) => el.prepend(canvasFor(el.dataset.p, 500, el.classList.contains('bleed') ? 640 : 600, 'p' + i + n)));
+  const bar = document.createElement('div'); bar.className = 'reader-bar';
+  bar.innerHTML = `<div class="pager"><button aria-label="Previous page">←</button><span class="count"></span><button aria-label="Next page">→</button></div><span class="hint">Drag a page or use ← →</span>${opts.keep !== false ? '<button class="btn btn-line keep">Keep this page</button>' : ''}`;
+  root.append(book, bar);
+  let at = 0; const [prev, , next] = bar.querySelector('.pager').children, count = $('.count', bar);
+  function show(i, quiet){ at = Math.max(0, Math.min(sp.length - 1, i));
+    leaves.forEach((L, k) => { L.classList.toggle('turned', k < at); L.style.zIndex = k < at ? 10 + k : sp.length - k + 10; });
+    book.classList.toggle('closed', at === 0); count.textContent = at === 0 ? 'Cover' : `Pages ${at*2}–${at*2+1}`; prev.disabled = at === 0; next.disabled = at === sp.length - 1; if (!quiet) sfx.flip(); }
+  prev.onclick = () => show(at - 1); next.onclick = () => show(at + 1);
+  // drag / tap to turn
+  let x0 = null; book.addEventListener('pointerdown', e => { x0 = e.clientX; });
+  book.addEventListener('pointerup', e => { if (x0 == null) return; const dx = e.clientX - x0, r = book.getBoundingClientRect(); x0 = null;
+    if (Math.abs(dx) > 30) show(at + (dx < 0 ? 1 : -1)); else show(at + (e.clientX > r.left + r.width/2 ? 1 : -1)); });
+  book.tabIndex = 0; book.setAttribute('aria-label', 'Book. Use the left and right arrow keys to turn pages.');
+  book.addEventListener('keydown', e => { if (e.key === 'ArrowRight') show(at + 1); if (e.key === 'ArrowLeft') show(at - 1); });
+  $('.keep', bar)?.addEventListener('click', () => {
+    const s = sp[at], pick = at === 0 ? { paint:'cover7', cap:'Cover' } : (s.right.type !== 'text' ? s.right : s.left);
+    const item = { title: pick.cap.split(' · ')[0], where: `Vol. ${n}, ${at === 0 ? 'cover' : 'pages ' + (at*2) + '–' + (at*2+1)}`, paint: pick.paint, seed: 'n' + at };
+    if (notes.some(x => x.where === item.where)) return toast('Already in your notes.', 'Open notes', () => openDrawer('notes'));
+    notes.push(item); store.set('notes', notes); renderNotes(); sfx.tick();
+    toast('Kept in your notes.', 'Open notes', () => openDrawer('notes')); });
+  show(opts.start || 0, true);
+  return { show };
+}
+const tableReader = makeReader($('#tableReader'), 7, { start: 2 });
+
+/* ---------- voice note (transcript read-along) ---------- */
+(() => { const q = $('#quote'), words = q.textContent.split(' '); q.innerHTML = words.map(w => `<span class="w">${w}</span>`).join(' ');
+  const ws = $$('.w', q), wave = $('#wave'), r = rng('voice'); for (let i = 0; i < 64; i++){ const b = document.createElement('i'); b.style.height = (8 + r()*30) + 'px'; wave.append(b); }
+  const bars = $$('i', wave), DUR = 14000; let t0 = null, raf = null; ws.forEach(w => w.classList.add('said'));
+  const btn = $('#play'), icon = btn.innerHTML, pause = '<svg viewBox="0 0 20 20"><path d="M5 3h4v14H5zM11 3h4v14h-4z"/></svg>';
+  function frame(ts){ if (t0 == null) t0 = ts; const p = Math.min(1, (ts - t0) / DUR); const wi = Math.floor(p * ws.length);
+    ws.forEach((w, i) => { w.classList.toggle('said', i <= wi); w.classList.toggle('now', i === wi && p < 1); });
+    bars.forEach((b, i) => b.classList.toggle('on', i / bars.length <= p)); const s = Math.round(p*14); $('#vtime').textContent = `0:${String(s).padStart(2,'0')} / 0:14`;
+    if (p < 1) raf = requestAnimationFrame(frame); else stop(true); }
+  function stop(done){ cancelAnimationFrame(raf); raf = null; t0 = null; btn.innerHTML = icon; btn.setAttribute('aria-label','Play voice note'); if (done) setTimeout(() => { ws.forEach(w => w.classList.add('said')); bars.forEach(b => b.classList.remove('on')); $('#vtime').textContent = '0:00 / 0:14'; }, 1200); }
+  btn.onclick = () => { if (raf) return stop(true); ws.forEach(w => w.classList.remove('said')); btn.innerHTML = pause; btn.setAttribute('aria-label','Stop'); raf = requestAnimationFrame(frame); };
+})();
+
+/* ---------- book page ---------- */
+let bookReader = null;
+const WORKS = [ { t:'River, 2026', m:'Oil on canvas · 18 × 14 in', p:'river', ar:'4/5', fc:'#3E0712' }, { t:'When the Eternal Breaks', m:'Oil on canvas · 72 × 60 in', p:'vase', ar:'5/6', fc:'#1C1310' }, { t:'The Serpent', m:'Oil on canvas · 16 × 14 in', p:'serpent', ar:'7/8', fc:'#850020' } ];
+function renderBook(n){
+  const v = VOLS[n-1] || VOLS[6]; n = v.n;
+  fillCover($('#bookCover'), n); $('#crumbV').textContent = 'Vol. ' + n;
+  $('#bkKick').textContent = `Studio Visit Books · Vol. ${n}` + (v.year ? ' · ' + v.year : '');
+  $('#bkTitle').innerHTML = n === 7 ? 'A visual journey through the studios of <em>artists</em>' : `Studio Visit Book, <em>Vol. ${n}</em>`;
+  $('#bkFacts').innerHTML = [['Cover artist', v.artist || 'To confirm'], ['Pages', '250+'], ['Format', 'Print and digital'], ['Ships', 'Worldwide']].map(([a, b]) => `<li><span>${a}</span><span>${b}</span></li>`).join('');
+  const [f, ...l] = (v.artist || 'Cover artist').split(' '); $('#caName').innerHTML = `${f} <em>${l.join(' ')}</em>`;
+  $('#works').innerHTML = ''; WORKS.forEach((w, i) => { const fig = document.createElement('figure'); fig.className = 'work';
+    fig.innerHTML = `<div class="frame" style="--fc:${w.fc}"><div class="in" style="--ar:${w.ar}"></div></div><figcaption><b>${w.t}</b><span>${w.m}</span></figcaption>`;
+    $('.in', fig).append(canvasFor(w.p, 400, 480, 'w' + i)); $('#works').append(fig); });
+  bookReader = makeReader($('#bookReader'), n);
+  buildShelf($('#shelf2'), $('#shelfCap2'), n);
+  $('#addBag').onclick = () => { bag[n] = (bag[n]||0) + 1; store.set('bag', bag); $('#bagN').textContent = bagCount(); sfx.stack(); toast(`Vol. ${n} is in your bag.`, 'View bag', () => openDrawer('bag')); };
+}
+
+/* ---------- footer pile: books settle as you arrive ---------- */
+const PILE = [ {t:'Studio Visit Book', v:'Vol. 7', sc:'#850020', st:'#FAD2E1', w:'100%'}, {t:'Studio Visit Book', v:'Vol. 6', sc:'#F9EEE5', st:'#1C1310', w:'90%', x:'14px'},
+  {t:'Studio Visit Book', v:'Vol. 5', sc:'#1C1310', st:'#F9EEE5', w:'94%', x:'-4px', rot:'-1deg'}, {t:'Studio Visit Book', v:'Vol. 4', sc:'#F6DCE0', st:'#850020', w:'82%', x:'22px'},
+  {t:'Studio Visit Book', v:'Vol. 3', sc:'#FAD2E1', st:'#3E0712', w:'88%', x:'6px', rot:'1.5deg'} ];
+const pile = $('#pile'); PILE.forEach(p => pile.append(flatEl(p)));
+if (!calm && 'IntersectionObserver' in window){
+  let done = false; new IntersectionObserver(es => { if (done || !es[0].isIntersecting) return; done = true;
+    $$('.flat', pile).forEach((f, i) => setTimeout(() => { f.animate([{ transform: `translate(${f.style.getPropertyValue('--x')||0}, -220px) rotate(-8deg)` }, { transform: getComputedStyle(f).transform }], { duration: 650, easing: 'cubic-bezier(.3,1.35,.5,1)', fill: 'backwards' }); setTimeout(sfx.stack, 450); }, i * 160)); }, { threshold: .35 }).observe(pile);
+}
+
+/* ---------- menu tuck on scroll, hero tilt ---------- */
+let lastY = scrollY; addEventListener('scroll', () => { const y = scrollY; $('#bar').classList.toggle('tuck', y > 160 && y > lastY && !openD); lastY = y; }, { passive: true });
+function tilt(pl){ if (calm || !matchMedia('(hover:hover)').matches) return; const c = $('.cover', pl);
+  pl.addEventListener('pointermove', e => { const r = pl.getBoundingClientRect(), px = (e.clientX - r.left)/r.width - .5, py = (e.clientY - r.top)/r.height - .5; c.style.transform = `rotateY(${-14 + px*18}deg) rotateX(${3 - py*10}deg)`; });
+  pl.addEventListener('pointerleave', () => c.style.transform = ''); }
+tilt($('#heroPlinth')); tilt($('#bookPlinth'));
+
+/* ---------- routes ---------- */
+function route(){
+  const h = location.hash.slice(1) || 'shop'; let view = 'shop';
+  if (h.startsWith('book')) { view = 'book'; renderBook(+h.split('-')[1] || 7); }
+  else if (h === 'brief') view = 'brief';
+  else if (h === 'shelves') { view = 'shop'; }
+  $$('.view').forEach(v => v.hidden = v.id !== 'v-' + view);
+  $$('.nav a').forEach(a => a.toggleAttribute('aria-current', view !== 'brief' && a.hasAttribute('data-books')));
+  if (h === 'shelves') $('#shelves').scrollIntoView(); else scrollTo({ top: 0, behavior: 'instant' });
+}
+addEventListener('hashchange', route); route();
+$('#lookBtn').onclick = () => $('#look').scrollIntoView({ behavior: calm ? 'auto' : 'smooth' });
+})();
+</script>
