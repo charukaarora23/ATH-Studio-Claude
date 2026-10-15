@@ -12,14 +12,14 @@ from fontTools.pens.svgPathPen import SVGPathPen
 from fontTools.pens.boundsPen import BoundsPen
 from fontTools.pens.transformPen import TransformPen
 
-FD, OUT = sys.argv[1], sys.argv[2]
+FD, OUT = (sys.argv[1], sys.argv[2]) if len(sys.argv) > 2 else (os.environ['ATH_FONTS'], os.environ.get('ATH_OUT', 'svg'))
 FONTS = {
     'name': os.path.join(FD, 'FacultyGlyphic-Regular.ttf'),
     'to': os.path.join(FD, 'LibreBaskerville-Italic.ttf'),
     'project': os.path.join(FD, os.environ.get('ATH_PROJECT_FONT', 'Nord-Regular.otf')),
 }
 S = 100.0           # name size (one em of Faculty Glyphic)
-TO = 1.18 * S       # "to" size: the ratio from the existing logo
+TO = float(os.environ.get('ATH_TO', '1.18')) * S  # "to" size: 1.18 is the ratio from the existing logo
 GAP = 0.25 * S      # equal ink gap either side of "to"
 PROJ_CAP = 0.27 * S # cap height of PROJECT
 PROJ_TRACK = 0.32   # tracking of PROJECT, in em
@@ -54,7 +54,7 @@ F = {k: Font(v) for k, v in FONTS.items()}
 def measure(font, text, size, track=0.0):
     _, bb = font.run(text, size, 0, 0, track); return bb
 
-def wordmark(project=True):
+def wordmark(project=True, label='PROJECT'):
     """Horizontal lockup. Returns list of path strings and overall bbox."""
     paths = []
     a_bb = measure(F['name'], 'arts', S); t_bb = measure(F['to'], 'to', TO); h_bb = measure(F['name'], 'hearts', S)
@@ -65,14 +65,14 @@ def wordmark(project=True):
     top = min(A[1], T[1], H[1]); left, right = A[0], H[2]
     bb = [left, top, right, max(A[3], T[3], H[3])]
     if project:
-        bb = add_project(paths, bb, (left + right) / 2)
+        bb = add_project(paths, bb, (left + right) / 2, label)
     return paths, bb
 
-def add_project(paths, bb, cx):
+def add_project(paths, bb, cx, label='PROJECT'):
     f = F['project']; size = PROJ_CAP / (f.cap / f.upem)
-    pb = measure(f, 'PROJECT', size, PROJ_TRACK)
+    pb = measure(f, label, size, PROJ_TRACK)
     w = pb[2] - pb[0]; x = cx - w / 2 - pb[0]; y = PROJ_DROP + PROJ_CAP
-    d, P = f.run('PROJECT', size, x, y, PROJ_TRACK); paths.append(d)
+    d, P = f.run(label, size, x, y, PROJ_TRACK); paths.append(d)
     return [min(bb[0], P[0]), bb[1], max(bb[2], P[2]), max(bb[3], P[3])]
 
 def stacked():
@@ -113,22 +113,26 @@ def svg(paths, bb, fg, bg=None, pad=X, square=False, title='Arts to Hearts Proje
     return (f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="{ox:.2f} {oy:.2f} {vw:.2f} {vh:.2f}" role="img" aria-label="{title}">'
             f'<title>{title}</title>{rect}<g fill="{fg}">{body}</g></svg>')
 
-os.makedirs(OUT, exist_ok=True)
-SETS = [  # name, fg, bg
-    ('burgundy-on-cream', 'burgundy', 'cream'), ('peony-on-burgundy', 'peony', 'burgundy'),
-    ('ballet-on-chilli', 'ballet', 'chilli'), ('burgundy-on-peony', 'burgundy', 'peony'),
-    ('burgundy', 'burgundy', None), ('peony', 'peony', None), ('ballet', 'ballet', None), ('chilli', 'chilli', None),
-]
-made = []
-for kind, fn in [('logo', lambda: wordmark(True)), ('logo-no-project', lambda: wordmark(False)), ('logo-stacked', stacked)]:
-    p, bb = fn()
-    for n, fg, bg in SETS:
-        f = f'{kind}_{n}.svg'; open(os.path.join(OUT, f), 'w').write(svg(p, bb, COLOURS[fg], COLOURS[bg] if bg else None)); made.append(f)
-p, bb = monogram()
-for n, fg, bg in [('ballet-on-chilli', 'ballet', 'chilli'), ('peony-on-burgundy', 'peony', 'burgundy'), ('burgundy-on-cream', 'burgundy', 'cream'), ('burgundy', 'burgundy', None)]:
-    f = f'monogram_{n}.svg'; open(os.path.join(OUT, f), 'w').write(svg(p, bb, COLOURS[fg], COLOURS[bg] if bg else None, pad=0.32 * S, square=True, title='AtH')); made.append(f)
-p, bb = favicon_t()
-for n, fg, bg in [('ballet-on-chilli', 'ballet', 'chilli'), ('peony-on-burgundy', 'peony', 'burgundy')]:
-    f = f'favicon_{n}.svg'; open(os.path.join(OUT, f), 'w').write(svg(p, bb, COLOURS[fg], COLOURS[bg], pad=0.2 * S, square=True, title='Arts to Hearts')); made.append(f)
-json.dump({'files': made, 'project_font': os.path.basename(FONTS['project'])}, open(os.path.join(OUT, 'manifest.json'), 'w'), indent=1)
-print(len(made), 'files; PROJECT font:', os.path.basename(FONTS['project']))
+def main():
+    os.makedirs(OUT, exist_ok=True)
+    SETS = [  # name, fg, bg
+        ('burgundy-on-cream', 'burgundy', 'cream'), ('peony-on-burgundy', 'peony', 'burgundy'),
+        ('ballet-on-chilli', 'ballet', 'chilli'), ('burgundy-on-peony', 'burgundy', 'peony'),
+        ('burgundy', 'burgundy', None), ('peony', 'peony', None), ('ballet', 'ballet', None), ('chilli', 'chilli', None),
+    ]
+    made = []
+    for kind, fn in [('logo', lambda: wordmark(True)), ('logo-no-project', lambda: wordmark(False)), ('logo-stacked', stacked)]:
+        p, bb = fn()
+        for n, fg, bg in SETS:
+            f = f'{kind}_{n}.svg'; open(os.path.join(OUT, f), 'w').write(svg(p, bb, COLOURS[fg], COLOURS[bg] if bg else None)); made.append(f)
+    p, bb = monogram()
+    for n, fg, bg in [('ballet-on-chilli', 'ballet', 'chilli'), ('peony-on-burgundy', 'peony', 'burgundy'), ('burgundy-on-cream', 'burgundy', 'cream'), ('burgundy', 'burgundy', None)]:
+        f = f'monogram_{n}.svg'; open(os.path.join(OUT, f), 'w').write(svg(p, bb, COLOURS[fg], COLOURS[bg] if bg else None, pad=0.32 * S, square=True, title='AtH')); made.append(f)
+    p, bb = favicon_t()
+    for n, fg, bg in [('ballet-on-chilli', 'ballet', 'chilli'), ('peony-on-burgundy', 'peony', 'burgundy')]:
+        f = f'favicon_{n}.svg'; open(os.path.join(OUT, f), 'w').write(svg(p, bb, COLOURS[fg], COLOURS[bg], pad=0.2 * S, square=True, title='Arts to Hearts')); made.append(f)
+    json.dump({'files': made, 'project_font': os.path.basename(FONTS['project'])}, open(os.path.join(OUT, 'manifest.json'), 'w'), indent=1)
+    print(len(made), 'files; PROJECT font:', os.path.basename(FONTS['project']))
+
+if __name__ == '__main__':
+    main()
