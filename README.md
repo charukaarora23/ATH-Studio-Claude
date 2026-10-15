@@ -33,6 +33,7 @@ These pages are private. To give someone access, the owner shares each page from
 - Editions Foundations: https://claude.ai/artifact/TXEnfjvsARQzTfdJfagjgf
 - ATH design system: https://claude.ai/artifact/VsF2w9855usFt9u5NYT445
 - My Studio prototype: https://claude.ai/artifact/NAzzJwUNz5Mry48gDnAUki
+- ATH logo explorations: https://claude.ai/artifact/Sa4erTUPavKpFr59ZY6GBF
 - Figma (My Studio folder design): https://www.figma.com/design/UijhBNM4c7OZzOH0dWcu1j
 
 ## Design rules in short
