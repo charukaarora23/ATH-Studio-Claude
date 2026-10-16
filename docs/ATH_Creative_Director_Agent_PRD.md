@@ -580,6 +580,71 @@ Start with open calls, because that's where inconsistency costs entries. Prove t
 
 The Phase 1 pilot runs on the next open call, from launch to winners, so we can compare entries and saves against past calls.
 
+## Next 30 days
+
+Test the system on a real open call before building the full dashboard. Three steps, in order:
+
+> **Diagram: next 30 days · proposed timeline.** View it in the [live PRD](https://claude.ai/code/artifact/f8524439-d613-48c0-8e9e-f45731fdcc3f).
+
+1. **Get the numbers and inputs flowing.** Connect every Instagram account, ManyChat and the entry platform, then build a starting report per account from the last 12 months. "Outperforming" only means something against a starting number. Setup steps are in the next section.
+2. **Lock the brand into templates.** Finish Brand Kit v1 (colour pairings, the font licence decision, the voice guide, logos when final) and build the open call template set (launch, 30-day reminder, countdown, closed, winners) in Canva or Figma. Templates fix the inconsistent look even before any software exists.
+3. **Pilot the next open call end to end.** Run the full sequence with the agent's playbook: a brief, a colour pairing, a unique comment keyword per post, and the brand check before each post. Compare entries, saves and DMs with the last three calls, then build the dashboard MVP around what worked.
+
+**Decision needed now:** Canva or Figma for templates.
+
+## Step 1 setup: connecting the data
+
+Four accounts are already readable through the Meta connector via the **Arts To hearts Project (New website)** ad account: @artstoheartsproject, @opencallforartists\_, @womeninartsnetwork and @risingartistsnetwork\_. That connection returns each post's caption, format, date, likes, comments and link. It doesn't return reach, saves, shares or DMs.
+
+**A. Right now (no setup):** pull every post from those four accounts into a starting report: how often each posts and in which formats, top and bottom 10 posts, likes and comments per post, best days and times, and how comment keyword posts perform.
+
+**B. Connect the remaining accounts (founder, about 1 hour)**
+
+- [ ] List every account in a sheet: handle, what it's for, who manages it.
+- [ ] Make each a professional (Business) account: Instagram → Settings → Account type and tools → Switch to professional.
+- [ ] Add each one to the **Arts To Hearts Project** business account in Meta Business Suite (Settings → Accounts → Instagram accounts → Add).
+- [ ] Give each one to the "Arts To hearts Project (New website)" ad account, so the current connector can read it.
+
+**C. Unlock reach, saves, shares and comment text (developer, about half a day)**
+
+- [ ] developers.facebook.com → Create app → Business, linked to the ATH business account.
+- [ ] Add the Instagram product with `instagram_basic`, `instagram_manage_insights`, `instagram_manage_comments`, `pages_show_list`, `pages_read_engagement` and `business_management`. If only ATH's own team uses the app, Meta's app review shouldn't be needed. Check Meta's current rules at setup.
+- [ ] In business settings, create a system user "ATH Agent", give it every account and Page, and generate a token.
+- [ ] Store the token as a secret in the build environment. Never paste it into chat or documents.
+- [ ] Write a daily sync job that saves posts and their numbers to the database.
+
+**D. Connect what happens after the post**
+
+- [ ] **ManyChat:** export subscribers with their tags and keyword stats as a CSV now. Add the Pro plan API key as a secret later.
+- [ ] **Entry platform:** export submissions as a CSV (date, which call, how they found us).
+- [ ] **Tracking tags on every entry link from now on:** `?utm_source=instagram&utm_medium=social&utm_campaign=<call>&utm_content=<account>-<post>`
+- [ ] **Flodesk and Shopify:** already connected. Pull email sign-ups and book or shop sales.
+
+**Quick fix found during setup:** @opencallforartists\_ uses the same comment keyword ("111") on many posts, so leads can't be traced to a post. Give every conversion post its own keyword (like the "FLOWER" post did).
+
+## Gap analysis: what this PRD still misses
+
+The PRD is strong on vision, brand, content and data. It's weak on the things that decide whether it ships: scope, owner, budget, how we test the agent, and risk. Fix the top five before any build starts.
+
+| # | Gap | Why it matters | Fix |
+| --- | --- | --- | --- |
+| 1 | **Phase 1 is too big** | Seven Phase 1 tabs is months of build. The pilot only needs a few | Cut the MVP to the call brief, the Open Calls sequence, the brand check and a basic Insights view. Move Templates scoring, Brand Health and gamification to Phase 2 |
+| 2 | **No owner, builder or budget** | Nothing says who builds it, by when, or what it costs | Name a product owner and a builder (in-house developer, freelancer or agency). Estimate costs: build hours, AI usage, database, Canva or Figma, ManyChat Pro |
+| 3 | **No way to test the agent's quality** | Without a test, nobody knows if its briefs and copy are good enough to trust | Build a test set of about 50 past posts with known results. Score the agent's critiques and copy against them each release, plus a monthly blind review by the founder |
+| 4 | **Risks aren't listed** | One ATH ad account is already flagged for unusual activity. API changes, account bans and wrong facts can stop the system | Add a risk register: Meta API changes, account restrictions, the AI getting a deadline or prize wrong, team not adopting it, ManyChat policy limits. Each with an owner and a fallback |
+| 5 | **Revenue isn't a goal** | Funnels exist, but no money targets per service | Add revenue and lead targets per service (entries × fee, memberships, book sales) and show them on the founder view |
+| 6 | **Privacy and consent for lead data** | ManyChat, DMs and email hold personal data from artists worldwide | Add a data policy: what's stored, for how long, who can see it, consent wording in DM flows, and how to delete someone's data on request |
+| 7 | **Reels and stories have no system** | Reels drive most reach, but there's only a script format | Add a reels and stories template set: cover style, on-screen type, motion rules, caption style, length per job |
+| 8 | **Per-account identity is undefined** | 15 to 20 accounts need to feel related but distinct | Define the brand architecture: a master brand, sub-brand rules, and one colour pairing and voice note per account |
+| 9 | **Team onboarding and adoption** | A tool the team doesn't use fixes nothing | Add a launch plan: training, a 2-week shadow period, success = 100% of open call posts going through the system |
+| 10 | **Accessibility** | Alt text, captions and contrast affect reach and inclusion | Add to the brand check: alt text on every post, captions on every reel, contrast checked on colour pairings |
+| 11 | **Paid boost strategy** | Organic and paid are tracked, but there's no plan for when to boost | Add a simple boost rule, e.g. boost the launch and final week posts once they beat the account's average saves rate |
+| 12 | **Benchmarks against peers** | "Outperforming" needs a reference point outside ATH | Track 5 to 10 comparable open call accounts from public data and compare formats and cadence monthly |
+| 13 | **Reliability** | Sync failures, expired tokens and backups aren't covered | Add alerts when a sync fails, a token about to expire, daily backups and an audit log |
+| 14 | **Document order** | Sections jumped around as the PRD grew | Reorder into Why → Who → What → How → When before sharing it widely |
+
+Items 1 to 5 block the build. Items 6 to 10 are needed before launch. Items 11 to 14 can follow in Phase 2.
+
 ## Open questions and decisions needed
 
 - [ ] **Logos:** when are the new logos final, and do we need a separate mark for open calls (e.g. a series seal)?
