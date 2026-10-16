@@ -590,7 +590,7 @@ Test the system on a real open call before building the full dashboard. Three st
 2. **Lock the brand into templates.** Finish Brand Kit v1 (colour pairings, the font licence decision, the voice guide, logos when final) and build the open call template set (launch, 30-day reminder, countdown, closed, winners) in Canva or Figma. Templates fix the inconsistent look even before any software exists.
 3. **Pilot the next open call end to end.** Run the full sequence with the agent's playbook: a brief, a colour pairing, a unique comment keyword per post, and the brand check before each post. Compare entries, saves and DMs with the last three calls, then build the dashboard MVP around what worked.
 
-**Decision needed now:** Canva or Figma for templates.
+**Templates:** decided: Figma as the master library, plus Canva copies for the team. Claude builds it (see Build plan).
 
 ## Step 1 setup: connecting the data
 
@@ -622,6 +622,61 @@ Four accounts are already readable through the Meta connector via the **Arts To 
 
 **Quick fix found during setup:** @opencallforartists\_ uses the same comment keyword ("111") on many posts, so leads can't be traced to a post. Give every conversion post its own keyword (like the "FLOWER" post did).
 
+## Build plan: Claude builds it
+
+Claude builds the system: the app, the database, the data sync, the agent and the template libraries. The founder is the product owner, approving each sprint. People supply access and approvals. Claude does the build work.
+
+### Templates in both Figma and Canva
+
+|  | Figma | Canva |
+| --- | --- | --- |
+| **Who uses it** | Designers | The wider team (poster, reels maker, quick edits) |
+| **Role** | **Master library.** Design tokens, components, every template and its variants | **Team copies** of the most-used templates, locked to the brand kit |
+| **What lives there** | Full open call family, artist features, articles, reels covers, the dashboard UI | Launch, reminder, countdown, winner, artist feature, quote card, story set |
+| **Editing** | Designers change the master | Team edits text and images only, with brand elements locked |
+
+**Sync rules**
+
+- Figma is the source of truth. When the Brand Kit or a template changes there, Claude regenerates the Canva copies.
+- Every template has **one ID** shared by its Figma and Canva versions, so performance tracking works whichever tool made the post.
+- The brand check runs on the exported image, so a post is checked the same way whether it came from Figma, Canva or the agent.
+- To confirm: Canva's API autofill (filling templates automatically) may need a Canva Enterprise plan. Without it, the team fills Canva templates by hand from the agent's copy.
+
+### Sprints
+
+Each sprint ends with a demo and a founder sign-off.
+
+1. **Foundations:** repo, database, Google sign-in with roles, the Brand Kit as design tokens. Done when the team can log in and see their role's view.
+2. **Data:** connect the Instagram accounts, ManyChat CSV import, entry CSV import, daily sync, baseline report. Done when the starting report shows every connected account.
+3. **Template libraries:** the Figma master library (tokens, components, open call family), then the Canva team copies and the shared template IDs. Done when the designer and the team can each make a launch carousel on-brand in under 30 minutes.
+4. **Open Calls MVP:** call brief, post sequence generator, copy, brand check, approval flow, unique comment keyword per post. Done when the pilot call's full sequence is drafted and approved in the system.
+5. **Today view and Insights MVP:** home screen tiles, tasks with buttons, entries goal bar, per-post results. Done when the pilot call is tracked live from launch.
+
+### What people provide
+
+- [ ] Access added as secrets in the build environment: Meta system user token, ManyChat API key, Canva and Figma access, hosting.
+- [ ] The list of Instagram accounts and services.
+- [ ] Brand decisions: colour pairings per call type, the font licence, voice sign-off, final logos.
+- [ ] Sign-off at the end of each sprint.
+
+### The build prompt to give Claude
+
+```markdown
+Build the ATH Creative Director Agent described in docs/ATH_Creative_Director_Agent_PRD.md (live version: https://claude.ai/code/artifact/f8524439-d613-48c0-8e9e-f45731fdcc3f).
+
+Rules:
+- Follow the Build plan sprints in order. Start with Sprint 1 and stop for my sign-off at the end of each sprint with a demo and a short summary.
+- Phase 1 scope is only: call brief, open call sequence, brand check, approvals, Today view, basic Insights, data sync. Everything else waits.
+- Use the ATH brand from the repo (app/css/studio.css tokens, design/DESIGN-NOTES.md). The dashboard must be visual first, on-brand and phone-friendly.
+- Templates: Figma is the master library for designers; make Canva team copies of the core open call templates. One template ID shared across both.
+- Never invent facts (dates, prizes, fees, names). Only use approved records.
+- Never post or schedule anything without a human approval.
+- Keep all keys and tokens as environment secrets, never in code or chat.
+- Commit to a feature branch and open a pull request per sprint.
+
+Before writing code, list what access or decisions you are missing and ask me for them.
+```
+
 ## Gap analysis: what this PRD still misses
 
 The PRD is strong on vision, brand, content and data. It's weak on the things that decide whether it ships: scope, owner, budget, how we test the agent, and risk. Fix the top five before any build starts.
@@ -629,7 +684,7 @@ The PRD is strong on vision, brand, content and data. It's weak on the things th
 | # | Gap | Why it matters | Fix |
 | --- | --- | --- | --- |
 | 1 | **Phase 1 is too big** | Seven Phase 1 tabs is months of build. The pilot only needs a few | Cut the MVP to the call brief, the Open Calls sequence, the brand check and a basic Insights view. Move Templates scoring, Brand Health and gamification to Phase 2 |
-| 2 | **No owner, builder or budget** | Nothing says who builds it, by when, or what it costs | Name a product owner and a builder (in-house developer, freelancer or agency). Estimate costs: build hours, AI usage, database, Canva or Figma, ManyChat Pro |
+| 2 | **No owner, builder or budget** | Builder decided: Claude, with the founder as product owner (see Build plan). Budget and running costs still need an estimate | Name a product owner and a builder (in-house developer, freelancer or agency). Estimate costs: build hours, AI usage, database, Canva or Figma, ManyChat Pro |
 | 3 | **No way to test the agent's quality** | Without a test, nobody knows if its briefs and copy are good enough to trust | Build a test set of about 50 past posts with known results. Score the agent's critiques and copy against them each release, plus a monthly blind review by the founder |
 | 4 | **Risks aren't listed** | One ATH ad account is already flagged for unusual activity. API changes, account bans and wrong facts can stop the system | Add a risk register: Meta API changes, account restrictions, the AI getting a deadline or prize wrong, team not adopting it, ManyChat policy limits. Each with an owner and a fallback |
 | 5 | **Revenue isn't a goal** | Funnels exist, but no money targets per service | Add revenue and lead targets per service (entries × fee, memberships, book sales) and show them on the founder view |
@@ -651,7 +706,7 @@ Items 1 to 5 block the build. Items 6 to 10 are needed before launch. Items 11 t
 - [ ] **Fonts:** license Nord and Proxima Nova for social use, or choose approved alternatives?
 - [ ] **Colour pairings:** which pairings from the v24 guide are approved for open call colour blocks? Is there one per call type (e.g. Women in Arts always uses the same pairing)?
 - [ ] **Voice:** who signs off the ATH voice guide the agent writes in?
-- [ ] **Design tool:** should the agent produce final files in Canva (brand templates + autofill) or Figma, or render them itself? This decides how editable the drafts are for the designer.
+- [ ] **Design tool:** decided: both. Figma is the master library for designers, and Canva holds locked copies for the team (see Build plan). Still to confirm: whether the Canva plan supports API autofill.
 - [ ] **Instagram access:** confirm that ATH's account is a Business account linked to a Facebook Page, and who owns the Meta app approval.
 - [ ] **Entry tracking:** which platform takes submissions, and can it report entries per day and per UTM source?
 - [ ] **Publishing:** should the agent schedule directly (Meta API or a scheduler) once a post is approved, or hand the files to the poster?
