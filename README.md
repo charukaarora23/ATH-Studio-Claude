@@ -36,6 +36,7 @@ These pages are private. To give someone access, the owner shares each page from
 - ATH design system: https://claude.ai/artifact/VsF2w9855usFt9u5NYT445
 - My Studio prototype: https://claude.ai/artifact/NAzzJwUNz5Mry48gDnAUki
 - ATH logo explorations: https://claude.ai/artifact/Sa4erTUPavKpFr59ZY6GBF
+- ATH social playbook (for the social and design team): https://claude.ai/artifact/1cF1fZVujYKaXtVWPod14x
 - ATH social and graphics guide: https://claude.ai/artifact/SLnYv7JsYLbaj83QypCCcf
 - ATH UI and print guide: https://claude.ai/artifact/MNh2oQbc1fXQk2U1itxg98
 - Figma (My Studio folder design): https://www.figma.com/design/UijhBNM4c7OZzOH0dWcu1j

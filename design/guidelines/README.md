@@ -4,6 +4,7 @@ Two guides, built from the outlined logo files so every logo in them is exact.
 
 | File | For | Live |
 | --- | --- | --- |
+| `ATH-social-playbook.html` | The social and design team handbook: fonts, frame, covers, text on images, artwork, open calls, urgency, numbers, participants | https://claude.ai/artifact/1cF1fZVujYKaXtVWPod14x |
 | `ATH-social-and-graphics.html` | Social media, emails, graphics and how printed pieces look | https://claude.ai/artifact/SLnYv7JsYLbaj83QypCCcf |
 | `ATH-ui-and-print.html` | Website and app interface, and print production | https://claude.ai/artifact/MNh2oQbc1fXQk2U1itxg98 |
 
@@ -12,3 +13,5 @@ Two guides, built from the outlined logo files so every logo in them is exact.
 To rebuild:
 1. `ATH_FONTS=<fonts folder> NP=<folder holding playwright> python3 src/slides.py` renders `img/slides/` (needs the npm packages @fontsource/inter-tight and @fontsource/libre-baskerville unpacked in the fonts folder as `it/` and `lb/`). `src/posts.py` renders `img/profile-set.png` and needs the licensed Nord files.
 2. `python3 src/build.py` writes the two HTML pages from `src/`.
+
+`templates/` holds every template at full size (1080 px wide JPG) for designers to rebuild in Canva or Figma.

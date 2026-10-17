@@ -233,6 +233,101 @@ slide('end-card', BURG, f'''{top(WHITE, '', '07 / 07')}
 <p class="sub" style="color:{PEONY};left:0;right:0;top:780px;text-align:center">artstoheartsproject.com</p>
 <div class="swipe" style="color:{WHITE}"><span>Save this for your next open call</span></div>''')
 
+
+# ---------------- Featuring artwork ----------------
+slide('art-white', WHITE, f"""{top(INK, 'Featured artist', '01 / 05')}
+<div class="pic fit" style="left:72px;right:72px;top:150px;height:820px">{img('starry_night.jpg')}</div>
+<p class="h s" style="color:{INK};top:1030px">Vincent van Gogh</p>
+<p class="serifs" style="color:{INK};left:72px;top:1105px;font-size:40px"><i>The Starry Night</i>, 1889</p>
+<p class="lbl" style="color:#6E6461;top:1165px;font-weight:400">Oil on canvas · 73.7 × 92.1 cm</p>
+{bottom(INK)}""")
+
+slide('art-detail', BLACK, f"""<div class="pic" style="height:900px"><img src="{(STOCK / 'starry_night.jpg').as_uri()}" style="width:260%;height:auto;max-width:none;object-fit:unset;transform:translate(-40%,-6%)"></div>
+<div class="m tl" style="color:{WHITE}">Look closer</div><div class="m tr" style="color:{WHITE}">02 / 05</div>
+<div class="pic" style="left:auto;right:72px;top:960px;width:250px;height:156px;outline:2px solid {WHITE}">{img('starry_night.jpg')}</div>
+<p class="h s" style="color:{WHITE};top:960px;right:380px">The sky is built from short, thick strokes laid side by side.</p>
+{bottom(WHITE, credit('Vincent van Gogh, The Starry Night, 1889 (detail)', '#CFC8C4'))}""")
+
+slide('art-artist', WHITE, f"""<div class="pic" style="right:auto;width:540px;height:1350px">{img('woman_with_hat.jpg', '50% 40%')}</div>
+<div class="m" style="color:{INK};left:600px;top:60px">Selected artist</div><div class="m tr" style="color:{INK}">03 / 05</div>
+<p class="h" style="color:{INK};left:600px;top:150px;font-size:96px;line-height:.95">Henri<br>Matisse</p>
+<p class="lbl" style="color:#6E6461;left:600px;top:360px;font-weight:400">France · Painting</p>
+<p class="serifs" style="color:{BURG};left:600px;right:72px;top:470px;font-size:44px;line-height:1.2">“I paint the colour I feel, not the colour I see.”</p>
+<span class="chip" style="background:{GREY};color:{INK};left:600px;top:1080px">101 Art Book: Faces</span>
+<div class="m bl" style="color:{INK};left:600px">@artistname</div><div class="m br" style="color:{INK}">{ARROW}</div>""")
+
+# ---------------- Urgency ladder: White, then Burgundy, then Chilli ----------------
+slide('urg-weeks', WHITE, f"""{top(INK, 'Open call', '01 / 04')}
+<h1 class="h xl" style="color:{INK};top:160px">{badge(BURG, WHITE)}Two weeks to enter 101 Art Book: Faces</h1>
+<div style="position:absolute;left:72px;right:72px;top:860px;height:14px;background:{GREY};border-radius:7px"><div style="width:78%;height:100%;background:{BURG};border-radius:7px"></div></div>
+<p class="lbl" style="color:{INK};top:900px;font-weight:400">Opened 1 October</p><p class="lbl" style="color:{BURG};top:900px;left:auto;right:72px">Closes 30 November</p>
+{bottom(INK)}""")
+
+slide('urg-days', BURG, f"""{top(WHITE, 'Open call', 'Closing soon')}
+<p class="fig" style="color:{WHITE};top:110px;font-size:640px">3</p>
+<p class="h l" style="color:{WHITE};top:640px">days left to apply</p>
+<p class="sub" style="color:{PEONY};top:790px">101 Art Book: Faces closes 30 November at midnight GMT.</p>
+<div style="position:absolute;left:72px;right:72px;top:1060px;border-top:2px solid {WHITE}66;padding-top:28px;display:flex;justify-content:space-between;align-items:center;color:{WHITE};font:500 40px/1 IT;z-index:2"><span>Apply at artstoheartsproject.com</span>{ARROW}</div>""")
+
+slide('urg-last', CHILLI, f"""{top(WHITE, 'Open call', 'Final day')}
+<h1 class="h xxl" style="color:{WHITE};top:180px">Last call</h1>
+<p class="sub" style="color:{WHITE};top:640px;font-size:52px;letter-spacing:-0.02em">Entries close tonight</p>
+<p class="fig2" style="color:{WHITE};top:760px;font-size:300px">23:59</p>
+<p class="lbl" style="color:{WHITE};top:1050px">GMT · 30 November · artstoheartsproject.com</p>
+{bottom(WHITE)}""")
+
+# ---------------- Participants ----------------
+TILES = [('starry_night.jpg', '20% 30%', 'Vincent van Gogh'), ('the_scream.jpg', '50% 70%', 'Edvard Munch'), ('woman_with_hat.jpg', '50% 35%', 'Henri Matisse'),
+         ('wave.jpg', '20% 40%', 'Katsushika Hokusai'), ('udnie.jpg', '50% 50%', 'Francis Picabia'), ('shipwreck.jpg', '60% 40%', 'J. M. W. Turner'),
+         ('starry_night.jpg', '85% 20%', 'Artist Name'), ('the_scream.jpg', '50% 10%', 'Artist Name'), ('wave.jpg', '75% 70%', 'Artist Name')]
+grid = ''.join(f'<div class="tile"><div class="ti">{img(f, pos)}</div><span>{n}</span></div>' for f, pos, n in TILES)
+slide('part-grid', WHITE, f"""{top(INK, '101 Art Book: Faces', '02 / 12')}
+<h2 class="h m" style="color:{INK};top:150px">Meet the artists</h2>
+<div class="tgrid">{grid}</div>
+{bottom(INK)}""")
+
+NAMES = ['Vincent van Gogh', 'Edvard Munch', 'Henri Matisse', 'Katsushika Hokusai', 'Francis Picabia', 'J. M. W. Turner', 'Hilma af Klint', 'Berthe Morisot',
+         'Mary Cassatt', 'Paul Cézanne', 'Georges Seurat', 'Gustav Klimt', 'Suzanne Valadon', 'Egon Schiele', 'Paula Modersohn-Becker', 'Henri Rousseau']
+nl = ''.join(f'<span>{n}</span>' for n in NAMES)
+slide('part-names', BLACK, f"""{top(WHITE, 'The selected artists', '03 / 12')}
+<h2 class="h l" style="color:{WHITE};top:150px">The 101</h2>
+<div class="names">{nl}</div>
+<p class="lbl" style="color:{ROSE};top:1150px">and 85 more. Swipe to see their work.</p>
+{bottom(WHITE)}""")
+
+slide('part-spotlight', WHITE, f"""<div class="pic" style="height:860px">{img('the_scream.jpg', '50% 45%')}</div>
+<span class="chip" style="background:{WHITE};color:{INK};left:72px;top:52px">Selected artist</span><span class="chip" style="background:{WHITE};color:{INK};right:72px;top:52px">04 / 12</span>
+<p class="h l" style="color:{INK};top:900px">Edvard Munch</p>
+<p class="serifs" style="color:{INK};left:72px;top:1020px;font-size:40px"><i>The Scream</i>, 1893 · Norway</p>
+<p class="lbl" style="color:{BURG};top:1090px">Page 47 in 101 Art Book: Faces</p>
+{bottom(INK, '@artistname')}""")
+
+strip = ''.join(f'<div class="st">{img(f, pos)}</div>' for f, pos, _ in TILES[:6])
+slide('part-results', BURG, f"""{top(WHITE, 'Results', '01 / 12')}
+<h1 class="h xl" style="color:{WHITE};top:160px">The 101 are in.</h1>
+<p class="sub" style="color:{PEONY};top:440px;right:96px">Congratulations to every artist selected for 101 Art Book: Faces. Swipe to meet them.</p>
+<div class="strip">{strip}</div>
+{bottom(WHITE)}""")
+
+# ---------------- Anatomy and font specimens (for the playbook) ----------------
+G = '#AA0003'
+slide('anatomy', WHITE, f"""{top(INK, 'Series name', '01 / 07')}
+<h1 class="h xl" style="color:{INK};top:160px">{badge(BURG, WHITE)}One headline that says what the reader&nbsp;gets</h1>
+<div class="swipe" style="color:{INK}"><span>Swipe</span>{ARROW}</div>{bottom(INK, br='')}
+<div class="guide" style="left:72px;top:0;bottom:0;width:0;border-left:2px dashed {G}"></div><div class="guide" style="right:72px;top:0;bottom:0;width:0;border-left:2px dashed {G}"></div>
+<div class="guide" style="left:0;right:0;top:110px;height:0;border-top:2px dashed {G}"></div><div class="guide" style="left:0;right:0;bottom:110px;height:0;border-top:2px dashed {G}"></div>
+<p class="gl" style="left:84px;top:118px">72 px margin</p><p class="gl" style="left:84px;top:12px">Corner: series · 30 px</p><p class="gl" style="right:84px;top:12px;text-align:right">Corner: slide number</p>
+<p class="gl" style="left:84px;top:690px">Headline · Inter Tight 124 px · 3 lines max</p><p class="gl" style="left:84px;top:1100px">Swipe cue · 34 px</p>
+<p class="gl" style="left:84px;bottom:12px">Corner: handle</p>""")
+
+slide('font-faculty', PAPER, f"""<p class="gl" style="left:72px;top:60px;color:#6E6461">Faculty Glyphic · inside the logo only</p>
+<p style="position:absolute;left:72px;top:140px;margin:0;font:400 170px/1 FAC;color:{BURG};letter-spacing:-0.02em;white-space:nowrap">arts hearts</p>
+<div style="position:absolute;left:72px;top:400px">{logo(BURG, 460)}</div>""", 1080, 600)
+
+slide('font-nord', PAPER, f"""<p class="gl" style="left:72px;top:60px;color:#6E6461">Nord · capitals, words only, print labels and room names</p>
+<p style="position:absolute;left:72px;top:170px;margin:0;font:500 120px/1 NORD;color:{INK};letter-spacing:.14em">BOOKSHOP</p>
+<p style="position:absolute;left:72px;top:360px;margin:0;font:500 44px/1.3 NORD;color:{INK};letter-spacing:.16em">PROJECT · GALLERY · STUDIO</p>""", 1080, 600)
+
 # ---------------- Story and print ----------------
 slide('story-event', WHITE, f'''<div class="m tl" style="color:{INK};top:250px">Reading · ATH Bookshop</div><div class="m tr" style="color:{INK};top:250px">Online</div>
 <h1 class="h xl" style="color:{BURG};top:330px">Artists read their own pages</h1>
@@ -252,6 +347,8 @@ slide('print-postcard-a6', CREAM, f'''<div class="pic" style="left:auto;right:0;
 
 CSS = '''
 @font-face{font-family:IT;font-weight:400;src:url("IT400")}
+@font-face{font-family:FAC;src:url("FACU")}
+@font-face{font-family:NORD;src:url("NORDM")}
 @font-face{font-family:IT;font-weight:500;src:url("IT500")}
 @font-face{font-family:LB;font-style:normal;src:url("LBN")}
 @font-face{font-family:LB;font-style:italic;src:url("LBI")}
@@ -317,10 +414,19 @@ body{margin:0;background:#777;display:flex;flex-wrap:wrap;gap:40px;padding:40px}
 .inl{display:inline-block;vertical-align:-0.08em}
 .capl{position:absolute;margin:0;font:500 38px/1.15 IT;letter-spacing:.005em;z-index:2}
 .edge{position:absolute;margin:0;font:400 176px/.9 IT;letter-spacing:-0.035em;z-index:2}
+.pic.fit img{object-fit:contain}
+.tgrid{position:absolute;left:72px;right:72px;top:290px;display:grid;grid-template-columns:repeat(3,1fr);gap:28px 24px}
+.tile .ti{height:236px;overflow:hidden}.tile .ti img{width:100%;height:100%;object-fit:cover;display:block}
+.tile span{display:block;margin-top:12px;font:500 26px/1.2 IT;color:#1C1310;letter-spacing:-0.01em}
+.names{position:absolute;left:72px;right:72px;top:330px;display:grid;grid-template-columns:1fr 1fr;gap:18px 40px;font:500 40px/1.1 IT;color:#fff;letter-spacing:-0.02em}
+.strip{position:absolute;left:72px;right:72px;top:760px;display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.strip .st{height:200px;overflow:hidden}.strip .st img{width:100%;height:100%;object-fit:cover;display:block}
+.guide{position:absolute;z-index:5}
+.gl{position:absolute;margin:0;z-index:6;font:600 22px/1.2 IT;color:#AA0003;letter-spacing:.02em}
 .note{position:absolute;right:72px;top:150px;width:470px;margin:0;font:500 26px/1.25 IT;letter-spacing:.08em;text-align:justify;z-index:2}
 '''
 for k, f in [('IT400', 'it/package/files/inter-tight-latin-400-normal.woff2'), ('IT500', 'it/package/files/inter-tight-latin-500-normal.woff2'),
-             ('LBN', 'lb/package/files/libre-baskerville-latin-400-normal.woff2'), ('LBI', 'lb/package/files/libre-baskerville-latin-400-italic.woff2')]:
+             ('LBN', 'lb/package/files/libre-baskerville-latin-400-normal.woff2'), ('FACU', 'FacultyGlyphic-Regular.ttf'), ('NORDM', 'Nord-Medium.otf'), ('LBI', 'lb/package/files/libre-baskerville-latin-400-italic.woff2')]:
     CSS = CSS.replace(f'"{k}"', '"' + (FONTS / f).as_uri() + '"')
 
 OUT.mkdir(parents=True, exist_ok=True)
@@ -338,6 +444,10 @@ subprocess.run(['node', str(HERE / 'shot.cjs'), (HERE / 'slides.html').as_uri(),
 for n in S:
     p = OUT / f'{n}.png'
     im = Image.open(p).convert('RGB')
+    full = ROOT / 'templates'
+    full.mkdir(exist_ok=True)
+    if not n.startswith(('anatomy', 'font-')):
+        im.save(full / f'{n}.jpg', quality=90, optimize=True, progressive=True)
     im = im.resize((720, round(im.height * 720 / im.width)), Image.LANCZOS)
     im.save(OUT / f'{n}.jpg', quality=86, optimize=True, progressive=True)
     p.unlink()

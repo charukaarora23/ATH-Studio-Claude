@@ -51,7 +51,7 @@ def logo_tag(m):
     return f'<svg{rest} viewBox="{vb}" fill="currentColor" role="img" aria-label="{b["label"]}"><use href="#lg-{key}"/></svg>'
 
 
-for src, out in [('social.html', 'ATH-social-and-graphics.html'), ('ui-print.html', 'ATH-ui-and-print.html')]:
+for src, out in [('social.html', 'ATH-social-and-graphics.html'), ('ui-print.html', 'ATH-ui-and-print.html'), ('playbook.html', 'ATH-social-playbook.html')]:
     page = (HERE / src).read_text()
     for k, v in LINKS.items():
         page = page.replace(k, v)
