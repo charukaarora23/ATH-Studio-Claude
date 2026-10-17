@@ -250,9 +250,11 @@ footer.end p{margin:0;font-size:14px}
     <!-- 5 -->
     <section class="s" id="colour">
       <p class="eyebrow">05 · Colour</p>
-      <h2>Deep grounds, pink type</h2>
-      <p class="intro">Night and Rose lead on social and posters. Cream and Burgundy carry the website, books and anything long to read. Chilli is the one loud accent.</p>
+      <h2>Neutral surfaces, a Burgundy signature</h2>
+      <p class="intro">White, off-white and black do most of the work, the way paper and ink do in a book. Burgundy is the signature: the logo, the badge, key headlines, the end card. Pink is a moment, Chilli is one loud word, and the four secondary colours are quiet accents.</p>
       <div class="grid g4">
+        <div class="sw"><div class="chip" style="background:#fff;color:var(--ink);box-shadow:inset 0 0 0 1px var(--rule)">White</div><dl><dt>HEX</dt><dd>#FFFFFF</dd><dt>Type</dt><dd>Ink, Burgundy</dd></dl><p class="use">The main social surface. Clean, fast, lets art lead.</p></div>
+        <div class="sw"><div class="chip" style="background:#141111;color:#fff">Black</div><dl><dt>HEX</dt><dd>#141111</dd><dt>Type</dt><dd>White, Rose</dd></dl><p class="use">The second surface. Numbers, single points, contrast.</p></div>
         <div class="sw"><div class="chip bg-night c-rose">Night</div><dl><dt>HEX</dt><dd>#52051A</dd><dt>RGB</dt><dd>82 5 26</dd><dt>CMYK</dt><dd>0 94 68 68</dd></dl><p class="use">Lead ground for social and posters.</p></div>
         <div class="sw"><div class="chip bg-rose c-night">Rose</div><dl><dt>HEX</dt><dd>#FFA1C2</dd><dt>RGB</dt><dd>255 161 194</dd><dt>CMYK</dt><dd>0 37 24 0</dd></dl><p class="use">Type and badges on Night. Never type on light grounds.</p></div>
         <div class="sw"><div class="chip bg-burgundy c-peony">Burgundy</div><dl><dt>HEX</dt><dd>#6A0620</dd><dt>RGB</dt><dd>106 6 32</dd><dt>CMYK</dt><dd>0 94 70 58</dd></dl><p class="use">Logo, headings and text on light grounds.</p></div>
@@ -263,14 +265,37 @@ footer.end p{margin:0;font-size:14px}
         <div class="sw"><div class="chip c-paper" style="background:var(--ink)">Ink</div><dl><dt>HEX</dt><dd>#1C1310</dd><dt>RGB</dt><dd>28 19 16</dd><dt>CMYK</dt><dd>0 32 43 89</dd></dl><p class="use">Long text and one-colour print. Never pure black.</p></div>
       </div>
       <h3>How much of each</h3>
-      <p>Social and posters</p>
-      <div class="bar"><span class="bg-night c-rose" style="flex:65">Night 65</span><span class="bg-rose c-night" style="flex:25">Rose 25</span><span class="bg-peony c-burgundy" style="flex:7">7</span><span class="bg-chilli c-ballet" style="flex:3"></span></div>
+      <p>Social, across the whole feed</p>
+      <div class="bar"><span style="flex:35;background:#fff;color:var(--ink);box-shadow:inset 0 0 0 1px var(--rule)">White 35</span><span style="flex:15;background:#141111;color:#fff">Black 15</span><span style="flex:25;background:#555;color:#fff">Artwork 25</span><span class="bg-burgundy c-peony" style="flex:15">Burgundy 15</span><span class="bg-rose c-night" style="flex:6">6</span><span class="bg-chilli c-ballet" style="flex:4"></span></div>
+      <figure style="margin-top:28px"><img class="shot" src="img/feed.jpg" width="1200" height="746" alt="Eighteen ATH posts in a profile grid: mostly white, black and artwork, with Burgundy covers and end card, one pink paragraph and one Chilli figure" loading="lazy"><figcaption><b>How the profile reads</b>White, black and artwork carry the grid. Burgundy appears every few posts, so it is remembered, not tiring.</figcaption></figure>
       <p style="margin-top:20px">Website, books, print to read</p>
       <div class="bar"><span class="bg-cream c-burgundy" style="flex:60">Cream 60</span><span class="bg-burgundy c-peony" style="flex:25">Burgundy 25</span><span class="bg-peony c-burgundy" style="flex:10">Pinks 10</span><span class="bg-chilli c-ballet" style="flex:5">5</span></div>
+      <h3>Accent colours</h3>
+      <p>Four secondary colours, from ATH's earlier palette, give each carousel its own note without changing the brand. They are never a background. Pick one per carousel and use it for a few small things only.</p>
+      <div class="grid g4">
+        <div class="sw"><div class="chip" style="background:var(--night);color:#B7D9FF">Sky</div><dl><dt>HEX</dt><dd>#B7D9FF</dd><dt>On Night</dt><dd>10.3 : 1</dd></dl><p class="use">Badge, slide numbers, one big figure.</p></div>
+        <div class="sw"><div class="chip" style="background:var(--night);color:#FFF3B2">Lemon</div><dl><dt>HEX</dt><dd>#FFF3B2</dd><dt>On Night</dt><dd>13.4 : 1</dd></dl><p class="use">One phrase in a headline, a chip, type over warm images.</p></div>
+        <div class="sw"><div class="chip" style="background:var(--cream);color:#025054">Petrol</div><dl><dt>HEX</dt><dd>#025054</dd><dt>On Cream</dt><dd>8.1 : 1</dd></dl><p class="use">Index numbers and rules on Cream.</p></div>
+        <div class="sw"><div class="chip" style="background:var(--night);color:#D0D996">Pistachio</div><dl><dt>HEX</dt><dd>#D0D996</dd><dt>On Night</dt><dd>10.1 : 1</dd></dl><p class="use">A tag or a single highlighted word.</p></div>
+      </div>
+      <div class="tw"><table>
+        <thead><tr><th>Where an accent can go</th><th>Where it never goes</th></tr></thead>
+        <tbody>
+          <tr><td>The arrow badge</td><td>A full slide background</td></tr>
+          <tr><td>Slide index numbers (01, 02…)</td><td>Body text</td></tr>
+          <tr><td>One phrase in a headline</td><td>More than one phrase</td></tr>
+          <tr><td>One hero figure on a number slide</td><td>Every figure in a list</td></tr>
+          <tr><td>A chip or tag</td><td>Two accents on one slide</td></tr>
+          <tr><td>Caps type over a warm image</td><td>Next to Chilli on the same slide</td></tr>
+        </tbody>
+      </table></div>
+      <p>A carousel keeps one surface (White, Black or Burgundy) and one accent from start to finish. Change the accent between carousels so the feed has variety while every post still looks like ATH.</p>
       <h3>Text colour on each ground</h3>
       <div class="tw"><table>
         <thead><tr><th>Ground</th><th>Headline</th><th>Body and labels</th><th>Never</th></tr></thead>
         <tbody>
+          <tr><td><span class="dot" style="background:#fff"></span>White</td><td>Ink · 18.3 : 1, Burgundy · 12.7 : 1</td><td>Ink</td><td>Rose, Peony, Sky, Lemon</td></tr>
+          <tr><td><span class="dot" style="background:#141111"></span>Black</td><td>White · 18.8 : 1, Rose · 10.0 : 1</td><td>White, light grey</td><td>Burgundy, Chilli</td></tr>
           <tr><td><span class="dot bg-night"></span>Night</td><td>Rose · 8.0 : 1</td><td>Peony · 11.0 : 1</td><td>Chilli, Burgundy</td></tr>
           <tr><td><span class="dot bg-rose"></span>Rose</td><td>Night · 8.0 : 1</td><td>Night</td><td>Cream, Peony, Chilli</td></tr>
           <tr><td><span class="dot bg-cream"></span>Cream</td><td>Burgundy · 11.1 : 1</td><td>Ink · 16.0 : 1</td><td>Rose, Peony</td></tr>
@@ -311,70 +336,73 @@ footer.end p{margin:0;font-size:14px}
       <h2>Flat colour, tight type, quiet corners</h2>
       <p class="intro">Every slide is one flat ground, one type colour and one thing to read. The small details (series name, slide number, handle, arrow) sit in the same four corners on every slide, so a carousel reads as one set and the middle of the slide stays clear.</p>
       <div class="dd">
-        <div class="yes"><h4>The rules</h4><ul><li>One ground colour per slide, or two in clean straight blocks.</li><li>One big thing: a headline, a figure, a list or an image.</li><li>Everything else is small and sits in the corners.</li><li>72 px margins on every side, every slide.</li><li>Images run to the edge or sit in a clean rectangle. Never under text.</li></ul></div>
-        <div class="no"><h4>Never</h4><ul><li>Decorations: hearts, stars, sparkles, scribbles, stickers.</li><li>Shadows, gradients, outlines on text.</li><li>Text on top of a busy part of an image.</li><li>More than one accent colour on a slide.</li><li>Centred text, except the serif cover and the end card.</li></ul></div>
+        <div class="yes"><h4>The rules</h4><ul><li>One surface per slide: White, Black, Burgundy or Night. Pink for a single moment.</li><li>One big thing: a headline, a figure, a list or an image.</li><li>Everything else is small and sits in the corners.</li><li>72 px margins on every side, every slide.</li><li>Type on images sits on the quiet areas, around the subject. Darken a busy image evenly if you must.</li></ul></div>
+        <div class="no"><h4>Never</h4><ul><li>Decorations: hearts, stars, sparkles, scribbles, stickers.</li><li>Shadows or outlines on text, coloured washes over images.</li><li>Text on top of a busy part of an image.</li><li>Secondary colours as backgrounds, or two accents on one slide.</li><li>Centred text, except the serif cover and the end card.</li></ul></div>
       </div>
 
       <h3>Covers</h3>
-      <p>The cover decides whether anyone swipes. Five ways in:</p>
+      <p>Same layout on the three surfaces. The badge carries the signature colour.</p>
       <div class="grid g3">
-        <figure><img class="shot" src="img/slides/cover-type.jpg" width="720" height="900" alt="Type cover on Night: round arrow badge and a three line headline in Rose, Swipe and arrow at the bottom" loading="lazy"><figcaption><b>Type only</b>The headline is the picture. Arrow badge before the first word.</figcaption></figure>
-        <figure><img class="shot" src="img/slides/cover-image.jpg" width="720" height="900" alt="Image cover: Starry Night in the top 60 percent, cream block below with label, slide number and Burgundy headline" loading="lazy"><figcaption><b>Image top</b>Artwork across the top, a flat block underneath for the words.</figcaption></figure>
-        <figure><img class="shot" src="img/slides/cover-panel.jpg" width="720" height="900" alt="Full bleed Scream with a Rose panel at bottom left holding the label, headline and credit" loading="lazy"><figcaption><b>Image with panel</b>Artwork full bleed, words in one flat panel over a quiet area.</figcaption></figure>
-        <figure><img class="shot" src="img/slides/cover-serif.jpg" width="720" height="900" alt="Cream cover with a centred serif title The month in books and Swipe to see more" loading="lazy"><figcaption><b>Serif title</b>For roundups and monthly series. The one centred cover.</figcaption></figure>
-        <figure><img class="shot" src="img/slides/cover-split.jpg" width="720" height="900" alt="Chilli top half with Open call in huge Ballet type, Great Wave in the bottom half" loading="lazy"><figcaption><b>Split</b>Huge two-word title on colour, artwork below.</figcaption></figure>
+        <figure><img class="shot" src="img/slides/cover-type.jpg" width="720" height="900" alt="Night cover with Rose headline and Rose badge" loading="lazy"><figcaption><b>Night and Rose</b>The lead look.</figcaption></figure>
+        <figure><img class="shot" src="img/slides/cover-type-white.jpg" width="720" height="900" alt="White cover with Ink headline and a Burgundy badge" loading="lazy"><figcaption><b>White</b>Ink type, Burgundy badge.</figcaption></figure>
+        <figure><img class="shot" src="img/slides/cover-type-black.jpg" width="720" height="900" alt="Black cover with White headline, last phrase and badge in Rose" loading="lazy"><figcaption><b>Black</b>One phrase picked out in Rose.</figcaption></figure>
+      </div>
+
+      <h3>Text on images</h3>
+      <p>Type sits directly on the artwork, placed around the subject, or in a clean block beside it. Where a painting is too busy, darken it evenly (black, 15 to 45%), never with a coloured wash.</p>
+      <div class="grid g3">
+        <figure><img class="shot" src="img/slides/img-around.jpg" width="720" height="900" alt="The Scream with Open call above, a serif line on the figure, small notes either side and the deadline below" loading="lazy"><figcaption><b>Around the subject</b>Text frames the subject: title above, details at the sides, date below.</figcaption></figure>
+        <figure><img class="shot" src="img/slides/img-stagger.jpg" width="720" height="900" alt="Turner shipwreck with The Quiet Art of Applying in large serif words placed across the painting" loading="lazy"><figcaption><b>Placed serif words</b>Big serif words set loose across the image, over its darkest areas.</figcaption></figure>
+        <figure><img class="shot" src="img/slides/img-serif-center.jpg" width="720" height="900" alt="Darkened Starry Night with a centred serif headline, one italic word and two lines of small text" loading="lazy"><figcaption><b>Centred serif</b>Serif headline with one italic word, two small lines under it.</figcaption></figure>
+        <figure><img class="shot" src="img/slides/img-edges.jpg" width="720" height="900" alt="Turner painting with THE and OPEN in the top corners, CALL bottom right, the date in the centre" loading="lazy"><figcaption><b>Words at the edges</b>The title pushed to the corners, the date in the middle.</figcaption></figure>
+        <figure><img class="shot" src="img/slides/img-caps-accent.jpg" width="720" height="900" alt="Turner painting with Lemon caps: a reading circle, dates, a big title and two notes at the bottom" loading="lazy"><figcaption><b>Accent caps</b>All type in one accent colour, in capitals, over a warm image.</figcaption></figure>
+        <figure><img class="shot" src="img/slides/img-mixed.jpg" width="720" height="900" alt="Matisse with BOOKS OF THE MONTH in mixed sizes and a frosted label card" loading="lazy"><figcaption><b>Mixed sizes</b>Big and small words together; a frosted card for the detail.</figcaption></figure>
+        <figure><img class="shot" src="img/slides/img-lockup.jpg" width="720" height="900" alt="Darkened Picabia with the ATH logo centred, small words either side and a line beneath" loading="lazy"><figcaption><b>Logo lockup</b>For brand moments: the logo, small words either side, one line.</figcaption></figure>
+        <figure><img class="shot" src="img/slides/img-card.jpg" width="720" height="900" alt="Picabia framing a paper card with a serif title, links and a paragraph that starts with the logo" loading="lazy"><figcaption><b>Paper card</b>A paper card over the artwork for something to read.</figcaption></figure>
+        <figure><img class="shot" src="img/slides/img-caption.jpg" width="720" height="900" alt="Great Wave with a caps headline in Night over the sky, a serif line and a small justified note" loading="lazy"><figcaption><b>Caps over sky</b>Headline in the quiet part of the image, a small note beside it.</figcaption></figure>
+        <figure><img class="shot" src="img/slides/img-scrim.jpg" width="720" height="900" alt="Great Wave darkened at the bottom with a headline, deadline and price" loading="lazy"><figcaption><b>Darkened base</b>For open calls: deadline and price big enough to act on.</figcaption></figure>
+        <figure><img class="shot" src="img/slides/img-band.jpg" width="720" height="900" alt="Starry Night above a Cream block with a Lemon chip, Enter by 30 November and price" loading="lazy"><figcaption><b>Image and block</b>Artwork above, a clean block with the action below.</figcaption></figure>
+        <figure><img class="shot" src="img/slides/img-giant.jpg" width="720" height="900" alt="Open call in huge Burgundy type on Cream above The Scream" loading="lazy"><figcaption><b>Giant word</b>Two huge words on Cream, the artwork underneath.</figcaption></figure>
       </div>
 
       <h3>Numbers</h3>
       <div class="grid g4">
-        <figure><img class="shot" src="img/slides/num-hero.jpg" width="720" height="900" alt="101 in huge Rose type on Night with one line underneath" loading="lazy"><figcaption><b>One figure</b>Fill the top with the figure; one sentence says what it counts.</figcaption></figure>
-        <figure><img class="shot" src="img/slides/num-list.jpg" width="720" height="900" alt="Key numbers on Cream: four rows with labels left and large Burgundy figures right" loading="lazy"><figcaption><b>Key numbers</b>Label left, figure right, a rule between rows.</figcaption></figure>
-        <figure><img class="shot" src="img/slides/num-panels.jpg" width="720" height="900" alt="Three Peony panels with 101, 8.5 by 8.5 and $35 and small labels" loading="lazy"><figcaption><b>Fact panels</b>A book or a call at a glance.</figcaption></figure>
-        <figure><img class="shot" src="img/slides/num-split.jpg" width="720" height="900" alt="Rose top half with $35, Night bottom half with 30.11" loading="lazy"><figcaption><b>Two figures</b>Two facts, two blocks, nothing else.</figcaption></figure>
+        <figure><img class="shot" src="img/slides/num-hero.jpg" width="720" height="900" alt="101 in Sky on Night with one line under it" loading="lazy"><figcaption><b>One figure</b>The figure takes the accent.</figcaption></figure>
+        <figure><img class="shot" src="img/slides/num-list.jpg" width="720" height="900" alt="Key numbers on Cream, the last figure in Chilli" loading="lazy"><figcaption><b>Key numbers</b>One figure picked out, the rest in Burgundy.</figcaption></figure>
+        <figure><img class="shot" src="img/slides/num-panels.jpg" width="720" height="900" alt="Three Peony panels with figures and labels" loading="lazy"><figcaption><b>Fact panels</b>A book or a call at a glance.</figcaption></figure>
+        <figure><img class="shot" src="img/slides/num-split.jpg" width="720" height="900" alt="Rose top with $35, Night bottom with 30.11 in Lemon" loading="lazy"><figcaption><b>Two figures</b>Two blocks, one accent.</figcaption></figure>
       </div>
 
       <h3>Pointers</h3>
       <div class="grid g3">
-        <figure><img class="shot" src="img/slides/point-list.jpg" width="720" height="900" alt="Numbered list of five checks on Cream with Chilli numbers and rules" loading="lazy"><figcaption><b>The list</b>All the points on one slide. Number, then a few words.</figcaption></figure>
-        <figure><img class="shot" src="img/slides/point-single.jpg" width="720" height="900" alt="One point on Night: index 01, headline, short paragraph" loading="lazy"><figcaption><b>One point a slide</b>Index, the point, one or two supporting lines.</figcaption></figure>
-        <figure><img class="shot" src="img/slides/point-image.jpg" width="720" height="900" alt="Shipwreck image on top, cream block with index 03 and a headline" loading="lazy"><figcaption><b>Point with image</b>When the point is about something you can show.</figcaption></figure>
+        <figure><img class="shot" src="img/slides/point-list.jpg" width="720" height="900" alt="Five checks on Cream with Chilli numbers and rules" loading="lazy"><figcaption><b>The list</b>Number, then a few words.</figcaption></figure>
+        <figure><img class="shot" src="img/slides/point-single.jpg" width="720" height="900" alt="One point on Night: Sky index, Rose headline, Cream paragraph" loading="lazy"><figcaption><b>One point a slide</b>Index in the accent.</figcaption></figure>
+        <figure><img class="shot" src="img/slides/point-image.jpg" width="720" height="900" alt="Shipwreck above, Cream block with index and headline" loading="lazy"><figcaption><b>Point with image</b>When the point is something you can show.</figcaption></figure>
       </div>
 
       <h3>Paragraphs</h3>
       <div class="grid g3">
-        <figure><img class="shot" src="img/slides/para-serif.jpg" width="720" height="900" alt="Serif paragraph in Night on Rose with an italic phrase" loading="lazy"><figcaption><b>Serif paragraph</b>For a thought worth reading slowly. One italic phrase.</figcaption></figure>
-        <figure><img class="shot" src="img/slides/para-editorial.jpg" width="720" height="900" alt="Headline, a serif pull quote in the left column and body text in the right column on paper" loading="lazy"><figcaption><b>Editorial</b>Headline, pull quote, paragraph. For explaining something properly.</figcaption></figure>
-        <figure><img class="shot" src="img/slides/para-image.jpg" width="720" height="900" alt="Square artwork inset at top left on Night, credit, serif quote and the artist name" loading="lazy"><figcaption><b>Quote with artwork</b>An artist in their own words, next to their work.</figcaption></figure>
+        <figure><img class="shot" src="img/slides/para-serif.jpg" width="720" height="900" alt="Serif paragraph in Night on Rose with one italic phrase" loading="lazy"><figcaption><b>Serif paragraph</b>One italic phrase.</figcaption></figure>
+        <figure><img class="shot" src="img/slides/para-editorial.jpg" width="720" height="900" alt="Headline, Chilli pull quote and body text on paper" loading="lazy"><figcaption><b>Editorial</b>Headline, pull quote, paragraph.</figcaption></figure>
+        <figure><img class="shot" src="img/slides/para-image.jpg" width="720" height="900" alt="Square artwork on Night, credit, serif quote and artist name" loading="lazy"><figcaption><b>Quote with artwork</b>An artist next to their work.</figcaption></figure>
       </div>
 
       <h3>End card</h3>
       <div class="grid g3">
-        <figure><img class="shot" src="img/slides/end-card.jpg" width="720" height="900" alt="Night end card with the logo in Rose, web address and Save this for your next open call" loading="lazy"><figcaption><b>Last slide</b>Logo, address, one line that asks for a save or a share.</figcaption></figure>
+        <figure><img class="shot" src="img/slides/end-card.jpg" width="720" height="900" alt="Rose end card with the logo in Night, web address and a line asking for a save" loading="lazy"><figcaption><b>Last slide</b>Logo, address, one line.</figcaption></figure>
         <div class="span2" style="min-width:0">
           <div class="tw" style="margin-top:0"><table>
             <thead><tr><th>A carousel, in order</th><th>Slides</th></tr></thead>
             <tbody>
-              <tr><td>Cover</td><td class="num">1</td></tr>
+              <tr><td>Cover (type or image)</td><td class="num">1</td></tr>
               <tr><td>The point, or the number that matters</td><td class="num">1</td></tr>
               <tr><td>Pointers or paragraphs</td><td class="num">3 to 5</td></tr>
               <tr><td>End card</td><td class="num">1</td></tr>
             </tbody>
           </table></div>
-          <p>Keep one ground colour for the whole carousel, or alternate two. Change the colour between carousels, not inside one.</p>
+          <p>One ground and one accent for the whole carousel. Text sizes on a 1080 px slide: corners 30 px, body 40 px, never smaller than 24 px for credits.</p>
         </div>
       </div>
-
-      <h3>Images</h3>
-      <div class="tw"><table>
-        <thead><tr><th>Layout</th><th>When</th><th>Rule</th></tr></thead>
-        <tbody>
-          <tr><td>Top block (60%)</td><td>Covers, pointers</td><td>Straight cut, flat block below for the words.</td></tr>
-          <tr><td>Full bleed with panel</td><td>Covers for a single artwork</td><td>Panel sits on the quietest part of the image.</td></tr>
-          <tr><td>Half and half</td><td>Open calls, events</td><td>Colour half for the title, image half untouched.</td></tr>
-          <tr><td>Inset square</td><td>Artist quotes</td><td>Aligned to the margins, never floating.</td></tr>
-        </tbody>
-      </table></div>
-      <p>Artwork is never cropped so far that the artist would object, never filtered and always credited in the corner. The paintings shown here are public-domain stand-ins.</p>
 
       <h3>Profile</h3>
       <figure style="margin-top:20px"><img class="shot" src="img/profile-set.png" width="960" height="333" alt="AtH avatar on Night and four highlight covers"><figcaption>Avatar: AtH in Rose on Night, from <code>design/logo/svg/avatar</code>. Highlight covers: one word on a brand ground.</figcaption></figure>
