@@ -12,6 +12,7 @@ ART = HERE / 'art'
 FONTS = pathlib.Path(os.environ.get('ATH_FONTS', 'fonts')).resolve()
 OUT = HERE / 'brand-slides'
 BURG, NIGHT, ROSE, PEONY, CREAM, INK = '#6A0620', '#52051A', '#FFA1C2', '#FAD2E1', '#F9EEE5', '#1C1310'
+CHILLI, WHITE, BLACK = '#AA0003', '#FFFFFF', '#141111'
 
 CHEV = '<svg viewBox="0 0 24 24"><path d="M9.5 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>'
 
@@ -29,8 +30,8 @@ def img(name, w, h, pos=(.5, .5), dark=0):
     return f'<img src="{out.as_uri()}">'
 
 
-def badge(bg, fg):
-    return f'<span class="badge" style="background:{bg};color:{fg}">{CHEV}</span>'
+def badge(bg, fg, extra=''):
+    return f'<span class="badge" style="background:{bg};color:{fg};{extra}">{CHEV}</span>'
 
 
 def pill(text, bg, fg, extra=''):
@@ -57,16 +58,20 @@ def add(name, bg, body):
 
 
 # 1 Hook
-add('01-hook', NIGHT, f'''<div class="pic">{img('flower-portrait.jpg', 1080, 1350, (.5, .3), .3)}</div>
+add('01-hook', NIGHT, f'''<div class="pic" style="bottom:400px">{img('flower-portrait.jpg', 1080, 950, (.5, .25), .25)}</div>
+<div class="blk" style="background:{CHILLI};top:950px"></div>
 {label('ARTS TO HEARTS PROJECT', CREAM)}{no(1, CREAM)}
-<h1 class="fg" style="color:{CREAM};top:150px;font-size:118px">What would you<br>make with $500,<br>no strings<br>attached?</h1>
-<p class="lb it" style="color:{PEONY};left:72px;top:1020px;font-size:56px">The ATH Creative Fund.<br>One artist, every month.</p>
-{pill('Swipe', ROSE, NIGHT, 'left:auto;right:72px;bottom:96px')}{credit(CREAM)}''')
+<p class="lb it" style="color:{CREAM};left:72px;top:140px;font-size:64px">The ATH</p>
+<h1 class="fg" style="color:{CREAM};top:215px;font-size:220px;line-height:.86;letter-spacing:-0.035em">Creative<br>Fund</h1>
+<p class="cr" style="color:{CREAM};bottom:430px">Artwork: Artist Name</p>
+<p class="fg" style="color:{WHITE};top:1000px;font-size:84px;line-height:1">$500 to an artist.<br>No questions asked.</p>
+<p class="lb it" style="color:{PEONY};left:72px;top:1205px;font-size:44px">Every month. Swipe to apply.</p>
+{badge(CREAM, CHILLI, 'left:auto;right:72px;top:1180px;width:96px;height:96px')}''')
 
 # 2 Pain
 pains = ['Twelve-page grant forms.', 'Budgets for work you<br>have not made yet.', 'Artist statements<br>written for strangers.', 'Months of waiting for a no.']
 pp = ''.join(f'<p>{t}</p>' for t in pains)
-add('02-pain', CREAM, f'''{label('SOUND FAMILIAR', BURG)}{no(2, BURG)}<div class="pains" style="color:{BURG}">{pp}</div><p class="lb it" style="color:{BURG};left:72px;top:1120px;font-size:60px">There is a simpler way.</p>''')
+add('02-pain', WHITE, f'''{label('SOUND FAMILIAR', CHILLI)}{no(2, CHILLI)}<div class="pains" style="color:{INK}">{pp}</div><p class="lb it" style="color:{CHILLI};left:72px;top:1120px;font-size:60px">There is a simpler way.</p>''')
 
 # 3 Conviction (kept)
 add('03-conviction', NIGHT, f'''<div class="pic">{img('night-bloom.jpg', 1080, 1350, (.5, .3), .2)}</div>
@@ -76,7 +81,7 @@ add('03-conviction', NIGHT, f'''<div class="pic">{img('night-bloom.jpg', 1080, 1
 
 # 4 The offer
 rows = ''.join(f'<div class="row"><span class="nord">{a}</span><span class="lb it">{b}</span></div>' for a, b in [('NO PROPOSAL', 'Just your work.'), ('NO REPORT', 'Spend it as you need.'), ('NO STRINGS', 'It is yours.')])
-add('04-offer', BURG, f'''{label('THE FUND', PEONY)}{no(4, PEONY)}
+add('04-offer', CHILLI, f'''{label('THE FUND', PEONY)}{no(4, PEONY)}
 <p class="fig" style="color:{CREAM}">$500</p>
 <p class="fg" style="color:{CREAM};top:520px;font-size:72px;left:72px">to one artist,<br>every month.</p>
 <div class="rows" style="color:{CREAM}">{rows}</div>
@@ -94,19 +99,19 @@ add('05-proof', CREAM, f'''{label('WHY ATH', BURG)}{no(5, BURG)}
 
 # 6 Who can apply
 grid = ''.join(f'<div>{img(f, 462, 304, p)}</div>' for f, p in [('flower-portrait.jpg', (.5, .28)), ('weave-teal.jpg', (.5, .5)), ('stripes.jpg', (.5, .5)), ('night-bloom.jpg', (.5, .35))])
-add('06-who', CREAM, f'''<div class="g4">{grid}</div>{no(6, BURG)}
+add('06-who', WHITE, f'''<div class="g4">{grid}</div>{no(6, BURG)}
 <h2 class="fg" style="color:{BURG};top:790px;font-size:96px">If you make it,<br>you can apply.</h2>
-<p class="nord-list" style="color:{INK}">PAINTING / ILLUSTRATION / PHOTOGRAPHY<br>SCULPTURE / TEXTILE / CERAMICS<br>DIGITAL / WRITING</p>
+<p class="nord-list" style="color:{CHILLI}">PAINTING / ILLUSTRATION / PHOTOGRAPHY<br>SCULPTURE / TEXTILE / CERAMICS<br>DIGITAL / WRITING</p>
 <p class="cr" style="color:{INK}">Artworks: Artist Name, Artist Name, Artist Name, Artist Name</p>''')
 
 # 7 How it works
 steps = [('Choose one piece<br>you made.', 'New or already shared.'), ('Post it on Instagram.', 'Mention @artstoheartsproject<br>and add #ATHCreativeFund.'), ('Comment FUND.', 'We will send you the link to apply.')]
-ss = ''.join(f'<div class="st"><span class="lb it n">{i + 1}</span><div><p class="fg t">{a}</p><p class="fg d">{b}</p></div></div>' for i, (a, b) in enumerate(steps))
+ss = ''.join(f'<div class="st"><span class="lb it n" style="color:{CHILLI}">{i + 1}</span><div><p class="fg t">{a}</p><p class="fg d">{b}</p></div></div>' for i, (a, b) in enumerate(steps))
 add('07-how', CREAM, f'''{label('HOW IT WORKS', BURG)}{no(7, BURG)}<div class="steps" style="color:{BURG}">{ss}</div>''')
 
 # 8 Reassurance
 qa = ''.join(f'<div class="qa"><p class="fg q">{q}</p><p class="lb it a">{a}</p></div>' for q, a in [('Is there a fee?', 'No. It is free to enter.'), ('Who owns my work?', 'You do. Always.'), ('What do I have to do<br>with the money?', 'Whatever your practice needs.')])
-add('08-catch', NIGHT, f'''{label('IS THERE A CATCH', PEONY)}{no(8, PEONY)}<div class="qas" style="color:{CREAM}">{qa}</div>''')
+add('08-catch', BLACK, f'''{label('IS THERE A CATCH', ROSE)}{no(8, ROSE)}<div class="qas" style="color:{CREAM}">{qa}</div>''')
 
 # 9 Urgency
 add('09-dates', BURG, f'''{label('OPEN NOW', PEONY)}{no(9, PEONY)}
@@ -117,7 +122,7 @@ add('09-dates', BURG, f'''{label('OPEN NOW', PEONY)}{no(9, PEONY)}
 # 10 Call to action
 add('10-cta', CREAM, f'''<div class="pic" style="top:auto;bottom:0;height:420px">{img('stripes.jpg', 1080, 420)}</div>{no(10, BURG)}
 {label('ONE LAST STEP', BURG)}
-<h2 class="fg" style="color:{BURG};top:150px;font-size:170px;line-height:.95">Comment<br>FUND</h2>{badge(ROSE, BURG)}
+<h2 class="fg" style="color:{BURG};top:150px;font-size:170px;line-height:.95">Comment<br>FUND</h2>{badge(CHILLI, WHITE)}
 <p class="fg" style="color:{INK};top:520px;font-size:56px">and we will send you the link.</p>
 <p class="lb it" style="color:{BURG};left:72px;top:660px;font-size:54px">Know an artist who needs this?<br>Send it to them.</p>
 <p class="cr" style="color:{INK};bottom:440px">Artwork: Artist Name</p>''')
@@ -130,7 +135,8 @@ CSS = f'''
 @page{{size:1080px 1350px;margin:0}}
 html,body{{margin:0;padding:0}}
 .s{{position:relative;width:1080px;height:1350px;overflow:hidden;page-break-after:always;-webkit-font-smoothing:antialiased}}
-.pic{{position:absolute;inset:0;overflow:hidden}}.pic img{{width:100%;height:100%;object-fit:cover;display:block}}
+.pic{{position:absolute;inset:0;overflow:hidden}}
+.blk{{position:absolute;left:0;right:0;bottom:0}}.pic img{{width:100%;height:100%;object-fit:cover;display:block}}
 .fg{{position:absolute;margin:0;font-family:"Faculty Glyphic";font-weight:400;letter-spacing:-0.02em;line-height:1.02;white-space:nowrap;left:72px;right:72px}}
 .c{{text-align:center;left:60px!important;right:60px!important}}
 .lb{{position:absolute;margin:0;font-family:"Libre Baskerville";letter-spacing:-0.02em;line-height:1.15;white-space:nowrap}}
