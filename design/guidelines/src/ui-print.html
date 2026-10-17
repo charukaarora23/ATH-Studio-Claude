@@ -2,7 +2,7 @@
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Faculty+Glyphic&family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Inter+Tight:wght@400;500&family=Libre+Baskerville:ital@0;1&display=swap">
 <style>/*SHARED*/
 /* Live UI samples, built with the product tokens below */
 .demo{border-radius:var(--r);background:var(--cream);padding:clamp(20px,4vw,40px);margin-top:28px;display:grid;gap:24px}
@@ -27,15 +27,15 @@
 .drawer{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,300px);border-radius:var(--r);overflow:hidden;min-height:220px;background:var(--cream-2)}
 .drawer .scrim{background:rgba(28,19,16,.28)}
 .drawer aside{background:var(--paper);padding:24px;display:grid;gap:10px;align-content:start;box-shadow:-12px 0 30px -20px rgba(28,19,16,.6)}
-.drawer h4{font:400 26px/1.1 var(--display);color:var(--burgundy);margin:0}
+.drawer h4{font:500 26px/1.1 var(--display);color:var(--burgundy);margin:0}
 .drawer p{margin:0;font-size:14px;color:var(--ink-7)}
 .card{background:var(--paper);border-radius:var(--r);box-shadow:inset 0 0 0 1px var(--rule);padding:20px;display:grid;gap:6px;max-width:300px}
-.card .cv{aspect-ratio:1;border-radius:4px;background:var(--burgundy);color:var(--peony);display:flex;align-items:flex-end;padding:14px;font:400 22px/1.05 var(--display)}
+.card .cv{aspect-ratio:1;border-radius:4px;background:var(--burgundy);color:var(--peony);display:flex;align-items:flex-end;padding:14px;font:500 22px/1.05 var(--display)}
 .card .t{font:italic 22px/1.2 var(--serif);color:var(--ink)}
 .card .m{font-size:13px;color:var(--ink-5)}
 .shelf{display:flex;align-items:flex-end;gap:4px;padding:0 12px;border-bottom:10px solid #E9D6C6;height:260px;overflow-x:auto}
 .spine{width:42px;border-radius:2px 2px 0 0;display:flex;flex-direction:column;align-items:center;justify-content:space-between;padding:10px 0;flex:0 0 auto}
-.spine span{writing-mode:vertical-rl;transform:rotate(180deg);font:400 14px/1 var(--display);white-space:nowrap}
+.spine span{writing-mode:vertical-rl;transform:rotate(180deg);font:500 14px/1 var(--display);white-space:nowrap}
 .spine b{font:600 9px/1 var(--sans);letter-spacing:.1em}
 .tok{display:inline-block;width:28px;height:28px;border-radius:8px;vertical-align:middle;margin-right:10px;box-shadow:inset 0 0 0 1px rgba(28,19,16,.15)}
 .scale p{margin:0;max-width:none}
@@ -115,11 +115,11 @@
     <section class="s" id="type">
       <p class="eyebrow">03 · Type scale</p>
       <h2>Display, editorial, interface</h2>
-      <p class="intro">Faculty Glyphic for room names and big moments. Instrument Serif Italic for book titles, artist names and quotes. Inter for everything you read or tap. Nord stays in print and the logo; it is not licensed for the web yet.</p>
+      <p class="intro">Inter Tight for room names and headings, set tight like the social slides. Libre Baskerville Italic for book titles, artist names and quotes. Inter for everything you read or tap. Faculty Glyphic and Nord live only inside the logo.</p>
       <div class="scale" style="margin-top:24px">
-        <div><small>display · 72 / 72<br>mobile 44</small><p style="font:400 clamp(44px,6vw,72px)/1 var(--display);letter-spacing:-.02em;color:var(--burgundy)">The Bookshop</p></div>
-        <div><small>h1 · 48 / 52<br>mobile 36</small><p style="font:400 clamp(36px,4.4vw,48px)/1.08 var(--display);letter-spacing:-.015em;color:var(--burgundy)">Open calls this month</p></div>
-        <div><small>h2 · 32 / 38</small><p style="font:400 32px/1.18 var(--display);color:var(--burgundy)">Books by this artist</p></div>
+        <div><small>display · 72 / 72<br>mobile 44</small><p style="font:500 clamp(44px,6vw,72px)/1 var(--display);letter-spacing:-.02em;color:var(--burgundy)">The Bookshop</p></div>
+        <div><small>h1 · 48 / 52<br>mobile 36</small><p style="font:500 clamp(36px,4.4vw,48px)/1.08 var(--display);letter-spacing:-.015em;color:var(--burgundy)">Open calls this month</p></div>
+        <div><small>h2 · 32 / 38</small><p style="font:500 32px/1.18 var(--display);color:var(--burgundy)">Books by this artist</p></div>
         <div><small>title · 24 / 30 italic</small><p style="font:italic 24px/1.25 var(--serif)">101 Art Book: Faces</p></div>
         <div><small>lead · 20 / 32</small><p style="font:400 20px/1.6 var(--sans);color:var(--ink-7)">Pick a book from the shelf to look inside.</p></div>
         <div><small>body · 16 / 26</small><p style="font:400 16px/1.62 var(--sans)">Each edition is printed on uncoated paper and ships within two weeks.</p></div>
@@ -165,7 +165,7 @@
           <tr><td>Footer</td><td>Name with PROJECT, Rose on Night</td><td class="num">220 px wide</td></tr>
           <tr><td>Browser tab</td><td><code>favicon.ico</code> + <code>favicon-32.png</code></td><td class="num">16, 32, 48</td></tr>
           <tr><td>Home screen</td><td><code>favicon-180.png</code> (Apple), 192 and 512 (Android)</td><td class="num">180 / 192 / 512</td></tr>
-          <tr><td>Link previews</td><td>Night card: master name in Rose, page title in Faculty Glyphic</td><td class="num">1200 × 630</td></tr>
+          <tr><td>Link previews</td><td>Night card: master name in Rose, page title in Inter Tight</td><td class="num">1200 × 630</td></tr>
           <tr><td>Email signature</td><td>Master name PNG, Burgundy</td><td class="num">140 px wide, 2× file</td></tr>
         </tbody>
       </table></div>
@@ -198,7 +198,7 @@
           <div class="spine" style="height:200px;background:#FAD2E1;color:#52051A"><span>ATH Catalog</span><b>AtH</b></div>
         </div>
         <div class="card"><div class="cv">101 Art Book: Faces</div><p class="t" style="margin:6px 0 0">101 Art Book: Faces</p><p class="m" style="margin:0">101 artists · 212 pages · $48</p></div>
-        <p style="margin:0;font-size:14px;color:var(--ink-7)"><b>Shelf and book card.</b> Spines show the title in Faculty Glyphic and AtH at the foot, in the same position on every book. On hover a book lifts 4 px and tilts −1°. Titles in Instrument Serif Italic.</p>
+        <p style="margin:0;font-size:14px;color:var(--ink-7)"><b>Shelf and book card.</b> Spines show the title in Inter Tight and AtH at the foot, in the same position on every book. On hover a book lifts 4 px and tilts −1°. Titles in Libre Baskerville Italic.</p>
       </div>
       <div class="tw"><table>
         <thead><tr><th>Component</th><th>Rule</th></tr></thead>
@@ -284,7 +284,7 @@
         <thead><tr><th>Text in print</th><th>Font</th><th class="num">Size</th></tr></thead>
         <tbody>
           <tr><td>Book body</td><td>Inter</td><td class="num">9.5 / 14 pt</td></tr>
-          <tr><td>Artist names, titles</td><td>Instrument Serif Italic</td><td class="num">14 to 18 pt</td></tr>
+          <tr><td>Artist names, titles</td><td>Libre Baskerville Italic</td><td class="num">14 to 18 pt</td></tr>
           <tr><td>Labels, running heads</td><td>Nord, capitals, +16%</td><td class="num">7 pt minimum</td></tr>
           <tr><td>Captions, folios</td><td>Inter</td><td class="num">7.5 to 8 pt</td></tr>
           <tr><td>Smallest reversed text (light on Night)</td><td>Inter Medium</td><td class="num">8 pt</td></tr>
@@ -313,7 +313,7 @@
       <ul class="check">
         <li>PDF/X-4 (or PDF/X-1a if the printer asks), CMYK, with bleed and crop marks.</li>
         <li>Images at 300 dpi at final size; artworks colour-checked against the artist's original file.</li>
-        <li>Fonts embedded. Nord and Faculty Glyphic licences cover the print run.</li>
+        <li>Fonts embedded: Inter Tight and Libre Baskerville. The logo is placed as a PDF, so no Nord or Faculty Glyphic licence is needed by the printer.</li>
         <li>A note listing the brand colours used and which need a spot match.</li>
         <li>A hard proof for Night, Rose, Burgundy and Chilli before the full run.</li>
         <li>Paper: uncoated cream for books to read, silk for image-heavy editions and posters.</li>
