@@ -18,6 +18,8 @@ To view an HTML file, download it and open it in a browser. GitHub only shows th
 | Folder | What it holds |
 | --- | --- |
 | [`design-system/`](design-system/) | The master ATH design system and the brand guide. |
+| [`design/guidelines/`](design/guidelines/) | Social and graphics guide, UI and print guide, example posts. |
+| [`design/logo/`](design/logo/) | Outlined logo files: SVG, PNG, PDF, favicons. |
 | [`design/`](design/) | Bookshop and Editions pages. Also the Figma build scripts (`source/`, `tools/`), the exported My Studio frames (`renders/`) and the design notes. |
 | [`app/`](app/) | My Studio source code. Serve the folder (for example `python3 -m http.server`) and open `index.html`. Run the tests with `node --test app/tests/logic.test.cjs`. |
 | [`build/`](build/) | My Studio as one file that opens in any browser. |
@@ -34,6 +36,8 @@ These pages are private. To give someone access, the owner shares each page from
 - ATH design system: https://claude.ai/artifact/VsF2w9855usFt9u5NYT445
 - My Studio prototype: https://claude.ai/artifact/NAzzJwUNz5Mry48gDnAUki
 - ATH logo explorations: https://claude.ai/artifact/Sa4erTUPavKpFr59ZY6GBF
+- ATH social and graphics guide: https://claude.ai/artifact/SLnYv7JsYLbaj83QypCCcf
+- ATH UI and print guide: https://claude.ai/artifact/MNh2oQbc1fXQk2U1itxg98
 - Figma (My Studio folder design): https://www.figma.com/design/UijhBNM4c7OZzOH0dWcu1j
 
 ## Design rules in short

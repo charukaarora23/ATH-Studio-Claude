@@ -1,0 +1,331 @@
+<title>ATH UI and Print</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Faculty+Glyphic&family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600&display=swap">
+<style>/*SHARED*/
+/* Live UI samples, built with the product tokens below */
+.demo{border-radius:var(--r);background:var(--cream);padding:clamp(20px,4vw,40px);margin-top:28px;display:grid;gap:24px}
+.row{display:flex;flex-wrap:wrap;gap:12px;align-items:center}
+.btn{font:500 15px/1 var(--sans);border-radius:12px;padding:0 20px;height:44px;display:inline-flex;align-items:center;gap:8px;border:0;cursor:pointer;transition:transform .16s cubic-bezier(.2,.7,.2,1),background-color .16s}
+.btn.primary{background:var(--burgundy);color:var(--paper)}
+.btn.primary:hover{background:#4E0418}
+.btn.primary:active{transform:translateY(1px)}
+.btn.secondary{background:transparent;color:var(--burgundy);box-shadow:inset 0 0 0 1.5px var(--burgundy)}
+.btn.quiet{background:transparent;color:var(--burgundy);text-decoration:underline;text-underline-offset:4px;padding:0 8px}
+.btn:focus-visible{outline:2px solid var(--burgundy);outline-offset:3px}
+.field{display:grid;gap:6px;max-width:360px}
+.field label{font:500 14px/1.3 var(--sans)}
+.field input{font:16px/1 var(--sans);height:44px;border-radius:12px;border:1.5px solid var(--rule);background:var(--paper);padding:0 14px;color:var(--ink)}
+.field input:focus{outline:none;border-color:var(--burgundy);box-shadow:0 0 0 3px rgba(106,6,32,.15)}
+.field small{color:var(--ink-5);font-size:13px}
+.menu{display:flex;align-items:center;gap:clamp(8px,2vw,24px);background:rgba(253,248,243,.92);border-radius:16px;padding:10px 12px 10px 20px;box-shadow:0 1px 0 rgba(28,19,16,.05),0 16px 32px -20px rgba(28,19,16,.5);flex-wrap:wrap}
+.menu svg{width:120px;height:auto;color:var(--burgundy)}
+.menu a{color:var(--ink-7);text-decoration:none;font-size:14px}
+.menu a[aria-current]{color:var(--burgundy);font-weight:600}
+.menu .sp{flex:1}
+.drawer{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,300px);border-radius:var(--r);overflow:hidden;min-height:220px;background:var(--cream-2)}
+.drawer .scrim{background:rgba(28,19,16,.28)}
+.drawer aside{background:var(--paper);padding:24px;display:grid;gap:10px;align-content:start;box-shadow:-12px 0 30px -20px rgba(28,19,16,.6)}
+.drawer h4{font:400 26px/1.1 var(--display);color:var(--burgundy);margin:0}
+.drawer p{margin:0;font-size:14px;color:var(--ink-7)}
+.card{background:var(--paper);border-radius:var(--r);box-shadow:inset 0 0 0 1px var(--rule);padding:20px;display:grid;gap:6px;max-width:300px}
+.card .cv{aspect-ratio:1;border-radius:4px;background:var(--burgundy);color:var(--peony);display:flex;align-items:flex-end;padding:14px;font:400 22px/1.05 var(--display)}
+.card .t{font:italic 22px/1.2 var(--serif);color:var(--ink)}
+.card .m{font-size:13px;color:var(--ink-5)}
+.shelf{display:flex;align-items:flex-end;gap:4px;padding:0 12px;border-bottom:10px solid #E9D6C6;height:260px;overflow-x:auto}
+.spine{width:42px;border-radius:2px 2px 0 0;display:flex;flex-direction:column;align-items:center;justify-content:space-between;padding:10px 0;flex:0 0 auto}
+.spine span{writing-mode:vertical-rl;transform:rotate(180deg);font:400 14px/1 var(--display);white-space:nowrap}
+.spine b{font:600 9px/1 var(--sans);letter-spacing:.1em}
+.tok{display:inline-block;width:28px;height:28px;border-radius:8px;vertical-align:middle;margin-right:10px;box-shadow:inset 0 0 0 1px rgba(28,19,16,.15)}
+.scale p{margin:0;max-width:none}
+.scale>div{display:grid;grid-template-columns:120px minmax(0,1fr);gap:16px;align-items:baseline;padding:14px 0;border-bottom:1px solid var(--rule)}
+.scale small{font-size:12px;color:var(--ink-5);font-variant-numeric:tabular-nums}
+@media (max-width:560px){.scale>div{grid-template-columns:1fr;gap:4px}.drawer{grid-template-columns:1fr}.drawer .scrim{display:none}}
+</style>
+<!--SPRITE-->
+
+<header class="hero">
+  <div class="wrap">
+    <div class="top">
+      <svg data-logo="full"></svg>
+      <span class="meta">Product and production guide · Version 1 · October 2026</span>
+    </div>
+    <h1>UI and print</h1>
+    <p class="lede">For whoever designs and builds the ATH website and apps, and whoever sends files to a printer. The social and graphics guide sets the look; this one sets the exact values.</p>
+    <div class="links">
+      <a class="pill rose" href="#ui">Interface</a>
+      <a class="pill rose" href="#print">Print production</a>
+      <a class="pill line" href="SOCIAL_URL">Social and graphics guide</a>
+    </div>
+  </div>
+</header>
+
+<div class="wrap layout">
+  <nav class="toc" aria-label="Contents">
+    <ol>
+      <li><a href="#ui">Principles</a></li>
+      <li><a href="#tokens">Colour tokens</a></li>
+      <li><a href="#type">Type scale</a></li>
+      <li><a href="#space">Space and shape</a></li>
+      <li><a href="#logo-ui">Logo on screen</a></li>
+      <li><a href="#components">Components</a></li>
+      <li><a href="#motion">Motion and sound</a></li>
+      <li><a href="#a11y">Accessibility</a></li>
+      <li><a href="#print">Print colour</a></li>
+      <li><a href="#setup">File setup</a></li>
+      <li><a href="#logo-print">Logo on paper</a></li>
+      <li><a href="#handoff">Printer handoff</a></li>
+    </ol>
+  </nav>
+
+  <main>
+    <section class="s" id="ui">
+      <p class="eyebrow">01 · Interface principles</p>
+      <h2>A house, not a dashboard</h2>
+      <p class="intro">ATH is one house with rooms: gallery, studio, bookshop, café, reading room, open calls. Every room shares the same menu, side drawers and footer. Product screens are calmer than social: Cream and Burgundy lead, Night appears in bands and the night theme.</p>
+      <div class="dd">
+        <div class="yes"><h4>Do</h4><ul><li>One message per screen, with lots of space around it.</li><li>Real artwork and real words. No stock photos, no filler text.</li><li>Movement that feels physical: lift, settle, turn a page.</li><li>Sound off until the visitor turns it on.</li></ul></div>
+        <div class="no"><h4>Don't</h4><ul><li>Pill-shaped buttons. Buttons have 12 px corners; pills belong to social.</li><li>Chilli for anything but one small accent per screen.</li><li>Rose as text on light grounds (1.7 : 1).</li><li>Cards inside cards, or a shadow on everything.</li></ul></div>
+      </div>
+    </section>
+
+    <section class="s" id="tokens">
+      <p class="eyebrow">02 · Colour tokens</p>
+      <h2>Name the job, not the colour</h2>
+      <p class="intro">Code uses these names. Swap the theme and the names stay the same. Day is the default; Night is the dark theme, built from the social look.</p>
+      <div class="tw"><table>
+        <thead><tr><th>Token</th><th>Day</th><th>Night</th><th>Used for</th></tr></thead>
+        <tbody>
+          <tr><td><code>surface</code></td><td><span class="tok" style="background:#FDF8F3"></span>#FDF8F3</td><td><span class="tok" style="background:#2B0710"></span>#2B0710</td><td>Page ground</td></tr>
+          <tr><td><code>surface-raised</code></td><td><span class="tok" style="background:#F9EEE5"></span>#F9EEE5</td><td><span class="tok" style="background:#3A0A17"></span>#3A0A17</td><td>Panels, drawers, cards</td></tr>
+          <tr><td><code>surface-band</code></td><td><span class="tok" style="background:#52051A"></span>#52051A</td><td><span class="tok" style="background:#52051A"></span>#52051A</td><td>Hero bands, footer</td></tr>
+          <tr><td><code>text</code></td><td><span class="tok" style="background:#1C1310"></span>#1C1310 · 16.0 : 1</td><td><span class="tok" style="background:#F9EEE5"></span>#F9EEE5 · 16.1 : 1</td><td>Body text</td></tr>
+          <tr><td><code>text-muted</code></td><td><span class="tok" style="background:#4A3A33"></span>#4A3A33 · 10.2 : 1</td><td><span class="tok" style="background:#E9C3CC"></span>#E9C3CC · 11.5 : 1</td><td>Secondary text</td></tr>
+          <tr><td><code>text-faint</code></td><td><span class="tok" style="background:#6E5E57"></span>#6E5E57 · 5.9 : 1</td><td><span class="tok" style="background:#C99AA6"></span>#C99AA6</td><td>Captions, meta</td></tr>
+          <tr><td><code>accent</code></td><td><span class="tok" style="background:#6A0620"></span>#6A0620 · 12.0 : 1</td><td><span class="tok" style="background:#FFA1C2"></span>#FFA1C2 · 9.8 : 1</td><td>Headings, links, active states, focus</td></tr>
+          <tr><td><code>action</code> / <code>on-action</code></td><td><span class="tok" style="background:#6A0620"></span>Burgundy / Paper</td><td><span class="tok" style="background:#FFA1C2"></span>Rose / #2B0710</td><td>The one main button</td></tr>
+          <tr><td><code>pop</code></td><td><span class="tok" style="background:#AA0003"></span>#AA0003 · 7.3 : 1</td><td><span class="tok" style="background:#FFA1C2"></span>Rose</td><td>One accent: a price sticker, a "new" tag</td></tr>
+          <tr><td><code>rule</code></td><td><span class="tok" style="background:#E2D0C4"></span>#E2D0C4</td><td><span class="tok" style="background:#5A1A2A"></span>#5A1A2A</td><td>Hairlines, input borders</td></tr>
+        </tbody>
+      </table></div>
+      <p style="font-size:14px;color:var(--ink-5)">Status colours (success, warning, error) always come with a word and an icon, never colour alone.</p>
+    </section>
+
+    <section class="s" id="type">
+      <p class="eyebrow">03 · Type scale</p>
+      <h2>Display, editorial, interface</h2>
+      <p class="intro">Faculty Glyphic for room names and big moments. Instrument Serif Italic for book titles, artist names and quotes. Inter for everything you read or tap. Nord stays in print and the logo; it is not licensed for the web yet.</p>
+      <div class="scale" style="margin-top:24px">
+        <div><small>display · 72 / 72<br>mobile 44</small><p style="font:400 clamp(44px,6vw,72px)/1 var(--display);letter-spacing:-.02em;color:var(--burgundy)">The Bookshop</p></div>
+        <div><small>h1 · 48 / 52<br>mobile 36</small><p style="font:400 clamp(36px,4.4vw,48px)/1.08 var(--display);letter-spacing:-.015em;color:var(--burgundy)">Open calls this month</p></div>
+        <div><small>h2 · 32 / 38</small><p style="font:400 32px/1.18 var(--display);color:var(--burgundy)">Books by this artist</p></div>
+        <div><small>title · 24 / 30 italic</small><p style="font:italic 24px/1.25 var(--serif)">101 Art Book: Faces</p></div>
+        <div><small>lead · 20 / 32</small><p style="font:400 20px/1.6 var(--sans);color:var(--ink-7)">Pick a book from the shelf to look inside.</p></div>
+        <div><small>body · 16 / 26</small><p style="font:400 16px/1.62 var(--sans)">Each edition is printed on uncoated paper and ships within two weeks.</p></div>
+        <div><small>label · 12 / 16 +0.14em</small><p style="font:600 12px/1.3 var(--sans);letter-spacing:.14em;text-transform:uppercase;color:var(--ink-7)">New on the shelf</p></div>
+        <div><small>caption · 13 / 20</small><p style="font:400 13px/1.5 var(--sans);color:var(--ink-5)">Artist Name, Title, 2026 · Oil on linen</p></div>
+      </div>
+      <p>Line length 45 to 75 characters. Body never below 16 px. Headings left aligned, sentence case, balanced line breaks.</p>
+    </section>
+
+    <section class="s" id="space">
+      <p class="eyebrow">04 · Space and shape</p>
+      <h2>A 4 px rhythm</h2>
+      <div class="tw"><table>
+        <thead><tr><th>Token</th><th>Value</th><th>Token</th><th>Value</th></tr></thead>
+        <tbody>
+          <tr><td><code>space-1</code></td><td class="num">4</td><td><code>space-8</code></td><td class="num">32</td></tr>
+          <tr><td><code>space-2</code></td><td class="num">8</td><td><code>space-12</code></td><td class="num">48</td></tr>
+          <tr><td><code>space-3</code></td><td class="num">12</td><td><code>space-16</code></td><td class="num">64</td></tr>
+          <tr><td><code>space-4</code></td><td class="num">16</td><td><code>space-24</code></td><td class="num">96</td></tr>
+          <tr><td><code>space-6</code></td><td class="num">24</td><td><code>space-32</code></td><td class="num">128 to 200 between sections</td></tr>
+        </tbody>
+      </table></div>
+      <div class="tw"><table>
+        <thead><tr><th>Screen</th><th class="num">Columns</th><th class="num">Gutter</th><th class="num">Side margin</th><th>Content width</th></tr></thead>
+        <tbody>
+          <tr><td>Phone, under 768</td><td class="num">4</td><td class="num">16</td><td class="num">16</td><td>Fluid</td></tr>
+          <tr><td>Tablet, 768 to 1023</td><td class="num">8</td><td class="num">24</td><td class="num">32</td><td>Fluid</td></tr>
+          <tr><td>Desktop, 1024 and up</td><td class="num">12</td><td class="num">24</td><td class="num">56</td><td>1240 max; reading text 680 max</td></tr>
+        </tbody>
+      </table></div>
+      <p>Corners: 12 px for buttons, inputs and cards; 16 px for the floating menu and drawers; 4 px for book covers and artworks. Shadows only on things that float: menu, drawers, a lifted book.</p>
+    </section>
+
+    <section class="s" id="logo-ui">
+      <p class="eyebrow">05 · Logo on screen</p>
+      <h2>Header, tab, share card</h2>
+      <div class="tw"><table>
+        <thead><tr><th>Place</th><th>File</th><th class="num">Size</th></tr></thead>
+        <tbody>
+          <tr><td>Header, desktop</td><td>Master name, SVG, <code>accent</code></td><td class="num">168 px wide</td></tr>
+          <tr><td>Header, phone</td><td>Master name, SVG</td><td class="num">128 px wide</td></tr>
+          <tr><td>Room pages</td><td>Room lockup (Bookshop, Studio…)</td><td class="num">180 px wide</td></tr>
+          <tr><td>Footer</td><td>Name with PROJECT, Rose on Night</td><td class="num">220 px wide</td></tr>
+          <tr><td>Browser tab</td><td><code>favicon.ico</code> + <code>favicon-32.png</code></td><td class="num">16, 32, 48</td></tr>
+          <tr><td>Home screen</td><td><code>favicon-180.png</code> (Apple), 192 and 512 (Android)</td><td class="num">180 / 192 / 512</td></tr>
+          <tr><td>Link previews</td><td>Night card: master name in Rose, page title in Faculty Glyphic</td><td class="num">1200 × 630</td></tr>
+          <tr><td>Email signature</td><td>Master name PNG, Burgundy</td><td class="num">140 px wide, 2× file</td></tr>
+        </tbody>
+      </table></div>
+      <p>Always the SVG in the interface, coloured with <code>currentColor</code>, with a text label for screen readers: "Arts to Hearts". Files are in <code>design/logo/svg</code> and <code>design/logo/favicon</code>.</p>
+    </section>
+
+    <section class="s" id="components">
+      <p class="eyebrow">06 · Components</p>
+      <h2>The shared furniture</h2>
+      <p class="intro">These samples are live, built with the tokens on this page. Try them with a keyboard.</p>
+      <div class="demo">
+        <nav class="menu" aria-label="Sample floating menu"><svg data-logo="name"></svg><span class="sp"></span><a href="#components">Gallery</a><a href="#components">Studio</a><a href="#components" aria-current="page">Bookshop</a><a href="#components">Open calls</a><button class="btn primary" type="button">Sign in</button></nav>
+        <p style="margin:0;font-size:14px;color:var(--ink-7)"><b>Floating menu.</b> Light, 16 px corners, floats 16 px below the top and stays put on scroll. The current room is Burgundy and bold. One action button at most.</p>
+      </div>
+      <div class="demo">
+        <div class="row"><button class="btn primary" type="button">Enter the open call</button><button class="btn secondary" type="button">Save for later</button><button class="btn quiet" type="button">See past winners</button></div>
+        <p style="margin:0;font-size:14px;color:var(--ink-7)"><b>Buttons.</b> 44 px tall, 12 px corners, Inter Medium 15. One primary per screen. Labels say exactly what happens.</p>
+        <div class="field"><label for="em">Email</label><input id="em" type="email" placeholder="you@studio.com" autocomplete="email"><small>We send the results here.</small></div>
+        <p style="margin:0;font-size:14px;color:var(--ink-7)"><b>Fields.</b> Label above, hint below, error replaces the hint in words.</p>
+      </div>
+      <div class="demo">
+        <div class="drawer"><div class="scrim"></div><aside><p style="font:600 11px/1 var(--sans);letter-spacing:.14em;text-transform:uppercase;color:var(--chilli)">Notes</p><h4>Your notes on this book</h4><p>Drawers slide in from the right for notes, the bag and filters, from the left for the menu on phones. 360 px wide on desktop, full width on phones.</p></aside></div>
+      </div>
+      <div class="demo">
+        <div class="shelf" aria-label="Sample shelf of book spines">
+          <div class="spine" style="height:215px;background:#52051A;color:#FFA1C2"><span>101 Art Book: Faces</span><b>AtH</b></div>
+          <div class="spine" style="height:230px;background:#6A0620;color:#FAD2E1"><span>101 Art Book: Dog</span><b>AtH</b></div>
+          <div class="spine" style="height:240px;background:#F9EEE5;color:#6A0620;box-shadow:inset 0 0 0 1px #E2D0C4"><span>The Big Book of Dog Artists</span><b>AtH</b></div>
+          <div class="spine" style="height:236px;background:#AA0003;color:#FFD6DE"><span>Arts to Hearts Magazine</span><b>AtH</b></div>
+          <div class="spine" style="height:200px;background:#FAD2E1;color:#52051A"><span>ATH Catalog</span><b>AtH</b></div>
+        </div>
+        <div class="card"><div class="cv">101 Art Book: Faces</div><p class="t" style="margin:6px 0 0">101 Art Book: Faces</p><p class="m" style="margin:0">101 artists · 212 pages · $48</p></div>
+        <p style="margin:0;font-size:14px;color:var(--ink-7)"><b>Shelf and book card.</b> Spines show the title in Faculty Glyphic and AtH at the foot, in the same position on every book. On hover a book lifts 4 px and tilts −1°. Titles in Instrument Serif Italic.</p>
+      </div>
+      <div class="tw"><table>
+        <thead><tr><th>Component</th><th>Rule</th></tr></thead>
+        <tbody>
+          <tr><td>Footer</td><td>Night band, book-stack illustration, name with PROJECT in Rose, links in Peony.</td></tr>
+          <tr><td>Artist voice note</td><td>Play button 44 px, waveform in <code>accent</code>, transcript underneath, never autoplay.</td></tr>
+          <tr><td>Page flip</td><td>Turns with a soft paper sound only when sound is on. Arrow keys turn pages.</td></tr>
+          <tr><td>Empty state</td><td>One sentence and one button: "No notes yet. Open a book to start one."</td></tr>
+          <tr><td>Loading</td><td>Calm blocks in <code>surface-raised</code>. No spinner longer than one second.</td></tr>
+          <tr><td>Errors</td><td>Say what happened and how to fix it. Never lose an artist's upload.</td></tr>
+        </tbody>
+      </table></div>
+    </section>
+
+    <section class="s" id="motion">
+      <p class="eyebrow">07 · Motion and sound</p>
+      <h2>Lift, settle, turn</h2>
+      <div class="tw"><table>
+        <thead><tr><th>Token</th><th>Value</th><th>Use</th></tr></thead>
+        <tbody>
+          <tr><td><code>duration-fast</code></td><td class="num">160 ms</td><td>Hover, press</td></tr>
+          <tr><td><code>duration-base</code></td><td class="num">240 ms</td><td>Menus, tabs, book lift</td></tr>
+          <tr><td><code>duration-slow</code></td><td class="num">480 ms</td><td>Drawers, page entrance</td></tr>
+          <tr><td><code>duration-turn</code></td><td class="num">700 ms</td><td>Page flip</td></tr>
+          <tr><td><code>ease-out</code></td><td>cubic-bezier(0.2, 0.7, 0.2, 1)</td><td>Default</td></tr>
+          <tr><td><code>ease-settle</code></td><td>cubic-bezier(0.3, 1.35, 0.5, 1)</td><td>Things landing on a surface</td></tr>
+        </tbody>
+      </table></div>
+      <p>Sound is off by default, with a visible switch in the menu. When on: paper turn, book set down, a soft bell for success. Under 0.6 s each, never looping. With reduced motion turned on, keep fades only.</p>
+    </section>
+
+    <section class="s" id="a11y">
+      <p class="eyebrow">08 · Accessibility</p>
+      <h2>Readable by everyone</h2>
+      <ul class="check">
+        <li>Text meets 4.5 : 1, large text and icons 3 : 1. Every pair on this page is measured.</li>
+        <li>Every control works by keyboard, with a visible 2 px <code>accent</code> focus ring.</li>
+        <li>Tap targets at least 44 × 44 px.</li>
+        <li>Alt text on every artwork. Artists are asked for it when they upload.</li>
+        <li>Voice notes have transcripts. Nothing plays on its own.</li>
+        <li>Errors are announced to screen readers and written in words.</li>
+      </ul>
+    </section>
+
+    <section class="s" id="print">
+      <p class="eyebrow">09 · Print colour</p>
+      <h2>Proof before every run</h2>
+      <p class="intro">Screens glow and paper absorbs. Night and Rose shift the most, so they need a proof on the actual paper. Starting values:</p>
+      <div class="tw"><table>
+        <thead><tr><th>Colour</th><th>HEX</th><th>CMYK, starting point</th><th>Notes</th></tr></thead>
+        <tbody>
+          <tr><td><span class="dot bg-night"></span>Night</td><td class="num">#52051A</td><td class="num">0 94 68 68</td><td>Large floods: proof on the real stock. On uncoated paper it prints darker.</td></tr>
+          <tr><td><span class="dot bg-rose"></span>Rose</td><td class="num">#FFA1C2</td><td class="num">0 37 24 0</td><td>Bright pinks dull in CMYK. For posters and merch, ask the printer to match a Pantone spot.</td></tr>
+          <tr><td><span class="dot bg-burgundy"></span>Burgundy</td><td class="num">#6A0620</td><td class="num">0 94 70 58</td><td>Proof every run.</td></tr>
+          <tr><td><span class="dot bg-chilli"></span>Chilli</td><td class="num">#AA0003</td><td class="num">0 100 98 33</td><td>Proof every run.</td></tr>
+          <tr><td><span class="dot bg-peony"></span>Peony</td><td class="num">#FAD2E1</td><td class="num">0 16 10 2</td><td>Light tints can drop out on cream paper; check.</td></tr>
+          <tr><td><span class="dot bg-ballet"></span>Ballet</td><td class="num">#FFD6DE</td><td class="num">0 16 13 0</td><td></td></tr>
+          <tr><td><span class="dot bg-cream"></span>Cream</td><td class="num">#F9EEE5</td><td class="num">0 4 8 2</td><td>Usually better as a cream paper than as ink.</td></tr>
+          <tr><td><span class="dot" style="background:var(--ink)"></span>Ink</td><td class="num">#1C1310</td><td class="num">0 32 43 89</td><td>Small text in 100 K or Ink. Rich black 40 30 30 100 only for big areas.</td></tr>
+        </tbody>
+      </table></div>
+      <p style="font-size:14px;color:var(--ink-5)">Pantone matches are still to be chosen at a press check. Record them here once agreed.</p>
+    </section>
+
+    <section class="s" id="setup">
+      <p class="eyebrow">10 · File setup</p>
+      <h2>Trim, bleed, safe</h2>
+      <div class="tw"><table>
+        <thead><tr><th>Piece</th><th class="num">Trim</th><th class="num">Bleed</th><th class="num">Safe margin</th><th>Notes</th></tr></thead>
+        <tbody>
+          <tr><td>Poster A3</td><td class="num">297 × 420 mm</td><td class="num">3 mm</td><td class="num">15 mm</td><td>Headline 160 to 250 pt</td></tr>
+          <tr><td>Poster A2</td><td class="num">420 × 594 mm</td><td class="num">3 mm</td><td class="num">20 mm</td><td>Scale A3 by 1.41</td></tr>
+          <tr><td>Postcard A6</td><td class="num">148 × 105 mm</td><td class="num">3 mm</td><td class="num">6 mm</td><td>Leave the back right half clear for the address</td></tr>
+          <tr><td>Business card</td><td class="num">85 × 55 mm</td><td class="num">3 mm</td><td class="num">4 mm</td><td>Master name front, details back in Inter 7.5 pt</td></tr>
+          <tr><td>Bookmark</td><td class="num">50 × 150 mm</td><td class="num">3 mm</td><td class="num">5 mm</td><td></td></tr>
+          <tr><td>101 Art Book, Big Book</td><td class="num">8.5 × 8.5 in</td><td class="num">0.125 in</td><td class="num">0.375 in</td><td>Spine width from the printer's calculator</td></tr>
+          <tr><td>Magazine</td><td class="num">8.5 × 11 in</td><td class="num">0.125 in</td><td class="num">0.5 in</td><td></td></tr>
+          <tr><td>Certificate A4</td><td class="num">297 × 210 mm</td><td class="num">3 mm</td><td class="num">10 mm</td><td>Landscape, centred</td></tr>
+          <tr><td>Tote bag</td><td class="num">Print area about 280 × 320 mm</td><td class="num">n/a</td><td class="num">n/a</td><td>One colour screen print, stacked logo</td></tr>
+        </tbody>
+      </table></div>
+      <div class="tw"><table>
+        <thead><tr><th>Text in print</th><th>Font</th><th class="num">Size</th></tr></thead>
+        <tbody>
+          <tr><td>Book body</td><td>Inter</td><td class="num">9.5 / 14 pt</td></tr>
+          <tr><td>Artist names, titles</td><td>Instrument Serif Italic</td><td class="num">14 to 18 pt</td></tr>
+          <tr><td>Labels, running heads</td><td>Nord, capitals, +16%</td><td class="num">7 pt minimum</td></tr>
+          <tr><td>Captions, folios</td><td>Inter</td><td class="num">7.5 to 8 pt</td></tr>
+          <tr><td>Smallest reversed text (light on Night)</td><td>Inter Medium</td><td class="num">8 pt</td></tr>
+        </tbody>
+      </table></div>
+    </section>
+
+    <section class="s" id="logo-print">
+      <p class="eyebrow">11 · Logo on paper</p>
+      <h2>Use the PDFs</h2>
+      <div class="grid g2">
+        <div class="tile bg-night c-rose"><svg data-logo="full"></svg></div>
+        <div class="tile bg-paper c-ink"><svg data-logo="stack" style="width:44%"></svg></div>
+      </div>
+      <ul class="check">
+        <li>Place the vector PDFs from <code>design/logo/pdf</code>. Never a PNG or a screenshot.</li>
+        <li>Minimum width: 35 mm with PROJECT, 20 mm for the name, 8 mm for AtH.</li>
+        <li>Foil, emboss, deboss and screen print: one-colour file only, at least 30 mm wide. Fine details in <em class="it">to</em> fill in below that.</li>
+        <li>Reversed on Night: let the printer know, so they can choke the pink slightly to stop it filling in.</li>
+      </ul>
+    </section>
+
+    <section class="s" id="handoff">
+      <p class="eyebrow">12 · Printer handoff</p>
+      <h2>What to send</h2>
+      <ul class="check">
+        <li>PDF/X-4 (or PDF/X-1a if the printer asks), CMYK, with bleed and crop marks.</li>
+        <li>Images at 300 dpi at final size; artworks colour-checked against the artist's original file.</li>
+        <li>Fonts embedded. Nord and Faculty Glyphic licences cover the print run.</li>
+        <li>A note listing the brand colours used and which need a spot match.</li>
+        <li>A hard proof for Night, Rose, Burgundy and Chilli before the full run.</li>
+        <li>Paper: uncoated cream for books to read, silk for image-heavy editions and posters.</li>
+      </ul>
+      <div class="note">
+        <b>Still open</b>
+        <p>Night theme values are new in this guide and need a test on real screens.</p>
+        <p>Nord needs a web licence before it can be used in the interface.</p>
+        <p>Pantone spot colours for Night and Rose are still to be chosen at a press check.</p>
+      </div>
+    </section>
+  </main>
+</div>
+
+<footer class="end"><div class="wrap"><svg data-logo="name"></svg><p>Companion: <a class="c-rose" href="SOCIAL_URL">Social and graphics guide</a></p></div></footer>
