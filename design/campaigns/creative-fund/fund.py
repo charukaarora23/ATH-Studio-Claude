@@ -1,21 +1,19 @@
-"""ATH Creative Fund: launch carousel (three cover options + nine slides, 1080 x 1350).
+"""ATH Creative Fund: launch carousel, built on one idea: the cheque.
 
 Usage: ATH_FONTS=<fonts folder> NP=<folder holding playwright> python3 design/campaigns/creative-fund/fund.py
 Fonts: npm @fontsource/inter-tight and @fontsource/libre-baskerville unpacked as it/ and lb/ in ATH_FONTS.
-Stand-in artworks come from design/guidelines/src/stock (public domain).
 Writes slides/*.jpg (full size, to post) and slides/web/*.jpg (720 px, for the brief).
 """
 import os, re, subprocess, pathlib
 from PIL import Image
 
 HERE = pathlib.Path(__file__).resolve().parent
-STOCK = HERE.parents[1] / 'guidelines' / 'src' / 'stock'
 LOGO = HERE.parents[1] / 'logo' / 'svg' / 'master' / 'logo-master_burgundy.svg'
 FONTS = pathlib.Path(os.environ.get('ATH_FONTS', 'fonts')).resolve()
 OUT = HERE / 'slides'
 
-BURG, NIGHT, ROSE, PEONY, INK = '#6A0620', '#52051A', '#FFA1C2', '#FAD2E1', '#1C1310'
-WHITE, BLACK, GREY, MUTED, CREAM = '#FFFFFF', '#141111', '#F1EEEB', '#6E6461', '#F9EEE5'
+BURG, ROSE, PEONY, INK = '#6A0620', '#FFA1C2', '#FAD2E1', '#1C1310'
+PAPER, PAPER2, RULE = '#F9EEE5', '#F1E2D6', '#D9C2B4'
 
 src = LOGO.read_text()
 x, y, w, h = map(float, re.search(r'viewBox="([^"]+)"', src).group(1).split())
@@ -25,10 +23,6 @@ G = re.search(r'<g fill="[^"]+">(.*?)</g>', src, re.S).group(1)
 
 def logo(c, wd):
     return f'<svg style="width:{wd}px;display:block" viewBox="{VB}" fill="{c}" aria-hidden="true">{G}</svg>'
-
-
-def img(name, pos='50% 50%'):
-    return f'<img src="{(STOCK / name).as_uri()}" style="object-position:{pos}">'
 
 
 ARROW = '<svg class="arw" viewBox="0 0 72 40" aria-hidden="true"><rect x="1.25" y="1.25" width="69.5" height="37.5" rx="18.75" fill="none" stroke="currentColor" stroke-width="2.5"/><path d="M22 20h28M42 12.5l8 7.5-8 7.5" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>'
@@ -42,9 +36,21 @@ def badge(bg, fg):
 N = 10
 
 
-def frame(c, i, br=True, bl='@artstoheartsproject'):
-    return (f'<div class="m tl" style="color:{c}">ATH Creative Fund</div><div class="m tr" style="color:{c}">{i:02d} / {N:02d}</div>'
-            f'<div class="m bl" style="color:{c}">{bl}</div>' + (f'<div class="m br" style="color:{c}">{ARROW}</div>' if br else ''))
+def stub(i, ground, ink):
+    """The cheque stub: a perforated band closing every slide. It is the thread through the carousel."""
+    return (f'<div class="stub" style="color:{ink};border-top-color:{ink}55">'
+            f'<span>ATH Creative Fund</span><span class="no">No. {i:03d} · {i:02d}/{N:02d}</span>'
+            f'<span>{ARROW if i < N else "@artstoheartsproject"}</span></div>')
+
+
+def cheque(payee='An artist like you', blank=False, extra=''):
+    pay = '<span class="blank"></span>' if blank else f'<span class="hand">{payee}</span>'
+    return f'''<div class="chq" {extra}>
+<div class="c-top"><div class="c-logo">{logo(BURG, 250)}<span>Creative Fund</span></div><div class="c-no">No. 001<br><span>Date: every month</span></div></div>
+<div class="c-line"><label>Pay to the order of</label>{pay}<div class="c-amt">$500.00</div></div>
+<div class="c-line"><span class="hand">Five hundred US dollars</span><label class="r">Dollars</label></div>
+<div class="c-foot"><div><label>Memo</label><span class="hand">No questions asked.</span></div><div class="c-sig"><span class="hand sig">Arts to Hearts</span><label>Arts to Hearts Project</label></div></div>
+<div class="c-micr">⑆ 0001 ⑆ 500 00 ⑈ ATH CREATIVE FUND ⑈</div></div>'''
 
 
 S = []
@@ -54,100 +60,84 @@ def add(name, bg, body):
     S.append((name, f'<section id="{name}" class="s" style="background:{bg}">{body}</section>'))
 
 
-# ---------------- Three cover options: the name is the hero ----------------
-add('01a-cover-type', BURG, f'''<div style="position:absolute;left:72px;top:64px">{logo(WHITE, 250)}</div><div class="m tr" style="color:{WHITE}">Save this</div>
-<h1 class="h" style="color:{WHITE};top:190px;font-size:150px;line-height:.92">{badge(ROSE, BURG)}ATH Creative Fund</h1>
-<div style="position:absolute;left:72px;right:72px;top:700px;border-top:2px solid {WHITE}55"></div>
-<p class="fig" style="color:{WHITE};top:740px;font-size:230px">$500</p>
-<p class="h" style="color:{WHITE};top:770px;left:560px;font-size:56px;line-height:1.05">for one artist,<br>every month.</p>
-<p class="serif" style="color:{PEONY};top:960px;font-size:64px"><i>No questions asked.</i></p>
-<div class="m bl" style="color:{WHITE}">Swipe to apply</div><div class="m br" style="color:{WHITE}">{ARROW}</div>''')
+# 01 Cover
+add('01-cover', BURG, f'''<div style="position:absolute;left:72px;top:64px">{logo(PAPER, 230)}</div><div class="m tr" style="color:{PAPER}">Save this</div>
+<h1 class="h" style="color:{PAPER};top:170px;font-size:132px;line-height:.92">{badge(ROSE, BURG)}ATH Creative&nbsp;Fund</h1>
+<div style="position:absolute;left:54px;top:500px;transform:rotate(-3deg)">{cheque()}</div>
+<p class="h" style="color:{PAPER};top:1000px;font-size:58px;line-height:1.05">$500 to one artist, every month.</p>
+<p class="serif" style="color:{ROSE};top:1075px;font-size:46px"><i>Free to enter. Comment FUND for the link.</i></p>
+{stub(1, BURG, PAPER)}''')
 
-add('01b-cover-art', NIGHT, f'''<div class="pic" style="inset:0">{img('woman_with_hat.jpg', '50% 32%')}</div>
-<div class="veil" style="inset:0;background:#000;opacity:.36"></div>
-<p class="cap c" style="color:{WHITE};top:64px">ARTS TO HEARTS PROJECT PRESENTS</p>
-<p class="caps c" style="color:{WHITE};top:130px;font-size:132px">Creative Fund</p>
-<p class="serif c" style="color:{WHITE};top:560px;font-size:84px;line-height:1.05">$500 for one artist,<br><i>every month</i></p>
-<p class="cap" style="color:{WHITE};left:72px;top:860px">NO PROPOSAL</p><p class="cap" style="color:{WHITE};right:72px;left:auto;top:860px">NO REPORT</p>
-<p class="caps c" style="color:{WHITE};top:1090px;font-size:96px">No questions asked</p>
-<p class="cr" style="color:{WHITE};left:72px;bottom:56px">Henri Matisse, Woman with a Hat, 1905 · stand-in</p><div class="m br" style="color:{WHITE}">{ARROW}</div>''')
+# 02 Conviction
+add('02-why', PAPER, f'''<div class="m tl" style="color:{INK}">Why we are doing this</div>
+<p class="serif" style="color:{INK};top:170px;font-size:64px">Most funding asks artists to prove they deserve it. Proposals, budgets, reports, waiting.</p>
+<h2 class="h" style="color:{BURG};top:660px;font-size:120px;line-height:.95">So we are writing <span class="serifi">the cheque.</span></h2>
+{stub(2, PAPER, INK)}''')
 
-add('01c-cover-split', WHITE, f'''<div class="pic" style="top:0;height:620px">{img('starry_night.jpg', '50% 45%')}</div>
-<span class="chip" style="background:{WHITE};color:{INK};left:72px;top:56px">New · Every month</span>
-<h1 class="h" style="color:{BURG};top:670px;font-size:130px;line-height:.92">ATH Creative Fund</h1>
-<p class="h" style="color:{INK};top:930px;font-size:64px;line-height:1.05">$500 for one artist. No questions asked.</p>
-<div class="m bl" style="color:{INK}">Swipe to apply</div><div class="m br" style="color:{INK}">{ARROW}</div>''')
+# 03 What you get: the cheque, annotated
+add('03-what', PAPER, f'''<div class="m tl" style="color:{INK}">What you get</div>
+<div style="position:absolute;left:70px;top:330px">{cheque()}</div>
+<div class="note" style="left:72px;top:150px"><b>One artist</b>chosen every month</div>
+<div class="note" style="left:640px;top:150px"><b>$500 in US dollars</b>sent to you</div>
+<div class="note" style="left:72px;top:850px"><b>Spend it on anything</b>paint, rent, a course, time</div>
+<div class="note" style="left:640px;top:850px"><b>No strings</b>no proposal, no report back</div>
+<svg class="lead" viewBox="0 0 1080 1350"><path d="M150 268 V 445" /><path d="M900 268 V 455" /><path d="M300 845 V 690" /><path d="M820 845 V 700" /></svg>
+{stub(3, PAPER, INK)}''')
 
-# ---------------- The carousel ----------------
-add('02-why', ROSE, f'''{frame(NIGHT, 2)}
-<p class="serif" style="color:{NIGHT};top:170px;font-size:66px">Most funding asks artists to prove they deserve it. Proposals, budgets, reports, waiting.</p>
-<h2 class="h" style="color:{NIGHT};top:740px;font-size:110px">We would rather <span class="serifi">just fund the work.</span></h2>''')
+# 04 Who can apply: typographic, no borrowed images
+words = [('Painters,', 0), ('potters,', 1), ('poets,', 0), ('photographers,', 1), ('printmakers,', 0), ('illustrators,', 1), ('sculptors,', 0), ('weavers,', 1), ('writers,', 0), ('collage artists', 1), ('and you.', 2)]
+ww = ''.join(f'<span class="{["sw", "si", "sy"][k]}">{t}</span> ' for t, k in words)
+add('04-who', BURG, f'''<div class="m tl" style="color:{PAPER}">Who can apply</div>
+<p class="poem" style="color:{PAPER}">{ww}</p>
+<p class="serif" style="color:{ROSE};top:1010px;font-size:56px"><i>If you made it, it counts.</i></p>
+{stub(4, BURG, PAPER)}''')
 
-rows = [('Paid to one artist', 'Chosen each month'), ('In US dollars', '$500, sent to you'), ('Spend it on anything', 'Materials, rent, a course, time'), ('No strings', 'No proposal, no report back')]
-rr = ''.join(f'<div class="row"><span style="color:{WHITE}">{a}</span><span style="color:{ROSE}">{b}</span></div>' for a, b in rows)
-add('03-what', BLACK, f'''{frame(WHITE, 3)}
-<p class="fig" style="color:{WHITE};top:120px;font-size:300px">$500</p>
-<p class="serif" style="color:{ROSE};top:420px;left:700px;right:72px;font-size:48px"><i>every month</i></p>
-<div class="list" style="top:520px">{rr}</div>''')
 
-tiles = [('starry_night.jpg', '50% 40%', 'Painting'), ('wave.jpg', '25% 50%', 'Printmaking'), ('udnie.jpg', '50% 50%', 'Abstract'),
-         ('the_scream.jpg', '50% 60%', 'Drawing and pastel'), ('woman_with_hat.jpg', '50% 30%', 'Portraits')]
-tt = ''.join(f'<div class="tile"><div class="ti">{img(f, p)}</div><span>{l}</span></div>' for f, p, l in tiles)
-tt += f'<div class="tile"><div class="ti" style="background:{CREAM};display:flex;align-items:center;padding:28px;box-sizing:border-box"><p style="margin:0;font:italic 400 34px/1.2 LB;color:{BURG}">“A poem counts too.”</p></div><span>Writing</span></div>'
-add('04-who', WHITE, f'''{frame(INK, 4)}
-<h2 class="h" style="color:{INK};top:150px;font-size:88px">Who can apply</h2>
-<div class="tgrid">{tt}</div>
-<p class="serif" style="color:{BURG};top:1110px;font-size:52px"><i>If you made it, it counts.</i></p>''')
+def step(n, name, title, body, art):
+    add(name, PAPER, f'''<div class="m tl" style="color:{INK}">How to apply</div><div class="m tr" style="color:{BURG}">Step {n} of 3</div>
+<p class="num" style="color:{BURG}">{n}</p>
+<h2 class="h" style="color:{INK};top:170px;left:300px;font-size:80px">{title}</h2>
+<p class="p" style="color:{INK};top:350px;left:300px;right:72px">{body}</p>
+{art}{stub(n + 4, PAPER, INK)}''')
 
-add('05-step1', WHITE, f'''{frame(INK, 5)}
-<p class="idx" style="color:{BURG}">Step 1 of 3</p>
-<div class="pic fit" style="left:72px;right:72px;top:210px;height:560px;background:{GREY}">{img('starry_night.jpg')}</div>
-<h2 class="h" style="color:{INK};top:820px;font-size:88px">{badge(BURG, WHITE)}Choose your work</h2>
-<p class="p" style="color:{INK};top:950px">One piece that best represents your practice. New or already shared, as long as you made it.</p>''')
 
-post = f'''<div class="phone">
-<div class="ph-top"><span class="av"></span><b>yourname</b></div>
-<div class="ph-img">{img('wave.jpg', '30% 50%')}</div>
-<div class="ph-cap"><b>yourname</b> My new print, made this autumn. <span style="color:#1d4ed8">@artstoheartsproject</span> <span style="color:#1d4ed8">#ATHCreativeFund</span></div></div>'''
-add('06-step2', GREY, f'''{frame(INK, 6)}
-<p class="idx" style="color:{BURG}">Step 2 of 3</p>
-<h2 class="h" style="color:{INK};top:200px;font-size:80px">Share it on Instagram</h2>
-<p class="small" style="color:{INK};top:310px;font-size:34px">Post it publicly between 15&nbsp;October and 15&nbsp;November.</p>
-{post}
-<div class="notes"><p><b>Mention</b>@artstoheartsproject in the caption</p><p><b>Add</b>#ATHCreativeFund</p><p><b>Follow</b>us, so you see our message if you are chosen</p><p><b>Writers</b>post a photo of the page or a simple text graphic</p></div>''')
+work = f'<div class="work" style="left:300px;top:640px;width:500px;height:500px"><span>your work</span></div>'
+step(1, '05-step1', 'Choose your work', 'One piece that best represents your practice. New or already shared, as long as you made it.', work)
 
-form = f'''<div class="form">
-<div class="f-head">ATH Creative Fund · Application</div>
-<label>Link to your Instagram post</label><div class="f-in">instagram.com/p/…</div>
-<label>Your work sample</label><div class="f-in f-up">Upload image</div>
-<label>A few lines about your practice</label><div class="f-in f-ta">In your own words</div>
-<div class="f-btn">Submit application</div></div>'''
-add('07-step3', WHITE, f'''{frame(INK, 7)}
-<p class="idx" style="color:{BURG}">Step 3 of 3</p>
-<h2 class="h" style="color:{INK};top:200px;font-size:80px">Apply on our site</h2>
-<p class="small" style="color:{BURG};top:310px;font-size:36px;font-weight:500">Link in our bio</p>
-{form}''')
+post = f'''<div class="phone"><div class="ph-top"><span class="av"></span><b>yourname</b></div>
+<div class="work" style="position:relative;height:360px;border-radius:0"><span>your work</span></div>
+<div class="ph-cap"><b>yourname</b> New work for the fund. <span style="color:{BURG};font-weight:500">@artstoheartsproject #ATHCreativeFund</span></div></div>'''
+step(2, '06-step2', 'Post it on Instagram', 'Publicly, between 15&nbsp;October and 15&nbsp;November. Mention <b>@artstoheartsproject</b> in the caption, add <b>#ATHCreativeFund</b> and follow us.', post)
 
-add('08-dates', BLACK, f'''{frame(WHITE, 8)}
-<h2 class="h" style="color:{WHITE};top:160px;font-size:96px">Dates</h2>
-<div class="list" style="top:360px">
-<div class="row big"><span style="color:{WHITE}">Opens</span><span style="color:{WHITE}">15 Oct</span></div>
-<div class="row big"><span style="color:{WHITE}">Closes</span><span style="color:{ROSE}">15 Nov</span></div>
-<div class="row big"><span style="color:{WHITE}">Artist chosen</span><span style="color:{WHITE}">TBC</span></div></div>
-<p class="serif" style="color:{ROSE};top:1040px;font-size:52px"><i>Then a new round, every month.</i></p>''')
+form = f'''<div class="form"><label>Link to your Instagram post</label><div class="f-in">instagram.com/p/…</div>
+<label>Your work sample</label><div class="f-in" style="text-align:center;border-style:dashed">Upload</div>
+<label>A few lines about your practice</label><div class="f-in" style="height:70px"></div>
+<div class="f-btn">Submit</div></div>'''
+step(3, '07-step3', 'Apply on our site', 'Comment <b>FUND</b> and we will send you the link. Add your post link, the work and a few lines in your own words.', form)
 
+# 08 Dates
+add('08-dates', BURG, f'''<div class="m tl" style="color:{PAPER}">Dates</div>
+<div class="tl-row" style="color:{PAPER}">
+<div><span class="d">15</span><span class="mth">October</span><span class="lb">Opens</span></div>
+<div class="line"></div>
+<div><span class="d" style="color:{ROSE}">15</span><span class="mth">November</span><span class="lb">Closes</span></div></div>
+<p class="h" style="color:{PAPER};top:820px;font-size:64px">Artist announced: TBC</p>
+<p class="serif" style="color:{ROSE};top:920px;font-size:56px"><i>Then a new cheque, every month.</i></p>
+{stub(8, BURG, PAPER)}''')
+
+# 09 Checklist
 checks = ['One piece of work you made', 'Posted publicly on Instagram', '@artstoheartsproject in the caption', '#ATHCreativeFund added', 'Following @artstoheartsproject', 'Form sent with your post link']
-cc = ''.join(f'<div class="ck"><span class="bx" style="color:{BURG}">{TICK}</span><span>{c}</span></div>' for c in checks)
-add('09-checklist', WHITE, f'''{frame(INK, 9)}
-<h2 class="h" style="color:{INK};top:160px;font-size:96px">Before you apply</h2>
+cc = ''.join(f'<div class="ck"><span class="bx">{TICK}</span><span>{c}</span></div>' for c in checks)
+add('09-checklist', PAPER, f'''<div class="m tl" style="color:{INK}">Before you apply</div><div class="m tr" style="color:{BURG}">Save this</div>
 <div class="checks">{cc}</div>
-<p class="serif" style="color:{BURG};top:1090px;font-size:52px"><i>Save this so you don't miss a step.</i></p>''')
+{stub(9, PAPER, INK)}''')
 
-add('10-share', BURG, f'''<div class="m tl" style="color:{WHITE}">ATH Creative Fund</div><div class="m tr" style="color:{WHITE}">10 / 10</div>
-<h2 class="h" style="color:{WHITE};top:170px;font-size:112px">{badge(ROSE, BURG)}Know an artist who needs $500?</h2>
-<p class="serif" style="color:{PEONY};top:600px;font-size:72px"><i>Send this to them.</i></p>
-<div style="position:absolute;left:72px;top:980px">{logo(WHITE, 460)}</div>
-<p class="small" style="color:{PEONY};top:1130px;font-size:36px">Apply: link in our bio</p>''')
+# 10 The send: the payee line is blank
+add('10-share', BURG, f'''<h2 class="h" style="color:{PAPER};top:120px;font-size:100px">{badge(ROSE, BURG)}Whose name belongs on this&nbsp;cheque?</h2>
+<div style="position:absolute;left:70px;top:470px;transform:rotate(2deg)">{cheque(blank=True)}</div>
+<p class="serif" style="color:{ROSE};top:990px;font-size:62px"><i>Send this to them.</i></p>
+<p class="h" style="color:{PAPER};top:1080px;font-size:44px">Comment FUND for the link.</p>
+{stub(10, BURG, PAPER)}''')
 
 CSS = f'''
 @font-face{{font-family:IT;font-weight:400;src:url("{(FONTS/'it/package/files/inter-tight-latin-400-normal.woff2').as_uri()}")}}
@@ -157,52 +147,68 @@ CSS = f'''
 body{{margin:0;background:#777;display:flex;flex-wrap:wrap;gap:40px;padding:40px}}
 .s{{position:relative;width:1080px;height:1350px;overflow:hidden;font-family:IT;-webkit-font-smoothing:antialiased}}
 .m{{position:absolute;font:500 30px/1.2 IT;letter-spacing:-.005em;display:flex;align-items:center;z-index:3}}
-.tl{{left:72px;top:60px}}.tr{{right:72px;top:60px}}.bl{{left:72px;bottom:60px}}.br{{right:72px;bottom:60px}}
+.tl{{left:72px;top:60px}}.tr{{right:72px;top:60px}}
 .arw{{width:88px;height:49px;display:block}}
 .h{{position:absolute;left:72px;right:72px;margin:0;font-weight:500;line-height:.98;letter-spacing:-0.035em;text-wrap:balance;z-index:2}}
-.fig{{position:absolute;left:56px;margin:0;font:500 520px/.85 IT;letter-spacing:-0.07em;z-index:2}}
+.h b,.p b{{font-weight:500}}
 .serif{{position:absolute;left:72px;right:96px;margin:0;font:400 64px/1.2 LB;letter-spacing:-0.02em;text-wrap:pretty;z-index:2}}
 .serifi{{font-family:LB;font-style:italic;font-weight:400;letter-spacing:-0.03em}}
 .badge{{display:inline-flex;width:.72em;height:.72em;border-radius:50%;align-items:center;justify-content:center;vertical-align:baseline;transform:translateY(.02em);margin-right:.16em}}
 .badge svg{{width:46%;height:46%}}
-.c{{left:0!important;right:0!important;text-align:center}}
-.cap{{position:absolute;margin:0;font:500 30px/1 IT;letter-spacing:.06em;z-index:2}}
-.caps{{position:absolute;margin:0;font:500 128px/.92 IT;letter-spacing:-0.035em;text-transform:uppercase;z-index:2}}
-.cr{{position:absolute;margin:0;font:400 24px/1.3 IT;z-index:3}}
-.pic{{position:absolute;left:0;right:0;top:0;overflow:hidden}}
-.pic img{{width:100%;height:100%;object-fit:cover;display:block}}
-.pic.fit img{{object-fit:contain}}
-.veil{{position:absolute;z-index:1}}
-.chip{{position:absolute;z-index:3;font:500 30px/1 IT;padding:18px 26px;border-radius:999px}}
-.list{{position:absolute;left:72px;right:72px}}
-.row{{display:flex;justify-content:space-between;gap:32px;border-top:2px solid #ffffff33;padding:30px 0;font:500 42px/1.15 IT;letter-spacing:-0.015em}}
-.row span:last-child{{text-align:right}}
-.row.big{{font-size:72px;letter-spacing:-0.03em;padding:40px 0}}
-.idx{{position:absolute;left:72px;top:140px;margin:0;font:500 32px/1 IT}}
-.p{{position:absolute;left:72px;right:120px;margin:0;font:400 42px/1.35 IT;letter-spacing:-0.01em}}
-.small{{position:absolute;left:72px;right:120px;margin:0;font:400 32px/1.4 IT}}
-.tgrid{{position:absolute;left:72px;right:72px;top:290px;display:grid;grid-template-columns:repeat(3,1fr);gap:28px 24px}}
-.tile .ti{{height:300px;overflow:hidden}}.tile .ti img{{width:100%;height:100%;object-fit:cover;display:block}}
-.tile span{{display:block;margin-top:14px;font:500 30px/1.2 IT;color:{INK};letter-spacing:-0.01em}}
-.phone{{position:absolute;left:72px;top:400px;width:560px;background:{WHITE};border-radius:28px;overflow:hidden;box-shadow:0 30px 60px -30px rgba(0,0,0,.35)}}
-.ph-top{{display:flex;align-items:center;gap:16px;padding:20px 24px;font:500 26px/1 IT;color:{INK}}}
-.av{{width:44px;height:44px;border-radius:50%;background:{GREY}}}
-.ph-img{{height:560px}}.ph-img img{{width:100%;height:100%;object-fit:cover;display:block}}
-.ph-cap{{padding:20px 24px 28px;font:400 25px/1.35 IT;color:{INK}}}
-.notes{{position:absolute;left:672px;right:72px;top:420px;display:grid;gap:30px}}
-.notes p{{margin:0;font:400 30px/1.3 IT;color:{INK};border-top:2px solid {INK}1f;padding-top:16px}}
-.notes b{{display:block;font:500 30px/1.2 IT;color:{BURG};margin-bottom:6px}}
-.form{{position:absolute;left:72px;right:72px;top:400px;background:{GREY};border-radius:28px;padding:44px}}
-.f-head{{font:500 30px/1 IT;color:{MUTED};margin-bottom:28px}}
-.form label{{display:block;font:500 32px/1.2 IT;color:{INK};margin:22px 0 12px}}
-.f-in{{background:{WHITE};border:2px solid #DDD6D1;border-radius:14px;padding:22px 24px;font:400 30px/1 IT;color:#9A908C}}
-.f-up{{border-style:dashed;text-align:center}}
-.f-ta{{height:90px}}
-.f-btn{{margin-top:34px;background:{BURG};color:{WHITE};border-radius:14px;padding:26px;text-align:center;font:500 34px/1 IT}}
-.checks{{position:absolute;left:72px;right:72px;top:330px;display:grid}}
-.ck{{display:flex;gap:28px;align-items:center;border-top:2px solid {INK}1f;padding:28px 0;font:500 46px/1.15 IT;letter-spacing:-0.02em;color:{INK}}}
-.bx{{flex:0 0 56px;height:56px;border:3px solid currentColor;border-radius:12px;display:inline-flex;align-items:center;justify-content:center}}
-.bx svg{{width:34px;height:34px}}
+.stub{{position:absolute;left:0;right:0;bottom:0;height:128px;border-top:3px dotted;display:flex;align-items:center;justify-content:space-between;padding:0 72px;box-sizing:border-box;font:500 30px/1 IT;z-index:3}}
+.stub .no{{font-variant-numeric:tabular-nums;opacity:.75}}
+.p{{position:absolute;margin:0;font:400 40px/1.36 IT;letter-spacing:-0.01em}}
+/* The cheque */
+.chq{{width:940px;height:440px;box-sizing:border-box;padding:34px 40px;background:{PAPER};background-image:repeating-linear-gradient(135deg,#6A06200d 0 2px,transparent 2px 9px);border:2px solid {BURG};outline:10px solid {PAPER};box-shadow:0 30px 60px -30px rgba(0,0,0,.55);color:{INK};position:relative}}
+.c-top{{display:flex;justify-content:space-between;align-items:flex-start}}
+.c-logo span{{display:block;font:500 22px/1 IT;letter-spacing:.14em;text-transform:uppercase;color:{BURG};margin-top:10px}}
+.c-no{{text-align:right;font:500 24px/1.3 IT;color:{BURG}}}.c-no span{{font-weight:400;color:{INK}}}
+.c-line{{display:flex;align-items:flex-end;gap:18px;margin-top:30px;border-bottom:2px solid {BURG}66;padding-bottom:6px}}
+.chq label{{font:500 18px/1 IT;letter-spacing:.12em;text-transform:uppercase;color:{BURG};white-space:nowrap;padding-bottom:8px}}
+.chq label.r{{margin-left:auto}}
+.hand{{font:italic 400 40px/1 LB;letter-spacing:-0.02em;color:{INK}}}
+.blank{{flex:1;height:40px}}
+.c-amt{{margin-left:auto;border:2px solid {BURG};padding:8px 18px;font:500 44px/1 IT;letter-spacing:-0.03em;color:{BURG};background:{PAPER}}}
+.c-foot{{display:flex;justify-content:space-between;align-items:flex-end;margin-top:34px;gap:30px}}
+.c-foot>div{{display:flex;flex-direction:column;gap:8px}}
+.c-foot .hand{{font-size:34px}}
+.c-sig{{align-items:flex-end;border-top:2px solid {BURG}66;padding-top:8px;min-width:330px}}
+.c-sig .sig{{font-size:46px;color:{BURG};margin-top:-56px}}
+.c-micr{{position:absolute;left:40px;bottom:14px;font:500 18px/1 IT;letter-spacing:.2em;color:{BURG}99}}
+/* Notes on slide 3 */
+.note{{position:absolute;width:368px;font:400 34px/1.25 IT;color:{INK};z-index:2}}
+.note b{{display:block;font:500 40px/1.1 IT;letter-spacing:-0.02em;color:{BURG};margin-bottom:6px}}
+.lead{{position:absolute;inset:0;width:1080px;height:1350px;z-index:1}}
+.lead path{{fill:none;stroke:{BURG};stroke-width:2.5;stroke-dasharray:6 8}}
+/* Who can apply */
+.poem{{position:absolute;left:72px;right:72px;top:150px;margin:0;font-size:96px;line-height:1.02;letter-spacing:-0.035em;text-wrap:balance}}
+.sw{{font-family:IT;font-weight:500}}
+.si{{font-family:LB;font-style:italic;font-weight:400;font-size:.94em}}
+.sy{{font-family:IT;font-weight:500;color:{ROSE}}}
+/* Steps */
+.num{{position:absolute;left:56px;top:110px;margin:0;font:500 300px/.85 IT;letter-spacing:-0.07em}}
+.work{{position:absolute;background:{PAPER2};border:2px solid {BURG};display:flex;align-items:center;justify-content:center;box-sizing:border-box}}
+.work span{{font:italic 400 44px/1 LB;color:{BURG}}}
+.phone{{position:absolute;left:300px;top:600px;width:470px;background:#fff;border-radius:26px;overflow:hidden;border:2px solid {RULE}}}
+.ph-top{{display:flex;align-items:center;gap:14px;padding:18px 22px;font:500 24px/1 IT;color:{INK}}}
+.av{{width:40px;height:40px;border-radius:50%;background:{PAPER2}}}
+.ph-cap{{padding:18px 22px 24px;font:400 24px/1.35 IT;color:{INK}}}
+.form{{position:absolute;left:300px;right:72px;top:600px;background:#fff;border:2px solid {RULE};border-radius:24px;padding:34px}}
+.form label{{display:block;font:500 28px/1.2 IT;color:{INK};margin:16px 0 10px}}
+.f-in{{border:2px solid {RULE};border-radius:12px;padding:16px 20px;font:400 26px/1 IT;color:#9A908C}}
+.f-btn{{margin-top:26px;background:{BURG};color:{PAPER};border-radius:12px;padding:22px;text-align:center;font:500 30px/1 IT}}
+/* Dates */
+.tl-row{{position:absolute;left:72px;right:72px;top:220px;display:flex;align-items:center;gap:40px}}
+.tl-row>div:not(.line){{display:flex;flex-direction:column}}
+.tl-row .d{{font:500 300px/.85 IT;letter-spacing:-0.07em}}
+.tl-row .mth{{font:500 52px/1.1 IT;letter-spacing:-0.02em;margin-top:10px}}
+.tl-row .lb{{font:400 32px/1.2 IT;opacity:.8;margin-top:8px}}
+.tl-row .line{{flex:1;height:0;border-top:3px dotted currentColor;margin-top:-120px}}
+/* Checklist */
+.checks{{position:absolute;left:72px;right:72px;top:170px}}
+.ck{{display:flex;gap:30px;align-items:center;border-top:2px dotted {BURG}66;padding:34px 0;font:500 52px/1.1 IT;letter-spacing:-0.025em;color:{INK}}}
+.bx{{flex:0 0 64px;height:64px;border:3px solid {BURG};color:{BURG};border-radius:12px;display:inline-flex;align-items:center;justify-content:center}}
+.bx svg{{width:38px;height:38px}}
 '''
 
 OUT.mkdir(exist_ok=True)
