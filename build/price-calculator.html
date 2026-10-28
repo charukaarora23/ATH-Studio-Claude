@@ -1,0 +1,1685 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Artwork Price Calculator · Arts to Hearts</title>
+  <meta name="description" content="Get a structured starting price for your artwork from its size, medium and where you are as an artist.">
+  <meta name="theme-color" content="#F9EEE5">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+/* ATH Artwork Price Calculator.
+   Values are copied from the approved prototype (Main-v3.dc.html); additions for the web build are at the end. */
+body{margin:0;background:#F9EEE5}
+a{color:#850020}a:hover{color:#1C1310}
+.app{--cream:#F9EEE5;--ink:#1C1310;--burg:#850020;--red:#FF0000;--red7:#AA0003;--sky:#B7D9FF;--white:#FFFFFF;--tray:#F1E8E2;--body-c:#F3E8DF;--muted:rgba(28,19,16,.68);--line:rgba(28,19,16,.12);--line2:rgba(28,19,16,.28);--head:"Helvetica Now Display","Helvetica Neue",Helvetica,Inter,Arial,sans-serif;--body:"Proxima Nova",Inter,system-ui,sans-serif;--mono:ui-monospace,"SFMono-Regular",Menlo,Consolas,monospace;font-family:var(--body);color:var(--ink);background:var(--cream);min-height:100vh;-webkit-font-smoothing:antialiased}
+.app *{box-sizing:border-box}
+.app :focus-visible{outline:2px solid var(--burg);outline-offset:3px}
+.stage :focus-visible{outline-color:var(--sky)}
+.wrap{max-width:1240px;margin:0 auto;padding:0 clamp(16px,4vw,48px)}
+
+/* ----- header (from the Artist Tools page) ----- */
+.site-wrap{padding:16px clamp(12px,3vw,40px) 0}
+.site{max-width:1360px;margin:0 auto;background:var(--white);border:1px solid rgba(133,0,32,.32);border-radius:40px;min-height:66px;padding:0 18px 0 28px;display:flex;align-items:center;gap:28px;box-shadow:0 8px 20px -14px rgba(28,19,16,.35)}
+.logo{display:flex;flex-direction:column;align-items:center;line-height:1;flex:none}
+.logo-w{font-family:"Instrument Serif",serif;font-size:22px;color:var(--ink);white-space:nowrap}
+.logo-w em{font-style:italic}
+.logo-dot{display:inline-block;width:5px;height:5px;border-radius:50%;background:var(--red7);margin-left:2px;vertical-align:middle}
+.logo-p{font:500 9px/1 "Instrument Serif",serif;letter-spacing:.06em;color:var(--burg);margin-top:2px}
+.site-nav{display:flex;gap:6px;margin-left:clamp(8px,6vw,96px)}
+.nav-l{appearance:none;background:none;border:0;padding:8px 10px;border-radius:9px;font:600 14px Inter,sans-serif;color:var(--ink);cursor:pointer;white-space:nowrap}
+.nav-l:hover{color:var(--burg);background:rgba(133,0,32,.05)}
+.site-right{margin-left:auto;display:flex;align-items:center;gap:12px}
+.rate{appearance:none;display:inline-flex;align-items:center;gap:6px;height:38px;padding:0 12px;border:1px solid var(--line);border-radius:999px;background:var(--white);font:600 13px Inter,sans-serif;color:#C2410C;cursor:pointer;box-shadow:0 2px 6px -4px rgba(28,19,16,.3)}
+.rate-g{font:800 15px Inter,sans-serif;color:#2563EB}
+.stars{letter-spacing:1px;font-size:11px}
+.circ{appearance:none;position:relative;width:38px;height:38px;border-radius:50%;border:1px solid var(--line);background:var(--white);display:inline-flex;align-items:center;justify-content:center;color:var(--ink);cursor:pointer;box-shadow:0 2px 6px -4px rgba(28,19,16,.3)}
+.circ:hover,.rate:hover,.avatar-btn:hover{border-color:var(--line2)}
+.badge{position:absolute;top:-7px;right:-7px;min-width:19px;height:19px;padding:0 5px;border-radius:10px;background:var(--burg);color:var(--white);font:700 10px/19px Inter,sans-serif;text-align:center}
+.avatar-btn{appearance:none;display:inline-flex;align-items:center;gap:6px;height:44px;padding:3px 10px 3px 3px;border:1px solid var(--line);border-radius:999px;background:var(--white);cursor:pointer;color:var(--ink)}
+.avatar{width:36px;height:36px;border-radius:50%;background:#E9D8CB;display:flex;align-items:center;justify-content:center;color:var(--burg)}
+.crumbs{display:flex;flex-wrap:wrap;align-items:center;gap:8px;font:500 13px Inter,sans-serif;color:var(--muted);padding:20px 0 0}
+.crumb-btn{appearance:none;background:none;border:0;padding:6px 0;font:inherit;color:var(--burg);text-decoration:underline;text-underline-offset:3px;cursor:pointer;min-height:32px}
+.crumb-cur{color:var(--ink);font-weight:600}
+
+/* ----- type + basics ----- */
+.eyebrow{font:700 11px/1.2 Inter,sans-serif;letter-spacing:.14em;text-transform:uppercase;color:var(--burg);margin:0}
+.mono{font:500 11px/1.3 var(--mono);letter-spacing:.14em;text-transform:uppercase;margin:0}
+.poster{font-family:"Archivo Black",sans-serif;font-weight:400;font-size:clamp(40px,6vw,76px);line-height:.92;letter-spacing:-.02em;margin:10px 0 0}
+.poster em{font-family:"Instrument Serif",serif;font-style:italic;font-weight:400;letter-spacing:0;color:var(--burg)}
+.h2{font-family:var(--head);font-weight:700;font-size:clamp(22px,2.4vw,28px);line-height:1.15;margin:0;letter-spacing:-.01em}
+.h3{font-family:var(--head);font-weight:700;font-size:18px;line-height:1.25;margin:0}
+.serif-i{font-family:"Instrument Serif",serif;font-style:italic;font-weight:400;color:var(--burg)}
+.small{font-size:14px;line-height:1.5}
+.muted{color:var(--muted)}
+.req{color:var(--red7);font-style:normal}
+.screen{animation:rise .34s ease both}
+.btn{appearance:none;min-height:46px;padding:0 20px;border-radius:6px;font:600 15px Inter,sans-serif;display:inline-flex;align-items:center;justify-content:center;gap:10px;cursor:pointer;border:1.5px solid var(--burg);transition:box-shadow .15s ease,transform .1s ease,background .15s ease;white-space:nowrap}
+.btn:hover{box-shadow:0 0 0 4px rgba(133,0,32,.14)}
+.btn:active{transform:translateY(1px)}
+.btn:disabled{cursor:not-allowed;opacity:.55;box-shadow:none;transform:none}
+.btn-p{background:var(--burg);color:var(--white)}
+.btn-s{background:var(--white);color:var(--burg)}
+.btn-g{background:transparent;border-color:transparent;color:var(--burg);padding:0 10px;text-decoration:underline;text-underline-offset:3px}
+.btn-g:hover{box-shadow:none;color:var(--ink)}
+.btn-dp{background:var(--red7);color:var(--white);border-color:var(--red7)}
+.icon-btn{appearance:none;width:44px;height:44px;border-radius:8px;border:1.5px solid transparent;background:transparent;color:var(--muted);display:inline-flex;align-items:center;justify-content:center;cursor:pointer;flex:none}
+.icon-btn:hover{border-color:var(--line2);color:var(--red7)}
+.spin{width:16px;height:16px;border:2px solid rgba(255,255,255,.35);border-top-color:#fff;border-radius:50%;animation:rot .8s linear infinite}
+
+/* ----- section tabs ----- */
+.tabs-wrap{margin-top:22px}
+.tabs{display:inline-flex;gap:5px;padding:5px;background:#EADFD7;border-radius:8px;max-width:100%;overflow-x:auto;scrollbar-width:none}
+.tab{appearance:none;display:inline-flex;align-items:center;gap:10px;min-height:46px;padding:0 18px;border:0;border-radius:5px;background:var(--white);color:var(--ink);font:600 14px Inter,sans-serif;cursor:pointer;white-space:nowrap;box-shadow:0 1px 2px rgba(28,19,16,.12);transition:background .22s ease,color .22s ease,transform .15s ease,box-shadow .22s ease}
+.tab-n{font:500 11px var(--mono);letter-spacing:.08em;color:var(--muted);transition:color .22s}
+.tab:hover{transform:translateY(-1px);box-shadow:0 4px 10px -4px rgba(28,19,16,.35)}
+.tab:active{transform:scale(.97)}
+.tab.on{background:var(--burg);color:var(--white);box-shadow:inset 0 1px 3px rgba(0,0,0,.3);transform:none}
+.tab.on .tab-n{color:var(--sky)}
+.count{display:inline-flex;align-items:center;justify-content:center;min-width:22px;height:22px;padding:0 6px;border-radius:4px;background:var(--tray);font:700 12px Inter,sans-serif;transition:all .22s}
+.tab.on .count{background:var(--cream);color:var(--burg)}
+
+/* ----- colour band behind the card (the reference's purple field) ----- */
+.band{background:var(--burg);margin-top:24px;padding:44px 0 56px}
+.band .resume{margin:0 0 20px}
+
+/* ----- the card: image panel + form ----- */
+.device{display:grid;grid-template-columns:minmax(0,.94fr) minmax(0,1.06fr);border-radius:8px;overflow:hidden;background:var(--white);box-shadow:0 40px 70px -36px rgba(0,0,0,.7);animation:rise .4s ease both}
+
+/* left: tinted artwork field, like the reference's photo panel */
+.stage{position:relative;overflow:hidden;background:#3E0712;color:var(--cream);padding:24px 26px 26px;min-height:720px}
+.tiles{position:absolute;inset:-20px;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));grid-auto-rows:132px;gap:14px;padding:14px;transform:rotate(-4deg);filter:grayscale(1) contrast(1.05);opacity:.32;pointer-events:none}
+.tile{position:relative;border-radius:50%;overflow:hidden;background:#d9d0ca}
+.tile.sq{border-radius:6px}
+.tint{position:absolute;inset:0;background:var(--burg);mix-blend-mode:multiply;opacity:.92;pointer-events:none}
+.shade{position:absolute;inset:0;background:linear-gradient(180deg,rgba(28,19,16,.25),rgba(28,19,16,.05) 40%,rgba(28,19,16,.45));pointer-events:none}
+.stage-top{position:relative;z-index:3;display:flex;justify-content:space-between;align-items:center;gap:12px}
+.back-l{appearance:none;background:none;border:0;padding:6px 0;display:inline-flex;align-items:center;gap:10px;font:700 11px Inter,sans-serif;letter-spacing:.14em;text-transform:uppercase;color:var(--cream);cursor:pointer}
+.back-l:hover{color:var(--white)}
+.st-chip{font:700 11px Inter,sans-serif;letter-spacing:.12em;text-transform:uppercase;color:rgba(249,238,229,.8)}
+.stage-in{position:relative;z-index:2;height:560px;max-width:520px;margin:18px auto 0}
+.stage-cap{position:relative;z-index:3;display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;margin:14px 0 0;font:600 11px/1.4 Inter,sans-serif;letter-spacing:.1em;text-transform:uppercase;color:rgba(249,238,229,.8)}
+.stage-cap b{color:var(--white)}
+.stage-foot{position:relative;z-index:3;display:flex;gap:28px;margin-top:18px;padding-top:16px;border-top:1px solid rgba(249,238,229,.18)}
+.sf-v{display:block;font:400 22px/1 "Archivo Black",sans-serif;color:var(--white)}
+.sf-k{display:block;margin-top:5px;font:600 10px Inter,sans-serif;letter-spacing:.12em;text-transform:uppercase;color:rgba(249,238,229,.72)}
+
+/* the physical calculator */
+.calc{position:absolute;left:0;bottom:0;width:286px;background:var(--body-c);border-radius:24px;padding:14px 16px 18px;z-index:2;box-shadow:0 40px 50px -24px rgba(0,0,0,.75),0 10px 18px -10px rgba(0,0,0,.4),inset 0 2px 0 rgba(255,255,255,.85),inset 0 -6px 0 rgba(28,19,16,.10),inset 0 0 0 1px rgba(255,255,255,.55);animation:calcIn .55s cubic-bezier(.2,.9,.3,1) both}
+.c-top{display:flex;justify-content:space-between;align-items:center;padding:0 4px 10px}
+.c-brand{font:400 15px/1 "Instrument Serif",serif;color:var(--burg)}
+.c-brand em{font-style:italic}
+.c-solar{width:70px;height:16px;border-radius:3px;background:#3A2A25;box-shadow:inset 0 1px 3px rgba(0,0,0,.6),0 1px 0 rgba(255,255,255,.7);background-image:repeating-linear-gradient(90deg,rgba(255,255,255,.10) 0 1px,transparent 1px 17px)}
+.c-disp{background:var(--burg);border-radius:10px;padding:11px 14px 12px;height:126px;display:flex;flex-direction:column;box-shadow:inset 0 3px 12px rgba(0,0,0,.45),inset 0 0 0 1px rgba(0,0,0,.2),0 1px 0 rgba(255,255,255,.8)}
+.c-bar{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.c-mode,.c-lbl{font:700 9px Inter,sans-serif;letter-spacing:.14em;text-transform:uppercase;color:rgba(249,238,229,.78)}
+.c-expr{font:500 12px/16px Inter,sans-serif;color:rgba(249,238,229,.82);margin:8px 0 0;max-height:32px;overflow:hidden}
+.c-expr .op{color:var(--sky)}
+.c-expr .miss{color:rgba(249,238,229,.42)}
+.c-res{margin:auto 0 0;text-align:right;font:400 38px/1 "Archivo Black",sans-serif;letter-spacing:-.02em;color:var(--white);white-space:nowrap;font-variant-numeric:tabular-nums}
+.c-res.wait{color:rgba(255,255,255,.4)}
+.c-eq{margin-right:6px;font-family:Inter,sans-serif;font-weight:300}
+.loading .c-res{animation:breathe 1s ease-in-out infinite}
+.c-keys{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:9px;margin-top:16px}
+.c-k{appearance:none;height:44px;border:0;border-radius:8px;background:var(--white);font:600 16px Inter,sans-serif;color:var(--ink);cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 3px 0 rgba(28,19,16,.14),0 6px 10px -6px rgba(28,19,16,.45),inset 0 1px 0 rgba(255,255,255,.9);transition:transform .08s,box-shadow .08s,background .15s}
+.c-k:hover{background:#FFFBF7}
+.c-k:active{transform:translateY(3px);box-shadow:0 0 0 rgba(28,19,16,.14),inset 0 2px 4px rgba(28,19,16,.15)}
+.c-k.fn{color:var(--muted);font-size:14px}
+.c-k.op{background:#FBEFE9;color:var(--burg);font-size:19px}
+.c-k.eq{background:var(--burg);color:var(--white);font:300 26px/1 Inter,sans-serif;box-shadow:0 3px 0 #5A0016,0 6px 10px -6px rgba(0,0,0,.5),inset 0 1px 0 rgba(255,255,255,.25)}
+.c-k.eq:active{box-shadow:inset 0 2px 5px rgba(0,0,0,.35)}
+.c-k.inert{cursor:default}
+.c-k.inert:active{transform:none;box-shadow:0 3px 0 rgba(28,19,16,.14),0 6px 10px -6px rgba(28,19,16,.45)}
+.c-k.sm{font-size:13px}
+
+/* the paper slip behind the calculator */
+.paper{position:absolute;right:0;top:0;width:min(264px,56%);background:var(--white);padding:14px 14px 16px;border-radius:6px;transform:rotate(3deg);box-shadow:0 28px 40px -22px rgba(0,0,0,.7);z-index:1;color:var(--ink);animation:slipIn .6s cubic-bezier(.2,.9,.3,1) both}
+.p-mono{font:700 10px/1.3 Inter,sans-serif;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin:0 0 10px}
+.pprev{position:relative;width:100%;aspect-ratio:5/4;background:var(--tray);border-radius:4px}
+.cv{position:absolute;left:46%;top:44%;transform:translate(-50%,-50%);transition:width .35s cubic-bezier(.2,.9,.3,1),height .35s cubic-bezier(.2,.9,.3,1)}
+.loading .cv{animation:breathe 1s ease-in-out infinite}
+.surf{position:absolute;inset:0;overflow:hidden;transition:background .3s ease;box-shadow:0 0 0 4px #fff,0 0 0 5px rgba(28,19,16,.18),0 10px 18px -8px rgba(0,0,0,.35)}
+.surf.paint{background:var(--sky)}
+.surf.photo{background:#CFC8C3}
+.surf.draw{background:#FFFDF8}
+.surf.blank{background:var(--white)}
+.surf.ghost{background:transparent;box-shadow:none;border:1.5px dashed var(--line2)}
+.hills{position:absolute;left:0;right:0;bottom:0;width:100%;height:100%}
+.sun{position:absolute;right:14%;top:14%;width:14%;aspect-ratio:1/1;border-radius:50%;background:var(--cream)}
+.surf-hint{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;text-align:center;padding:6px;font:500 11px Inter,sans-serif;color:var(--muted)}
+.depth-chip{position:absolute;left:8px;bottom:6px;background:var(--white);border-radius:4px;padding:4px 8px;font:600 10px Inter,sans-serif;animation:rise .25s ease both}
+.dimx{position:absolute;left:0;right:0;display:flex;align-items:center;gap:8px;color:var(--ink)}
+.dimy{position:absolute;top:0;bottom:0;display:flex;flex-direction:column;align-items:center;gap:6px;color:var(--ink)}
+.dl{position:relative;background:currentColor;opacity:.7}
+.dimx .dl{flex:1;height:1px;min-width:0}
+.dimy .dl{flex:1;width:1px;min-height:0}
+.dimx .dl-a:before,.dimx .dl-b:after{content:"";position:absolute;top:-4px;width:1px;height:9px;background:currentColor}
+.dimx .dl-a:before{left:0}.dimx .dl-b:after{right:0}
+.dimy .dl-a:before,.dimy .dl-b:after{content:"";position:absolute;left:-4px;width:9px;height:1px;background:currentColor}
+.dimy .dl-a:before{top:0}.dimy .dl-b:after{bottom:0}
+.dv{font:700 11px Inter,sans-serif;white-space:nowrap;font-variant-numeric:tabular-nums}
+.prow{display:flex;justify-content:space-between;align-items:baseline;gap:10px;padding:10px 0;border-bottom:1px dashed var(--line2)}
+.prow:last-child{border-bottom:0}
+.prow span:first-child{font:700 10px Inter,sans-serif;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.prow span:last-child{font:400 22px/1 "Archivo Black",sans-serif}
+.pframe-wrap{display:flex;justify-content:center;padding:6px 54px 44px 0}
+.pframe{position:relative}
+.pframe-in{position:relative;overflow:hidden;border:7px solid var(--ink);box-shadow:inset 0 0 0 5px #fff}
+.pframe-in.surf{box-shadow:inset 0 0 0 5px #fff}
+.p-dot{position:absolute;top:-10px;right:-10px;width:30px;height:30px;border-radius:50%;background:var(--red);box-shadow:0 4px 8px -3px rgba(0,0,0,.4);animation:dot .5s cubic-bezier(.2,1.6,.4,1) 1s both;z-index:2}
+
+/* right: the form, like the reference's white panel */
+.keys{padding:34px 36px;display:flex;flex-direction:column}
+.kp-title{display:flex;gap:14px;align-items:flex-start;margin-bottom:22px}
+.kp-ico{width:40px;height:40px;border-radius:8px;background:#F7D3E0;color:var(--burg);display:flex;align-items:center;justify-content:center;flex:none}
+.kp-h{font:400 22px/1.1 "Archivo Black",sans-serif;letter-spacing:.01em;text-transform:uppercase;color:var(--burg);margin:0}
+.kp-sub{margin:5px 0 0;font-size:13px;line-height:1.45;color:var(--muted)}
+.krow{display:grid;grid-template-columns:140px minmax(0,1fr);gap:16px;align-items:start;padding:10px 0;animation:rise .3s ease both}
+.klabel{display:flex;align-items:center;gap:6px;flex-wrap:wrap;font:800 11px/1.3 Inter,sans-serif;letter-spacing:.1em;text-transform:uppercase;color:var(--burg);padding-top:14px}
+.klabel .opt{flex-basis:100%;font:500 11px Inter,sans-serif;letter-spacing:0;text-transform:none;color:var(--muted);margin-top:2px}
+.qdot{display:inline-flex;align-items:center;justify-content:center;width:15px;height:15px;border-radius:50%;background:#E89AB5;color:var(--white);font:800 9px Inter,sans-serif;letter-spacing:0;cursor:help}
+.kctl{min-width:0}
+.tray{display:inline-flex;flex-wrap:wrap;gap:4px;padding:4px;background:#EDE6E1;border-radius:6px;max-width:100%}
+.key{appearance:none;min-height:40px;padding:0 16px;border:0;border-radius:4px;background:var(--white);color:var(--ink);font:600 14px Inter,sans-serif;cursor:pointer;box-shadow:0 1px 2px rgba(28,19,16,.14),0 2px 6px -3px rgba(28,19,16,.22);transition:background .18s,color .18s,transform .12s,box-shadow .18s;display:inline-flex;flex-direction:column;align-items:center;justify-content:center;text-align:center}
+.key:hover{transform:translateY(-1px)}
+.key:active{transform:scale(.96)}
+.key.on{background:var(--burg);color:var(--white);box-shadow:inset 0 1px 3px rgba(0,0,0,.3)}
+.key-sub{font:500 11px Inter,sans-serif;color:var(--muted);margin-top:2px}
+.key.on .key-sub{color:rgba(255,255,255,.78)}
+.key.tall{min-height:52px;padding:6px 14px}
+.key.static{cursor:default;background:var(--burg);color:var(--white);box-shadow:inset 0 1px 3px rgba(0,0,0,.3)}
+.key.static:hover,.key.ghost:hover{transform:none}
+.key.ghost{cursor:default;background:transparent;box-shadow:none;border:1.5px dashed var(--line2);color:var(--muted);font-weight:500}
+.boxes{display:flex;flex-wrap:wrap;gap:10px}
+.box{display:inline-flex;align-items:center;border:1.5px solid var(--line2);border-radius:5px;background:var(--white);min-height:42px;transition:border-color .15s,box-shadow .15s}
+.box:focus-within{border-color:var(--burg);box-shadow:0 0 0 3px rgba(133,0,32,.14)}
+.box.bad{border-color:var(--red7);box-shadow:0 0 0 3px rgba(170,0,3,.10)}
+.box-in{width:72px;min-height:38px;border:0;background:transparent;font:600 16px Inter,sans-serif;color:var(--ink);text-align:center;font-variant-numeric:tabular-nums;padding:0 4px}
+.box-in:focus{outline:none}
+.box-in::placeholder{color:rgba(28,19,16,.35);font-weight:500}
+.box-u{font:500 13px Inter,sans-serif;color:var(--muted);padding:0 4px}
+.bstp{appearance:none;width:32px;height:38px;border:0;background:transparent;color:var(--burg);font:500 19px/1 Inter,sans-serif;cursor:pointer;border-radius:4px;transition:background .15s,transform .1s}
+.bstp:hover{background:var(--tray)}
+.bstp:active{transform:scale(.9)}
+.kerr{display:block;margin-top:7px;font:500 12px/1.35 Inter,sans-serif;color:var(--red7);animation:rise .2s ease both}
+.knote{margin:7px 0 0;font-size:12px;color:var(--muted)}
+.keys-foot{margin-top:auto;padding-top:18px;display:flex;flex-direction:column;gap:14px;background:var(--white)}
+.foot-row{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+.cta-bar{appearance:none;width:100%;min-height:52px;border:0;border-radius:5px;background:var(--burg);color:var(--white);font:800 13px Inter,sans-serif;letter-spacing:.12em;text-transform:uppercase;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;box-shadow:0 2px 0 #5A0016;transition:transform .12s,box-shadow .15s,background .15s}
+.cta-bar:hover{background:#73001B}
+.cta-bar:active{transform:translateY(2px);box-shadow:none}
+.cta-bar:disabled{opacity:.6;cursor:not-allowed}
+.punches{display:flex;gap:14px;flex-wrap:wrap;align-items:center}
+.punch{display:inline-flex;align-items:center;gap:6px;font:600 13px Inter,sans-serif;color:var(--muted)}
+.punch i{width:18px;height:18px;border-radius:50%;border:1.5px dashed var(--line2);display:inline-flex;align-items:center;justify-content:center;font-style:normal;font-size:10px;color:transparent;transition:all .25s}
+.punch.on{color:var(--ink)}
+.punch.on i{border:1.5px solid var(--burg);background:var(--burg);color:#fff;animation:punch .35s cubic-bezier(.2,1.6,.4,1)}
+
+/* ----- overview ----- */
+.ov-head{display:flex;justify-content:space-between;align-items:flex-end;gap:24px;flex-wrap:wrap;padding:30px 0 0}
+.ws-line{font-family:"Instrument Serif",serif;font-style:italic;font-size:24px;line-height:1.3;max-width:24ch;margin:0}
+.ov{display:grid;grid-template-columns:minmax(0,1fr) 330px;gap:28px;align-items:start}
+.ov-tape{margin-top:56px}
+.resume{background:var(--sky);border-radius:6px;padding:12px 16px;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+.ws-foot{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:18px 28px;border-top:1.5px solid var(--ink);margin:48px 0 96px;padding-top:18px}
+.ws-foot h3{font:700 14px/1.3 Inter,sans-serif;margin:6px 0 4px}
+.ws-foot p{margin:0;font-size:13px;line-height:1.45;color:var(--muted)}
+
+/* ----- history tape ----- */
+.tape{background:var(--white);border-radius:8px;padding:20px;box-shadow:0 30px 60px -34px rgba(0,0,0,.7);display:flex;flex-direction:column;gap:14px}
+.tape-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
+.slips{display:flex;flex-direction:column;gap:8px}
+.slip{appearance:none;width:100%;border:0;background:var(--tray);border-radius:6px;padding:12px 14px;display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:12px;align-items:center;text-align:left;font:inherit;color:inherit;cursor:pointer;transition:transform .15s,background .15s;animation:rise .3s ease both}
+.slip:hover{transform:translateX(2px);background:#EADDD4}
+.slip-thumb{display:flex;align-items:center;justify-content:center;width:44px;height:44px}
+.slip-expr{font:500 12px/1.45 Inter,sans-serif;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.slip-t{display:block;font:400 17px/1.2 "Instrument Serif",serif;font-style:italic;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.slip-v{font:400 20px/1 "Archivo Black",sans-serif;white-space:nowrap}
+.slip-v i{font-style:normal;color:var(--red7);margin-right:4px}
+.tape-empty{background:var(--tray);border-radius:6px;padding:22px 18px;text-align:center}
+.tape-empty-t{font:400 22px/1.2 "Instrument Serif",serif;font-style:italic;margin:0;color:var(--burg)}
+
+/* ----- result receipt ----- */
+.title-in{width:100%;border:0;border-bottom:1.5px dashed var(--line2);background:transparent;font:400 30px/1.2 "Instrument Serif",serif;font-style:italic;color:var(--ink);padding:2px 0 6px}
+.title-in:focus{outline:none;border-bottom-color:var(--burg)}
+.title-in::placeholder{color:rgba(28,19,16,.45)}
+.title-st{font:400 30px/1.2 "Instrument Serif",serif;font-style:italic;margin:0}
+.lab-lines{margin:10px 0 0;display:flex;flex-direction:column;gap:3px;font-size:15px}
+.lab-b{font-weight:700}
+.receipt{margin:18px 0 0;background:var(--tray);border-radius:6px;padding:6px 16px}
+.rc-row{display:flex;align-items:baseline;gap:8px;padding:9px 0;border-bottom:1px dashed var(--line2);font-size:14px;animation:rise .35s ease both}
+.rc-row:last-child{border-bottom:0}
+.rc-row dt{color:var(--muted);margin:0;white-space:nowrap}
+.rc-row .lead{flex:1;border-bottom:1px dotted var(--line2);transform:translateY(-4px);min-width:12px}
+.rc-row dd{margin:0;font-weight:600;text-align:right}
+.res-note{font-family:"Instrument Serif",serif;font-style:italic;font-size:19px;line-height:1.35;margin:16px 0 0}
+.akeys{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px;margin-top:20px;background:#EDE6E1;padding:5px;border-radius:7px}
+.akey{appearance:none;min-height:50px;border:0;border-radius:4px;background:var(--white);color:var(--ink);font:800 12px Inter,sans-serif;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;box-shadow:0 1px 2px rgba(28,19,16,.14),0 2px 6px -3px rgba(28,19,16,.22);transition:transform .12s,box-shadow .15s}
+.akey:hover{transform:translateY(-1px)}
+.akey:active{transform:scale(.97)}
+.akey.pri{background:var(--burg);color:var(--white)}
+.akey.done{background:var(--white);color:var(--burg);cursor:default;box-shadow:inset 0 0 0 1.5px var(--burg)}
+.akey.danger{color:var(--red7)}
+.akey:disabled:hover{transform:none}
+.saved-line{display:flex;align-items:center;gap:8px;font:600 14px Inter,sans-serif;margin-top:12px;animation:rise .25s ease both}
+.rec-strip{background:var(--tray);border-radius:5px;padding:9px 12px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;font:700 11px Inter,sans-serif;letter-spacing:.1em;text-transform:uppercase;color:var(--burg);margin-bottom:16px}
+.res-top{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:16px;color:var(--cream)}
+.res-top .btn-g{color:var(--cream)}
+.res-top .mono{color:rgba(249,238,229,.8)}
+
+/* ----- library ----- */
+.lib-head{display:flex;justify-content:space-between;align-items:flex-end;gap:20px;flex-wrap:wrap;padding:30px 0 22px}
+.lib-tools{display:flex;gap:12px;flex-wrap:wrap;align-items:center}
+.wallpanel{background:var(--white);border-radius:8px;box-shadow:0 30px 60px -40px rgba(28,19,16,.5);display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:center;gap:56px 48px;padding:64px 24px 40px}
+.piece{display:flex;flex-direction:column;align-items:center;gap:14px;animation:hangIn .5s cubic-bezier(.2,.9,.3,1) both}
+.piece-btn{appearance:none;border:0;background:none;padding:0;cursor:pointer;position:relative}
+.piece-btn:before{content:"";position:absolute;left:50%;top:-26px;height:26px;border-left:1px solid var(--line2)}
+.piece-fr{display:block;border:7px solid var(--ink);background:var(--white);padding:6px;box-shadow:0 18px 26px -18px rgba(28,19,16,.55);transition:transform .22s ease}
+.piece-btn:hover .piece-fr,.piece-btn:focus-visible .piece-fr{transform:translateY(-4px)}
+.piece .surf{box-shadow:none}
+.plabel{background:var(--tray);border-radius:6px;padding:10px 6px 10px 14px;display:flex;gap:4px;align-items:center;min-width:190px}
+.plabel-in{flex:1;min-width:0}
+.pl-title{font:400 17px/1.15 "Instrument Serif",serif;font-style:italic;margin:0}
+.pl-what{font:500 12px/1.4 Inter,sans-serif;color:var(--muted);margin:3px 0 0}
+.pl-price{font:400 20px/1 "Archivo Black",sans-serif;margin:7px 0 0;display:flex;align-items:baseline;gap:8px}
+.pl-price i{font-style:normal;color:var(--red7)}
+.pl-date{font:500 11px var(--mono);color:var(--muted)}
+.scale-note{text-align:center;font:600 11px Inter,sans-serif;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin:14px 0 96px}
+.ltape{background:var(--white);border-radius:8px;padding:16px;box-shadow:0 30px 60px -40px rgba(28,19,16,.5);display:flex;flex-direction:column;gap:8px;margin-bottom:96px}
+.lslip{display:flex;align-items:center;gap:6px;background:var(--tray);border-radius:6px;animation:rise .3s ease both}
+.lslip .slip{background:transparent;grid-template-columns:auto minmax(0,1fr) auto auto}
+.lslip .slip:hover{background:transparent}
+.ldate{font:500 11px var(--mono);color:var(--muted);white-space:nowrap}
+.emptypanel{background:var(--white);border-radius:8px;box-shadow:0 30px 60px -40px rgba(28,19,16,.5);display:flex;flex-direction:column;align-items:center;text-align:center;gap:12px;padding:64px 20px 70px;margin-bottom:96px}
+.empty-lead{font-size:18px;line-height:1.5;margin:4px 0 0;max-width:44ch}
+.slip-thumb .surf,.lslip .surf{box-shadow:none}
+
+/* ----- tools listing (first screen, unchanged) ----- */
+.at-title{font-family:var(--head);font-weight:700;font-size:clamp(40px,5vw,56px);line-height:1.05;letter-spacing:-.02em;color:#850020;margin:44px 0 0}
+.at-sub{font-family:"Instrument Serif",Georgia,serif;font-size:20px;line-height:1.45;color:var(--muted);margin:12px 0 0;max-width:72ch}
+.at-box{background:var(--white);border:1px solid var(--line);border-radius:20px;padding:32px;margin:36px 0 96px}
+.at-head{display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;margin-bottom:28px}
+.at-ico{width:52px;height:52px;border-radius:50%;background:#F7D3E0;display:flex;align-items:center;justify-content:center;color:#850020;flex:none}
+.at-mono{font:500 11px/1.3 var(--mono);letter-spacing:.16em;text-transform:uppercase;margin:0;color:var(--ink)}
+.at-h2{font-family:var(--head);font-weight:700;font-size:28px;color:#850020;margin:4px 0 0;letter-spacing:-.01em}
+.at-count{color:#850020;display:flex;gap:8px;align-items:center}
+.at-dot{width:7px;height:7px;border-radius:50%;background:var(--red7)}
+.at-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:20px}
+.at-card{border-radius:16px;padding:28px;display:flex;flex-direction:column;gap:20px;align-items:flex-start;border:1px solid rgba(133,0,32,.12);transition:transform .2s ease,box-shadow .2s ease}
+.at-card:hover{transform:translateY(-2px);box-shadow:0 14px 30px -20px rgba(133,0,32,.45)}
+.at-pink{background:linear-gradient(135deg,#F8D0DE 0%,#FBE4EC 60%,#FCEFF3 100%)}
+.at-peach{background:linear-gradient(135deg,#F8F0D8 0%,#FBE6DC 55%,#F8D3E0 100%)}
+.at-ct{display:flex;gap:14px;align-items:center;width:100%}
+.at-circle{width:56px;height:56px;border-radius:50%;background:var(--white);flex:none;display:flex;align-items:center;justify-content:center;color:#850020}
+.at-h3{font-family:var(--head);font-weight:700;font-size:22px;line-height:1.2;margin:6px 0 0}
+.at-perk{background:var(--white);border-radius:999px;padding:5px 10px;font:500 10px var(--mono);letter-spacing:.14em;text-transform:uppercase;color:#1F6F63;align-self:flex-start;white-space:nowrap}
+.at-desc{font-family:"Instrument Serif",Georgia,serif;font-size:19px;line-height:1.5;color:#3A2A25;margin:0}
+.at-demo{background:var(--white);border-radius:14px;padding:14px;width:100%;display:flex;align-items:center;gap:12px;flex-wrap:wrap;box-shadow:0 10px 26px -18px rgba(133,0,32,.4)}
+.at-arrow{flex:none}
+.at-notes{background:#FBE3EB;border-radius:8px;padding:14px 16px;flex:0 0 auto}
+.at-k{color:var(--muted);font-size:9px;margin-top:10px}
+.at-it{font-family:"Instrument Serif",serif;font-style:italic;font-size:17px;margin:2px 0 0}
+.at-out{flex:1 1 180px;border:1.5px solid #850020;border-radius:6px;padding:12px 14px;min-width:0}
+.at-tabs{display:inline-flex;background:#FBE3EB;border-radius:999px;padding:3px;gap:2px}
+.at-tabs span{padding:4px 10px;border-radius:999px;font:600 11px Inter,sans-serif;color:#850020}
+.at-tabs span.on{background:#850020;color:var(--white)}
+.at-out p{font-family:"Instrument Serif",serif;font-size:16px;line-height:1.4;margin:12px 0 0}
+.at-fw{position:relative;padding:0 28px 26px 0;flex:none}
+.at-frame{width:126px;height:96px;border:1.5px solid #850020;padding:5px;background:var(--white)}
+.at-pic{width:100%;height:100%;background:#F9D6E3;position:relative;overflow:hidden}
+.at-sun{position:absolute;right:20px;top:12px;width:20px;height:20px;border-radius:50%;background:#F3E08C}
+.at-dv{position:absolute;right:12px;top:0;height:96px;border-left:1px solid #850020}
+.at-dh{position:absolute;left:0;width:126px;bottom:12px;border-top:1px solid #850020}
+.at-dv:before,.at-dv:after{content:"";position:absolute;left:-5px;width:9px;height:1px;background:#850020}
+.at-dv:before{top:0}.at-dv:after{bottom:0}
+.at-dh:before,.at-dh:after{content:"";position:absolute;top:-5px;height:9px;width:1px;background:#850020}
+.at-dh:before{left:0}.at-dh:after{right:0}
+.at-dl{position:absolute;font:600 9px var(--mono);color:var(--ink)}
+.at-calc{flex:1 1 160px;background:#F8EEE8;border-radius:10px;padding:14px 16px;min-width:0}
+.at-chip{border:1px solid #850020;border-radius:4px;padding:1px 6px;font:500 10px var(--mono);letter-spacing:.1em;text-transform:uppercase;color:#850020;background:var(--white)}
+.at-op{font:600 12px Inter,sans-serif}
+.at-rule{height:1px;background:rgba(133,0,32,.2);margin:12px 0}
+.at-cur{display:flex;align-items:center;gap:8px;font:700 22px Inter,sans-serif;color:#850020;margin-top:8px}
+.at-tagdot{width:24px;height:24px;border-radius:50%;background:#850020;display:inline-flex;align-items:center;justify-content:center}
+.at-btn{border-radius:999px;min-height:48px;padding:0 24px}
+
+/* ----- overlays ----- */
+.banner{border-radius:6px;padding:14px 16px;display:flex;gap:12px;align-items:flex-start;margin:0 0 18px;animation:rise .25s ease both}
+.banner-err{border:1.5px solid var(--red7);background:var(--white)}
+.banner-info{background:var(--sky)}
+.banner b{display:block;margin-bottom:2px}
+.linklist{display:flex;flex-wrap:wrap;gap:2px 14px;margin-top:4px}
+.scrim{position:fixed;inset:0;background:rgba(28,19,16,.52);display:flex;align-items:center;justify-content:center;padding:16px;z-index:50;animation:fade .2s ease both}
+.modal{background:var(--white);border-radius:8px;max-width:540px;width:100%;padding:30px;max-height:calc(100vh - 32px);overflow:auto;animation:pop .24s cubic-bezier(.2,1,.3,1) both}
+.modal-head{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;margin-bottom:16px}
+.lbl{display:flex;justify-content:space-between;gap:8px;font:600 14px Inter,sans-serif;margin-bottom:8px}
+.input{width:100%;min-height:46px;border:1.5px solid var(--line2);border-radius:6px;background:var(--white);padding:0 14px;font:500 16px Inter,sans-serif;color:var(--ink);transition:border-color .15s,box-shadow .15s}
+.input:focus{outline:none;border-color:var(--burg);box-shadow:0 0 0 3px rgba(133,0,32,.16)}
+.input.bad{border-color:var(--red7)}
+.err{color:var(--red7);font:500 13px/1.4 Inter,sans-serif;margin-top:7px;display:block}
+.preview{background:var(--tray);border-radius:6px;padding:18px 20px;margin-top:18px}
+.pv-sub{font:700 15px Inter,sans-serif;margin:0 0 10px}
+.pv-row{display:flex;justify-content:space-between;gap:16px;padding:6px 0;border-bottom:1px dashed var(--line2);font-size:14px}
+.pv-row span:first-child{color:var(--muted)}
+.pv-row span:last-child{font-weight:600;text-align:right}
+.status{border-radius:6px;padding:16px;margin-top:18px;display:flex;gap:12px;align-items:flex-start;animation:rise .25s ease both}
+.status-ok{background:var(--sky)}
+.status-err{border:1.5px solid var(--red7)}
+.modal-actions{display:flex;flex-wrap:wrap;gap:12px;justify-content:flex-end;margin-top:22px}
+.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:var(--ink);color:var(--cream);padding:10px 10px 10px 18px;border-radius:8px;display:flex;gap:14px;align-items:center;z-index:60;animation:toast .3s ease both;font:600 14px Inter,sans-serif;max-width:calc(100vw - 32px);min-height:52px}
+.toast-btn{appearance:none;background:var(--cream);color:var(--ink);border:0;border-radius:5px;min-height:36px;padding:0 14px;font:700 13px Inter,sans-serif;cursor:pointer}
+
+@keyframes rise{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+@keyframes fade{from{opacity:0}to{opacity:1}}
+@keyframes pop{from{opacity:0;transform:translateY(10px) scale(.98)}to{opacity:1;transform:none}}
+@keyframes toast{from{opacity:0;transform:translate(-50%,10px)}to{opacity:1;transform:translate(-50%,0)}}
+@keyframes rot{to{transform:rotate(360deg)}}
+@keyframes punch{0%{transform:scale(.4)}100%{transform:scale(1)}}
+@keyframes breathe{0%,100%{opacity:1}50%{opacity:.45}}
+@keyframes hangIn{from{opacity:0;transform:translateY(-22px) rotate(-2deg)}to{opacity:1;transform:none}}
+@keyframes dot{from{opacity:0;transform:scale(0)}to{opacity:1;transform:scale(1)}}
+@keyframes calcIn{from{opacity:0;transform:translateY(22px) rotate(-2deg)}to{opacity:1;transform:none}}
+@keyframes slipIn{from{opacity:0;transform:translateY(-14px) rotate(8deg)}to{opacity:1;transform:rotate(3deg)}}
+
+@media (max-width:1180px){.site-nav{display:none}}
+@media (max-width:1080px){
+.device{grid-template-columns:1fr}
+.stage{min-height:0}
+.ov{grid-template-columns:1fr}
+.ov-tape{margin-top:0}
+.keys-foot{position:sticky;bottom:0;z-index:4;margin:0 -36px -34px;padding:14px 36px 18px;box-shadow:0 -10px 20px -16px rgba(28,19,16,.4)}
+}
+@media (max-width:640px){
+.site{padding:0 10px 0 18px;gap:12px;min-height:58px}
+.rate{display:none}
+.tabs{display:flex}
+.tab{padding:0 12px;font-size:13px}
+.tab-n{display:none}
+.band{padding:24px 0 36px}
+.stage{padding:18px 14px 20px}
+.stage-in{height:auto;display:flex;flex-direction:column;align-items:center}
+.paper{position:relative;right:auto;top:auto;width:100%;max-width:300px;margin-bottom:-26px;transform:rotate(2deg)}
+.calc{position:relative;left:auto;bottom:auto}
+.stage-foot{gap:18px;flex-wrap:wrap}
+.keys{padding:22px 18px}
+.keys-foot{margin:0 -18px -22px;padding:12px 18px 16px}
+.krow{grid-template-columns:1fr;gap:6px}
+.klabel{padding-top:0}
+.box-in{width:60px}
+.akeys{grid-template-columns:1fr}
+.wallpanel{gap:48px 24px;padding:52px 12px 28px}
+.lslip .slip{grid-template-columns:auto minmax(0,1fr) auto}
+.lslip .ldate{display:none}
+.at-box{padding:20px;border-radius:16px}.at-card{padding:20px}
+.at-arrow{transform:rotate(90deg);margin:0 auto}.at-demo{justify-content:center}
+.modal{padding:22px}
+.toast{left:16px;right:16px;transform:none;animation:fade .2s ease both}
+}
+@media (prefers-reduced-motion:reduce){.app *{animation:none!important;transition:none!important}}
+
+/* ----- web build additions ----- */
+.sr-only{position:absolute!important;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
+.skip{position:absolute;left:16px;top:-60px;z-index:70;background:var(--burg);color:var(--white);padding:10px 16px;border-radius:6px;font:600 14px Inter,sans-serif;text-decoration:none}
+.skip:focus{top:12px;color:var(--white)}
+.app main:focus{outline:none}
+.app{overflow-x:clip}
+/* overflow:hidden on .device makes it a scroll container, which stops the mobile Calculate bar from sticking to the viewport. clip keeps the rounded corners without that. */
+@media (max-width:1080px){.device{overflow:clip}}
+</style>
+</head>
+<body>
+<div class="app">
+  <a class="skip" href="#main" data-action="skip">Skip to content</a>
+
+  <div class="site-wrap">
+    <header class="site">
+      <div class="logo" aria-label="Arts to Hearts Project"><span class="logo-w">arts <em>to</em> hearts<span class="logo-dot" aria-hidden="true"></span></span><span class="logo-p">PROJECT</span></div>
+      <nav class="site-nav" aria-label="Main">
+        <button class="nav-l" type="button" data-action="navNote">Open Calls</button>
+        <button class="nav-l" type="button" data-action="navNote">Book Our Services</button>
+        <button class="nav-l" type="button" data-action="navNote">Artists</button>
+        <button class="nav-l" type="button" data-action="navNote">How To Submit</button>
+        <button class="nav-l" type="button" data-action="navNote">Contact Us</button>
+      </nav>
+      <div class="site-right">
+        <button class="rate" type="button" data-action="navNote" aria-label="Rated 4.9 out of 5"><span class="rate-g" aria-hidden="true">G</span>4.9 <span class="stars" aria-hidden="true">★★★★★</span><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#1C1310" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"></path></svg></button>
+        <button class="circ" type="button" data-action="navNote" aria-label="Help"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9.5 9a2.5 2.5 0 1 1 3.5 2.3c-.6.3-1 .9-1 1.6v.6"></path><path d="M12 17.5v.01"></path></svg></button>
+        <button class="circ" type="button" data-action="navNote" aria-label="Notifications, 13 new"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#850020" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9a6 6 0 0 1 12 0c0 6 2 7 2 7H4s2-1 2-7"></path><path d="M10 20a2 2 0 0 0 4 0"></path></svg><span class="badge" aria-hidden="true">13</span></button>
+        <button class="avatar-btn" type="button" data-action="navNote" aria-label="Account menu"><span class="avatar" aria-hidden="true"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="8" r="4"></circle><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"></path></svg></span><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"></path></svg></button>
+      </div>
+    </header>
+  </div>
+
+  <div id="view"></div>
+  <p class="sr-only" id="announce" aria-live="polite"></p>
+  <noscript><p class="wrap small">The Artwork Price Calculator needs JavaScript turned on.</p></noscript>
+</div>
+<script>
+/* Calculator logic: pure functions shared by the app and the tests.
+   Labels, validation, the calculator expression, the artwork preview geometry and the receipt rows.
+   Pricing itself is NOT here: it lives behind ATHPricing.estimate() in pricing.js. */
+(function (root) {
+  'use strict';
+
+  const MISS = '–'; // shown on the display while a value is missing
+
+  const LABELS = {
+    mode: { standard: 'Standard', size: 'Size-Based', time: 'Time-Based' },
+    experience: { hobby: 'Hobby Artist (0-2 years)', amateur: 'Amateur Artist (2-5 years)', emerging: 'New Emerging Artist (5-10 years)' },
+    unit: { in: 'Inches', cm: 'Centimeters' },
+    medium: { painting: 'Painting', photography: 'Photography', drawing: 'Drawing' },
+    gallery: { no: 'No' }, online: { low: 'Low' }, reputation: { emerging: 'Emerging' }, demand: { low: 'Low' },
+  };
+  const EXP_ORDER = ['hobby', 'amateur', 'emerging'];
+  const FIELD_NAMES = { length: 'Length', width: 'Width', height: 'Height', medium: 'Medium', experience: 'Experience', materials: 'Cost of Materials', rate: 'Price per Hour', hours: 'Hours Spent' };
+  const MODE_NOTES = {
+    standard: 'Size, medium and where you stand as an artist.',
+    size: 'Size, your experience and what your materials cost.',
+    time: 'Your hourly rate, the hours you spent and your materials.',
+  };
+
+  function defaults(unit, mode) {
+    return { mode: mode || 'standard', experience: '', unit: unit || 'in', length: '', width: '', height: '', medium: '', gallery: 'no', online: 'low', reputation: 'emerging', demand: 'low', materials: '', rate: '', hours: '' };
+  }
+
+  function num(s) {
+    const t = String(s == null ? '' : s).trim().replace(',', '.');
+    if (!t) return null;
+    const n = Number(t);
+    return isFinite(n) ? n : NaN;
+  }
+  const fmtN = (n) => String(Math.round(n * 100) / 100);
+  const money = (n) => '$' + Math.round(n).toLocaleString('en-US');
+  const cash = (n) => '$' + fmtN(n);
+  const dateLabel = (iso) => new Date(iso).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+  const expShort = (v) => { const s = LABELS.experience[v]; return s ? s.replace(/ \(.*\)/, '') : ''; };
+  const expYears = (v) => (LABELS.experience[v].match(/\((.*)\)/) || ['', ''])[1];
+
+  // The keypad's target fields, in order, for a screen and mode.
+  function kpFields(screen, mode) {
+    if (screen === 'workspace') return ['length', 'width'];
+    if (mode === 'time') return ['rate', 'hours', 'materials'];
+    if (mode === 'size') return ['length', 'width', 'height', 'materials'];
+    return ['length', 'width', 'height'];
+  }
+
+  // One keypad press applied to a field's text. Returns null when the press changes nothing allowed.
+  function kpApply(cur, ch) {
+    cur = String(cur == null ? '' : cur);
+    let next = cur;
+    if (ch === 'del') next = cur.slice(0, -1);
+    else if (ch === 'clr') next = '';
+    else if (ch === '.') { if (cur.indexOf('.') < 0) next = (cur || '0') + '.'; }
+    else next = (cur === '0' ? '' : cur) + ch;
+    return next.length > 8 ? null : next;
+  }
+
+  function errs(f) {
+    const out = {};
+    const need = (k, label, allowZero) => {
+      const v = num(f[k]);
+      if (v === null) out[k] = 'Enter the ' + label + '.';
+      else if (!(allowZero ? v >= 0 : v > 0)) out[k] = allowZero ? 'Use a number of 0 or more.' : 'Use a number above 0, like 12 or 12.5.';
+    };
+    if (f.mode === 'time') {
+      need('rate', 'price per hour'); need('hours', 'hours spent'); need('materials', 'cost of materials', true);
+      return out;
+    }
+    need('length', 'length'); need('width', 'width');
+    const Hv = num(f.height);
+    if (Hv !== null && !(Hv > 0)) out.height = 'Use a number above 0, or leave it empty.';
+    if (f.mode === 'standard' && !f.medium) out.medium = 'Pick the artwork medium.';
+    if (!f.experience) out.experience = 'Choose your experience level.';
+    if (f.mode === 'size') need('materials', 'cost of materials', true);
+    return out;
+  }
+
+  // The three progress punches under the form.
+  function punches(f) {
+    const e = errs(f);
+    const ok = (k) => !e[k] && num(f[k]) !== null;
+    if (f.mode === 'time') return [{ label: 'Rate', on: ok('rate') }, { label: 'Hours', on: ok('hours') }, { label: 'Materials', on: ok('materials') }];
+    if (f.mode === 'size') return [{ label: 'Size', on: ok('length') && ok('width') }, { label: 'Experience', on: !!f.experience }, { label: 'Materials', on: ok('materials') }];
+    return [{ label: 'Size', on: ok('length') && ok('width') }, { label: 'Medium', on: !!f.medium }, { label: 'Experience', on: !!f.experience }];
+  }
+
+  function dims(f) {
+    if (f.mode === 'time') return '';
+    const Lv = num(f.length), Wv = num(f.width), Hv = num(f.height);
+    if (!(Lv > 0) || !(Wv > 0)) return '';
+    return fmtN(Lv) + ' × ' + fmtN(Wv) + (Hv > 0 ? ' × ' + fmtN(Hv) : '') + ' ' + f.unit;
+  }
+
+  function what(f) {
+    if (f.mode === 'time') return fmtN(num(f.hours)) + ' hours at ' + cash(num(f.rate)) + '/hour';
+    if (f.mode === 'size') return dims(f);
+    return LABELS.medium[f.medium] + ', ' + dims(f);
+  }
+
+  function lines(f) {
+    if (f.mode === 'time') return { l1: what(f), l2: 'Materials ' + cash(num(f.materials)) };
+    if (f.mode === 'size') return { l1: dims(f), l2: LABELS.experience[f.experience] + ' · Materials ' + cash(num(f.materials)) };
+    return { l1: what(f), l2: LABELS.experience[f.experience] };
+  }
+
+  // The inputs written as an expression on the calculator display.
+  function tokens(f) {
+    const out = [];
+    const add = (v, cls) => out.push({ v: v, cls: cls || '' });
+    const val = (k, fmt) => { const n = num(f[k]); return n !== null && n >= 0 && isFinite(n) ? fmt(n) : null; };
+    const put = (v, miss) => (v === null ? add(miss, 'miss') : add(v));
+    const sep = () => add(' · ', 'op');
+    if (f.mode === 'time') {
+      put(val('rate', cash), '$' + MISS); add('/hr'); sep();
+      put(val('hours', fmtN), MISS); add(' hrs'); sep();
+      add('materials '); put(val('materials', cash), '$' + MISS);
+      return out;
+    }
+    put(val('length', fmtN), 'L'); add(' × ', 'op'); put(val('width', fmtN), 'W');
+    const H = val('height', fmtN);
+    if (H !== null && num(f.height) > 0) { add(' × ', 'op'); add(H); }
+    add(' ' + f.unit);
+    if (f.mode === 'standard') { sep(); put(f.medium ? LABELS.medium[f.medium] : null, 'medium'); }
+    sep(); put(f.experience ? expShort(f.experience) : null, 'experience');
+    if (f.mode === 'size') { sep(); add('materials '); put(val('materials', cash), '$' + MISS); }
+    return out;
+  }
+
+  function timeVals(f) {
+    const v = (k, fmt, miss) => { const n = num(f[k]); return n !== null && isFinite(n) && n >= 0 ? fmt(n) : miss; };
+    return { rate: v('rate', cash, '$' + MISS), hours: v('hours', fmtN, MISS), mat: v('materials', cash, '$' + MISS) };
+  }
+
+  // Live preview on the paper slip, as percentages of the preview box.
+  function geo(f) {
+    const Lv = num(f.length), Wv = num(f.width), Hv = num(f.height);
+    const okW = Wv > 0, okL = Lv > 0;
+    const boxW = 125, boxH = 100, maxW = boxW * 0.56, maxH = boxH * 0.58;
+    const r = (okW ? Wv : 4) / (okL ? Lv : 5);
+    let w = maxW, h = w / r;
+    if (h > maxH) { h = maxH; w = h * r; }
+    w = Math.max(8, w); h = Math.max(8, h);
+    return {
+      w: +(w / boxW * 100).toFixed(2), l: +(h / boxH * 100).toFixed(2),
+      hasD: Hv > 0, ghost: !(okW && okL), hl: Hv > 0 ? fmtN(Hv) + ' ' + f.unit : '',
+      wl: okW ? fmtN(Wv) + ' ' + f.unit : 'W', ll: okL ? fmtN(Lv) + ' ' + f.unit : 'L',
+    };
+  }
+
+  // Which drawing stands in for the artwork: paint, photo, draw, blank or ghost.
+  function artKind(f, ghost) {
+    if (ghost) return 'ghost';
+    const m = f.mode === 'standard' ? f.medium : '';
+    return m === 'painting' ? 'paint' : m === 'photography' ? 'photo' : m === 'drawing' ? 'draw' : 'blank';
+  }
+
+  // The framed artwork on the result and saved slips, in pixels.
+  function framePx(f, mw, mh) {
+    if (f.mode === 'time') return { w: Math.round(mh * 0.8), h: mh, wl: '', ll: '' };
+    const Lv = num(f.length), Wv = num(f.width);
+    const ratio = Wv / Lv;
+    let w = mw, h = w / ratio;
+    if (h > mh) { h = mh; w = h * ratio; }
+    return { w: Math.max(36, Math.round(w)), h: Math.max(36, Math.round(h)), wl: fmtN(Wv) + ' ' + f.unit, ll: fmtN(Lv) + ' ' + f.unit };
+  }
+
+  function rows(f) {
+    const Hv = num(f.height);
+    const mode = { k: 'Calculation mode', v: LABELS.mode[f.mode] };
+    if (f.mode === 'time') return [mode, { k: 'Price per hour', v: cash(num(f.rate)) }, { k: 'Hours spent', v: fmtN(num(f.hours)) }, { k: 'Cost of materials', v: cash(num(f.materials)) }];
+    const dimRow = { k: 'Dimensions (L × W' + (Hv > 0 ? ' × H)' : ')'), v: dims(f) };
+    if (f.mode === 'size') return [mode, dimRow, { k: 'Measurement unit', v: LABELS.unit[f.unit] }, { k: 'Artist experience', v: LABELS.experience[f.experience] }, { k: 'Cost of materials', v: cash(num(f.materials)) }];
+    return [
+      mode, dimRow,
+      { k: 'Measurement unit', v: LABELS.unit[f.unit] },
+      { k: 'Artwork medium', v: LABELS.medium[f.medium] },
+      { k: 'Artist experience', v: LABELS.experience[f.experience] },
+      { k: 'Artist reputation', v: LABELS.reputation[f.reputation] },
+      { k: 'Gallery representation', v: LABELS.gallery[f.gallery] },
+      { k: 'Online presence', v: LABELS.online[f.online] },
+      { k: 'Market demand', v: LABELS.demand[f.demand] },
+    ];
+  }
+
+  // Wall view: frames to relative scale, in inches.
+  const toIn = (form, k) => (num(form[k]) || 1) * (form.unit === 'cm' ? 1 / 2.54 : 1);
+  function maxIn(list) {
+    const d = list.filter((x) => x.inputs.mode !== 'time');
+    return d.length ? Math.max.apply(null, d.map((x) => Math.max(toIn(x.inputs, 'width'), toIn(x.inputs, 'length')))) : 1;
+  }
+  function wallSize(form, mx) {
+    const isTime = form.mode === 'time';
+    const wi = isTime ? 4 : toIn(form, 'width'), li = isTime ? 5 : toIn(form, 'length');
+    const m = isTime ? 5 : (mx || Math.max(wi, li));
+    const big = Math.max(wi, li);
+    const sz = (v, px, lo) => (isTime ? Math.round(v / 5 * px * 0.8) : Math.max(lo, Math.round(v / m * px)));
+    return { pw: sz(wi, 200, 44), ph: sz(li, 200, 44), tw: Math.max(12, Math.round(wi / big * 40)), th: Math.max(12, Math.round(li / big * 40)) };
+  }
+
+  const validEmail = (s) => /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(String(s).trim());
+
+  // Only the inputs that belong to the chosen mode, so saved records stay clean.
+  function inputsFor(f) {
+    const keep = { standard: ['unit', 'length', 'width', 'height', 'medium', 'experience', 'gallery', 'online', 'reputation', 'demand'], size: ['unit', 'length', 'width', 'height', 'experience', 'materials'], time: ['rate', 'hours', 'materials'] }[f.mode];
+    const out = { mode: f.mode };
+    keep.forEach((k) => { out[k] = f[k]; });
+    return out;
+  }
+
+  root.PriceLogic = { MISS, LABELS, EXP_ORDER, FIELD_NAMES, MODE_NOTES, defaults, num, fmtN, money, cash, dateLabel, expShort, expYears, kpFields, kpApply, errs, punches, dims, what, lines, tokens, timeVals, geo, artKind, framePx, rows, maxIn, wallSize, validEmail, inputsFor };
+})(typeof window !== 'undefined' ? window : globalThis);
+
+/* Pricing: the ONE place the calculator gets a price from.
+
+   ATHPricing.estimate(inputs) -> Promise<{ price: number, currency: 'USD', source: 'prototype' | 'ath-engine' }>
+   `inputs` is PriceLogic.inputsFor(form): { mode, ...only the fields that mode uses }.
+   Reject the promise to show "We couldn't calculate this price".
+
+   To connect ATH's real pricing engine, replace the body of estimate() with the API call
+   (for example POST /api/artwork-price with `inputs` as JSON) and return source: 'ath-engine'.
+   The "Prototype figure" label on the result shows only while source is 'prototype'.
+
+   standIn() below is a PLACEHOLDER from the design prototype. It is not ATH's pricing and must not ship as real. */
+(function (root) {
+  'use strict';
+  const num = (v) => root.PriceLogic.num(v);
+
+  function standIn(f) {
+    const mat = num(f.materials) || 0;
+    if (f.mode === 'time') return Math.max(1, Math.round(num(f.rate) * num(f.hours) + mat));
+    const k = f.unit === 'cm' ? 1 / 2.54 : 1;
+    const Lv = num(f.length) * k, Wv = num(f.width) * k, Hv = num(f.height);
+    const base = { hobby: 30, amateur: 50, emerging: 120 }[f.experience] || 30;
+    const rate = { hobby: 0.5, amateur: 1, emerging: 2 }[f.experience] || 0.5;
+    const med = f.mode === 'standard' ? ({ painting: 1, photography: 0.8, drawing: 0.7 }[f.medium] || 1) : 1;
+    let size = Lv * Wv; if (Hv > 0) size = size * 1.5;
+    return Math.max(1, Math.round(base + size * rate * med + (f.mode === 'size' ? mat : 0)));
+  }
+
+  const wait = (ms) => new Promise((r) => setTimeout(r, ms));
+
+  root.ATHPricing = {
+    async estimate(inputs) {
+      await wait(1000); // stands in for the network round trip
+      if (root.ATH_SIMULATE === 'calc-fail') throw new Error('Simulated pricing failure');
+      return { price: standIn(inputs), currency: 'USD', source: 'prototype' };
+    },
+  };
+})(typeof window !== 'undefined' ? window : globalThis);
+
+/* Saved calculations, kept per user. This is the browser-local version (localStorage).
+   To move to ATH's backend, keep these method shapes and swap the bodies for API calls:
+   list() -> GET, save(rec) -> POST, remove(id) -> DELETE.
+
+   Record: { id, mode, inputs, price, priceSource, title, createdAt } */
+(function (root) {
+  'use strict';
+  const PREFIX = 'ath-price-calculator:v1:';
+  let user = 'local'; // set from the ATH session when there is one: ATHStore.setUser(account.id)
+  let memory = null; // used when storage is blocked (private windows, previews)
+
+  const key = () => PREFIX + user;
+  function read() {
+    if (memory) return memory.slice();
+    try { const a = JSON.parse(localStorage.getItem(key())); return Array.isArray(a) ? a : []; } catch (e) { return []; }
+  }
+  function write(list) {
+    try { localStorage.setItem(key(), JSON.stringify(list)); memory = null; } catch (e) { memory = list.slice(); }
+  }
+  const uid = () => 'c' + Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
+
+  root.ATHStore = {
+    setUser(id) { user = String(id || 'local'); memory = null; },
+    // Newest first.
+    async list() { return read().sort((a, b) => b.createdAt.localeCompare(a.createdAt)); },
+    async save({ mode, inputs, price, priceSource, title, createdAt }) {
+      const rec = { id: uid(), mode, inputs: Object.assign({}, inputs), price, priceSource: priceSource || 'prototype', title: (title || '').trim(), createdAt: createdAt || new Date().toISOString() };
+      write([rec].concat(read()));
+      return rec;
+    },
+    async remove(id) { write(read().filter((r) => r.id !== id)); },
+  };
+})(typeof window !== 'undefined' ? window : globalThis);
+
+/* Email Result. No mail service is connected yet, so nothing is delivered.
+   ATHMail.sendEstimate({ to, subject, rows }) -> Promise<{ delivered: boolean }>
+   While delivered is false the dialog says "nothing was delivered".
+   To connect a mail service, POST to the server here and return { delivered: true } on success.
+   Never send mail or hold mail-service keys from the browser. */
+(function (root) {
+  'use strict';
+  const wait = (ms) => new Promise((r) => setTimeout(r, ms));
+  root.ATHMail = {
+    async sendEstimate(message) { // eslint-disable-line no-unused-vars
+      await wait(1200);
+      if (root.ATH_SIMULATE === 'email-fail') throw new Error('Simulated email failure');
+      return { delivered: false };
+    },
+  };
+})(typeof window !== 'undefined' ? window : globalThis);
+
+/* Views and interactions for the Artwork Price Calculator.
+   State lives in one object; render() rebuilds the markup and morph() patches the page so focus,
+   caret position and running animations survive each update. */
+(function () {
+  'use strict';
+  const P = window.PriceLogic, Pricing = window.ATHPricing, Store = window.ATHStore, Mail = window.ATHMail;
+  const L = P.LABELS;
+
+  // ---------- options from the address bar (QA only) ----------
+  const params = new URLSearchParams(location.search);
+  window.ATH_SIMULATE = params.get('simulate') || ''; // calc-fail | email-fail
+
+  // ---------- state ----------
+  const state = {
+    screen: 'tools', form: P.defaults('in', 'standard'), touched: {}, submitted: false, calcStatus: 'idle',
+    result: null, records: [], detailId: null, reuseFrom: null, view: 'wall',
+    email: { open: false, to: '', status: 'idle', source: null, id: null },
+    dialog: null, toast: null, activeField: null,
+  };
+  const ui = { shown: 0, raf: 0, toastT: 0, opener: null, lastModal: '', lastScreen: '', saving: false };
+
+  function set(patch) { Object.assign(state, typeof patch === 'function' ? patch(state) : patch); render(); }
+  const reduceMotion = () => { try { return matchMedia('(prefers-reduced-motion: reduce)').matches; } catch (e) { return false; } };
+  const formOf = (rec) => Object.assign(P.defaults(rec.inputs.unit || 'in', rec.mode), rec.inputs);
+  const announce = (t) => { const el = document.getElementById('announce'); el.textContent = ''; setTimeout(() => { el.textContent = t; }, 30); };
+
+  // ---------- routing ----------
+  const ROUTES = { tools: '#/', workspace: '#/calculator', form: '#/calculator/price', result: '#/calculator/result', library: '#/calculator/saved' };
+  function hashFor(screen, id) { return screen === 'detail' ? '#/calculator/saved/' + encodeURIComponent(id) : ROUTES[screen]; }
+  function go(screen, id) {
+    const h = hashFor(screen, id);
+    if (location.hash === h) applyRoute(); else location.hash = h;
+  }
+  function applyRoute() {
+    const h = location.hash || '';
+    let screen = 'tools', detailId = null;
+    const m = h.match(/^#\/calculator\/saved\/(.+)$/);
+    if (m) { screen = 'detail'; detailId = decodeURIComponent(m[1]); }
+    else Object.keys(ROUTES).forEach((k) => { if (ROUTES[k] === h) screen = k; });
+    if (!h && params.get('start') === 'workspace') screen = 'workspace';
+    if (screen === 'result' && !state.result) { location.replace(ROUTES.form); return; }
+    if (screen === 'detail' && !state.records.some((r) => r.id === detailId)) { location.replace(ROUTES.library); return; }
+    set({ screen, detailId, toast: screen === state.screen ? state.toast : state.toast });
+  }
+
+  // ---------- small markup helpers ----------
+  const esc = (s) => String(s == null ? '' : s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  const on = (b) => (b ? 'on' : '');
+  const tf = (b) => (b ? 'true' : 'false');
+
+  const ICON = {
+    back: '<svg width="18" height="12" viewBox="0 0 24 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M23 8H2M8 1 1 8l7 7"></path></svg>',
+    left: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5M11 18l-6-6 6-6"></path></svg>',
+    arrow: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"></path></svg>',
+    arrowB: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"></path></svg>',
+    calc: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2.5" width="14" height="19" rx="2"></rect><rect x="8" y="5.5" width="8" height="4" rx=".5"></rect><path d="M8.5 13h.01M12 13h.01M15.5 13h.01M8.5 16.5h.01M12 16.5h.01M15.5 16.5h.01"></path></svg>',
+    trash: (s) => `<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"></path></svg>`,
+    close: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"></path></svg>',
+    check: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex:none"><path d="m5 12 5 5 9-10"></path></svg>',
+  };
+
+  // The drawing that stands in for the artwork. 'tile' and 'wall' are the lighter versions the prototype uses there.
+  function artSvg(kind, variant) {
+    const ns = 'class="hills" viewBox="0 0 100 100" preserveAspectRatio="none"';
+    if (kind === 'paint') return `<span class="sun"></span><svg ${ns}><polygon points="0,100 0,72 28,46 50,66 72,44 100,70 100,100" fill="#850020"></polygon></svg>`;
+    if (kind === 'photo') {
+      const back = '<polygon points="0,100 0,70 30,50 52,68 74,48 100,66 100,100" fill="#3B302C"></polygon>';
+      return `<svg ${ns}>${back}${variant === 'tile' ? '' : '<polygon points="0,100 0,86 40,74 70,84 100,78 100,100" fill="#6E625C"></polygon>'}</svg>`;
+    }
+    if (kind === 'draw') {
+      const sw = variant === 'tile' ? '1.5' : '1.3';
+      const line = `<polyline points="0,72 28,46 50,66 72,44 100,70" fill="none" stroke="#1C1310" stroke-width="${sw}" vector-effect="non-scaling-stroke"></polyline>`;
+      const hatch = variant === 'full' ? '<path d="M30,60 L36,54 M40,64 L47,57 M58,60 L64,54 M68,58 L75,51 M80,66 L86,60" stroke="#1C1310" stroke-width="1" vector-effect="non-scaling-stroke"></path>' : '';
+      return `<svg ${ns}>${line}${hatch}</svg>`;
+    }
+    return '';
+  }
+
+  const TILE_KINDS = ['paint', 'photo', 'draw', 'photo', 'draw', 'paint', 'paint', 'draw', 'photo', 'draw', 'paint', 'photo', 'photo', 'paint', 'draw', 'paint', 'draw', 'photo', 'paint', 'draw'];
+  const TILES = '<div class="tiles" aria-hidden="true">' + TILE_KINDS.map((k, i) => `<span class="tile ${i % 3 === 1 ? 'sq' : ''} surf ${k}">${artSvg(k, 'tile')}</span>`).join('') + '</div><span class="tint" aria-hidden="true"></span><span class="shade" aria-hidden="true"></span>';
+
+  const tokensHtml = (list) => list.map((t) => `<span class="${t.cls}">${esc(t.v)}</span>`).join('');
+
+  // The physical calculator. interactive: keypad types into the active field; otherwise every key is inert.
+  function calcHtml(o) {
+    const k = (label, kp, cls) => (o.interactive && kp
+      ? `<button class="c-k ${cls || ''}" type="button" tabindex="-1" aria-hidden="true" data-kp="${kp}">${label}</button>`
+      : `<span class="c-k ${cls || ''} inert" aria-hidden="true">${label}</span>`);
+    const deco = (label, cls) => `<span class="c-k ${cls} inert" aria-hidden="true">${label}</span>`;
+    const eq = o.interactive ? `<button class="c-k eq" type="button" data-action="kpEq" aria-label="${o.eqLabel}">=</button>` : '<span class="c-k eq inert" aria-hidden="true">=</span>';
+    return `<div class="calc" role="group" aria-label="${o.aria}">
+<div class="c-top"><span class="c-brand">arts <em>to</em> hearts</span><span class="c-solar" aria-hidden="true"></span></div>
+<div class="c-disp">
+<div class="c-bar"><span class="c-mode">${esc(o.mode)}</span><span class="c-lbl">${o.label}</span></div>
+<p class="c-expr" aria-hidden="true">${tokensHtml(o.tokens)}</p>
+<p class="c-res ${o.wait ? 'wait' : ''}" aria-hidden="true"><span class="c-eq">=</span><span ${o.shown ? 'data-shown' : ''}>${esc(o.price)}</span></p>
+</div>
+<div class="c-keys" ${o.interactive ? '' : 'aria-hidden="true"'}>
+${k('C', 'clr', 'fn')}${deco('+/-', 'fn')}${deco('%', 'fn')}${deco('÷', 'op')}
+${k('7', '7')}${k('8', '8')}${k('9', '9')}${deco('×', 'op')}
+${k('4', '4')}${k('5', '5')}${k('6', '6')}${deco('−', 'op')}
+${k('1', '1')}${k('2', '2')}${k('3', '3')}${deco('+', 'op')}
+${k('0', '0')}${k('.', '.')}${k('del', 'del', 'sm')}${eq}
+</div>
+</div>`;
+  }
+
+  // Live preview on the paper slip (overview and form).
+  function previewHtml(f, hint) {
+    const g = P.geo(f), kind = P.artKind(f, g.ghost);
+    return `<div class="pprev">
+<div class="cv" style="width: ${g.w}%; height: ${g.l}%">
+<div class="surf ${kind}">${artSvg(kind, 'full')}${g.ghost ? `<span class="surf-hint">${hint}</span>` : ''}</div>
+<div class="dimx" style="top: calc(100% + 12px)"><span class="dl dl-a"></span><span class="dv">${esc(g.wl)}</span><span class="dl dl-b"></span></div>
+<div class="dimy" style="left: calc(100% + 12px)"><span class="dl dl-a"></span><span class="dv">${esc(g.ll)}</span><span class="dl dl-b"></span></div>
+</div>
+${g.hasD ? `<span class="depth-chip">3D · ${esc(g.hl)} high</span>` : ''}
+</div>`;
+  }
+
+  function timeRows(tv) {
+    return `<div class="prow"><span>Price per hour</span><span>${esc(tv.rate)}</span></div><div class="prow"><span>Hours spent</span><span>${esc(tv.hours)}</span></div><div class="prow"><span>Materials</span><span>${esc(tv.mat)}</span></div>`;
+  }
+
+  // Framed artwork on the result and saved slips.
+  function framedHtml(f) {
+    if (f.mode === 'time') return timeRows(P.timeVals(f));
+    const rf = P.framePx(f, 150, 150), kind = P.artKind(f);
+    return `<div class="pframe-wrap"><div class="pframe">
+<div class="pframe-in surf ${kind}" style="width: ${rf.w}px; height: ${rf.h}px">${artSvg(kind, 'full')}</div>
+<div class="dimx" style="top: calc(100% + 14px)"><span class="dl dl-a"></span><span class="dv">${esc(rf.wl)}</span><span class="dl dl-b"></span></div>
+<div class="dimy" style="left: calc(100% + 14px)"><span class="dl dl-a"></span><span class="dv">${esc(rf.ll)}</span><span class="dl dl-b"></span></div>
+</div></div>`;
+  }
+
+  const receiptHtml = (rows) => '<dl class="receipt">' + rows.map((r) => `<div class="rc-row"><dt>${esc(r.k)}</dt><span class="lead" aria-hidden="true"></span><dd>${esc(r.v)}</dd></div>`).join('') + '</dl>';
+
+  function recView(rec, mx) {
+    const f = formOf(rec), date = P.dateLabel(rec.createdAt), title = rec.title || 'Untitled', price = P.money(rec.price), w = P.what(f);
+    return Object.assign({ id: rec.id, f, title, priceLabel: price, what: w, modeLabel: L.mode[rec.mode], date, kind: P.artKind(f), aria: title + ', ' + price + ', ' + w + ', ' + date }, P.lines(f), P.wallSize(f, mx));
+  }
+
+  const unsavedSummary = () => (state.result ? P.money(state.result.price) + ' for ' + P.what(state.result.form) : '');
+  const recCountLine = () => (state.records.length === 0 ? 'Nothing saved yet' : state.records.length + (state.records.length === 1 ? ' saved piece' : ' saved pieces'));
+  const hasUnsaved = () => !!(state.result && !state.result.savedId);
+
+  // Keypad target: the last-focused numeric field on this screen, or the first one.
+  function kpTarget() {
+    const list = P.kpFields(state.screen, state.form.mode);
+    return list.indexOf(state.activeField) >= 0 ? state.activeField : list[0];
+  }
+
+  // ---------- screens ----------
+  function toolsScreen() {
+    return `<main class="wrap screen" id="main" tabindex="-1" data-key="tools">
+<nav class="crumbs" aria-label="Breadcrumb"><span>Home</span><span aria-hidden="true">/</span><span class="crumb-cur" aria-current="page">Artist Tools</span></nav>
+<h1 class="at-title">Artist Tools</h1>
+<p class="at-sub">Practical, free tools for working artists: the words, the paperwork and the presentation behind every application.</p>
+<section class="at-box" aria-labelledby="at-all">
+<div class="at-head">
+<div style="display:flex;gap:16px;align-items:center">
+<span class="at-ico" aria-hidden="true"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a4 4 0 0 0 5.2 5.2L13 18.4a2.1 2.1 0 1 1-3-3l6.9-6.9a4 4 0 0 0-5.2-5.2l2.6 2.6-.6 2.4-2.4.6z"></path><path d="M10 15 4 21"></path></svg></span>
+<div><p class="at-mono" style="color:#850020">Explore</p><h2 class="at-h2" id="at-all">All tools</h2></div>
+</div>
+<p class="at-mono at-count"><span class="at-dot" aria-hidden="true"></span>2 tools in your tool kit</p>
+</div>
+<div class="at-grid">
+<article class="at-card at-pink">
+<div class="at-ct">
+<span class="at-circle" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h4L19 9l-4-4L4 16z"></path><path d="m13.5 6.5 4 4"></path></svg></span>
+<div style="flex:1;min-width:0"><p class="at-mono">Tool 01</p><h3 class="at-h3">Artist Studio</h3></div>
+<span class="at-perk">Artist perk</span>
+</div>
+<p class="at-desc">Write your artist bio and statement once, then tailor them to any gallery, grant, open call or website in seconds.</p>
+<div class="at-demo" aria-hidden="true">
+<div class="at-notes"><p class="at-mono">Your notes</p><p class="at-mono at-k">Medium</p><p class="at-it">Acrylics on canvas</p><p class="at-mono at-k">Based in</p><p class="at-it">Mumbai</p></div>
+<svg class="at-arrow" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#850020" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12h16M14 6l6 6-6 6"></path></svg>
+<div class="at-out"><div class="at-tabs"><span class="on">Bio</span><span>Statement</span></div><p><b>Maya Rao</b> is a Mumbai-based painter working with acrylic medi....</p></div>
+</div>
+<button class="btn btn-p at-btn" type="button" data-action="openStudio">Open the studio ${ICON.arrow}</button>
+</article>
+<article class="at-card at-peach">
+<div class="at-ct">
+<span class="at-circle" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12V4h8l10 10-8 8z"></path><circle cx="7.5" cy="7.5" r="1.3"></circle></svg></span>
+<div style="flex:1;min-width:0"><p class="at-mono">Tool 02</p><h3 class="at-h3">Artwork Price Calculator</h3></div>
+<span class="at-perk">Artist perk</span>
+</div>
+<p class="at-desc">Get a structured starting price for your artwork from its size, medium and where you are as an artist.</p>
+<div class="at-demo" aria-hidden="true">
+<div class="at-fw">
+<div class="at-frame"><div class="at-pic"><span class="at-sun"></span><svg class="hills" viewBox="0 0 100 100" preserveAspectRatio="none"><polygon points="0,100 0,78 22,52 44,74 64,50 100,86 100,100" fill="#7A1A35"></polygon><polygon points="0,100 6,86 18,92 26,100" fill="#E89AB5"></polygon></svg></div></div>
+<div class="at-dv"></div><span class="at-dl" style="right:-2px;top:44px">H</span>
+<div class="at-dh"></div><span class="at-dl" style="left:62px;bottom:-4px">W</span>
+</div>
+<svg class="at-arrow" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#850020" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12h16M14 6l6 6-6 6"></path></svg>
+<div class="at-calc">
+<div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap"><span class="at-chip">W</span><span class="at-op">×</span><span class="at-chip">H</span><span class="at-op">=</span><span class="at-chip">Rate</span></div>
+<div class="at-rule"></div><p class="at-mono" style="font-size:10px">Price</p>
+<div class="at-cur"><span class="at-tagdot"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12V4h8l10 10-8 8z"></path></svg></span>₹ / $</div>
+</div>
+</div>
+<button class="btn btn-s at-btn" type="button" data-action="go" data-arg="workspace">Open the calculator ${ICON.arrow}</button>
+</article>
+</div>
+</section>
+</main>`;
+  }
+
+  function toolNav() {
+    const s = state.screen;
+    const tab = (onNow, target, n, label, extra) => `<button class="tab ${on(onNow)}" type="button" role="tab" aria-selected="${tf(onNow)}" data-action="go" data-arg="${target}"><span class="tab-n" aria-hidden="true">${n}</span>${label}${extra || ''}</button>`;
+    return `<div class="wrap" data-key="toolnav">
+<nav class="crumbs" aria-label="Breadcrumb"><span>Home</span><span aria-hidden="true">/</span><button class="crumb-btn" type="button" data-action="go" data-arg="tools">Artist Tools</button><span aria-hidden="true">/</span><span class="crumb-cur" aria-current="page">Artwork Price Calculator</span></nav>
+<div class="tabs-wrap">
+<div class="tabs" role="tablist" aria-label="Calculator sections">
+${tab(s === 'workspace', 'workspace', '01', 'Overview')}${tab(s === 'form' || s === 'result', 'form', '02', 'Calculate a Price')}${tab(s === 'library' || s === 'detail', 'library', '03', 'My Calculations', ` <span class="count">${state.records.length}</span>`)}
+</div>
+</div>
+</div>`;
+  }
+
+  function resumeHtml(prefix, style) {
+    if (!hasUnsaved()) return '';
+    return `<div class="resume" ${style || ''}><span class="small"><b>${prefix}</b> ${esc(unsavedSummary())}</span><button class="btn btn-s" type="button" data-action="go" data-arg="result" style="min-height:40px">Back to result</button></div>`;
+  }
+
+  function slipHtml(it, withDate) {
+    return `<button class="slip" type="button" data-action="openDetail" data-arg="${esc(it.id)}" aria-label="Open calculation: ${esc(it.aria)}">
+<span class="slip-thumb" aria-hidden="true"><span class="surf ${it.kind}" style="position:relative;display:block;border:2px solid #1C1310;width: ${it.tw}px; height: ${it.th}px"></span></span>
+<span style="min-width:0"><span class="slip-t">${esc(it.title)}</span><span class="slip-expr" style="display:block">${esc(it.what)}${withDate ? ' · ' + esc(it.modeLabel) : ''}</span></span>
+${withDate ? `<span class="ldate">${esc(it.date)}</span>` : ''}
+<span class="slip-v"><i>=</i>${esc(it.priceLabel)}</span>
+</button>`;
+  }
+
+  function workspaceScreen() {
+    const f = state.form;
+    const mini = state.records.slice(0, 4), mx = P.maxIn(mini);
+    const box = (id, k) => `<div class="box"><input id="${id}" class="box-in" data-field="${k}" type="text" inputmode="decimal" autocomplete="off" placeholder="0" value="${esc(f[k])}"><span class="box-u">${f.unit}</span></div>`;
+    return `<main class="screen" id="main" tabindex="-1" data-key="workspace">
+<div class="wrap">
+<div class="ov-head">
+<div><p class="eyebrow">Artwork Price Calculator</p><h1 class="poster">Price your <em>artwork.</em></h1></div>
+<p class="ws-line">Size it, pick the medium, tell us where you are. Get a starting price.</p>
+</div>
+</div>
+<div class="band">
+<div class="wrap">
+${resumeHtml('Unsaved result:')}
+<div class="ov">
+<div class="device">
+<section class="stage" aria-label="Calculator">
+${TILES}
+<div class="stage-top"><button class="back-l" type="button" data-action="go" data-arg="tools">${ICON.back}Artist Tools</button><span class="st-chip">${L.mode[f.mode]}</span></div>
+<div class="stage-in">
+<div class="paper" aria-hidden="true"><p class="p-mono">Your artwork</p>${previewHtml(f, 'Your artwork')}</div>
+${calcHtml({ interactive: true, aria: 'Calculator', mode: L.mode[f.mode], label: 'Estimated price', tokens: P.tokens(f), price: '$ ' + P.MISS, wait: true, eqLabel: 'Continue to the calculator' })}
+</div>
+<p class="stage-cap"><span>Keypad types into <b>${P.FIELD_NAMES[kpTarget()]}</b></span><span>= opens the calculator</span></p>
+</section>
+<section class="keys" aria-labelledby="ov-calc-h">
+<div class="kp-title">
+<span class="kp-ico" aria-hidden="true">${ICON.calc}</span>
+<div><h2 class="kp-h" id="ov-calc-h">Calculate a price</h2><p class="kp-sub">Start with the size. You'll pick the rest on the next screen.</p></div>
+</div>
+<div class="krow"><span class="klabel" id="ov-unit">Unit</span><div class="kctl"><div class="tray" role="radiogroup" aria-labelledby="ov-unit">${radio('unit', 'in', 'Inches')}${radio('unit', 'cm', 'Centimeters')}</div></div></div>
+<div class="krow"><label class="klabel" for="q-len">Length</label><div class="kctl">${box('q-len', 'length')}</div></div>
+<div class="krow"><label class="klabel" for="q-wid">Width</label><div class="kctl">${box('q-wid', 'width')}</div></div>
+<div class="keys-foot" style="position:static;margin:0;box-shadow:none;padding-top:22px">
+<button class="cta-bar" type="button" data-action="go" data-arg="form">Next: price details ${ICON.arrowB}</button>
+</div>
+</section>
+</div>
+<aside class="tape ov-tape" aria-labelledby="ov-lib-h">
+<div class="tape-head">
+<div><p class="eyebrow">Your wall</p><h2 class="h3" id="ov-lib-h" style="margin-top:6px">My Calculations</h2></div>
+<span class="mono muted" style="padding-top:2px">${recCountLine()}</span>
+</div>
+${mini.length ? '<div class="slips">' + mini.map((r) => slipHtml(recView(r, mx))).join('') + '</div>' : `<div class="tape-empty">
+<p class="tape-empty-t">Your wall is empty for now.</p>
+<p class="small muted" style="margin:6px 0 0">Calculate and save an artwork price, and it will appear here.</p>
+</div>
+<p class="small muted" style="margin:0">Every price you save hangs here, drawn to its real proportions.</p>`}
+<button class="btn btn-s" type="button" data-action="go" data-arg="library">Open My Calculations</button>
+</aside>
+</div>
+</div>
+</div>
+<div class="wrap">
+<div class="ws-foot">
+<div><span class="mono" style="color:#850020">01</span><h3>Find a starting point</h3><p>Get a realistic price based on factors that actually influence value.</p></div>
+<div><span class="mono" style="color:#850020">02</span><h3>Stay consistent across your work</h3><p>Apply a clearer structure so your pricing doesn't feel scattered.</p></div>
+<div><span class="mono" style="color:#850020">03</span><h3>Make more confident decisions</h3><p>Understand where your work stands before listing or selling.</p></div>
+<div><span class="mono" style="color:#850020">04</span><h3>Adjust as your practice grows</h3><p>Evolve your pricing as your experience and visibility increase.</p></div>
+<div><span class="mono" style="color:#850020">05</span><h3>Avoid common pricing mistakes</h3><p>Reduce the risk of pricing too low or unrealistically high.</p></div>
+</div>
+</div>
+</main>`;
+  }
+
+  // A radio-style key in a tray. Arrow keys move between options (see onKeydown).
+  function radio(field, value, label, extra) {
+    const sel = state.form[field] === value;
+    return `<button ${extra && extra.id ? `id="${extra.id}"` : ''} class="key ${extra && extra.tall ? 'tall' : ''} ${on(sel)}" type="button" role="radio" aria-checked="${tf(sel)}" tabindex="${sel || (!state.form[field] && extra && extra.first) ? '0' : '-1'}" data-action="pick" data-field="${field}" data-arg="${value}">${label}${extra && extra.sub ? `<span class="key-sub">${extra.sub}</span>` : ''}</button>`;
+  }
+
+  function formScreen() {
+    const s = state, f = s.form, e = P.errs(f);
+    const showE = (k) => !!e[k] && (s.submitted || !!s.touched[k]);
+    const isTime = f.mode === 'time', isStd = f.mode === 'standard', isDim = !isTime;
+    const pun = P.punches(f), done = pun.filter((p) => p.on).length;
+    const errKeys = Object.keys(e);
+    const ids = { length: 'f-len', width: 'f-wid', height: 'f-hei', medium: 'md-painting', experience: 'exp-hobby', materials: 'f-mat', rate: 'f-rate', hours: 'f-hrs' };
+    const stepper = (k, id, opt) => {
+      const bad = showE(k);
+      const errId = id + '-err';
+      const input = `<input id="${id}" class="box-in" data-field="${k}" data-touch="${k}" type="text" inputmode="decimal" autocomplete="off" placeholder="${opt.ph}" value="${esc(f[k])}" ${opt.aria ? `aria-label="${opt.aria}"` : ''} aria-invalid="${tf(bad)}" ${opt.req ? 'aria-required="true"' : ''} ${bad ? `aria-describedby="${errId}"` : ''}>`;
+      return `<div class="box ${bad ? 'bad' : ''}"><button class="bstp" type="button" data-action="bump" data-field="${k}" data-arg="-1" aria-label="Decrease ${opt.name}">−</button>${opt.pre ? `<span class="box-u">${opt.pre}</span>` : ''}${input}${opt.post ? `<span class="box-u">${opt.post}</span>` : ''}<button class="bstp" type="button" data-action="bump" data-field="${k}" data-arg="1" aria-label="Increase ${opt.name}">+</button></div>`;
+    };
+    const errLine = (k, prefix) => (showE(k) ? `<span class="kerr" id="${ids[k]}-err">${prefix || ''}${esc(e[k])}</span>` : '');
+    const tv = P.timeVals(f);
+    const progText = done === 3 ? 'Ready to price' : done + ' of 3 ready';
+    const loading = s.calcStatus === 'loading';
+    const staticRow = (label, v) => `<div class="krow"><span class="klabel">${label}</span><div class="kctl"><div class="tray"><span class="key static">${v}</span><span class="key ghost">More in live tool</span></div></div></div>`;
+
+    return `<main class="screen" id="main" tabindex="-1" data-key="form">
+<div class="band" style="padding-bottom:80px">
+<div class="wrap">
+${s.reuseFrom ? `<div class="banner banner-info" role="status">
+<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex:none;margin-top:1px"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"></path><path d="M3 3v5h5"></path></svg>
+<div class="small"><b>Starting from a saved calculation (${esc(s.reuseFrom)})</b>This is a new calculation. The saved one stays exactly as it was.</div>
+</div>` : ''}
+${s.submitted && errKeys.length ? `<div class="banner banner-err" role="alert">
+<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#AA0003" stroke-width="2" stroke-linecap="round" aria-hidden="true" style="flex:none;margin-top:1px"><circle cx="12" cy="12" r="9"></circle><path d="M12 8v5M12 16.5v.01"></path></svg>
+<div class="small"><b>${errKeys.length === 1 ? 'One thing left before we can price this' : errKeys.length + ' things left before we can price this'}</b><div class="linklist">${errKeys.map((k) => `<button class="crumb-btn" type="button" data-action="focusField" data-arg="${ids[k]}">${P.FIELD_NAMES[k]}</button>`).join('')}</div></div>
+</div>` : ''}
+${s.calcStatus === 'error' ? `<div class="banner banner-err" role="alert">
+<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#AA0003" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex:none;margin-top:1px"><path d="M12 3 2 20h20z"></path><path d="M12 10v4M12 17v.01"></path></svg>
+<div class="small" style="flex:1"><b>We couldn't calculate this price</b>Your inputs are still here. Please try again in a moment.</div>
+<button class="btn btn-s" type="button" data-action="calculate" style="min-height:40px">Try again</button>
+</div>` : ''}
+<div class="device">
+<section class="stage ${loading ? 'loading' : ''}" aria-label="Calculator">
+${TILES}
+<div class="stage-top"><button class="back-l" type="button" data-action="go" data-arg="workspace">${ICON.back}Overview</button><span class="st-chip">${progText}</span></div>
+<div class="stage-in">
+<div class="paper" aria-hidden="true"><p class="p-mono">${isTime ? 'Your time and materials' : 'Your artwork'}</p>${isDim ? previewHtml(f, 'Add a size') : timeRows(tv)}</div>
+${calcHtml({ interactive: true, aria: 'Calculator', mode: L.mode[f.mode], label: 'Estimated price', tokens: P.tokens(f), price: loading ? '…' : '$ ' + P.MISS, wait: true, eqLabel: 'Calculate price' })}
+</div>
+<p class="stage-cap"><span>Keypad types into <b>${P.FIELD_NAMES[kpTarget()]}</b></span><span>= calculates</span></p>
+<div class="stage-foot"><div><span class="sf-v">${L.mode[f.mode]}</span><span class="sf-k">Mode</span></div><div><span class="sf-v">${f.unit}</span><span class="sf-k">Unit</span></div><div><span class="sf-v">${done}/3</span><span class="sf-k">Ready</span></div></div>
+</section>
+
+<section class="keys" aria-label="Calculator inputs">
+<div class="kp-title">
+<span class="kp-ico" aria-hidden="true">${ICON.calc}</span>
+<div><h1 class="kp-h">Artwork Price Calculator</h1><p class="kp-sub">${P.MODE_NOTES[f.mode]}</p></div>
+</div>
+<div class="krow"><span class="klabel" id="k-mode">Calculation mode <span class="qdot" title="${P.MODE_NOTES[f.mode]}" aria-hidden="true">?</span></span>
+<div class="kctl"><div class="tray" role="radiogroup" aria-labelledby="k-mode">${radio('mode', 'standard', 'Standard')}${radio('mode', 'size', 'Size-Based')}${radio('mode', 'time', 'Time-Based')}</div></div>
+</div>
+${isDim ? `<div class="krow"><span class="klabel" id="k-unit">Unit <i class="req" aria-hidden="true">*</i></span>
+<div class="kctl"><div class="tray" role="radiogroup" aria-labelledby="k-unit" aria-required="true">${radio('unit', 'in', 'Inches')}${radio('unit', 'cm', 'Centimeters')}</div></div>
+</div>
+<div class="krow"><span class="klabel" id="k-size">Size <i class="req" aria-hidden="true">*</i><span class="opt">Length and width</span></span>
+<div class="kctl" role="group" aria-labelledby="k-size">
+<div class="boxes">
+<div>${stepper('length', 'f-len', { ph: 'L', aria: 'Length', name: 'length', req: true, post: f.unit })}</div>
+<div>${stepper('width', 'f-wid', { ph: 'W', aria: 'Width', name: 'width', req: true, post: f.unit })}</div>
+</div>
+${errLine('length', 'Length: ')}${errLine('width', 'Width: ')}
+</div>
+</div>
+<div class="krow"><label class="klabel" for="f-hei">Height <span class="qdot" title="Optional, for 3D work" aria-hidden="true">?</span><span class="opt">Optional, for 3D</span></label>
+<div class="kctl">${stepper('height', 'f-hei', { ph: '–', name: 'height', post: f.unit })}${errLine('height')}</div>
+</div>` : ''}
+${isStd ? `<div class="krow"><span class="klabel" id="k-med">Artwork Medium <i class="req" aria-hidden="true">*</i></span>
+<div class="kctl">
+<div class="tray" role="radiogroup" aria-labelledby="k-med" aria-required="true" ${showE('medium') ? 'aria-invalid="true" aria-describedby="md-painting-err"' : ''}>${radio('medium', 'painting', 'Painting', { id: 'md-painting', first: true })}${radio('medium', 'photography', 'Photography', { id: 'md-photography' })}${radio('medium', 'drawing', 'Drawing', { id: 'md-drawing' })}</div>
+<p class="knote">More mediums load from the live tool.</p>
+${errLine('medium')}
+</div>
+</div>` : ''}
+${isDim ? `<div class="krow"><span class="klabel" id="k-exp">Artist Experience <i class="req" aria-hidden="true">*</i> <span class="qdot" title="How long you've been making work" aria-hidden="true">?</span></span>
+<div class="kctl">
+<div class="tray" role="radiogroup" aria-labelledby="k-exp" aria-required="true" ${showE('experience') ? 'aria-invalid="true" aria-describedby="exp-hobby-err"' : ''}>${P.EXP_ORDER.map((v, i) => radio('experience', v, P.expShort(v), { id: 'exp-' + v, tall: true, sub: P.expYears(v), first: i === 0 })).join('')}</div>
+<p class="knote">More levels load from the live tool.</p>
+${errLine('experience')}
+</div>
+</div>` : ''}
+${isStd ? staticRow('Gallery Representation', 'No') + staticRow('Online Presence', 'Low') + staticRow('Artist Reputation', 'Emerging') + staticRow('Market Demand', 'Low') : ''}
+${isTime ? `<div class="krow"><label class="klabel" for="f-rate">Price per Hour ($) <i class="req" aria-hidden="true">*</i></label>
+<div class="kctl">${stepper('rate', 'f-rate', { ph: '0', name: 'price per hour', req: true, pre: '$' })}${errLine('rate')}</div>
+</div>
+<div class="krow"><label class="klabel" for="f-hrs">Hours Spent <i class="req" aria-hidden="true">*</i></label>
+<div class="kctl">${stepper('hours', 'f-hrs', { ph: '0', name: 'hours spent', req: true, post: 'hrs' })}${errLine('hours')}</div>
+</div>` : ''}
+${!isStd ? `<div class="krow"><label class="klabel" for="f-mat">Cost of Materials ($) <i class="req" aria-hidden="true">*</i></label>
+<div class="kctl">${stepper('materials', 'f-mat', { ph: '0', name: 'cost of materials', req: true, pre: '$' })}${errLine('materials')}</div>
+</div>` : ''}
+<div class="keys-foot">
+<div class="foot-row">
+<div class="punches" role="group" aria-label="Progress">${pun.map((p) => `<span class="punch ${on(p.on)}"><i aria-hidden="true">✓</i>${p.label}<span class="sr-only">${p.on ? ', done' : ', not done'}</span></span>`).join('')}</div>
+<button class="btn btn-g" type="button" data-action="clearForm" style="min-height:36px">Clear all</button>
+</div>
+<button class="cta-bar" type="button" data-action="calculate" ${loading ? 'disabled aria-busy="true"' : ''}>${loading ? '<span class="spin" aria-hidden="true"></span>' : ''}${loading ? 'Calculating…' : 'Calculate Price'}</button>
+</div>
+</section>
+</div>
+</div>
+</div>
+</main>`;
+  }
+
+  function sourceCap(source) {
+    return source === 'prototype'
+      ? '<p class="stage-cap"><span>Prototype figure</span><span>Live price comes from ATH\'s pricing engine</span></p>'
+      : '<p class="stage-cap"><span>From ATH\'s pricing engine</span></p>';
+  }
+
+  function resultScreen() {
+    const r = state.result, f = r.form, date = P.dateLabel(r.createdAt), ln = P.lines(f), saved = !!r.savedId;
+    return `<main class="screen" id="main" tabindex="-1" data-key="result">
+<div class="band" style="padding-bottom:80px">
+<div class="wrap">
+<div class="res-top">
+<button class="btn btn-g" type="button" data-action="go" data-arg="form" style="padding-left:0">${ICON.left}Back to the calculator</button>
+<span class="mono">Priced ${date}</span>
+</div>
+<div class="device">
+<section class="stage" aria-label="Suggested price">
+${TILES}
+<div class="stage-top"><span class="st-chip">Suggested price</span><span class="st-chip">${L.mode[f.mode]}</span></div>
+<div class="stage-in">
+<div class="paper" aria-hidden="true"><span class="p-dot"></span><p class="p-mono">Priced · ${date}</p>${framedHtml(f)}</div>
+${calcHtml({ interactive: false, aria: 'Calculator showing the suggested price', mode: L.mode[f.mode], label: 'Estimated price', tokens: P.tokens(f), price: P.money(ui.shown), shown: true })}
+</div>
+<p class="sr-only">Suggested price ${P.money(r.price)}</p>
+${sourceCap(r.source)}
+</section>
+<section class="keys" aria-label="Result details">
+${saved ? `<p class="title-st">${esc(r.title || 'Untitled')}</p>` : `<label class="klabel" for="r-title" style="display:block;padding:0 0 6px">Title of work, optional</label>
+<input id="r-title" class="title-in" type="text" placeholder="Untitled" maxlength="120" autocomplete="off" value="${esc(r.title)}" data-title>`}
+<div class="lab-lines"><span class="lab-b">${esc(ln.l1)}</span><span class="muted">${esc(ln.l2)}</span></div>
+${receiptHtml(P.rows(f))}
+<p class="res-note">A starting point, not a fixed number. Refine it for your audience, market and goals.</p>
+<div class="akeys">
+${saved ? '<button class="akey done" type="button" disabled>✓ Saved</button>' : '<button class="akey pri" type="button" data-action="save">Save Calculation</button>'}
+<button class="akey" type="button" data-action="openEmail" data-arg="result">Email Result</button>
+<button class="akey" type="button" data-action="newCalc">Calculate Again</button>
+<button class="akey" type="button" data-action="go" data-arg="form">Edit Inputs</button>
+</div>
+${saved ? `<p class="saved-line">Hung on your wall. <button class="crumb-btn" type="button" data-action="openDetail" data-arg="${esc(r.savedId)}">View it</button></p>` : ''}
+</section>
+</div>
+</div>
+</div>
+</main>`;
+  }
+
+  function libraryScreen() {
+    const recs = state.records, mx = P.maxIn(recs), views = recs.map((r) => recView(r, mx));
+    const v = state.view;
+    const viewKey = (val, label) => `<button class="key ${on(v === val)}" type="button" role="radio" aria-checked="${tf(v === val)}" tabindex="${v === val ? '0' : '-1'}" data-action="setView" data-arg="${val}">${label}</button>`;
+    let body;
+    if (!recs.length) {
+      body = `<div class="emptypanel">
+<p class="eyebrow">Nothing here yet</p>
+<h2 class="h2" style="font-size:clamp(28px,3.4vw,40px)">Your wall is empty <span class="serif-i">for now.</span></h2>
+<p class="empty-lead">Calculate and save an artwork price, and it will appear here.</p>
+<p class="small muted" style="margin:0">Every price you save hangs here, drawn to its real proportions.</p>
+<button class="cta-bar" type="button" data-action="newCalc" style="max-width:360px;margin-top:14px">Calculate your first price</button>
+</div>`;
+    } else if (v === 'wall') {
+      body = `<ul class="wallpanel" role="list" style="list-style:none;margin:0" data-key="wall">${views.map((it) => `<li class="piece" data-key="${esc(it.id)}">
+<button class="piece-btn" type="button" data-action="openDetail" data-arg="${esc(it.id)}" aria-label="Open calculation: ${esc(it.aria)}">
+<span class="piece-fr"><span class="surf ${it.kind}" style="display:block;position:relative;width: ${it.pw}px; height: ${it.ph}px">${artSvg(it.kind, 'wall')}</span></span>
+</button>
+<div class="plabel">
+<div class="plabel-in">
+<p class="pl-title">${esc(it.title)}</p>
+<p class="pl-what">${esc(it.what)} · ${esc(it.modeLabel)}</p>
+<p class="pl-price"><i>=</i>${esc(it.priceLabel)}<span class="pl-date">${esc(it.date)}</span></p>
+</div>
+<button class="icon-btn" type="button" data-action="askDelete" data-arg="${esc(it.id)}" aria-label="Delete calculation: ${esc(it.aria)}">${ICON.trash(17)}</button>
+</div>
+</li>`).join('')}</ul>
+<p class="scale-note">Frames shown to relative scale · newest first</p>`;
+    } else {
+      body = `<ul class="ltape" role="list" style="list-style:none;margin:0 0 96px" data-key="index">${views.map((it) => `<li class="lslip" data-key="${esc(it.id)}">${slipHtml(it, true)}<button class="icon-btn" type="button" data-action="askDelete" data-arg="${esc(it.id)}" aria-label="Delete calculation: ${esc(it.aria)}">${ICON.trash(18)}</button></li>`).join('')}</ul>`;
+    }
+    return `<main class="wrap screen" id="main" tabindex="-1" data-key="library">
+<div class="lib-head">
+<div>
+<p class="eyebrow">Your wall</p>
+<h1 class="poster">My <em>Calculations</em></h1>
+<p class="small muted" style="margin:12px 0 0">${recCountLine()}. Saved on this device for now; the live tool keeps them in your ATH account.</p>
+</div>
+<div class="lib-tools">
+${recs.length ? `<div class="tray" role="radiogroup" aria-label="View">${viewKey('wall', 'Wall')}${viewKey('index', 'Index')}</div>` : ''}
+<button class="btn btn-p" type="button" data-action="newCalc">New calculation</button>
+</div>
+</div>
+${resumeHtml('Not saved yet:', 'style="margin:0 0 20px"')}
+${body}
+</main>`;
+  }
+
+  function detailScreen() {
+    const rec = state.records.find((x) => x.id === state.detailId);
+    if (!rec) return '<main class="wrap screen" id="main" tabindex="-1" data-key="detail-missing"></main>';
+    const d = recView(rec), f = d.f;
+    return `<main class="screen" id="main" tabindex="-1" data-key="detail-${esc(rec.id)}">
+<div class="band" style="padding-bottom:80px">
+<div class="wrap">
+<div class="res-top"><button class="btn btn-g" type="button" data-action="go" data-arg="library" style="padding-left:0">${ICON.left}My Calculations</button></div>
+<div class="device">
+<section class="stage" aria-label="Saved price">
+${TILES}
+<div class="stage-top"><span class="st-chip">Saved price</span><span class="st-chip">${d.modeLabel}</span></div>
+<div class="stage-in">
+<div class="paper" aria-hidden="true"><span class="p-dot" style="animation-delay:.2s"></span><p class="p-mono">Saved · ${d.date}</p>${framedHtml(f)}</div>
+${calcHtml({ interactive: false, aria: 'Calculator showing the saved price', mode: d.modeLabel, label: 'Saved price', tokens: P.tokens(f), price: d.priceLabel })}
+</div>
+<p class="sr-only">Saved price ${d.priceLabel}</p>
+${sourceCap(rec.priceSource)}
+</section>
+<section class="keys" aria-label="Saved calculation details">
+<div class="rec-strip"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2"></rect><path d="M8 11V7a4 4 0 0 1 8 0v4"></path></svg><span>Saved calculation</span><span style="opacity:.5" aria-hidden="true">·</span><span>${d.date}</span><span style="opacity:.5" aria-hidden="true">·</span><span>Read-only</span></div>
+<h1 class="title-st">${esc(d.title)}</h1>
+<div class="lab-lines"><span class="lab-b">${esc(d.l1)}</span><span class="muted">${esc(d.l2)}</span></div>
+${receiptHtml(P.rows(f))}
+<div class="akeys">
+<button class="akey pri" type="button" data-action="reuse" data-arg="${esc(rec.id)}">Use as Starting Point</button>
+<button class="akey" type="button" data-action="openEmail" data-arg="detail">Email Result</button>
+<button class="akey danger" type="button" data-action="askDelete" data-arg="${esc(rec.id)}" style="grid-column:1/-1">Delete</button>
+</div>
+<p class="small muted" style="margin:12px 0 0">Starting from it opens a new calculation. This record won't change.</p>
+</section>
+</div>
+</div>
+</div>
+</main>`;
+  }
+
+  // ---------- overlays ----------
+  function emailSource() {
+    const em = state.email;
+    if (em.source === 'result' && state.result) return { title: state.result.title, price: state.result.price, form: state.result.form };
+    const rec = em.source === 'detail' && state.records.find((x) => x.id === em.id);
+    return rec ? { title: rec.title, price: rec.price, form: formOf(rec) } : null;
+  }
+  function emailMessage(src) {
+    return {
+      subject: (src.title ? src.title.trim() + ': ' : '') + 'your artwork price estimate is ' + P.money(src.price),
+      rows: [{ k: 'Suggested price', v: P.money(src.price) }].concat(P.rows(src.form)),
+    };
+  }
+
+  function emailModal() {
+    const em = state.email, src = emailSource();
+    if (!em.open || !src) return '';
+    const msg = emailMessage(src);
+    const invalid = em.status === 'invalid', sending = em.status === 'sending';
+    const done = em.status === 'prepared' || em.status === 'sent';
+    return `<div class="scrim" data-scrim="email" data-key="m-email">
+<div class="modal" role="dialog" aria-modal="true" aria-labelledby="em-h">
+<div class="modal-head">
+<div><p class="eyebrow">Email Result</p><h2 class="h3" id="em-h" style="margin-top:8px">Send this estimate by email</h2></div>
+<button class="icon-btn" type="button" data-action="closeEmail" aria-label="Close">${ICON.close}</button>
+</div>
+${done ? `<div class="status status-ok" role="status">
+<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex:none"><path d="m5 12 5 5 9-10"></path></svg>
+${em.status === 'sent'
+    ? `<div class="small"><b style="display:block">Sent to ${esc(em.to)}</b>The estimate is on its way.</div>`
+    : `<div class="small"><b style="display:block">Email ready for ${esc(em.to)}</b>This prototype isn't connected to an email service, so nothing was delivered. In the live tool, this step sends the estimate and confirms it here.</div>`}
+</div>
+<div class="modal-actions"><button class="btn btn-p" type="button" data-action="closeEmail" data-autofocus>Done</button></div>` : `<form data-form="email" novalidate>
+<label class="lbl" for="em-to"><span>Send to <span class="req" aria-hidden="true">*</span></span></label>
+<input id="em-to" class="input ${invalid ? 'bad' : ''}" type="email" autocomplete="email" placeholder="name@example.com" value="${esc(em.to)}" data-email data-autofocus aria-required="true" aria-invalid="${tf(invalid)}" ${invalid ? 'aria-describedby="em-err"' : ''}>
+${invalid ? '<span class="err" id="em-err">Enter a valid email address, like name@example.com.</span>' : ''}
+<div class="preview">
+<p class="mono muted" style="margin-bottom:10px">What they'll receive</p>
+<p class="pv-sub">${esc(msg.subject)}</p>
+${msg.rows.map((row) => `<div class="pv-row"><span>${esc(row.k)}</span><span>${esc(row.v)}</span></div>`).join('')}
+<p class="small muted" style="margin:12px 0 0">Calculated with the ATH Artwork Price Calculator. A starting point, not a fixed number.</p>
+</div>
+${em.status === 'error' ? '<div class="status status-err" role="alert"><div class="small"><b style="display:block">Couldn\'t send the email</b>Nothing was sent. Check the address and try again.</div></div>' : ''}
+<div class="modal-actions">
+<button class="btn btn-g" type="button" data-action="closeEmail">Cancel</button>
+<button class="btn btn-p" type="submit" ${sending ? 'disabled aria-busy="true"' : ''}>${sending ? '<span class="spin" aria-hidden="true"></span>' : ''}${sending ? 'Sending…' : (em.status === 'error' ? 'Try again' : 'Send')}</button>
+</div>
+</form>`}
+</div>
+</div>`;
+  }
+
+  function dialogModal() {
+    const d = state.dialog;
+    if (!d) return '';
+    if (d.kind === 'unsaved') {
+      return `<div class="scrim" data-key="m-unsaved"><div class="modal" role="alertdialog" aria-modal="true" aria-labelledby="us-h" aria-describedby="us-d">
+<h2 class="h3" id="us-h">This price isn't saved yet</h2>
+<p class="small muted" style="margin:10px 0 0" id="us-d">${esc(unsavedSummary())}. Save it to hang it on your wall, or discard it and continue.</p>
+<div class="modal-actions">
+<button class="btn btn-g" type="button" data-action="dlgCancel">Cancel</button>
+<button class="btn btn-s" type="button" data-action="dlgDiscard">Discard</button>
+<button class="btn btn-p" type="button" data-action="dlgSave" data-autofocus>Save and continue</button>
+</div>
+</div></div>`;
+    }
+    const rec = state.records.find((x) => x.id === d.id);
+    const v = rec ? recView(rec) : null;
+    return `<div class="scrim" data-key="m-delete"><div class="modal" role="alertdialog" aria-modal="true" aria-labelledby="del-h" aria-describedby="del-d">
+<h2 class="h3" id="del-h">Take this off your wall?</h2>
+<p class="small" style="margin:10px 0 0"><b>${v ? esc(v.title + ' · ' + v.priceLabel + ' · ' + v.what) : ''}</b></p>
+<p class="small muted" style="margin:6px 0 0" id="del-d">The calculation will be deleted. This can't be undone.</p>
+<div class="modal-actions">
+<button class="btn btn-s" type="button" data-action="dlgCancel" data-autofocus>Keep it</button>
+<button class="btn btn-dp" type="button" data-action="dlgDelete">Delete</button>
+</div>
+</div></div>`;
+  }
+
+  function toastHtml() {
+    const t = state.toast;
+    if (!t) return '';
+    return `<div class="toast" role="status" data-key="toast-${t.n}">${ICON.check}<span>${esc(t.text)}</span>${t.act ? `<button class="toast-btn" type="button" data-action="toastAct">${esc(t.actionLabel)}</button>` : ''}</div>`;
+  }
+
+  // ---------- render ----------
+  const SCREENS = { tools: toolsScreen, workspace: workspaceScreen, form: formScreen, result: resultScreen, library: libraryScreen, detail: detailScreen };
+  // Replacing a focused node fires blur handlers mid-patch; those updates wait until this pass ends.
+  let rendering = false, pending = false;
+  function render() {
+    if (rendering) { pending = true; return; }
+    rendering = true;
+    try { paint(); } finally { rendering = false; }
+    if (pending) { pending = false; render(); }
+  }
+  function paint() {
+    const s = state.screen;
+    const html = (s === 'tools' ? '' : toolNav()) + SCREENS[s]() + emailModal() + dialogModal() + toastHtml();
+    const view = document.getElementById('view');
+    const next = document.createElement('div');
+    next.innerHTML = html;
+    morphChildren(view, next);
+    afterRender();
+  }
+
+  function afterRender() {
+    // Screen change: move focus to the new screen so screen readers and keyboards start there.
+    if (ui.lastScreen !== state.screen + state.detailId) {
+      const first = !ui.lastScreen;
+      ui.lastScreen = state.screen + state.detailId;
+      if (!first) {
+        try { window.scrollTo({ top: 0, behavior: reduceMotion() ? 'auto' : 'smooth' }); } catch (e) { window.scrollTo(0, 0); }
+        const main = document.getElementById('main');
+        if (main && !document.querySelector('.scrim')) main.focus({ preventScroll: true });
+      }
+    }
+    // Dialogs: focus the first action on open, give focus back on close.
+    const scrim = document.querySelector('.scrim');
+    const key = scrim ? scrim.getAttribute('data-key') : '';
+    if (key !== ui.lastModal) {
+      if (key && !ui.lastModal) ui.opener = document.activeElement;
+      ui.lastModal = key;
+      if (key) {
+        const t = scrim.querySelector('[data-autofocus]') || scrim.querySelector('button, input');
+        if (t) t.focus();
+      } else if (ui.opener && document.contains(ui.opener)) {
+        ui.opener.focus();
+        ui.opener = null;
+      }
+    }
+    // Background content is inert while a dialog is open.
+    document.querySelectorAll('.site-wrap, #main, [data-key="toolnav"]').forEach((el) => { if (key) el.setAttribute('inert', ''); else el.removeAttribute('inert'); });
+    document.body.style.overflow = key ? 'hidden' : '';
+  }
+
+  // Minimal DOM morph: keeps existing nodes (and so focus and caret) where the markup matches.
+  function morphChildren(from, to) {
+    const a = Array.from(from.childNodes), b = Array.from(to.childNodes);
+    for (let i = 0; i < b.length; i++) {
+      const f = a[i], t = b[i];
+      if (!f) { from.appendChild(t); continue; }
+      if (f.nodeType !== t.nodeType || f.nodeName !== t.nodeName || (f.nodeType === 1 && f.getAttribute('data-key') !== t.getAttribute('data-key'))) { from.replaceChild(t, f); continue; }
+      if (f.nodeType === 3 || f.nodeType === 8) { if (f.data !== t.data) f.data = t.data; continue; }
+      morphEl(f, t);
+    }
+    for (let i = a.length - 1; i >= b.length; i--) if (a[i].parentNode === from) from.removeChild(a[i]);
+  }
+  function morphEl(f, t) {
+    for (const at of Array.from(f.attributes)) if (!t.hasAttribute(at.name)) f.removeAttribute(at.name);
+    for (const at of Array.from(t.attributes)) if (f.getAttribute(at.name) !== at.value) f.setAttribute(at.name, at.value);
+    if (f.nodeName === 'INPUT') {
+      const v = t.getAttribute('value') || '';
+      if (f.value !== v) f.value = v;
+      return;
+    }
+    if (f.nodeName === 'BUTTON') f.disabled = t.hasAttribute('disabled');
+    morphChildren(f, t);
+  }
+
+  // ---------- actions ----------
+  function showToast(text, actionLabel, act) {
+    clearTimeout(ui.toastT);
+    set({ toast: { text, actionLabel: actionLabel || '', act: act || null, n: Date.now() } });
+    ui.toastT = setTimeout(() => set({ toast: null }), act ? 6000 : 4200);
+  }
+
+  function setField(k, v) {
+    const form = Object.assign({}, state.form); form[k] = v;
+    const patch = { form };
+    if (state.calcStatus === 'error') patch.calcStatus = 'idle';
+    if (k === 'mode') patch.submitted = false;
+    set(patch);
+  }
+
+  function bump(k, dir) {
+    const min = k === 'materials' ? 0 : 1;
+    const cur = P.num(state.form[k]);
+    const v = Math.round(((cur >= 0 ? cur : 0) + dir) * 100) / 100;
+    if (k === 'height' && v <= 0) { setField('height', ''); return; }
+    setField(k, String(Math.max(min, v)));
+  }
+
+  function kpPress(ch) {
+    if (state.screen !== 'form' && state.screen !== 'workspace') return;
+    const k = kpTarget();
+    const next = P.kpApply(state.form[k], ch);
+    if (next === null) return;
+    const form = Object.assign({}, state.form); form[k] = next;
+    set({ form, activeField: k, calcStatus: state.calcStatus === 'error' ? 'idle' : state.calcStatus });
+  }
+
+  function focusId(id) { setTimeout(() => { const el = document.getElementById(id); if (el) { el.focus(); el.scrollIntoView({ block: 'center', behavior: reduceMotion() ? 'auto' : 'smooth' }); } }, 30); }
+
+  async function calculate() {
+    if (state.calcStatus === 'loading') return;
+    const f = state.form;
+    const keys = Object.keys(P.errs(f));
+    const ids = { length: 'f-len', width: 'f-wid', height: 'f-hei', medium: 'md-painting', experience: 'exp-hobby', materials: 'f-mat', rate: 'f-rate', hours: 'f-hrs' };
+    if (keys.length) { set({ submitted: true }); focusId(ids[keys[0]]); return; }
+    set({ submitted: true, calcStatus: 'loading' });
+    announce('Calculating');
+    const snapshot = Object.assign({}, f);
+    let out;
+    try { out = await Pricing.estimate(P.inputsFor(snapshot)); } catch (e) { set({ calcStatus: 'error' }); return; }
+    state.result = { form: snapshot, price: out.price, source: out.source || 'prototype', createdAt: new Date().toISOString(), savedId: null, title: '' };
+    ui.shown = reduceMotion() ? out.price : 0;
+    set({ calcStatus: 'idle', reuseFrom: null });
+    go('result');
+    animate(out.price);
+    announce('Suggested price ' + P.money(out.price));
+  }
+
+  function animate(target) {
+    cancelAnimationFrame(ui.raf);
+    if (reduceMotion()) { ui.shown = target; paintShown(); return; }
+    const start = performance.now() + 350, dur = 800;
+    const step = (t) => {
+      const p = Math.max(0, Math.min(1, (t - start) / dur));
+      ui.shown = target * (1 - Math.pow(1 - p, 3));
+      paintShown();
+      if (p < 1) ui.raf = requestAnimationFrame(step);
+    };
+    ui.raf = requestAnimationFrame(step);
+  }
+  function paintShown() { document.querySelectorAll('[data-shown]').forEach((el) => { el.textContent = P.money(ui.shown); }); }
+
+  async function save(after) {
+    const r = state.result;
+    if (!r || r.savedId || ui.saving) return;
+    ui.saving = true;
+    try {
+      const rec = await Store.save({ mode: r.form.mode, inputs: P.inputsFor(r.form), price: r.price, priceSource: r.source, title: r.title, createdAt: r.createdAt });
+      state.records = await Store.list();
+      state.result = Object.assign({}, r, { savedId: rec.id, title: rec.title });
+      if (after) after(); else render();
+      showToast('Hung on your wall', 'View', () => go('detail', rec.id));
+    } finally { ui.saving = false; }
+  }
+
+  function guard(kind, payload) {
+    if (hasUnsaved()) set({ dialog: { kind: 'unsaved', next: kind, payload } });
+    else run(kind, payload);
+  }
+  function run(kind, payload) { if (kind === 'new') doNew(); if (kind === 'reuse') doReuse(payload); }
+  function doNew() {
+    const f = state.form;
+    Object.assign(state, { form: P.defaults(f.unit, f.mode), touched: {}, submitted: false, calcStatus: 'idle', result: null, reuseFrom: null, dialog: null });
+    go('form');
+  }
+  function doReuse(id) {
+    const rec = state.records.find((x) => x.id === id);
+    if (!rec) return;
+    Object.assign(state, { form: formOf(rec), touched: {}, submitted: false, calcStatus: 'idle', result: null, reuseFrom: (rec.title || 'Untitled') + ', ' + P.dateLabel(rec.createdAt), dialog: null });
+    go('form');
+  }
+
+  async function confirmDelete() {
+    const id = state.dialog && state.dialog.id;
+    await Store.remove(id);
+    state.records = await Store.list();
+    if (state.result && state.result.savedId === id) state.result = Object.assign({}, state.result, { savedId: null });
+    ui.opener = null;
+    state.dialog = null;
+    if (state.screen === 'detail') go('library'); else render();
+    showToast('Calculation deleted');
+  }
+
+  function openEmail(source) {
+    set({ email: { open: true, to: state.email.to || '', status: 'idle', source, id: source === 'detail' ? state.detailId : null } });
+  }
+  async function sendEmail() {
+    const em = state.email;
+    if (em.status === 'sending') return;
+    if (!P.validEmail(em.to)) { set({ email: Object.assign({}, em, { status: 'invalid' }) }); const i = document.getElementById('em-to'); if (i) i.focus(); return; }
+    const src = emailSource();
+    set({ email: Object.assign({}, em, { status: 'sending' }) });
+    try {
+      const res = await Mail.sendEstimate(Object.assign({ to: em.to.trim() }, emailMessage(src)));
+      if (!state.email.open) return;
+      set({ email: Object.assign({}, state.email, { status: res && res.delivered ? 'sent' : 'prepared' }) });
+    } catch (e) {
+      if (state.email.open) set({ email: Object.assign({}, state.email, { status: 'error' }) });
+    }
+    const done = document.querySelector('.scrim [data-autofocus]');
+    if (done) done.focus();
+  }
+  function closeEmail() { set({ email: Object.assign({}, state.email, { open: false, status: 'idle' }) }); }
+
+  const ACTIONS = {
+    go: (arg) => go(arg),
+    skip: (arg, el, ev) => { ev.preventDefault(); const m = document.getElementById('main'); if (m) m.focus(); },
+    navNote: () => showToast('Site navigation isn’t part of this prototype'),
+    openStudio: () => showToast('Artist Studio isn’t part of this prototype'),
+    pick: (arg, el) => setField(el.getAttribute('data-field'), arg),
+    bump: (arg, el) => bump(el.getAttribute('data-field'), Number(arg)),
+    kpEq: () => { if (state.screen === 'workspace') go('form'); else if (state.screen === 'form') calculate(); },
+    calculate: () => calculate(),
+    clearForm: () => set({ form: P.defaults(state.form.unit, state.form.mode), touched: {}, submitted: false, calcStatus: 'idle', reuseFrom: null }),
+    focusField: (arg) => focusId(arg),
+    save: () => save(),
+    newCalc: () => guard('new'),
+    reuse: (arg) => guard('reuse', arg),
+    openDetail: (arg) => { set({ toast: null }); go('detail', arg); },
+    setView: (arg) => set({ view: arg }),
+    askDelete: (arg) => set({ dialog: { kind: 'delete', id: arg } }),
+    openEmail: (arg) => openEmail(arg),
+    closeEmail: () => closeEmail(),
+    dlgCancel: () => set({ dialog: null }),
+    dlgDiscard: () => { const d = state.dialog; state.result = null; state.dialog = null; ui.opener = null; run(d.next, d.payload); },
+    dlgSave: () => { const d = state.dialog; ui.opener = null; save(() => run(d.next, d.payload)); },
+    dlgDelete: () => confirmDelete(),
+    toastAct: () => { const t = state.toast; clearTimeout(ui.toastT); set({ toast: null }); if (t && t.act) t.act(); },
+  };
+
+  // ---------- events ----------
+  document.addEventListener('click', (ev) => {
+    const kp = ev.target.closest('[data-kp]');
+    if (kp) { kpPress(kp.getAttribute('data-kp')); return; }
+    const el = ev.target.closest('[data-action]');
+    if (el && !el.disabled) { ACTIONS[el.getAttribute('data-action')](el.getAttribute('data-arg'), el, ev); return; }
+    const scrim = ev.target.closest('[data-scrim]');
+    if (scrim && ev.target === scrim) closeEmail();
+  });
+  // Keep focus in the field while pressing the keypad, so typing continues where it was.
+  document.addEventListener('mousedown', (ev) => { if (ev.target.closest('[data-kp], .c-k.eq, .c-k.inert')) ev.preventDefault(); });
+
+  document.addEventListener('input', (ev) => {
+    const t = ev.target;
+    if (t.hasAttribute('data-field')) setField(t.getAttribute('data-field'), t.value);
+    else if (t.hasAttribute('data-title') && state.result) { state.result = Object.assign({}, state.result, { title: t.value }); render(); }
+    else if (t.hasAttribute('data-email')) set({ email: Object.assign({}, state.email, { to: t.value, status: state.email.status === 'invalid' || state.email.status === 'error' ? 'idle' : state.email.status }) });
+  });
+  document.addEventListener('focusin', (ev) => {
+    const k = ev.target.getAttribute && ev.target.getAttribute('data-field');
+    if (k && ev.target.nodeName === 'INPUT' && state.activeField !== k) set({ activeField: k });
+  });
+  document.addEventListener('focusout', (ev) => {
+    const k = ev.target.getAttribute && ev.target.getAttribute('data-touch');
+    if (k && !state.touched[k]) set({ touched: Object.assign({}, state.touched, { [k]: true }) });
+  });
+  document.addEventListener('submit', (ev) => { if (ev.target.getAttribute('data-form') === 'email') { ev.preventDefault(); sendEmail(); } });
+
+  document.addEventListener('keydown', (ev) => {
+    const scrim = document.querySelector('.scrim');
+    if (scrim) {
+      if (ev.key === 'Escape') { ev.preventDefault(); if (state.email.open) closeEmail(); else if (state.dialog) set({ dialog: null }); return; }
+      if (ev.key === 'Tab') { // keep focus inside the dialog
+        const f = Array.from(scrim.querySelectorAll('button:not([disabled]), input')).filter((x) => x.offsetParent !== null);
+        if (!f.length) return;
+        const first = f[0], last = f[f.length - 1];
+        if (ev.shiftKey && document.activeElement === first) { ev.preventDefault(); last.focus(); }
+        else if (!ev.shiftKey && document.activeElement === last) { ev.preventDefault(); first.focus(); }
+      }
+      return;
+    }
+    const t = ev.target;
+    // Enter in a number field works like "=" on the calculator.
+    if (ev.key === 'Enter' && t.classList && t.classList.contains('box-in')) { ev.preventDefault(); ACTIONS.kpEq(); return; }
+    // Arrow keys move between options in a radio tray.
+    if (['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown'].indexOf(ev.key) >= 0 && t.getAttribute && t.getAttribute('role') === 'radio') {
+      const group = Array.from(t.parentNode.querySelectorAll('[role="radio"]'));
+      const i = group.indexOf(t), d = ev.key === 'ArrowLeft' || ev.key === 'ArrowUp' ? -1 : 1;
+      const nxt = group[(i + d + group.length) % group.length];
+      ev.preventDefault();
+      nxt.click();
+      const id = nxt.id, field = nxt.getAttribute('data-field'), arg = nxt.getAttribute('data-arg'), action = nxt.getAttribute('data-action');
+      setTimeout(() => { const el = id ? document.getElementById(id) : document.querySelector(`[data-action="${action}"][data-arg="${arg}"]${field ? `[data-field="${field}"]` : ''}`); if (el) el.focus(); }, 0);
+    }
+  });
+
+  window.addEventListener('hashchange', applyRoute);
+
+  // ---------- start ----------
+  Store.list().then((list) => { state.records = list; applyRoute(); });
+})();
+</script>
+</body>
+</html>

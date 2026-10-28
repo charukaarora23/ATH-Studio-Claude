@@ -9,7 +9,8 @@ ATH is being designed as a house for art, with a gallery, an artist's studio, a 
 1. **The design system** in [`design-system/`](design-system/). This holds the colours, type, layout, motion, print and books, brand architecture and product UI. It also has the NavBar, Button and Footer components, and the tokens in `design-system.json`. Open `ATH-brand-guide.html` in a browser for the full brand guide.
 2. **The Bookshop brief and prototype** in [`design/bookshop.html`](design/bookshop.html). This is the newest direction. It covers the creative brief, the floating menu, the side drawers, the book-stack footer, the shelves, the flip-through book and the artist voice note.
 3. **The Editions Foundations** in [`design/editions-foundations.html`](design/editions-foundations.html). These are the product and design rules for the books pages. The page also audits the old screens and lists six open decisions.
-4. **My Studio**, the artist bio and statement writer. The source is in [`app/`](app/), and [`build/my-studio.html`](build/my-studio.html) is the same app as a single file.
+4. **The Artwork Price Calculator** in [`price-calculator/`](price-calculator/). [`build/price-calculator.html`](build/price-calculator.html) is the same app as a single file. See its README to learn how to connect the pricing engine, accounts and email.
+5. **My Studio**, the artist bio and statement writer. The source is in [`app/`](app/), and [`build/my-studio.html`](build/my-studio.html) is the same app as a single file.
 
 To view an HTML file, download it and open it in a browser. GitHub only shows the code.
 
@@ -22,7 +23,8 @@ To view an HTML file, download it and open it in a browser. GitHub only shows th
 | [`design/logo/`](design/logo/) | Outlined logo files: SVG, PNG, PDF, favicons. |
 | [`design/`](design/) | Bookshop and Editions pages. Also the Figma build scripts (`source/`, `tools/`), the exported My Studio frames (`renders/`) and the design notes. |
 | [`app/`](app/) | My Studio source code. Serve the folder (for example `python3 -m http.server`) and open `index.html`. Run the tests with `node --test app/tests/logic.test.cjs`. |
-| [`build/`](build/) | My Studio as one file that opens in any browser. |
+| [`price-calculator/`](price-calculator/) | Artwork Price Calculator source code. Serve the folder and open `index.html`. Run the tests with `node --test price-calculator/tests/logic.test.cjs`. |
+| [`build/`](build/) | My Studio and the Artwork Price Calculator, each as one file that opens in any browser. |
 | [`reference/docs/`](reference/docs/) | My Studio PRD, screen map and creative direction brief. |
 | [`reference/images/`](reference/images/) | References from the founder, in three folders: `my-studio-references`, `editions-current-screens` (the old books pages) and `bookshop-references`. |
 | [`reference/moodboard/`](reference/moodboard/) | The original My Studio moodboard. |

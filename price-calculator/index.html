@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Artwork Price Calculator · Arts to Hearts</title>
+  <meta name="description" content="Get a structured starting price for your artwork from its size, medium and where you are as an artist.">
+  <meta name="theme-color" content="#F9EEE5">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/calculator.css">
+</head>
+<body>
+<div class="app">
+  <a class="skip" href="#main" data-action="skip">Skip to content</a>
+
+  <div class="site-wrap">
+    <header class="site">
+      <div class="logo" aria-label="Arts to Hearts Project"><span class="logo-w">arts <em>to</em> hearts<span class="logo-dot" aria-hidden="true"></span></span><span class="logo-p">PROJECT</span></div>
+      <nav class="site-nav" aria-label="Main">
+        <button class="nav-l" type="button" data-action="navNote">Open Calls</button>
+        <button class="nav-l" type="button" data-action="navNote">Book Our Services</button>
+        <button class="nav-l" type="button" data-action="navNote">Artists</button>
+        <button class="nav-l" type="button" data-action="navNote">How To Submit</button>
+        <button class="nav-l" type="button" data-action="navNote">Contact Us</button>
+      </nav>
+      <div class="site-right">
+        <button class="rate" type="button" data-action="navNote" aria-label="Rated 4.9 out of 5"><span class="rate-g" aria-hidden="true">G</span>4.9 <span class="stars" aria-hidden="true">★★★★★</span><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#1C1310" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"></path></svg></button>
+        <button class="circ" type="button" data-action="navNote" aria-label="Help"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9.5 9a2.5 2.5 0 1 1 3.5 2.3c-.6.3-1 .9-1 1.6v.6"></path><path d="M12 17.5v.01"></path></svg></button>
+        <button class="circ" type="button" data-action="navNote" aria-label="Notifications, 13 new"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#850020" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9a6 6 0 0 1 12 0c0 6 2 7 2 7H4s2-1 2-7"></path><path d="M10 20a2 2 0 0 0 4 0"></path></svg><span class="badge" aria-hidden="true">13</span></button>
+        <button class="avatar-btn" type="button" data-action="navNote" aria-label="Account menu"><span class="avatar" aria-hidden="true"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="8" r="4"></circle><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"></path></svg></span><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"></path></svg></button>
+      </div>
+    </header>
+  </div>
+
+  <div id="view"></div>
+  <p class="sr-only" id="announce" aria-live="polite"></p>
+  <noscript><p class="wrap small">The Artwork Price Calculator needs JavaScript turned on.</p></noscript>
+</div>
+<script src="js/logic.js"></script>
+<script src="js/pricing.js"></script>
+<script src="js/store.js"></script>
+<script src="js/mail.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
