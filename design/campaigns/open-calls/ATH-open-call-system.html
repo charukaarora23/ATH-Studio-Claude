@@ -1,0 +1,261 @@
+<title>ATH Open Call System</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600&display=swap">
+<style>
+/* Layout: an editorial handbook on paper; slides sit in a horizontal shelf, rules in two-column rows. */
+:root{
+  --paper:#FFFBF6; --cream:#F9EEE5; --ink:#1C1310; --muted:#6B5A54; --line:#E7DAD0;
+  --burgundy:#6A0620; --peony:#FAD2E1; --chilli:#AA0003;
+  --petrol:#0B3B36; --pistachio:#D0D996; --tint:#EEF0D6;
+  --serif:"Instrument Serif",Georgia,"Times New Roman",serif;
+  --sans:Inter,system-ui,-apple-system,"Segoe UI",sans-serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --paper:#1A1311; --cream:#241B18; --ink:#F6ECE4; --muted:#BFAEA6; --line:#3A2E2A;
+  --burgundy:#F2A8BC; --peony:#4A1626; --chilli:#FF5A4E; --petrol:#CFE0B0; --pistachio:#3A4A2A; --tint:#26301F; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --paper:#1A1311; --cream:#241B18; --ink:#F6ECE4; --muted:#BFAEA6; --line:#3A2E2A;
+  --burgundy:#F2A8BC; --peony:#4A1626; --chilli:#FF5A4E; --petrol:#CFE0B0; --pistachio:#3A4A2A; --tint:#26301F; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--paper);color:var(--ink);font:400 16px/1.6 var(--sans);margin:0}
+.wrap{max-width:1120px;margin:0 auto;padding-left:max(20px,env(safe-area-inset-left,0px));padding-right:max(20px,env(safe-area-inset-right,0px))}
+section{padding-block:64px;border-top:1px solid var(--line)}
+h1,h2,h3{font-family:var(--serif);font-weight:400;letter-spacing:-.015em;text-wrap:balance;margin:0}
+h1{font-size:clamp(48px,8vw,96px);line-height:.95}
+h2{font-size:clamp(34px,5vw,56px);line-height:1}
+h3{font-size:26px;line-height:1.1}
+em{font-style:italic}
+p{margin:0}
+.eyebrow{font:600 12px/1 var(--sans);letter-spacing:.16em;text-transform:uppercase;color:var(--burgundy);margin-bottom:16px}
+.lead{font-size:19px;line-height:1.55;max-width:62ch;color:var(--ink)}
+.muted{color:var(--muted)}
+.hero{padding-block:72px 40px}
+.hero .lead{margin-top:24px}
+.shelf{display:flex;gap:14px;overflow-x:auto;padding:8px 0 18px;scroll-snap-type:x mandatory}
+.shelf figure{margin:0;flex:0 0 auto;scroll-snap-align:start}
+.shelf img{display:block;height:380px;width:auto;border-radius:6px;box-shadow:0 10px 30px rgba(28,19,16,.14)}
+.shelf.small img{height:300px}
+.shelf figcaption{font:500 12px/1.3 var(--sans);color:var(--muted);margin-top:10px;max-width:300px}
+.shelf figcaption b{color:var(--ink);font-weight:600}
+.two{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.4fr);gap:48px;align-items:start}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px;margin-top:32px}
+.rule{background:var(--cream);border-radius:16px;padding:22px 22px 24px}
+.rule h3{margin-bottom:8px}
+.rule p{font-size:15px;color:var(--muted)}
+table{width:100%;border-collapse:collapse;font-size:15px}
+th,td{text-align:left;padding:12px 14px 12px 0;border-bottom:1px solid var(--line);vertical-align:top}
+th{font:600 11px/1.2 var(--sans);letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+td:first-child{font-weight:600;white-space:nowrap}
+.scroll{overflow-x:auto}
+.sw{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-top:28px}
+.sw div{border-radius:14px;overflow:hidden;border:1px solid var(--line)}
+.sw i{display:block;height:64px}
+.sw i+i{height:30px}
+.sw p{padding:10px 12px;font-size:13px;line-height:1.35}
+.sw b{display:block;font-family:var(--serif);font-weight:400;font-size:22px}
+.cal{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px;margin-top:28px}
+.day{border:1px solid var(--line);border-radius:12px;padding:12px;min-height:118px;display:flex;flex-direction:column;gap:6px;background:var(--paper)}
+.day .d{font:600 11px/1 var(--sans);letter-spacing:.12em;text-transform:uppercase;color:var(--muted);display:flex;justify-content:space-between}
+.day .t{font:600 14px/1.3 var(--sans)}
+.day .s{font-size:13px;line-height:1.35;color:var(--muted)}
+.day.feed{background:var(--cream)}
+.day.key{background:var(--tint);border-color:transparent}
+.tag{display:inline-block;font:600 10px/1 var(--sans);letter-spacing:.1em;text-transform:uppercase;padding:5px 8px;border-radius:999px;background:var(--peony);color:var(--ink)}
+.tag.g{background:var(--pistachio)}
+.flag{border-left:3px solid var(--chilli);background:var(--cream);padding:16px 20px;border-radius:0 12px 12px 0;margin-top:14px;font-size:15px}
+.flag b{font-weight:600}
+ol.steps{list-style:none;padding:0;margin:28px 0 0;display:grid;gap:0}
+ol.steps li{display:grid;grid-template-columns:120px minmax(0,1fr);gap:20px;padding:18px 0;border-bottom:1px solid var(--line)}
+ol.steps li span{font-family:var(--serif);font-size:24px;color:var(--burgundy)}
+.legend{display:flex;flex-wrap:wrap;gap:16px;margin-top:20px;font-size:13px;color:var(--muted)}
+.legend i{display:inline-block;width:14px;height:14px;border-radius:4px;vertical-align:-2px;margin-right:6px;border:1px solid var(--line)}
+footer{padding-block:48px;color:var(--muted);font-size:14px;border-top:1px solid var(--line)}
+@media (max-width:760px){.two{grid-template-columns:1fr;gap:24px}.shelf img{height:300px}ol.steps li{grid-template-columns:1fr;gap:4px}}
+</style>
+
+<div class="wrap">
+<header class="hero">
+  <p class="eyebrow">Arts to Hearts · Open Calls</p>
+  <h1>One card, <em>every call.</em></h1>
+  <p class="lead">The social system for ATH open calls. Every call shares the same frame, the same call card and the same rules, so people know it's ATH before they read a word. Each call gets its own artwork and colour pair, so the feed never repeats itself. Below: the rules, the parts, the launch carousel for the Garden Edition, and a 30-day plan for each call.</p>
+</header>
+
+<section>
+  <p class="eyebrow">Launch carousel · 101 Art Book: Garden Edition</p>
+  <h2>Eight slides, <em>value first.</em></h2>
+  <p class="lead" style="margin-top:16px">Cover, then the reason to care, the theme, what selected artists get, the awards, who can apply, how it works, and the call card. All copy and figures come from the live call page.</p>
+  <div class="shelf">
+    <figure><img src="slides/01-cover.jpg" alt="Cover slide: Garden Edition over a painting, with a red Now open sticker"><figcaption><b>01 Cover.</b> Art full bleed, scrim into the edition colour, status sticker.</figcaption></figure>
+    <figure><img src="slides/02-promise.jpg" alt="Slide: We want to put 101 artists on the radar, with three stat tiles"><figcaption><b>02 Promise.</b> Why it matters, with three checkable numbers.</figcaption></figure>
+    <figure><img src="slides/03-theme.jpg" alt="Slide: What counts as a garden, with subject pills"><figcaption><b>03 Theme.</b> Subjects as pills. Removes the "does my work fit?" doubt.</figcaption></figure>
+    <figure><img src="slides/04-value.jpg" alt="Slide: Selected? Here's what you get, four numbered benefits"><figcaption><b>04 Value.</b> What selection gives you, in plain words.</figcaption></figure>
+    <figure><img src="slides/05-awards.jpg" alt="Slide: Three artists get even more, three award tiers"><figcaption><b>05 Awards.</b> Burgundy, because it's about money and value.</figcaption></figure>
+    <figure><img src="slides/06-who.jpg" alt="Slide: If you make it, you can enter, eligibility checklist"><figcaption><b>06 Who.</b> Eligibility plus the trust note on AI and rights.</figcaption></figure>
+    <figure><img src="slides/07-how.jpg" alt="Slide: How it works, four steps"><figcaption><b>07 How.</b> Dates first, then what happens after you apply.</figcaption></figure>
+    <figure><img src="slides/08-apply.jpg" alt="Slide: the call card with deadline, artists and top award tiles and an Apply button"><figcaption><b>08 Call card.</b> The same card the website listing uses.</figcaption></figure>
+  </div>
+  <p class="eyebrow" style="margin-top:36px">Same system, later in the call</p>
+  <div class="shelf small">
+    <figure><img src="slides/m1-story.jpg" alt="Story: art with the call card at the bottom"><figcaption><b>Story.</b> Art plus the call card. Add the link sticker.</figcaption></figure>
+    <figure><img src="slides/m2-reminder.jpg" alt="Single post: 10 days left"><figcaption><b>Countdown.</b> A real number of days, never a fake timer.</figcaption></figure>
+    <figure><img src="slides/m3-lastcall.jpg" alt="Single post: last call"><figcaption><b>Last call.</b> Night burgundy is kept for closing day only.</figcaption></figure>
+  </div>
+</section>
+
+<section>
+  <div class="two">
+    <div>
+      <p class="eyebrow">The idea</p>
+      <h2>The call card <em>is the brand.</em></h2>
+    </div>
+    <div>
+      <p class="lead">One object turns up everywhere a call appears: the website listing, the last slide of every carousel, the story, the email header, the ad. It always shows the same things in the same order: art, status pill, series and edition, title, three fact tiles (deadline, artists, top award) and one Apply bar.</p>
+      <p class="lead" style="margin-top:16px">Someone who saw the card on Instagram finds the same card on the site. That match is what makes people trust the link and finish applying. Your web card references (photo on top, white panel, pills, two stat tiles, one strong button) are the model. The card now carries ATH type and colour.</p>
+    </div>
+  </div>
+</section>
+
+<section>
+  <p class="eyebrow">What stays and what changes</p>
+  <h2>Same frame. <em>New art.</em></h2>
+  <div class="scroll" style="margin-top:28px">
+  <table>
+    <thead><tr><th>Part</th><th>Always the same</th><th>Changes per call</th></tr></thead>
+    <tbody>
+      <tr><td>Frame</td><td>72 px margins. Logo top left, slide count top right. Series and edition bottom left, Swipe bottom right. Same place on every slide.</td><td>Nothing</td></tr>
+      <tr><td>Type</td><td>Instrument Serif for headlines, with one italic phrase per headline. Inter for everything else. Labels in caps with wide tracking.</td><td>Nothing</td></tr>
+      <tr><td>Call card</td><td>Order, corners (40 px card, 24 px tiles, 12 px button), the three tiles, the Apply bar in burgundy.</td><td>Art, title, tile values, edition colour on pills and tiles</td></tr>
+      <tr><td>Colour</td><td>Burgundy and cream mean value and action: awards, Apply, Last call. Chilli only on the status sticker.</td><td>One edition colour pair (deep and light) for theme slides and backgrounds</td></tr>
+      <tr><td>Sticker</td><td>Round, chilli red, serif italic word plus a caps label, tilted 8 to 10°</td><td>Status text: Now open · 10 days · Last call · Selected</td></tr>
+      <tr><td>Art</td><td>Credit on every artwork, set vertically on the right edge</td><td>The artwork itself: past selected artists first, public domain second</td></tr>
+    </tbody>
+  </table>
+  </div>
+</section>
+
+<section>
+  <p class="eyebrow">Edition colours</p>
+  <h2>Each call gets <em>one pair.</em></h2>
+  <p class="lead" style="margin-top:16px">Every pair comes from the ATH palette. Choose the pair that suits the theme's art, and keep it for the whole life of the call, from launch to the book. That way people learn the colour as well as the name.</p>
+  <div class="sw">
+    <div><i style="background:#0B3B36"></i><i style="background:#D0D996"></i><p><b>Garden</b>Petrol + pistachio</p></div>
+    <div><i style="background:#52051A"></i><i style="background:#FAD2E1"></i><p><b>Pattern</b>Burgundy + peony</p></div>
+    <div><i style="background:#1C1310"></i><i style="background:#FFF3B2"></i><p><b>Colors</b>Ink + lemon</p></div>
+    <div><i style="background:#DD4E28"></i><i style="background:#F9EEE5"></i><p><b>Landscape</b>Blood orange + cream</p></div>
+    <div><i style="background:#2B1030"></i><i style="background:#FFA1C2"></i><p><b>Portrait</b>Night + hot rose</p></div>
+    <div><i style="background:#0E2547"></i><i style="background:#B7D9FF"></i><p><b>Abstract</b>Deep sky + sky</p></div>
+  </div>
+  <p class="muted" style="margin-top:14px;font-size:14px">Running three calls at once: give them pairs that look clearly different side by side, such as one dark green, one pink and one yellow.</p>
+</section>
+
+<section>
+  <p class="eyebrow">Convert without hype</p>
+  <h2>Six rules that make people <em>trust the link.</em></h2>
+  <div class="grid">
+    <div class="rule"><h3>Value before the ask</h3><p>A carousel earns its Apply slide. Promise, theme and what you get come before the button.</p></div>
+    <div class="rule"><h3>Every claim checkable</h3><p>Numbers come from the call page: 15 editions, 1,300+ artists, 190,000+ followers. Don't add followers and email subscribers together.</p></div>
+    <div class="rule"><h3>Real dates, real counts</h3><p>"10 days left" only when it's true. No countdown clocks, no "spots filling fast". 101 is a real limit, so say it calmly.</p></div>
+    <div class="rule"><h3>State the cost</h3><p>Hidden fees read as a scam. Put the entry fee on the call card and in the caption, the same way every time.</p></div>
+    <div class="rule"><h3>One action</h3><p>One Apply bar per post. Saves and shares are the second action, never a second button.</p></div>
+    <div class="rule"><h3>Credit the art</h3><p>Every artwork carries its artist's name. It's fair to artists, and it shows the people applying how they'll be treated.</p></div>
+  </div>
+</section>
+
+<section>
+  <p class="eyebrow">Post types</p>
+  <h2>Fourteen layouts, <em>one look.</em></h2>
+  <p class="lead" style="margin-top:16px">Mix these to fill the calendar. Each one does one job.</p>
+  <div class="scroll" style="margin-top:28px">
+  <table>
+    <thead><tr><th>Type</th><th>Job</th><th>Format</th><th>Built</th></tr></thead>
+    <tbody>
+      <tr><td>Launch carousel</td><td>Announce and explain the whole call</td><td>8 slides</td><td>Yes</td></tr>
+      <tr><td>Theme carousel</td><td>"Does my work fit?" Show 4 to 6 different ways into the theme</td><td>5 to 6 slides</td><td>Slide 03</td></tr>
+      <tr><td>Value single</td><td>What selected artists get</td><td>1 post</td><td>Slide 04</td></tr>
+      <tr><td>Awards single</td><td>The $500 and the trophies</td><td>1 post</td><td>Slide 05</td></tr>
+      <tr><td>Book proof</td><td>Photos of a real past edition: cover, spread, artist page</td><td>Carousel or reel</td><td>Needs photos</td></tr>
+      <tr><td>Artist voice</td><td>A past selected artist in their own words, with their work</td><td>Single or reel</td><td>Needs quote</td></tr>
+      <tr><td>How to apply</td><td>The four steps, plus how to photograph your work</td><td>5 slides</td><td>Slide 07</td></tr>
+      <tr><td>FAQ</td><td>Fee, rights, AI, results date, shipping</td><td>5 slides</td><td>To build</td></tr>
+      <tr><td>Jury or curator</td><td>Who decides. Trust.</td><td>Single or carousel</td><td>Needs names</td></tr>
+      <tr><td>Countdown</td><td>15, 10 and 3 days left</td><td>Single and story</td><td>Yes</td></tr>
+      <tr><td>Last call</td><td>Closes tonight</td><td>Single and 3 stories</td><td>Yes</td></tr>
+      <tr><td>Story card</td><td>Daily story with the link sticker</td><td>Story</td><td>Yes</td></tr>
+      <tr><td>Results</td><td>Congratulate the 101 and tag artists</td><td>Carousel</td><td>To build</td></tr>
+      <tr><td>Book out</td><td>The finished book, with where to buy it</td><td>Carousel and reel</td><td>To build</td></tr>
+    </tbody>
+  </table>
+  </div>
+</section>
+
+<section>
+  <p class="eyebrow">30-day plan</p>
+  <h2>One call, <em>thirty days.</em></h2>
+  <p class="lead" style="margin-top:16px">Each call gets about 13 feed posts and a story every day. With three calls running about ten days apart, the feed gets one or two posts a day and never shows the same call twice in a row. Day 30 is the deadline.</p>
+  <div class="legend"><span><i style="background:var(--tint)"></i>Key moment</span><span><i style="background:var(--cream)"></i>Feed post</span><span><i style="background:var(--paper)"></i>Stories only</span></div>
+  <div class="cal" id="cal"></div>
+  <div class="flag" style="margin-top:28px"><b>Garden Edition:</b> launch around 12 Nov 2026, deadline 13 Dec 2026, so day 30 is 13 Dec. Results are due within three weeks of the deadline (by 3 Jan 2027).</div>
+</section>
+
+<section>
+  <p class="eyebrow">Running three calls at once</p>
+  <h2>Stagger them, <em>never stack them.</em></h2>
+  <ol class="steps">
+    <li><span>Launches</span><p>Launch a new call about every 10 days. Never two launch carousels in the same week.</p></li>
+    <li><span>Each day</span><p>One feed post, chosen by priority: the call closest to its deadline comes first, then a launch, then the rest. Run stories for every open call each day, one card per call.</p></li>
+    <li><span>Grid</span><p>Edition colours make the grid read like a set of book spines. Check the grid view before scheduling so two posts in the same colour don't sit side by side.</p></li>
+    <li><span>Link in bio</span><p>Put one link page in the bio, with a call card for each open call, ordered by deadline. It's the same card again.</p></li>
+  </ol>
+</section>
+
+<section>
+  <p class="eyebrow">Before this goes live</p>
+  <h2>Four things <em>to confirm.</em></h2>
+  <div class="flag"><b>Entry fee.</b> The call page doesn't show it unless you log in. Add it to the call card and the caption.</div>
+  <div class="flag"><b>Artwork credits.</b> The two portrait paintings came from the Creative Fund folder and still read "Artist Name". Add the artist and title, or swap in past Garden-style selected work.</div>
+  <div class="flag"><b>Old carousel credits.</b> In the earlier Garden posts, the Pissarro credit is on a Caillebotte painting and the Manet credit is on a Childe Hassam painting.</div>
+  <div class="flag"><b>Jury and curator names.</b> The page mentions a guest curator. Naming them is the strongest trust post in the plan.</div>
+</section>
+
+<footer>
+  Source: <code>design/campaigns/open-calls/build.py</code>. To make the posts for another call, change the CALL block and pick an edition pair, then run the script again.
+</footer>
+</div>
+
+<script>
+const plan = [
+ [1,'key','Launch carousel','8 slides. Story: call card plus link.'],
+ [2,'','Stories','Slides from the launch, one per frame.'],
+ [3,'feed','Theme carousel','"What counts as a garden?" Six ways in.'],
+ [4,'','Stories','Poll: "Which garden are you?"'],
+ [5,'feed','Value single','Selected? Here\'s what you get.'],
+ [6,'','Stories','Book flip-through clip.'],
+ [7,'feed','Book proof reel','A past edition, page by page.'],
+ [8,'','Stories','Q&A box: ask about the call.'],
+ [9,'feed','Awards single','$500, a 4-page feature and three trophies.'],
+ [10,'','Stories','Repost artists sharing the call.'],
+ [11,'feed','Artist voice','A past selected artist on being in print.'],
+ [12,'','Stories','Answers from the Q&A box.'],
+ [13,'feed','How to apply','Four steps and how to photograph your work.'],
+ [14,'','Stories','Behind the scenes: the jury brief.'],
+ [15,'key','Halfway: 15 days','Countdown single plus FAQ carousel.'],
+ [16,'','Stories','Countdown sticker.'],
+ [17,'feed','Who can apply','Checklist plus the AI and rights note.'],
+ [18,'','Stories','Repost entries tagged with the hashtag.'],
+ [19,'feed','Jury or curator','Who decides, and what they look for.'],
+ [20,'key','10 days left','Countdown single.'],
+ [21,'','Stories','"Still deciding?" Answer three doubts.'],
+ [22,'feed','Theme, part 2','Unexpected gardens: decay, weeds, memory.'],
+ [23,'','Stories','Book proof clip.'],
+ [24,'feed','Artist voice','Second testimonial.'],
+ [25,'','Stories','Reminder card.'],
+ [26,'feed','Social proof','Real entry count or countries so far.'],
+ [27,'key','3 days left','Countdown plus what happens next.'],
+ [28,'','Stories','Countdown sticker.'],
+ [29,'feed','Closes tomorrow','Call card single.'],
+ [30,'key','Last call','Single plus three stories through the day.'],
+];
+document.getElementById('cal').innerHTML = plan.map(([d,k,t,s]) =>
+  `<div class="day ${k}"><p class="d"><span>Day ${d}</span>${k==='key'?'<span class="tag g">Key</span>':''}</p><p class="t">${t}</p><p class="s">${s}</p></div>`).join('');
+</script>
