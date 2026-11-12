@@ -36,6 +36,11 @@ def credit(t, fg):
 
 CSS = f'''
 @font-face{{font-family:"IS";src:url(fonts/InstrumentSerif-Regular.ttf)}}
+@font-face{{font-family:"AB";src:url(fonts/ArchivoBlack-Regular.ttf)}}
+.ab{{font-family:AB;text-transform:uppercase;letter-spacing:-.02em;line-height:.9}}
+.kwbig{{display:flex;align-items:center;justify-content:space-between;border-radius:12px;padding:0 44px;height:150px}}
+.kwbig b{{font:400 62px/1 AB;letter-spacing:.01em;white-space:nowrap}}
+.kwbig span{{font:500 26px/1.25 Inter;text-align:right}}
 @font-face{{font-family:"IS";font-style:italic;src:url(fonts/InstrumentSerif-Italic.ttf)}}
 *{{box-sizing:border-box;margin:0;padding:0}}
 body{{font-family:Inter,sans-serif;-webkit-font-smoothing:antialiased;background:#ccc}}
@@ -144,6 +149,57 @@ slide('07-close', C['deep'], f'''
   <div style="margin-top:44px">{kw(C['paper'], C['deep'], 1.1)}</div>
 </div>
 {foot(C['paper'], 'Link in bio')}''')
+
+
+# ---- COVER v3: loud call-out, offer and keyword on the cover (what GROW / FUND / AWARD posts did) ----
+def kwbar(bg, fg, sub):
+    return f'<div class="kwbig" style="background:{bg};color:{fg}"><b>Comment {KW}</b><span style="color:{sub}">We\'ll DM you<br>everything</span></div>'
+
+def seal(top_, bottom, x, y, r=-10):
+    return (f'<div style="position:absolute;left:{x}px;top:{y}px;width:250px;height:250px;border-radius:50%;background:{C["chilli"]};color:{C["cream"]};'
+            f'display:flex;flex-direction:column;align-items:center;justify-content:center;transform:rotate({r}deg);z-index:6;text-align:center">'
+            f'<b style="font:400 84px/.9 AB">{top_}</b><span style="font:600 20px/1.2 Inter;letter-spacing:.12em;text-transform:uppercase;margin-top:8px">{bottom}</span></div>')
+
+slide('01a-callout', C['deep'], f"""
+<div class="bg" style="height:700px;background-image:url(art/flower-portrait.jpg);background-position:50% 18%"></div>
+<div class="bg" style="top:560px;height:140px;background:linear-gradient(180deg,rgba(11,59,54,0),{C['deep']})"></div>
+{top(1, C['paper'])}{seal('$500', 'cash award', 770, 330)}
+<div class="abs" style="top:690px">
+  <p style="font:700 26px/1 Inter;letter-spacing:.16em;color:{C['light']}">OPEN CALL · 101 ART BOOK</p>
+  <h1 class="ab" style="color:{C['paper']};font-size:96px;margin-top:22px">Calling all artists who paint nature</h1>
+  <p class="h" style="color:{C['light']};font-size:62px;margin-top:20px"><em>Get published in our Garden Edition.</em></p>
+</div>
+<div class="abs" style="top:1130px">{kwbar(C['light'], C['deep'], C['mid'])}</div>
+""")
+
+slide('01b-offer', C['deep'], f"""
+<div class="bg" style="background-image:url(art/night-bloom.jpg);background-position:50% 30%"></div>
+<div class="bg" style="background:linear-gradient(180deg,rgba(11,59,54,.92) 0%,rgba(11,59,54,.55) 45%,rgba(11,59,54,.2) 62%,{C['deep']} 86%)"></div>
+{top(1, C['paper'])}
+<div class="abs" style="top:190px">
+  <p style="font:700 26px/1 Inter;letter-spacing:.16em;color:{C['light']}">ARTISTS, THIS IS YOUR CALL</p>
+  <h1 class="ab" style="color:{C['paper']};font-size:150px;margin-top:24px">Get<br>published</h1>
+  <p class="h" style="color:{C['paper']};font-size:74px;margin-top:22px">in a hardcover art book <em>+ win $500</em></p>
+</div>
+<div class="abs" style="top:1050px">
+  <p style="font:600 28px/1 Inter;color:{C['light']};margin-bottom:26px">Garden Edition · Open worldwide · Apply by 13 Dec</p>
+  {kwbar(C['paper'], C['deep'], C['mid'])}
+</div>
+""")
+
+slide('01c-keyword', C['light'], f"""
+{top(1, C['deep'])}
+<div style="position:absolute;right:72px;top:170px;width:420px;height:520px;border-radius:24px;background:url(art/flower-portrait.jpg) 50% 15%/cover;transform:rotate(4deg);box-shadow:0 30px 60px rgba(11,59,54,.35)"></div>
+{seal('101', 'artists', 470, 560, -8)}
+<div class="abs" style="top:190px;right:520px">
+  <p style="font:700 24px/1.3 Inter;letter-spacing:.14em;color:{C['mid']}">NEW OPEN CALL</p>
+  <h1 class="ab" style="color:{C['deep']};font-size:112px;margin-top:22px">Your art in our next book</h1>
+</div>
+<div class="abs" style="top:860px">
+  <h2 class="ab" style="color:{C['deep']};font-size:150px">Comment<br>“{KW}”</h2>
+  <p class="sub" style="color:{C['deep']};margin-top:26px">We'll DM you how to apply. <b style="font-weight:600">$500 for the winner.</b></p>
+</div>
+""")
 
 (HERE / 'slides-v2.html').write_text(f'<!doctype html><html><head><meta charset="utf-8"><style>{CSS}</style></head><body>{"".join(h for _, h in S)}</body></html>')
 js = f'''const {{chromium}}=require('playwright');(async()=>{{const b=await chromium.launch();const p=await b.newPage({{viewport:{{width:1080,height:1350}}}});
