@@ -1,0 +1,197 @@
+<title>ATH Open Call Playbook</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600;700&display=swap">
+<style>
+/* Layout: an operating playbook. The ladder and phases first, then the 15 posts, then how three calls share one feed. */
+:root{
+  --paper:#FBF7F2; --card:#F3E9E1; --ink:#1C1310; --muted:#6B5A54; --line:#E3D5CA;
+  --a:#DD4E28; --b:#6A0620; --c:#3F6B4A; --tint-a:#FBE3DA; --tint-b:#F4D9DF; --tint-c:#DFEADF;
+  --serif:"Instrument Serif",Georgia,serif; --sans:Inter,system-ui,-apple-system,"Segoe UI",sans-serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--paper:#17110F;--card:#231A17;--ink:#F6ECE4;--muted:#BCAAA2;--line:#3A2E2A;--a:#F08560;--b:#E58FA5;--c:#93C29F;--tint-a:#3A2019;--tint-b:#3A1B24;--tint-c:#1E2E22;color-scheme:dark}}
+:root[data-theme="dark"]{--paper:#17110F;--card:#231A17;--ink:#F6ECE4;--muted:#BCAAA2;--line:#3A2E2A;--a:#F08560;--b:#E58FA5;--c:#93C29F;--tint-a:#3A2019;--tint-b:#3A1B24;--tint-c:#1E2E22;color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--paper);color:var(--ink);font:400 16px/1.6 var(--sans);margin:0}
+.wrap{max-width:1160px;margin:0 auto;padding-left:max(20px,env(safe-area-inset-left,0px));padding-right:max(20px,env(safe-area-inset-right,0px))}
+section{padding-block:56px;border-top:1px solid var(--line)}
+h1,h2,h3{font-weight:600;letter-spacing:-.03em;margin:0;text-wrap:balance}
+h1{font-size:clamp(42px,6.5vw,78px);line-height:.98}
+h2{font-size:clamp(28px,4vw,44px);line-height:1.04}
+h3{font-size:19px;letter-spacing:-.01em}
+em{font-family:var(--serif);font-style:italic;font-weight:400;letter-spacing:0}
+p{margin:0}
+.eyebrow{font:600 12px/1 var(--sans);letter-spacing:.18em;text-transform:uppercase;color:var(--a);margin-bottom:14px}
+.lead{font-size:18px;line-height:1.55;max-width:66ch;margin-top:14px}
+.muted{color:var(--muted)}
+.hero{padding-block:60px 40px}
+.ladder{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px;margin-top:30px}
+.step{background:var(--card);border-radius:14px;padding:16px 16px 18px;position:relative}
+.step b{display:block;font-size:13px;letter-spacing:.12em;text-transform:uppercase;color:var(--a);margin-bottom:6px}
+.step p{font-size:14px;line-height:1.45}
+.phases{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-top:28px}
+.ph{border-radius:16px;padding:20px;border:1px solid var(--line)}
+.ph .d{font:600 12px/1 var(--sans);letter-spacing:.14em;color:var(--muted);text-transform:uppercase}
+.ph h3{margin:10px 0 4px;font-size:22px}
+.ph .q{font-family:var(--serif);font-style:italic;font-size:20px;line-height:1.2;margin-bottom:10px}
+.ph p{font-size:14px;color:var(--muted)}
+.ph ul{margin:10px 0 0;padding-left:18px;font-size:14px}
+.scroll{overflow-x:auto;margin-top:24px}
+table{width:100%;border-collapse:collapse;font-size:14.5px;min-width:760px}
+th,td{text-align:left;padding:10px 12px 10px 0;border-bottom:1px solid var(--line);vertical-align:top}
+th{font:600 11px/1.2 var(--sans);letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+td.n{font-variant-numeric:tabular-nums;white-space:nowrap;font-weight:600}
+.tag{display:inline-block;font:600 11px/1 var(--sans);letter-spacing:.08em;text-transform:uppercase;padding:5px 8px;border-radius:999px;white-space:nowrap}
+.t1{background:var(--tint-a);color:var(--ink)}.t2{background:var(--tint-b);color:var(--ink)}.t3{background:var(--tint-c);color:var(--ink)}.t4{background:var(--ink);color:var(--paper)}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:12px;margin-top:24px}
+.card{background:var(--card);border-radius:16px;padding:20px}
+.card h3{margin-bottom:6px}.card p{font-size:14.5px;color:var(--muted)}
+.lanes{margin-top:26px;overflow-x:auto}
+.cal{display:grid;grid-template-columns:repeat(10,minmax(96px,1fr));gap:6px;min-width:1000px}
+.day{border:1px solid var(--line);border-radius:10px;padding:8px;min-height:132px;display:flex;flex-direction:column;gap:5px;background:var(--paper)}
+.day .dn{font:600 11px/1 var(--sans);letter-spacing:.1em;color:var(--muted)}
+.chip{border-radius:7px;padding:6px 7px;font-size:12px;line-height:1.25;border-left:4px solid}
+.chip i{font-style:normal;font-weight:700;display:block;font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;margin-bottom:2px}
+.cA{background:var(--tint-a);border-color:var(--a)}.cB{background:var(--tint-b);border-color:var(--b)}.cC{background:var(--tint-c);border-color:var(--c)}
+.cAll{background:var(--card);border-color:var(--ink)}
+.legend{display:flex;flex-wrap:wrap;gap:16px;margin-top:16px;font-size:13px;color:var(--muted)}
+.legend span::before{content:"";display:inline-block;width:12px;height:12px;border-radius:3px;margin-right:6px;vertical-align:-1px;background:var(--sw)}
+.blockt{font:600 13px/1 var(--sans);margin:22px 0 10px}
+.flag{border-left:3px solid var(--a);background:var(--card);padding:14px 18px;border-radius:0 12px 12px 0;margin-top:12px;font-size:15px}
+footer{padding-block:40px;color:var(--muted);font-size:14px;border-top:1px solid var(--line)}
+@media (max-width:860px){.ladder{grid-template-columns:1fr 1fr}.phases{grid-template-columns:1fr 1fr}}
+@media (max-width:520px){.ladder,.phases{grid-template-columns:1fr}}
+</style>
+
+<div class="wrap">
+<header class="hero">
+  <p class="eyebrow">Arts to Hearts · Open calls</p>
+  <h1>Every call, 30 days, <em>15 posts.</em></h1>
+  <p class="lead">The operating plan for running three open calls at once. Each call runs 30 days and gets 15 feed posts, a story every day and a DM sequence. Each call takes an artist through the same steps in the same order, so the feed teaches people how ATH calls work. A new call launches every 10 days. That means one call is always launching, one is building trust and one is closing.</p>
+  <div class="ladder">
+    <div class="step"><b>1 · See</b><p>"Calling all ___ artists." They recognise themselves in the first line.</p></div>
+    <div class="step"><b>2 · Comment</b><p>One keyword. A small, free yes that costs nothing.</p></div>
+    <div class="step"><b>3 · DM</b><p>Brief, link and a free guide arrive at once. We now have them in DMs.</p></div>
+    <div class="step"><b>4 · Start</b><p>"One artwork is enough." Make the first step feel small.</p></div>
+    <div class="step"><b>5 · Submit</b><p>Reminders at 10 days, 3 days and the last day, by post, story and DM.</p></div>
+  </div>
+  <p class="muted" style="margin-top:14px;font-size:14px">Every post moves people one step down this ladder. The keyword is the hinge: once someone comments, they're in the DM list and get the reminders even if they miss the posts.</p>
+</header>
+
+<section>
+  <p class="eyebrow">The psychology</p>
+  <h2>Four phases, <em>four questions</em> in the artist's head</h2>
+  <div class="phases">
+    <div class="ph" style="background:var(--tint-a)"><p class="d">Days 1–10</p><h3>Attention</h3><p class="q">"Is this for me?"</p><p>Identity and self-relevance. Name the artist, show the theme is wide, make the book feel real.</p><ul><li>Identity call-out</li><li>Self-relevance</li><li>Tangible proof (the book)</li><li>Value anchor</li></ul></div>
+    <div class="ph" style="background:var(--tint-b)"><p class="d">Days 11–20</p><h3>Trust</h3><p class="q">"Is this legit, and is it worth it?"</p><p>Show the people behind it. Past artists, the curator, real numbers. Answer the doubts before they're asked.</p><ul><li>Social proof</li><li>Authority</li><li>Objection handling</li><li>Reciprocity (free guide)</li></ul></div>
+    <div class="ph" style="background:var(--tint-c)"><p class="d">Days 21–27</p><h3>Momentum</h3><p class="q">"Are others doing this?"</p><p>Real entry numbers and real dates. Others are already in, and the window is closing.</p><ul><li>Momentum</li><li>Real scarcity (101 places)</li><li>Commitment reminder</li></ul></div>
+    <div class="ph" style="background:var(--card)"><p class="d">Days 28–30</p><h3>Urgency</h3><p class="q">"If not now, never."</p><p>Fear of missing out, with true dates only. Every channel at once: post, story, DM, ad.</p><ul><li>Loss aversion</li><li>Deadline</li><li>One last easy step</li></ul></div>
+  </div>
+  <div class="flag"><b>Rule that keeps it honest:</b> every number and date is real. No countdown clocks, no "only 5 spots left". 101 places and a fixed deadline are real scarcity, and that's enough.</div>
+</section>
+
+<section>
+  <p class="eyebrow">One call, start to finish</p>
+  <h2>The 15 feed posts, <em>in order</em></h2>
+  <p class="lead">Call-day 1 is launch day and call-day 30 is the deadline. Posts fall on set days so they fit with the other two calls (see the calendar below).</p>
+  <div class="scroll"><table>
+    <thead><tr><th>Day</th><th>Phase</th><th>Post</th><th>Format</th><th>Why it converts</th></tr></thead>
+    <tbody id="posts"></tbody>
+  </table></div>
+  <p class="muted" style="margin-top:12px;font-size:14px">Mix per call: 7 carousels, 6 singles, 1 reel, 1 combined post. Every post ends on the call's keyword.</p>
+</section>
+
+<section>
+  <p class="eyebrow">Three calls at once</p>
+  <h2>Launch every 10 days. <em>Never collide.</em></h2>
+  <p class="lead">With launches 10 days apart, one call is always new, one is in the middle and one is closing. Each 10-day block repeats the same pattern: the new call posts on odd days, the middle call on even days, and the closing call on days 1, 4, 7, 9 and 10. That's 15 posts every 10 days, about one or two a day, and no call ever posts twice in a row.</p>
+  <div class="legend"><span style="--sw:var(--a)">Call A</span><span style="--sw:var(--b)">Call B</span><span style="--sw:var(--c)">Call C</span><span style="--sw:var(--ink)">All calls together</span></div>
+  <div class="lanes" id="cal"></div>
+  <div class="grid">
+    <div class="card"><h3>Two posts on one day</h3><p>The closing call posts in the morning, the other call in the evening. Urgency gets the best slot.</p></div>
+    <div class="card"><h3>All calls together</h3><p>Day 24 of every call is a combined "Closing soon" post listing every open call. The same list runs as a pinned story highlight called "Open now".</p></div>
+    <div class="card"><h3>Each call stays recognisable</h3><p>Each call keeps one artwork, one name, one keyword and one hook for all 30 days. The frame and templates never change.</p></div>
+    <div class="card"><h3>Grid check</h3><p>Before scheduling, check the grid. The countdowns look the same across calls, so make sure two never sit side by side.</p></div>
+  </div>
+</section>
+
+<section>
+  <p class="eyebrow">Every day, outside the feed</p>
+  <h2>Stories, DMs and ads <em>do the reminding</em></h2>
+  <div class="grid">
+    <div class="card"><h3>Stories, daily</h3><p>One card per open call each day, with the keyword and a link sticker. Add the native Instagram countdown sticker on launch day so people can tap "remind me". Rotate a poll, a Q&amp;A box, reposts of entries and a book clip.</p></div>
+    <div class="card"><h3>DM sequence</h3><p><b>On comment:</b> brief, link and free guide. <b>Day 21:</b> "10 days left, here's your link." <b>Day 27:</b> "3 days left." <b>Day 30 morning:</b> "Closes tonight." Everyone who commented gets these, even if they never see the posts.</p></div>
+    <div class="card"><h3>Ads follow the phases</h3><p><b>Days 1–10:</b> the "Calling all ___ artists" cover, your best hook at ₹212 per application. <b>Days 11–20:</b> proof and value, optimised for sign-ups. <b>Days 21–30:</b> "Few days to apply" plus retargeting with "finish your entry".</p></div>
+    <div class="card"><h3>Caption formula</h3><p>Line 1: the identity hook and the keyword. Then what you get, the proof, who can apply, the deadline, and the keyword again. Keep it under 120 words.</p></div>
+  </div>
+</section>
+
+<section>
+  <p class="eyebrow">Where your live calls sit today</p>
+  <h2>Your three calls already <em>fit the model</em></h2>
+  <div class="scroll"><table>
+    <thead><tr><th>Call</th><th>Deadline</th><th>Days left</th><th>Phase now</th><th>Next posts</th></tr></thead>
+    <tbody>
+      <tr><td>Artist of the Year 2026</td><td>16 Nov</td><td class="n">4</td><td><span class="tag t4">Urgency</span></td><td>4 days left (today) · closes tomorrow (story, DM) · last call</td></tr>
+      <tr><td>Woman Artist Award · 7th</td><td>30 Nov</td><td class="n">18</td><td><span class="tag t2">Trust</span></td><td>Artist voice · curator · "Is this for me?" · how to apply · momentum</td></tr>
+      <tr><td>101 Art Book: Garden</td><td>13 Dec</td><td class="n">31</td><td><span class="tag t1">Attention</span></td><td>Launch carousel · does my work count? · book proof reel · what you get · prize</td></tr>
+    </tbody>
+  </table></div>
+  <p class="muted" style="margin-top:12px;font-size:14px">The next call should launch around 26 November, about 10 days after Artist of the Year closes, so there are always three running.</p>
+</section>
+
+<section>
+  <p class="eyebrow">Next: the templates</p>
+  <h2>Keep the deadline posts. <em>Redo the rest.</em></h2>
+  <div class="flag"><b>Keep:</b> the countdown, last-call and closing-soon templates you liked. Their structure becomes the base for all 15 posts.</div>
+  <div class="flag"><b>Redo:</b> the launch and the other carousels, so they belong to the same family as the deadline posts.</div>
+  <div class="flag"><b>Colour, for you to decide:</b> keep the fixed frame (ink, cream, the same layout) and give each call one accent colour taken from its artwork. Garden would get a leaf green from the painting, Woman Artist Award a velvet red. Everything else stays identical, so the calls look related and each one still suits its theme.</div>
+</section>
+
+<footer>Source: <code>design/campaigns/open-calls/ATH-open-call-playbook.html</code>. Companion to the ATH Open Call System page.</footer>
+</div>
+
+<script>
+// One call's 15 feed posts: call-day, phase, post, format, why
+const POSTS = [
+ [1,'Attention','Launch: "Calling all ___ artists", the offer, the keyword','Carousel','Identity call-out; the best ad hook at ₹212 per application'],
+ [3,'Attention','Does my work count? What fits the theme, plus the AI rule','Carousel','Self-relevance; removes the first doubt'],
+ [5,'Attention','The book in hands: a flip-through of a past edition','Reel','Makes it real; reels reach non-followers'],
+ [7,'Attention','What you get, as a receipt','Single','Value anchoring: list everything before the price'],
+ [9,'Attention','$500, the trophy and the 4-page feature','Single','Aspiration; money hooks drew 426 comments'],
+ [12,'Trust','A past selected artist in their own words','Carousel','Social proof from someone like them'],
+ [14,'Trust','The curator or jury: who decides, and what they look for','Carousel','Authority'],
+ [16,'Trust','Is this for me? Self-taught, abroad, abstract','Carousel','Objection handling'],
+ [18,'Trust','How to apply in 3 steps, plus a free guide to photographing your work','Carousel','Reciprocity; makes the first step small'],
+ [20,'Trust','Halfway: real numbers, e.g. "artists from 40 countries have entered"','Single','Momentum; others are already in'],
+ [21,'Momentum','10 days left','Single + story','Deadline becomes concrete'],
+ [24,'Momentum','Closing soon: all open calls in one post','Single (shared)','Choice; cross-sells the other calls'],
+ [27,'Urgency','3 days left','Single + story','Loss aversion'],
+ [29,'Urgency','Closes tomorrow','Story + DM','Last reminder to people who commented'],
+ [30,'Urgency','Last call: closes tonight','Single + 3 stories','Final push across every channel'],
+];
+const tagc = {Attention:'t1',Trust:'t2',Momentum:'t3',Urgency:'t4'};
+document.getElementById('posts').innerHTML = POSTS.map(([d,p,t,f,w]) =>
+  `<tr><td class="n">${d}</td><td><span class="tag ${tagc[p]}">${p}</span></td><td>${t}</td><td>${f}</td><td>${w}</td></tr>`).join('');
+
+// 30-day model month: launches on calendar day 1 (C), 11 (D), 21 (E); A and B already running.
+const short = {1:'Launch',3:'Does it count?',5:'Book reel',7:'What you get',9:'$500 prize',12:'Artist voice',14:'Curator',16:'Is this for me?',18:'How to apply',20:'Halfway',21:'10 days left',24:'Closing soon · all',27:'3 days left',29:'Closes tomorrow',30:'Last call'};
+const calls = [{n:'A',start:-19,cls:'cA'},{n:'B',start:-9,cls:'cB'},{n:'C',start:1,cls:'cC'},{n:'D',start:11,cls:'cA'},{n:'E',start:21,cls:'cB'}];
+let html='';
+for(let blk=0;blk<3;blk++){
+  html+=`<p class="blockt">Days ${blk*10+1}–${blk*10+10}</p><div class="cal">`;
+  for(let d=blk*10+1; d<=blk*10+10; d++){
+    let chips='';
+    for(const c of calls){
+      const cd=d-c.start+1;
+      if(cd>=1 && cd<=30 && short[cd]){
+        const cls = cd===24 ? 'cAll' : c.cls;
+        chips+=`<div class="chip ${cls}"><i>Call ${c.n} · day ${cd}</i>${short[cd]}</div>`;
+      }
+    }
+    html+=`<div class="day"><span class="dn">DAY ${d}</span>${chips}</div>`;
+  }
+  html+='</div>';
+}
+document.getElementById('cal').innerHTML=html;
+</script>
