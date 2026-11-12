@@ -26,7 +26,7 @@ STAR = '<svg viewBox="0 0 100 100" width="{s}" height="{s}"><path fill="currentC
 
 # ---- PER CALL (the only thing that changes) ----
 CALL = dict(kw='GARDEN', series='101 Art Book · Garden Edition', deadline='13 Dec 2026',
-            hook='Calling all artists who paint <em>nature.</em>', art='night-bloom.jpg', art_pos='50% 30%')
+            hook='Calling all artists who paint <em>nature.</em>', art='call-garden.jpg', art_pos='50% 40%')
 
 
 def arr(s=30):
