@@ -42,7 +42,7 @@ def kwpill(kw, bg, fg, size=30):
 def card(c, top, kwbg=BURG, kwfg=CREAM, days=None):
     """The website listing card, shrunk: image, name, ending pill, date, perks, keyword."""
     d = c['days_now'] if days is None else days
-    ending = 'ENDS TONIGHT' if d == 0 else f'ENDING IN {d} DAYS'
+    ending = 'ENDS TONIGHT' if d == 0 else ('ENDS TOMORROW' if d == 1 else f'ENDING IN {d} DAYS')
     return f'''<div class="a" style="left:72px;right:72px;top:{top}px;background:{CREAM};border-radius:28px;padding:22px;display:flex;gap:28px;color:{INK}">
   <div style="width:300px;height:262px;border-radius:18px;background:url(art/{c['img']}) {c['pos']}/cover;flex:none"></div>
   <div style="display:flex;flex-direction:column;justify-content:space-between;padding:6px 6px 4px 0;min-width:0">
@@ -129,6 +129,38 @@ post('aoty-4days-story', BURG, f'''
 {card(c, 1150)}
 <p class="a" style="left:0;right:0;top:1520px;text-align:center;font:500 30px/1 Inter;color:{CREAM}">Tap the link to apply</p>
 ''', story=True)
+
+
+# ---- ESCALATION for one call (Garden): burgundy at 10 days, ink for the final week ----
+def countdown_on(cid, days, bg, name):
+    c = CALLS[cid]
+    post(name, bg, f"""
+{frame(CREAM, 'Deadline', c['short'], right='Link in bio', accent=PEONY)}
+<p class="g a" style="left:52px;top:110px;font-size:600px;color:{CREAM}">{days}</p>
+<p class="it a" style="left:{90 + 300 * len(str(days))}px;top:450px;font-size:190px;color:{PEONY}">{'day' if days == 1 else 'days'}</p>
+<p class="g a" style="left:72px;right:72px;top:690px;font-size:84px;color:{CREAM}">left to apply to <em style="color:{PEONY}">{c['short']}.</em></p>
+{card(dict(c, days_now=days), 900)}
+""")
+
+
+def words_on(cid, name, big, small, days, sticker=False):
+    c = CALLS[cid]
+    st = (f'<div class="a" style="right:72px;top:150px;width:210px;height:210px;border-radius:50%;background:{CHILLI};color:{CREAM};display:flex;flex-direction:column;align-items:center;justify-content:center;transform:rotate(-10deg)">'
+          f'<b style="font:italic 400 64px/.9 IS">Last</b><span style="font:600 18px/1.2 Inter;letter-spacing:.14em;margin-top:6px">CALL</span></div>') if sticker else ''
+    post(name, INK, f"""
+{frame(CREAM, 'Last call' if sticker else 'Deadline', c['short'], right='Link in bio', accent=PEONY)}
+{st}
+<p class="g a" style="left:62px;right:300px;top:170px;font-size:210px;color:{CREAM}">{big}</p>
+<p class="a" style="left:72px;right:72px;top:640px;font:400 40px/1.35 Inter;color:{CREAM};opacity:.9">{small}</p>
+{card(dict(c, days_now=days), 900)}
+""")
+
+
+countdown_on('garden', 10, BURG, 'esc-1-day21-10days')
+countdown_on('garden', 7, INK, 'esc-2-day24-7days')
+countdown_on('garden', 3, INK, 'esc-3-day27-3days')
+words_on('garden', 'esc-4-day29-tomorrow', 'Closes <em style="color:#FAD2E1">tomorrow.</em>', 'One artwork is enough. Comment GARDEN and we\'ll DM you the link.', 1)
+words_on('garden', 'esc-5-day30-lastcall', 'Closes <em style="color:#FAD2E1">tonight.</em>', 'Your last chance to be one of the 101 in the Garden Edition.', 0, sticker=True)
 
 (HERE / 'deadlines-ath.html').write_text(f'<!doctype html><html><head><meta charset="utf-8"><style>{CSS}</style></head><body>{"".join(h for _, h in S)}</body></html>')
 (HERE / '.shot8.cjs').write_text(f"""const {{chromium}}=require('playwright');(async()=>{{const b=await chromium.launch();const p=await b.newPage({{viewport:{{width:1080,height:1350}}}});
