@@ -1,0 +1,146 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>Garden launch drafts</title>
+<style>
+@font-face{font-family:HG;src:url(fonts/ath/HankenGrotesk.woff2) format("woff2");font-weight:100 900}
+@font-face{font-family:NR;src:url(fonts/ath/Newsreader-Italic.woff2) format("woff2");font-style:italic;font-weight:200 800}
+@font-face{font-family:NR;src:url(fonts/ath/Newsreader.woff2) format("woff2");font-weight:200 800}
+body{margin:0;background:#C9D3CF;display:flex;flex-wrap:wrap;gap:40px;padding:40px}
+/* Draft A: light editorial · Draft B: dark gallery. Same copy, same grid. */
+.A{--bg:#F6F2EA;--bg2:#E9ECDF;--fg:#16080C;--mute:rgba(22,8,12,.6);--line:rgba(22,8,12,.22);--acc:#025054;--btn:#6A0620;--btnfg:#F6F2EA;--logo:url(art/logo-no-project_burgundy.svg)}
+.B{--bg:#023A3D;--bg2:#025054;--fg:#F6F2EA;--mute:rgba(246,242,234,.65);--line:rgba(246,242,234,.25);--acc:#D0D996;--btn:#D0D996;--btnfg:#16080C;--logo:url(art/logo-no-project_peony.svg)}
+.s{position:relative;width:1080px;height:1350px;overflow:hidden;font-family:HG,sans-serif;-webkit-font-smoothing:antialiased;background:var(--bg);color:var(--fg)}
+.s *{margin:0;box-sizing:border-box}
+.a{position:absolute}
+.logo{left:72px;top:62px;width:200px;height:52px;background:var(--logo) left center/contain no-repeat}
+.sec{right:72px;top:74px;font-size:24px;font-weight:500;color:var(--mute)}
+.foot{left:72px;right:72px;bottom:56px;display:flex;justify-content:space-between;font-size:23px;font-weight:500;padding-top:20px;border-top:1.5px solid var(--line)}
+.foot span:last-child{color:var(--mute)}
+.oc{font-weight:700;letter-spacing:-.05em;line-height:.85;text-transform:uppercase}
+.d{font-family:NR,serif;font-weight:400;letter-spacing:-.022em;line-height:1.06}
+.d i{font-style:italic}
+.p{font-size:31px;line-height:1.42;font-weight:400;color:var(--mute)}
+.lab{font-size:24px;font-weight:600;color:var(--acc)}
+.img{background-size:cover;background-repeat:no-repeat;background-position:center}
+.row{display:grid;grid-template-columns:1fr 1.25fr;gap:40px;padding:28px 0;border-top:1.5px solid var(--line);align-items:baseline}
+.book{position:absolute;border-radius:2px 6px 6px 2px;overflow:hidden;box-shadow:0 30px 40px -18px rgba(0,0,0,.5)}
+.book:before{content:"";position:absolute;left:0;top:0;bottom:0;width:8%;background:linear-gradient(90deg,rgba(0,0,0,.35),rgba(255,255,255,.12) 60%,rgba(0,0,0,.1));z-index:2}
+</style></head><body>
+<div id="out" style="display:contents"></div>
+<script>
+const EDS = [['Photography','#16080C','#F6F2EA'],['Food','#AA0003','#FFD6DE'],['Collage','#FAD2E1','#6A0620'],['Landscape','#025054','#D0D996'],['Abstract','#F6F2EA','#16080C'],
+['Portrait','#6A0620','#FAD2E1'],['Animal','#D0D996','#025054'],['Floral','#FFD6DE','#AA0003'],['Nature','#2E4A2A','#E9ECDF'],['Dogs','#B7D9FF','#6A0620'],
+['Pattern','#16080C','#D0D996'],['Colors','#FFF3B2','#AA0003'],['Faces','#4C4240','#F6F2EA'],['Texture','#E9ECDF','#16080C'],['Artist of the Year','#6A0620','#F6F2EA']];
+const AR = '<svg width="40" height="18" viewBox="0 0 46 20"><path d="M2 10h40M33 2l9 8-9 8" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+const head = sec => `<div class="a logo"></div><p class="a sec">${sec}</p>`;
+const foot = (l='Open call · DM “GARDEN” for the brief', r='Closes 13 Dec') => `<div class="a foot"><span>${l}</span><span>${r}</span></div>`;
+const cover = (x,y,w,h,img,title,sub='101 ART BOOK') => `<div class="book" style="left:${x}px;top:${y}px;width:${w}px;height:${h}px">
+  <div class="a img" style="inset:0;background-image:url(${img});background-position:center 30%"></div>
+  <div class="a" style="left:0;right:0;top:0;height:40%;background:linear-gradient(180deg,rgba(20,6,10,.8),rgba(20,6,10,0))"></div>
+  <p class="a" style="left:14%;top:7%;color:#fff;font-size:${w*.036}px;font-weight:700;letter-spacing:.16em">${sub}</p>
+  <p class="a d" style="left:14%;top:12%;color:#fff;font-size:${w*.12}px"><i>${title}</i></p></div>`;
+
+function slides(T){ return [
+// 1 COVER — OPEN CALL loudest
+`${head('Edition 16')}
+ <p class="a oc" style="left:60px;top:170px;font-size:184px;white-space:nowrap">Open call</p>
+ <p class="a d" style="left:72px;top:360px;font-size:62px">101 Art Book: <i>Garden Edition</i></p>
+ <p class="a" style="left:72px;top:450px;font-size:28px;color:var(--mute)">Submissions now open for the sixteenth edition.</p>
+ <div class="a img" style="left:72px;right:72px;top:540px;height:640px;background-image:url(art/flower-portrait.jpg);background-position:center 20%"></div>
+ ${cover(690,790,260,348,'art/night-bloom.jpg','Garden','101 ART BOOK · VOL. 16')}
+ ${foot('Open call · DM “GARDEN” for the brief','Closes 13 December')}`,
+
+// 2 THE QUESTION — brand story
+`${head('The 101 Art Book')}
+ <p class="a lab" style="left:72px;top:300px">It started with a question</p>
+ <p class="a d" style="left:72px;right:90px;top:360px;font-size:90px">What happens when 101 artists from around the world come together around a <i>single idea?</i></p>
+ <p class="a p" style="left:72px;right:200px;top:900px">Each edition becomes a record of how one theme is understood across cultures, disciplines and creative voices.</p>
+ ${foot()}`,
+
+// 3 THE COLLECTION — heritage, with Garden's empty slot
+`${head('The collection')}
+ <p class="a d" style="left:72px;right:72px;top:160px;font-size:80px">15 editions. 1,300+ artists.<br><span style="color:var(--mute)">Since 2023.</span></p>
+ <div class="a" style="left:72px;right:72px;top:420px;display:grid;grid-template-columns:repeat(4,1fr);gap:18px">
+  ${EDS.map(([n,b,f])=>`<div style="height:150px;background:${b};color:${f};border-radius:3px 8px 8px 3px;padding:16px 18px;display:flex;flex-direction:column;justify-content:space-between;box-shadow:inset 8px 0 0 rgba(0,0,0,.12)"><span style="font-size:12px;font-weight:700;letter-spacing:.14em;opacity:.75">101 ART BOOK</span><span class="d" style="font-size:${n.length>12?22:28}px"><i>${n}</i></span></div>`).join('')}
+  <div style="height:150px;border:2.5px dashed var(--acc);border-radius:8px;display:flex;flex-direction:column;justify-content:center;padding:0 18px;color:var(--acc)"><span style="font-size:13px;font-weight:700;letter-spacing:.14em">EDITION 16</span><span class="d" style="font-size:30px;margin-top:6px"><i>Garden</i></span></div>
+ </div>
+ <p class="a p" style="left:72px;right:72px;top:1130px">The sixteenth place on the shelf is open.</p>
+ ${foot()}`,
+
+// 4 EDITION 16 — the theme, artwork untouched
+`<div class="a img" style="left:0;right:0;top:0;height:760px;background-image:url(art/night-bloom.jpg);background-position:center 40%"></div>
+ <p class="a lab" style="left:72px;top:820px">Edition 16 · The theme</p>
+ <p class="a d" style="left:72px;right:72px;top:870px;font-size:84px"><i>Garden</i></p>
+ <p class="a p" style="left:72px;right:100px;top:980px;color:var(--fg)">101 artists inspired by the natural world: flowers, butterflies and blooming plants, trees, leaves and the smallest details of nature.</p>
+ ${foot('Open call · DM “GARDEN” for the brief','Art: [Artist name]')}`,
+
+// 5 THE LATEST RELEASE — proof (dummy spread)
+`${head('Just released')}
+ <div class="a" style="left:72px;right:72px;top:170px;height:560px;box-shadow:0 40px 60px -24px rgba(0,0,0,.45)">
+  <div class="a img" style="left:0;top:0;width:50%;height:100%;background-image:url(art/flower-portrait.jpg);background-position:center 25%"></div>
+  <div class="a" style="right:0;top:0;width:50%;height:100%;background:linear-gradient(90deg,#E6DFD2,#FFFDF8 14%);color:#16080C">
+   <p class="a" style="left:50px;top:50px;font-size:15px;font-weight:700;letter-spacing:.14em;opacity:.5">NATURE EDITION</p>
+   <p class="a d" style="left:50px;top:300px;font-size:42px">Artist name</p>
+   <p class="a" style="left:50px;top:360px;right:40px;font-size:18px;line-height:1.5;opacity:.65">Title of work, 2025<br>Oil on canvas · Country</p>
+   <p class="a" style="left:50px;bottom:36px;font-size:15px;opacity:.4">212</p></div>
+  <div class="a" style="left:50%;top:0;bottom:0;width:30px;margin-left:-15px;background:linear-gradient(90deg,rgba(0,0,0,0),rgba(0,0,0,.18),rgba(0,0,0,0))"></div>
+ </div>
+ <p class="a lab" style="left:72px;top:800px">Our latest edition</p>
+ <p class="a d" style="left:72px;right:72px;top:850px;font-size:76px">The Nature Edition,<br>now in print.</p>
+ <p class="a p" style="left:72px;right:140px;top:1020px">This is what publication looks like: your work and your name, on the page.</p>
+ ${foot()}`,
+
+// 6 ARTIST VOICE — needs a real quote
+`${head('From the collection')}
+ <div class="a img" style="left:72px;top:180px;width:300px;height:380px;background-image:url(art/ref-palms.jpg)"></div>
+ <p class="a" style="left:410px;top:440px;font-size:26px;font-weight:600">[Artist name]</p>
+ <p class="a" style="left:410px;top:480px;font-size:24px;color:var(--mute)">Published in the [X] Edition · [Country]</p>
+ <p class="a d" style="left:72px;right:80px;top:650px;font-size:72px">“[One real line from a past artist about what being in the book meant to their practice.]”</p>
+ ${foot()}`,
+
+// 7 WHAT SELECTION BRINGS — career record
+`${head('If selected')}
+ <p class="a d" style="left:72px;right:72px;top:170px;font-size:80px">What selection<br>brings</p>
+ <div class="a" style="left:72px;right:72px;top:430px;border-bottom:1.5px solid var(--line)">
+  <div class="row"><p style="font-size:30px;font-weight:600">In print</p><p class="p" style="font-size:28px">Your work in a hardcover collectible edition.</p></div>
+  <div class="row"><p style="font-size:30px;font-weight:600">On record</p><p class="p" style="font-size:28px">An official Certificate of Recognition for your CV, portfolio and grant applications.</p></div>
+  <div class="row"><p style="font-size:30px;font-weight:600">In the campaign</p><p class="p" style="font-size:28px">Features to our 190,000+ community and 100,000+ email subscribers.</p></div>
+  <div class="row"><p style="font-size:30px;font-weight:600">On the shelf</p><p class="p" style="font-size:28px">Sold through Amazon, Barnes &amp; Noble and bookstores.</p></div>
+  <div class="row"><p style="font-size:30px;font-weight:600">In the room</p><p class="p" style="font-size:28px">Introduced to collectors, galleries and curators.</p></div>
+ </div>
+ ${foot()}`,
+
+// 8 WHO IT'S FOR — belonging
+`${head('Who it’s for')}
+ <p class="a d" style="left:72px;right:72px;top:300px;font-size:96px">Emerging, mid-career or <i>established.</i></p>
+ <div class="a" style="left:72px;width:420px;top:720px;height:0;border-top:1.5px solid var(--line)"></div>
+ <p class="a" style="left:72px;right:200px;top:760px;font-size:40px;line-height:1.3;font-weight:500">No degree, gallery or exhibition history needed.</p>
+ <p class="a p" style="left:72px;right:200px;top:920px">Open to individual artists aged 18 and over, anywhere in the world, in any medium.</p>
+ ${foot()}`,
+
+// 9 SELECTION — scarcity + recognition
+`${head('Selection')}
+ <p class="a oc" style="left:56px;top:170px;font-size:400px;font-weight:600;text-transform:none;letter-spacing:-.06em">101</p>
+ <p class="a d" style="left:72px;right:72px;top:530px;font-size:64px">places, chosen by the jury.</p>
+ <div class="a" style="left:72px;right:72px;top:740px;border-bottom:1.5px solid var(--line)">
+  <div class="row" style="grid-template-columns:1fr 1.6fr"><p style="font-size:28px;font-weight:600;color:var(--acc)">Winner</p><p class="p" style="font-size:28px;color:var(--fg)">$500, a 4-page feature, trophy and Artsy listing</p></div>
+  <div class="row" style="grid-template-columns:1fr 1.6fr"><p style="font-size:28px;font-weight:600;color:var(--acc)">Two runners-up</p><p class="p" style="font-size:28px;color:var(--fg)">2-page feature and trophy</p></div>
+ </div>
+ ${foot()}`,
+
+// 10 JOIN THE COLLECTION — clear action
+`${head('Submissions open')}
+ <p class="a d" style="left:72px;right:72px;top:200px;font-size:110px">Join the <i>collection.</i></p>
+ <p class="a p" style="left:72px;right:200px;top:470px;color:var(--fg)">Submissions for the Garden Edition close 13 December.</p>
+ <div class="a" style="left:72px;right:72px;top:620px;height:120px;border-radius:999px;background:var(--btn);color:var(--btnfg);display:flex;align-items:center;justify-content:space-between;padding:0 18px 0 50px">
+  <span style="font-size:38px;font-weight:600;letter-spacing:-.01em">DM “GARDEN” for the full brief</span>
+  <span style="width:84px;height:84px;border-radius:50%;background:var(--btnfg);color:var(--btn);display:inline-flex;align-items:center;justify-content:center">${AR}</span></div>
+ <div class="a" style="left:72px;right:72px;top:770px;height:120px;border-radius:999px;border:2px solid var(--fg);display:flex;align-items:center;justify-content:space-between;padding:0 18px 0 50px">
+  <span style="font-size:38px;font-weight:500;letter-spacing:-.01em">Or apply via the link in bio</span>
+  <span style="width:84px;height:84px;border-radius:50%;border:2px solid var(--fg);display:inline-flex;align-items:center;justify-content:center">${AR}</span></div>
+ <p class="a p" style="left:72px;right:72px;top:960px;font-size:28px">Know an artist whose work belongs in this book? Send this to them.</p>
+ ${foot('Arts to Hearts · 101 Art Book Vol. 16','Application fee applicable')}`
+];}
+const out = document.getElementById('out');
+['A','B'].forEach(T => slides(T).forEach((h,i) => { const d = document.createElement('div'); d.className = 's ' + T; d.id = T + (i+1); d.innerHTML = h; out.appendChild(d); }));
+</script>
+</body></html>
