@@ -2,11 +2,16 @@
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Faculty+Glyphic&family=Hanken+Grotesk:wght@400;500;600;700&family=Newsreader:ital,opsz,wght@0,6..72,300;0,6..72,400;1,6..72,300;1,6..72,400&family=Playfair+Display:ital@1&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Hanken+Grotesk:wght@400;500;600;700&display=swap">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 <style>
-/* Layout: a working tool. Call details on the left, generated posts in a grid on the right. */
+/* Post fonts ship with the page so previews and exported PNGs match exactly */
+@font-face{font-family:"ATH Grotesk";src:url(fonts/ath/HankenGrotesk.woff2) format("woff2");font-weight:100 900}
+@font-face{font-family:"ATH Serif";src:url(fonts/ath/Newsreader-Italic.woff2) format("woff2");font-style:italic;font-weight:200 800}
+@font-face{font-family:"ATH Script";src:url(fonts/InstrumentSerif-Italic.ttf) format("truetype");font-style:italic}
+
+/* ===== Studio UI ===== */
 :root{
   --bg:#F6F1EC; --panel:#FFFCF8; --ink:#2A0A12; --muted:#6E5F5A; --line:#E4D8CF; --accent:#6A0620; --field:#FFFFFF;
   --sans:"Hanken Grotesk",system-ui,-apple-system,"Segoe UI",sans-serif; --mono:"DM Mono",ui-monospace,monospace;
@@ -16,7 +21,7 @@
 *{box-sizing:border-box}
 html,body{height:100%}
 body{margin:0;background:var(--bg);color:var(--ink);font:400 14px/1.45 var(--sans)}
-.app{display:grid;grid-template-columns:380px minmax(0,1fr);min-height:100%}
+.app{display:grid;grid-template-columns:390px minmax(0,1fr);min-height:100%}
 aside{background:var(--panel);border-right:1px solid var(--line);padding-block:20px;padding-left:max(18px,env(safe-area-inset-left,0px));padding-right:18px;overflow:auto;max-height:100vh;position:sticky;top:0}
 main{padding-block:20px;padding-left:24px;padding-right:max(20px,env(safe-area-inset-right,0px));min-width:0}
 h1{font:700 20px/1.1 var(--sans);letter-spacing:-.02em;margin:0 0 4px}
@@ -27,11 +32,14 @@ summary{font:600 12px/1 var(--mono);letter-spacing:.1em;text-transform:uppercase
 .f label{font-size:12px;color:var(--muted)}
 .f input,.f textarea,.f select{font:inherit;color:var(--ink);background:var(--field);border:1px solid var(--line);border-radius:8px;padding:8px 10px;width:100%}
 .f textarea{min-height:64px;resize:vertical}
+.hint{font-size:12px;color:var(--muted);margin:6px 0 0}
 .row2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-.sw{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
+.row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+.sw{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px;align-items:center}
 .sw button{width:34px;height:34px;border-radius:8px;border:2px solid transparent;cursor:pointer;padding:0;overflow:hidden;display:flex}
 .sw button span{flex:1}
 .sw button[aria-pressed="true"]{border-color:var(--ink)}
+.sw input[type=color]{width:34px;height:34px;padding:0;border:1px solid var(--line);border-radius:8px;background:none}
 .img-in{display:flex;align-items:center;gap:8px}
 .img-in .th{width:44px;height:44px;border-radius:6px;background:var(--line) center/cover;flex:none}
 .top{display:flex;flex-wrap:wrap;gap:10px;align-items:end;margin-bottom:18px}
@@ -40,114 +48,115 @@ summary{font:600 12px/1 var(--mono);letter-spacing:.1em;text-transform:uppercase
 .btn.ghost{background:transparent;color:var(--ink)}
 .btn:focus-visible,.sw button:focus-visible,summary:focus-visible{outline:3px solid #FFA1C2;outline-offset:2px}
 .status{font-size:13px;color:var(--muted);min-height:18px}
-.group{margin-bottom:30px}
 .group h2{font:600 16px/1.2 var(--sans);margin:0 0 2px}
 .group .meta{font:400 12px/1.3 var(--mono);color:var(--muted);margin-bottom:10px;text-transform:uppercase;letter-spacing:.06em}
-.slides{display:flex;gap:14px;overflow-x:auto;padding-bottom:8px}
-.cell{flex:none;width:var(--pw);display:flex;flex-direction:column;gap:6px}
+.slides{display:grid;grid-template-columns:repeat(auto-fill,minmax(var(--pw),1fr));gap:16px}
+.cell{display:flex;flex-direction:column;gap:6px}
 .frame{width:var(--pw);height:calc(var(--pw) * 1.25);overflow:hidden;border-radius:6px;box-shadow:0 1px 0 var(--line),0 8px 24px rgba(0,0,0,.08);position:relative}
 .frame>.post{transform:scale(var(--sc));transform-origin:0 0}
-.cell .act{display:flex;justify-content:space-between;align-items:center;font-size:12px;color:var(--muted)}
+.cell .act{display:flex;justify-content:space-between;align-items:center;font-size:12px;color:var(--muted);width:var(--pw)}
 .cell .act button{font:600 12px/1 var(--sans);border:1px solid var(--line);background:var(--panel);color:var(--ink);border-radius:8px;padding:6px 9px;cursor:pointer}
-.empty{border:1px dashed var(--line);border-radius:12px;padding:40px;text-align:center;color:var(--muted)}
 #stage{position:fixed;left:-30000px;top:0}
 @media (max-width:900px){.app{grid-template-columns:1fr}aside{position:static;max-height:none;border-right:0;border-bottom:1px solid var(--line)}}
 
-/* ===== POSTS (1080 x 1350) — fixed brand values, never themed ===== */
-.post{position:relative;width:1080px;height:1350px;overflow:hidden;font-family:"Hanken Grotesk",sans-serif;-webkit-font-smoothing:antialiased;color:#2A0A12}
-.post *{box-sizing:border-box;margin:0}
-.post .a{position:absolute}
-.post .num{font-weight:400;letter-spacing:-.065em;line-height:.8;white-space:nowrap}
-.post .h{font-weight:500;letter-spacing:-.045em;line-height:.96}
-.post .h2{font-weight:500;letter-spacing:-.035em;line-height:1.02}
-.post .p{font-weight:400;font-size:26px;line-height:1.34;letter-spacing:-.005em}
-.post .lab{font-weight:400;font-size:22px;letter-spacing:-.005em;line-height:1}
-.post .tag{font-weight:500;font-size:15px;letter-spacing:.08em;text-transform:uppercase;line-height:1.35}
-.post .q{font-family:"Newsreader",serif;font-weight:300;letter-spacing:-.02em;line-height:1.06}
-.post i.s{font-family:"Newsreader",serif;font-style:italic;font-weight:300;letter-spacing:-.01em}
-.post .logo{font-family:"Faculty Glyphic",serif;font-size:30px;line-height:1;white-space:nowrap}
-.post .logo i{font-family:"Playfair Display",serif;font-style:italic;font-size:32px}
-.post .img{background-size:cover;background-position:center}
-.post .ph{background:repeating-linear-gradient(135deg,rgba(255,255,255,.07) 0 16px,rgba(0,0,0,.07) 16px 32px);color:currentColor;outline:2px dashed rgba(127,127,127,.45);outline-offset:-24px;display:flex;align-items:center;justify-content:center}
-.post .ph span{font-size:22px;letter-spacing:.06em;text-transform:uppercase;opacity:.7;color:#8a8a8a}
-.post .rule{border-top:2px solid currentColor}
-.post .pill{display:inline-flex;align-items:center;gap:14px;border-radius:999px;white-space:nowrap}
+/* ===== POSTS (1080 x 1350): ATH brand colours + one call colour ===== */
+.post{position:relative;width:1080px;height:1350px;overflow:hidden;font-family:"ATH Grotesk","Hanken Grotesk",sans-serif;-webkit-font-smoothing:antialiased;color:#14090C}
+.post *{margin:0;box-sizing:border-box}
+.post .a{position:absolute}.post .c{text-align:center}
+.post .img{background-size:cover;background-repeat:no-repeat}
+.post .cn{font-size:20px;font-weight:700;letter-spacing:.16em;text-transform:uppercase}
+.post .H{font-weight:600;letter-spacing:-.045em;line-height:1.02}
+.post .R{font-weight:400;letter-spacing:-.04em;line-height:1.1}
+.post .sub{color:inherit;font-size:32px;font-weight:500;line-height:1.38;letter-spacing:-.01em}
+.post .scr{font-family:"ATH Script",serif;font-style:italic;font-weight:400}
+.post .ser{font-family:"ATH Serif",serif;font-style:italic;font-weight:400}
+.post .lab{font-size:22px;font-weight:700;letter-spacing:.12em;text-transform:uppercase}
+/* gap = information still to be supplied; visible on purpose */
+.post .gap{display:inline-block;border:2px dashed currentColor;border-radius:8px;padding:0 .3em;opacity:.75}
+.post .ph{display:flex;align-items:center;justify-content:center;text-align:center;border:3px dashed currentColor;border-radius:18px;opacity:.6;font-size:24px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;line-height:1.5}
 </style>
 
 <div class="app">
 <aside>
   <h1>ATH Post Studio</h1>
-  <p class="sub">Fill in one open call, pick a post or the whole month, and the posts render on the right.</p>
+  <p class="sub">Fill in one open call and the launch carousel renders on the right in ATH colours plus the call’s own colour. Dashed boxes mark details still to supply.</p>
 
   <div class="f"><label for="saved">Saved calls (this browser)</label>
     <div class="row2"><select id="saved"></select><button class="btn ghost" id="saveCall" type="button">Save call</button></div></div>
 
   <details open><summary>The call</summary>
-    <div class="f"><label for="name">Full name</label><input id="name"></div>
     <div class="row2">
-      <div class="f"><label for="short">Short name</label><input id="short"></div>
-      <div class="f"><label for="word">Theme word</label><input id="word"></div>
+      <div class="f"><label for="series">Series</label><input id="series"></div>
+      <div class="f"><label for="edition">Edition number</label><input id="edition"></div>
     </div>
+    <div class="f"><label for="name">Edition name</label><input id="name"></div>
     <div class="row2">
-      <div class="f"><label for="series">Series label</label><input id="series"></div>
       <div class="f"><label for="keyword">DM keyword</label><input id="keyword"></div>
-    </div>
-    <div class="row2">
       <div class="f"><label for="deadline">Deadline</label><input id="deadline" type="date"></div>
+    </div>
+    <div class="row2">
       <div class="f"><label for="selected">Artists selected</label><input id="selected"></div>
+      <div class="f"><label for="headline">Cover headline</label><select id="headline"><option>Call for artists</option><option>Open call</option><option>Get published</option><option>Submissions open</option></select></div>
     </div>
-    <div class="f"><label>Call colour (ATH palette)</label><div class="sw" id="palettes"></div></div>
+    <div class="f"><label for="coverLine">Cover line</label><input id="coverLine"></div>
+    <div class="f"><label>Call colour (one colour that matches the theme)</label><div class="sw" id="colours"></div></div>
   </details>
 
-  <details><summary>Offer and proof</summary>
+  <details><summary>About ATH</summary>
     <div class="row2">
-      <div class="f"><label for="prize">Top award</label><input id="prize"></div>
-      <div class="f"><label for="feature">Winner feature</label><input id="feature"></div>
+      <div class="f"><label for="books">Books published</label><input id="books"></div>
+      <div class="f"><label for="featured">Artists featured</label><input id="featured"></div>
     </div>
+    <div class="row3">
+      <div class="f"><label for="editions">Editions</label><input id="editions"></div>
+      <div class="f"><label for="published">Artists in series</label><input id="published"></div>
+      <div class="f"><label for="since">Since</label><input id="since"></div>
+    </div>
+    <div class="f"><label for="shelf">Past editions on the shelf (comma separated)</label><textarea id="shelf"></textarea></div>
+  </details>
+
+  <details><summary>Theme</summary>
+    <div class="f"><label for="quote">Theme line</label><textarea id="quote"></textarea></div>
+    <div class="f"><label for="submit">What artists can submit</label><textarea id="submit"></textarea></div>
+  </details>
+
+  <details><summary>What selected artists receive</summary>
+    <div class="f"><label for="bookText">The book (one sentence)</label><textarea id="bookText"></textarea></div>
+    <div class="f"><label for="benefits">Benefits, one per line: Title | detail (first line sits at the bottom of the stack)</label><textarea id="benefits" style="min-height:130px"></textarea></div>
     <div class="row2">
-      <div class="f"><label for="published">Artists published</label><input id="published"></div>
-      <div class="f"><label for="editions">Editions in print</label><input id="editions"></div>
+      <div class="f"><label for="prize">Winner award</label><input id="prize"></div>
+      <div class="f"><label for="runners">Runners-up</label><input id="runners"></div>
     </div>
-    <div class="f"><label for="benefits">What selected artists get (one per line)</label><textarea id="benefits"></textarea></div>
-    <div class="f"><label for="awards">Awards (one per line: Title | details)</label><textarea id="awards"></textarea></div>
+    <div class="f"><label for="prizeExtra">Winner also receives</label><input id="prizeExtra"></div>
+  </details>
+
+  <details><summary>Selection and timeline</summary>
+    <div class="f"><label for="jury">Jury (leave empty for “the jury”)</label><input id="jury"></div>
     <div class="row2">
-      <div class="f"><label for="entries">Entries so far</label><input id="entries"></div>
-      <div class="f"><label for="countries">Countries so far</label><input id="countries"></div>
+      <div class="f"><label for="results">Results date</label><input id="results" placeholder="e.g. 10 Jan"></div>
+      <div class="f"><label for="pub">Publication month</label><input id="pub" placeholder="e.g. March"></div>
     </div>
+    <div class="f"><label for="fee">Application fee wording</label><input id="fee" placeholder="e.g. applicable"></div>
+    <div class="f"><label for="elig">Eligibility line</label><input id="elig"></div>
   </details>
 
-  <details><summary>Theme and voice</summary>
-    <div class="f"><label for="quote">Curatorial line</label><textarea id="quote"></textarea></div>
-    <div class="f"><label for="themeBody">Theme paragraph</label><textarea id="themeBody"></textarea></div>
-    <div class="f"><label for="ins">What counts (comma separated)</label><textarea id="ins"></textarea></div>
-    <div class="f"><label for="outs">What doesn't (comma separated)</label><input id="outs"></div>
-  </details>
-
-  <details><summary>Jury and artists</summary>
+  <details><summary>Images and past artists</summary>
+    <div class="f"><label for="imgCover">Cover artwork</label><div class="img-in"><span class="th" id="th-imgCover"></span><input id="imgCover" type="file" accept="image/*"></div></div>
+    <div class="f"><label for="credit">Cover credit</label><input id="credit" placeholder="Artist name, Title"></div>
+    <div class="f"><label for="imgTheme">Theme artwork</label><div class="img-in"><span class="th" id="th-imgTheme"></span><input id="imgTheme" type="file" accept="image/*"></div></div>
+    <div class="f"><label for="imgBooks">Photo: the books together</label><div class="img-in"><span class="th" id="th-imgBooks"></span><input id="imgBooks" type="file" accept="image/*"></div></div>
+    <div class="f"><label for="imgSpread">Photo: an open spread</label><div class="img-in"><span class="th" id="th-imgSpread"></span><input id="imgSpread" type="file" accept="image/*"></div></div>
+    <div class="f"><label for="artists">Past artists, one per line: Name | Edition · Country | One line</label><textarea id="artists"></textarea></div>
     <div class="row2">
-      <div class="f"><label for="jury">Jury / curator name</label><input id="jury"></div>
-      <div class="f"><label for="juryRole">Role</label><input id="juryRole"></div>
+      <div class="f"><label for="imgA1">Artist 1 page</label><div class="img-in"><span class="th" id="th-imgA1"></span><input id="imgA1" type="file" accept="image/*"></div></div>
+      <div class="f"><label for="imgA2">Artist 2 page</label><div class="img-in"><span class="th" id="th-imgA2"></span><input id="imgA2" type="file" accept="image/*"></div></div>
     </div>
-    <div class="f"><label for="juryQuote">Jury quote</label><textarea id="juryQuote"></textarea></div>
-    <div class="f"><label for="testimonials">Artist quotes (one per line: Quote | Name | Edition)</label><textarea id="testimonials"></textarea></div>
-  </details>
-
-  <details><summary>Images</summary>
-    <div class="f"><label for="imgHero">Hero artwork</label><div class="img-in"><span class="th" id="th-imgHero"></span><input id="imgHero" type="file" accept="image/*"></div></div>
-    <div class="f"><label for="imgCredit">Hero credit (Artist · Title · Medium · City)</label><input id="imgCredit"></div>
-    <div class="f"><label for="imgBook">Book photo</label><div class="img-in"><span class="th" id="th-imgBook"></span><input id="imgBook" type="file" accept="image/*"></div></div>
-    <div class="f"><label for="imgJury">Jury portrait</label><div class="img-in"><span class="th" id="th-imgJury"></span><input id="imgJury" type="file" accept="image/*"></div></div>
-    <div class="f"><label for="imgArt2">Second artwork</label><div class="img-in"><span class="th" id="th-imgArt2"></span><input id="imgArt2" type="file" accept="image/*"></div></div>
-  </details>
-
-  <details><summary>Other open calls</summary>
-    <div class="f"><label for="others">One per line: Name | Deadline (YYYY-MM-DD) | Keyword</label><textarea id="others"></textarea></div>
   </details>
 </aside>
 
 <main>
   <div class="top">
-    <div class="f"><label for="ptype">Post</label><select id="ptype"></select></div>
+    <div class="f"><label for="ptype">Post</label><select id="ptype"><option value="launch">Launch carousel (11 slides)</option></select></div>
     <button class="btn" id="go" type="button">Create posts</button>
     <button class="btn ghost" id="zip" type="button">Save all as ZIP</button>
     <p class="status" id="status" role="status"></p>
@@ -159,57 +168,50 @@ summary{font:600 12px/1 var(--mono);letter-spacing:.1em;text-transform:uppercase
 
 <script>
 const $ = id => document.getElementById(id);
-const CREAM='#F9ECE5', INK='#2A0A12', BURG='#6A0620', CHILLI='#AA0003', PEONY='#FAD2E1', COCOA='#4C4240';
-
-// Call colour presets from the ATH palette: ground, type on ground, soft ground, type on soft
-const PALETTES = {
-  petrol:   {label:'Petrol + Pistachio', bg:'#025054', fg:'#D0D996', soft:'#E9ECD3', softFg:'#025054'},
-  burgundy: {label:'Burgundy + Peony',   bg:'#6A0620', fg:'#FAD2E1', soft:'#F8DFE6', softFg:'#6A0620'},
-  ink:      {label:'Ink + Hot Rose',     bg:'#2A0A12', fg:'#FFA1C2', soft:'#F9ECE5', softFg:'#2A0A12'},
-  chilli:   {label:'Chilli + Ballet',    bg:'#AA0003', fg:'#FFD6DE', soft:'#FFE7EB', softFg:'#AA0003'},
-  sky:      {label:'Sky + Burgundy',     bg:'#B7D9FF', fg:'#6A0620', soft:'#E4F0FF', softFg:'#6A0620'},
-  lemon:    {label:'Lemon + Chilli',     bg:'#FFF3B2', fg:'#AA0003', soft:'#FFF8D6', softFg:'#AA0003'},
-};
+// ATH brand colours: fixed on every call
+const INK='#14090C', CREAM='#F9ECE5', BURG='#6A0620', PEONY='#FAD2E1', WHITE='#FFFFFF';
+// one colour per call, matched to its theme
+const COLOURS = { Emerald:'#0E6B4A', Cobalt:'#1E4FA3', Plum:'#5B2A6E', Teal:'#0B6E79', Ochre:'#9A6A12' };
 
 const DEFAULTS = {
-  name:'101 Art Book: Garden Edition', short:'Garden Edition', word:'garden', series:'101 Art Book · Vol. 16', keyword:'GARDEN',
-  deadline:'2026-12-13', selected:'101', palette:'petrol',
-  prize:'$500', feature:'4-page feature', published:'1,300+', editions:'15',
-  benefits:'Publication credit for your CV, website and grant applications\nCertificate of Recognition\nSold on Amazon, Barnes & Noble and in bookstores\nIntroduction to collectors, curators and galleries\nPromotion to our 190,000+ community',
-  awards:'Winner | $500 · 4-page feature · glass trophy · Artsy listing\nFirst runner-up | 2-page feature · glass trophy · Artsy listing\nSecond runner-up | 2-page feature · glass trophy · Artsy listing',
-  entries:'', countries:'',
+  series:'101 Art Book', edition:'16', name:'Garden Edition', keyword:'GARDEN', deadline:'2026-12-13', selected:'101',
+  headline:'Call for artists', coverLine:'Get published in a juried hardcover book of 101 artists.', colour:'#0E6B4A',
+  books:'35+', featured:'10K+', editions:'15', published:'1,300+', since:'2023',
+  shelf:'Photography, Food, Collage, Landscape, Abstract, Portrait, Animal, Floral, Nature, Dogs, Pattern, Colors, Faces, Texture, Artist of the Year',
   quote:'A garden is more than a place where things grow.',
-  themeBody:'A single flower, the shape of a leaf, an overgrown landscape, or a world that exists only in memory. We want to see how you interpret it.',
-  ins:'Flowers and plants, Trees and forests, Butterflies and birds, Landscapes, Abstract or imagined nature, Any medium',
-  outs:'AI-generated work',
-  jury:'', juryRole:'Guest curator', juryQuote:'',
-  testimonials:'',
-  imgCredit:'Artist Name · Title · Oil · City',
-  others:'Artist of the Year 2026 | 2026-11-16 | NOMINATE\nWoman Artist Award · 7th | 2026-11-30 | AWARD',
+  submit:'Flowers, butterflies, trees, leaves, landscapes or imagined nature. Any medium. Original work only, no AI.',
+  bookText:'Every selected artist is published with their name, artwork title, medium and country.',
+  benefits:'Published in the book | Your work in print\nCertificate of Recognition | For your CV and grant applications\nThe book’s campaign | 190K+ followers · 100K+ email subscribers\nSold worldwide | Amazon · Barnes & Noble · ATH Shop\nIntroductions | To collectors, galleries and curators\nCopies for you | Available at a subsidised rate',
+  prize:'$500', prizeExtra:'a 4-page feature, a trophy and an Artsy listing', runners:'A 2-page feature and a trophy.',
+  jury:'', results:'', pub:'', fee:'', elig:'No degree, gallery or exhibition history needed. Individual artists, 18+, worldwide.',
+  credit:'', artists:'',
 };
-const IMGKEYS = ['imgHero','imgBook','imgJury','imgArt2'];
-const FIELDS = Object.keys(DEFAULTS).filter(k => k !== 'palette');
-let state = {...DEFAULTS, images:{imgHero:'art/call-garden.jpg', imgArt2:'art/night-bloom.jpg'}};
+const IMGKEYS = ['imgCover','imgTheme','imgBooks','imgSpread','imgA1','imgA2'];
+const FIELDS = Object.keys(DEFAULTS).filter(k => k !== 'colour');
+const DEFAULT_IMAGES = { imgCover:'art/flower-portrait.jpg', imgTheme:'art/night-bloom.jpg' };
+let state = {...DEFAULTS, images:{...DEFAULT_IMAGES}};
 
-// ---------- form wiring ----------
-function fillForm(){ FIELDS.forEach(k => { if ($(k)) $(k).value = state[k] ?? ''; }); renderSwatches(); IMGKEYS.forEach(k => { $('th-'+k).style.backgroundImage = state.images[k] ? `url(${state.images[k]})` : ''; }); }
+// ---------- form ----------
+function fillForm(){ FIELDS.forEach(k => { if ($(k)) $(k).value = state[k] ?? ''; }); renderColours(); IMGKEYS.forEach(k => { $('th-'+k).style.backgroundImage = state.images[k] ? `url(${state.images[k]})` : ''; }); }
 function readForm(){ FIELDS.forEach(k => { if ($(k)) state[k] = $(k).value; }); }
-function renderSwatches(){
-  $('palettes').innerHTML = Object.entries(PALETTES).map(([k,p]) => `<button type="button" title="${p.label}" aria-label="${p.label}" aria-pressed="${state.palette===k}" data-k="${k}"><span style="background:${p.bg}"></span><span style="background:${p.fg}"></span></button>`).join('');
-  $('palettes').querySelectorAll('button').forEach(b => b.onclick = () => { state.palette = b.dataset.k; renderSwatches(); });
+function renderColours(){
+  $('colours').innerHTML = Object.entries(COLOURS).map(([n,c]) => `<button type="button" title="${n}" aria-label="${n}" aria-pressed="${state.colour.toLowerCase()===c.toLowerCase()}" data-c="${c}"><span style="background:${c}"></span><span style="background:${tint(c)}"></span></button>`).join('')
+    + `<input type="color" id="customColour" aria-label="Custom call colour" value="${state.colour}">`;
+  $('colours').querySelectorAll('button').forEach(b => b.onclick = () => { state.colour = b.dataset.c; renderColours(); render(); });
+  $('customColour').oninput = e => { state.colour = e.target.value; render(); };
+  $('customColour').onchange = () => renderColours();
 }
 IMGKEYS.forEach(k => $(k).addEventListener('change', e => {
   const file = e.target.files[0]; if (!file) return;
-  const r = new FileReader(); r.onload = () => { state.images[k] = r.result; $('th-'+k).style.backgroundImage = `url(${r.result})`; }; r.readAsDataURL(file);
+  const r = new FileReader(); r.onload = () => { state.images[k] = r.result; $('th-'+k).style.backgroundImage = `url(${r.result})`; render(); }; r.readAsDataURL(file);
 }));
-
-function loadSaved(){ try { return JSON.parse(localStorage.getItem('athStudioCalls') || '{}'); } catch { return {}; } }
+function loadSaved(){ try { return JSON.parse(localStorage.getItem('athStudioCalls2') || '{}'); } catch { return {}; } }
 function refreshSaved(){ const s = loadSaved(); $('saved').innerHTML = '<option value="">Garden Edition (example)</option>' + Object.keys(s).map(n => `<option>${esc(n)}</option>`).join(''); }
-$('saved').onchange = () => { const s = loadSaved(); const v = $('saved').value; state = v && s[v] ? {...DEFAULTS, ...s[v], images: s[v].images || {}} : {...DEFAULTS, images:{}}; fillForm(); };
-$('saveCall').onclick = () => { readForm(); const s = loadSaved(); s[state.short || state.name] = state;
-  try { localStorage.setItem('athStudioCalls', JSON.stringify(s)); status('Saved "' + (state.short || state.name) + '" in this browser.'); }
-  catch { const lite = {...state, images:{}}; s[state.short || state.name] = lite; try { localStorage.setItem('athStudioCalls', JSON.stringify(s)); status('Saved without images (too large for browser storage).'); } catch { status('Could not save in this browser.'); } }
-  refreshSaved(); $('saved').value = state.short || state.name; };
+$('saved').onchange = () => { const s = loadSaved(); const v = $('saved').value; state = v && s[v] ? {...DEFAULTS, ...s[v], images: s[v].images || {}} : {...DEFAULTS, images:{...DEFAULT_IMAGES}}; fillForm(); render(); };
+$('saveCall').onclick = () => { readForm(); const s = loadSaved(); const key = state.name || 'Call'; s[key] = state;
+  try { localStorage.setItem('athStudioCalls2', JSON.stringify(s)); status('Saved "' + key + '" in this browser.'); }
+  catch { s[key] = {...state, images:{}}; try { localStorage.setItem('athStudioCalls2', JSON.stringify(s)); status('Saved without images (too large for browser storage).'); } catch { status('Could not save in this browser.'); } }
+  refreshSaved(); $('saved').value = key; };
 
 // ---------- helpers ----------
 function esc(s){ return String(s ?? '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
@@ -218,402 +220,159 @@ const lines = s => String(s || '').split('\n').map(x => x.trim()).filter(Boolean
 const csv = s => String(s || '').split(',').map(x => x.trim()).filter(Boolean);
 const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
 const MONTHS_L = ['January','February','March','April','May','June','July','August','September','October','November','December'];
-function dl(){ const [y,m,d] = state.deadline.split('-').map(Number); return new Date(y, m-1, d); }
-function fmt(d){ return d.getDate() + ' ' + MONTHS[d.getMonth()]; }
-function fmtLong(d){ return d.getDate() + ' ' + MONTHS_L[d.getMonth()]; }
-function dot(d){ return String(d.getDate()).padStart(2,'0') + '.' + String(d.getMonth()+1).padStart(2,'0'); }
-function addDays(d, n){ const x = new Date(d); x.setDate(x.getDate() + n); return x; }
-let GRAIN = '';
-(function(){ const c = document.createElement('canvas'); c.width = c.height = 256; const g = c.getContext('2d'); const im = g.createImageData(256,256); for (let i=0;i<im.data.length;i+=4){ const v = Math.random()*255; im.data[i]=im.data[i+1]=im.data[i+2]=v; im.data[i+3]=255; } g.putImageData(im,0,0); GRAIN = c.toDataURL(); })();
+function dl(){ const [y,m,d] = String(state.deadline||'2026-12-13').split('-').map(Number); return new Date(y, m-1, d); }
+const ORD = ['','first','second','third','fourth','fifth','sixth','seventh','eighth','ninth','tenth','eleventh','twelfth','thirteenth','fourteenth','fifteenth','sixteenth','seventeenth','eighteenth','nineteenth','twentieth','twenty-first','twenty-second','twenty-third','twenty-fourth','twenty-fifth'];
+const ordinal = n => ORD[Number(n)] || (n + 'th');
+const short = () => dl().getDate() + ' ' + MONTHS[dl().getMonth()];
+function mix(hex, to, t){ const a = hex.replace('#',''), b = to.replace('#',''); const p = i => parseInt(a.substr(i,2),16), q = i => parseInt(b.substr(i,2),16);
+  return '#' + [0,2,4].map(i => Math.round(p(i) + (q(i)-p(i))*t).toString(16).padStart(2,'0')).join(''); }
+const tint = c => mix(c, '#FFFFFF', .72);         // light version of the call colour, for text on dark
+const rgba = (hex, a) => { const h = hex.replace('#',''); return `rgba(${parseInt(h.substr(0,2),16)},${parseInt(h.substr(2,2),16)},${parseInt(h.substr(4,2),16)},${a})`; };
+const gap = (v, label) => v ? esc(v) : `<span class="gap">${esc(label)}</span>`;
+const photo = (k, label, style, col) => state.images[k]
+  ? `<div class="a img" style="${style};background-image:url(${state.images[k]});background-position:center;border-radius:18px"></div>`
+  : `<div class="a ph" style="${style};color:${col}">Real photo needed<br>${esc(label)}</div>`;
+const KW = () => esc((state.keyword || 'KEYWORD').toUpperCase());
 
-// ---------- shared post pieces ----------
-const P = () => PALETTES[state.palette] || PALETTES.petrol;
-const light = p => p.bg === '#B7D9FF' || p.bg === '#FFF3B2';
-const accentOnInk = p => p.bg === INK ? p.fg : (light(p) ? p.bg : p.fg);
-const logo = c => `<span class="logo" style="color:${c}">arts <i>to</i> hearts</span>`;
-const img = (k, style, label) => state.images[k] ? `<div class="a img" style="${style};background-image:url(${state.images[k]})"></div>` : `<div class="a ph" style="${style}"><span>${label}</span></div>`;
-const topL = (c, l, r) => `<p class="a lab" style="left:64px;top:60px;color:${c}">${l||''}</p><p class="a lab" style="right:64px;top:60px;color:${c};text-align:right">${r||''}</p>`;
-const foot = (c, ctx, l) => `<p class="a lab" style="left:64px;bottom:60px;color:${c}">${l || closesLine(ctx)}</p><div class="a" style="right:64px;bottom:56px">${logo(c)}</div>`;
-const closesLine = ctx => ctx.left === 0 ? 'Closes tonight · Link in bio' : `${ctx.left} ${ctx.left === 1 ? 'day' : 'days'} left · Closes ${fmt(dl())} · Link in bio`;
-const arrowSvg = (c, w=44) => `<svg width="${w}" height="${Math.round(w*.55)}" viewBox="0 0 44 24"><path d="M2 12h38M30 3l10 9-10 9" fill="none" stroke="${c}" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
-const arrowPill = (c, w=104, h=58) => `<span style="display:inline-flex;align-items:center;justify-content:center;width:${w}px;height:${h}px;border:2.4px solid ${c};border-radius:999px">${arrowSvg(c, 40)}</span>`;
-const nameOf = () => esc(state.short);
+// four corner labels: the one header system on every slide
+const corners = (col, dmCol, tr) => `
+  <p class="a cn" style="left:52px;top:48px;color:${col}">Arts to Hearts</p><p class="a cn" style="right:52px;top:48px;color:${col}">${esc(tr)}</p>
+  <p class="a cn" style="left:52px;bottom:48px;color:${dmCol}">DM “${KW()}”</p><p class="a cn" style="right:52px;bottom:48px;color:${col}">Closes ${short()}</p>`;
+const spineLab = (n,f,fs) => `<span style="position:absolute;left:50%;bottom:18px;transform:translateX(-50%) rotate(-90deg);white-space:nowrap;font-family:'ATH Serif',serif;font-style:italic;font-size:${fs}px;width:0;color:${f}">${esc(n)}</span>`;
+const SPINES = [['#14090C','#F9ECE5'],['#AA0003','#FFD6DE'],['#FAD2E1','#6A0620'],['#2E4A2A','#E3E8DE'],['#E3E8DE','#14090C'],['#6A0620','#FAD2E1'],['#C9D3BE','#14090C'],['#FFD6DE','#AA0003'],['#4C4240','#F9ECE5'],['#B7D9FF','#6A0620'],['#FFF3B2','#AA0003']];
+const HEIGHTS = [360,330,370,345,380,350,335,365,375,340,360,350,370,345,380];
 
-// ---------- templates: one clean idea per slide ----------
-const T = {
-  // Photo above, colour panel below (Foremark "Strategy is a choice")
-  cover(ctx, o){ const p = P(); return { bg:p.bg, html:`
-    ${img(o.imgKey||'imgHero','left:0;top:0;width:1080px;height:800px', o.imgLabel||'Hero artwork')}
-    <p class="a lab" style="left:64px;top:852px;color:${p.fg}">${esc(o.label||'Open call')}</p>
-    <p class="a lab" style="left:64px;top:888px;color:${p.fg};opacity:.7">${esc(state.series)}</p>
-    <h1 class="a h" style="left:470px;right:64px;top:844px;font-size:${o.size||80}px;color:${p.fg}">${o.title}</h1>
-    ${foot(p.fg, ctx)}` }; },
+// ---------- the launch carousel ----------
+function launch(){
+  const C = state.colour, Tn = tint(C), S = [];
+  const name = esc(state.name), kw = KW();
+  const head = esc(state.headline || 'Call for artists').split(' ');
+  const headHtml = head.length > 2 ? head.slice(0, Math.ceil(head.length/2)).join(' ') + '<br>' + head.slice(Math.ceil(head.length/2)).join(' ') : head.join('<br>');
 
-  // Label top, statement low, rule, short text (Foremark "Focus defines direction")
-  split(ctx, o){ const p = P(); const g = o.ground === 'ink' ? {bg:INK, fg:CREAM} : o.ground === 'soft' ? {bg:p.soft, fg:p.softFg} : o.ground === 'cream' ? {bg:CREAM, fg:INK} : {bg:p.bg, fg:p.fg};
-    return { bg:g.bg, html:`${topL(g.fg, esc(o.label||''), nameOf())}
-    <div class="a" style="left:64px;right:${o.right||200}px;bottom:150px;color:${g.fg}">
-      <h2 class="h" style="font-size:${o.size||118}px">${o.title}</h2>
-      <div class="rule" style="width:430px;margin-top:40px;opacity:.6"></div>
-      <p class="p" style="width:440px;margin-top:22px">${o.text||''}</p></div>
-    ${foot(g.fg, ctx)}` }; },
+  // 1 cover
+  S.push({bg:INK, html:`
+    <div class="a img" style="inset:0;background-image:url(${state.images.imgCover || ''});background-position:center 6%"></div>
+    <div class="a" style="inset:0;background:linear-gradient(180deg,rgba(20,14,12,.38) 0%,rgba(20,14,12,0) 16%,rgba(20,14,12,0) 40%,rgba(20,14,12,.6) 62%,rgba(20,14,12,.82) 100%)"></div>
+    ${corners(WHITE, WHITE, state.series)}
+    <div class="a" style="left:0;right:0;top:650px;display:flex;justify-content:center"><span class="cn" style="display:inline-flex;align-items:center;height:46px;padding:0 26px;background:${Tn};color:${INK};border-radius:999px">Open call · Edition ${esc(state.edition)}</span></div>
+    <p class="a c" style="left:0;right:0;top:720px;font-size:136px;font-weight:700;letter-spacing:-.01em;line-height:.9;text-transform:uppercase;color:${WHITE}">${headHtml}</p>
+    <p class="a c scr" style="left:0;right:0;top:975px;font-size:88px;line-height:1;color:${Tn}">the ${name}</p>
+    <p class="a c sub" style="left:150px;right:150px;top:1095px;color:${WHITE}">${esc(state.coverLine)}</p>`});
 
-  // Huge number, small text, image band (Foremark "+27%")
-  number(ctx, o){ const p = P(); const s = o.size || Math.min(560, Math.floor(2000/Math.max(3,String(o.num).length)));
-    return { bg:p.bg, html:`
-    <p class="a num" style="left:40px;top:50px;font-size:${s}px;color:${p.fg}">${o.num}</p>
-    <p class="a p" style="left:64px;top:${o.textTop||660}px;width:460px;color:${p.fg}">${o.text}</p>
-    <p class="a lab" style="right:64px;top:${(o.textTop||660)+4}px;color:${p.fg}">${esc(o.label||'')}</p>
-    ${o.imgKey ? img(o.imgKey,'left:0;right:0;bottom:0;height:430px', o.imgLabel||'Artwork') : `<div class="a" style="left:0;right:0;bottom:0;height:430px;background:${p.soft}"></div><p class="a h2" style="left:64px;right:64px;bottom:150px;font-size:64px;color:${p.softFg}">${o.band||''}</p><div class="a" style="right:64px;bottom:56px">${logo(p.softFg)}</div>`}` }; },
+  // 2 who we are
+  S.push({bg:INK, html:`${corners(WHITE, PEONY, 'Who we are')}
+    <p class="a lab" style="left:80px;top:180px;color:${Tn}">Arts to Hearts Project</p>
+    <div class="a" style="left:80px;right:80px;top:240px;display:grid;grid-template-columns:1fr 1fr;gap:40px;color:${WHITE}">
+      <div><p style="font-size:150px;font-weight:400;letter-spacing:-.06em;line-height:.9">${esc(state.books)}</p><p class="sub" style="margin-top:14px;opacity:.85">curated art books published</p></div>
+      <div><p style="font-size:150px;font-weight:400;letter-spacing:-.06em;line-height:.9">${esc(state.featured)}</p><p class="sub" style="margin-top:14px;opacity:.85">artists featured worldwide</p></div></div>
+    ${photo('imgBooks', 'The books together', 'left:80px;right:80px;top:560px;height:620px', WHITE)}`});
 
-  // Statement on soft ground with folded light (Foremark "Market rewards clarity")
-  statement(ctx, o){ const p = P(); const fold = `radial-gradient(64% 52% at 108% 14%, rgba(255,255,255,0) 60%, rgba(255,255,255,.42) 66%, rgba(255,255,255,0) 74%),radial-gradient(86% 72% at 114% 30%, rgba(255,255,255,0) 62%, rgba(255,255,255,.3) 69%, rgba(255,255,255,0) 79%)`;
-    return { bg:p.soft, html:`<div class="a" style="inset:0;background:${fold}"></div>
-    <h2 class="a ${o.serif?'q':'h'}" style="left:60px;right:${o.right||170}px;top:84px;font-size:${o.size||124}px;color:${p.softFg}">${o.title}</h2>
-    <div class="a" style="left:64px;top:${o.ruleTop||560}px;width:430px;border-top:2px solid ${p.softFg};opacity:.6"></div>
-    <p class="a p" style="left:64px;top:${(o.ruleTop||560)+24}px;width:440px;color:${p.softFg}">${o.text||''}</p>
-    ${foot(p.softFg, ctx, esc(o.label||''))}` }; },
+  // 3 the series: shelf with this call's empty slot
+  const eds = csv(state.shelf);
+  const spines = eds.map((n,i) => { const [b,f] = SPINES[i % SPINES.length]; return `<div style="flex:1;height:${HEIGHTS[i % HEIGHTS.length]}px;background:${b};border-radius:3px 3px 0 0;position:relative;box-shadow:inset -3px 0 0 rgba(0,0,0,.12)">${spineLab(n,f,22)}</div>`; }).join('');
+  S.push({bg:CREAM, html:`${corners(INK, BURG, 'The series')}
+    <p class="a R c" style="left:80px;right:80px;top:200px;font-size:84px;color:${INK}">${esc(state.editions)} editions. ${esc(state.published)} artists.<br>The <span style="color:${C};font-weight:600">${ordinal(state.edition)}</span> is open.</p>
+    <div class="a" style="left:64px;right:64px;top:640px;height:420px;display:flex;align-items:flex-end;gap:8px;border-bottom:6px solid ${INK};padding:0 10px">${spines}
+      <div style="flex:1.3;height:390px;border:3px dashed ${C};border-bottom:none;border-radius:3px 3px 0 0;position:relative;background:${rgba(Tn,.45)}">${spineLab(state.name, C, 26)}</div></div>
+    <p class="a c sub" style="left:0;right:0;top:1110px;font-size:28px;opacity:.7;color:${INK}">Publishing contemporary artists since ${esc(state.since)}.</p>`});
 
-  // Two blocks of different height (Foremark "$900K / $1.8M")
-  bars(ctx, o){ const p = P(); return { bg:p.soft, html:`
-    <h2 class="a h" style="left:60px;top:76px;width:620px;font-size:92px;color:${p.softFg}">${o.title}</h2>
-    <div class="a" style="left:64px;top:${o.ruleTop||290}px;width:420px;border-top:2px solid ${p.softFg};opacity:.6"></div>
-    <p class="a p" style="left:64px;top:${(o.ruleTop||290)+24}px;width:420px;color:${p.softFg}">${o.text}</p>
-    <div class="a" style="left:64px;bottom:64px;width:430px;height:${o.h1||400}px;background:${INK};padding:34px"><p class="h" style="font-size:88px;color:${CREAM}">${o.a}</p><p class="p" style="color:${CREAM};margin-top:12px">${o.aLabel}</p></div>
-    <div class="a" style="right:64px;bottom:64px;width:430px;height:${o.h2||860}px;background:${p.bg};padding:34px"><p class="h" style="font-size:88px;color:${p.fg}">${o.b}</p><p class="p" style="color:${p.fg};margin-top:12px">${o.bLabel}</p></div>` }; },
+  // 4 the theme
+  S.push({bg:INK, html:`
+    <div class="a img" style="inset:0;background-image:url(${state.images.imgTheme || ''});background-position:center 44%"></div>
+    <div class="a" style="inset:0;background:linear-gradient(180deg,rgba(20,9,12,.9) 0%,rgba(20,9,12,.5) 26%,rgba(20,9,12,0) 42%,rgba(20,9,12,0) 62%,rgba(20,9,12,.85) 80%,rgba(20,9,12,.95) 100%)"></div>
+    ${corners(WHITE, PEONY, 'The theme')}
+    <p class="a c ser" style="left:100px;right:100px;top:160px;font-size:76px;line-height:1.08;letter-spacing:-.015em;color:${WHITE}">“${esc(state.quote)}”</p>
+    <p class="a lab c" style="left:0;right:0;top:1000px;color:${Tn}">What you can submit</p>
+    <p class="a c sub" style="left:110px;right:110px;top:1044px;font-size:30px;color:${WHITE}">${esc(state.submit)}</p>`});
 
-  // Big figure on ink with an italic word (Better Future "2.4K Companies")
-  stat(ctx, o){ const p = P(); const acc = accentOnInk(p); const two = String(o.num).length > 1;
-    return { bg:INK, html:`${topL(CREAM, nameOf(), esc(o.label||'Open call'))}
-    <p class="a num" style="left:40px;top:${o.top||250}px;font-size:${o.size||(two?470:620)}px;color:${CREAM}">${o.num}<span style="font-size:${o.unitSize||(two?170:210)}px;color:${acc};letter-spacing:-.04em;margin-left:16px">${o.unit||''}</span></p>
-    <div class="a" style="left:64px;top:880px;display:flex;align-items:center;gap:26px">${arrowPill(acc)}<i class="s" style="font-size:70px;color:${CREAM}">${o.word}</i></div>
-    <p class="a p" style="left:64px;top:1010px;width:640px;color:${CREAM};opacity:.8">${o.text}</p>` }; },
+  // 5 the book
+  S.push({bg:CREAM, html:`${corners(INK, BURG, 'The book')}
+    ${photo('imgSpread', 'An open spread of a past edition', 'left:80px;right:80px;top:150px;height:640px', INK)}
+    <p class="a R" style="left:80px;right:80px;top:850px;font-size:76px;color:${INK}">A juried hardcover edition.</p>
+    <p class="a sub" style="left:80px;right:140px;top:960px;color:${INK}">${esc(state.bookText)}</p>`});
 
-  // Big step number on ink (Better Future "01")
-  step(ctx, o){ const p = P(); const acc = accentOnInk(p); return { bg:INK, html:`${topL(CREAM, esc(o.label||''), nameOf())}
-    <p class="a num" style="left:36px;top:140px;font-size:470px;color:${CREAM}">${o.n}</p>
-    <h2 class="a h" style="left:64px;right:160px;top:700px;font-size:96px;color:${CREAM}">${o.title}</h2>
-    <p class="a p" style="left:64px;top:${o.textTop||960}px;width:620px;color:${CREAM};opacity:.8">${o.text||''}</p>
-    <div class="a" style="right:64px;top:${o.textTop||960}px">${arrowPill(acc)}</div>
-    ${foot(CREAM, ctx)}` }; },
+  // 6 what selected artists receive: the stack
+  const bl = lines(state.benefits).slice(0,6).map(l => l.split('|').map(x => x.trim()));
+  const fills = [[C,WHITE],[CREAM,INK],[PEONY,BURG],[BURG,WHITE],[Tn,INK],[CREAM,INK]];
+  const widths = [952,926,910,944,930,900], offs = [0,12,-4,6,-8,10];
+  const stack = bl.map(([t,d],i) => { const [bg,fg] = fills[i]; const w = widths[i];
+    return `<div style="width:${w}px;height:106px;margin-left:${(952-w)/2+offs[i]}px;background:${bg};color:${fg};border-radius:6px;display:flex;align-items:center;justify-content:space-between;padding:0 38px;box-shadow:inset 0 -5px 0 rgba(0,0,0,.14)"><span style="font-size:38px;font-weight:600;letter-spacing:-.025em">${esc(t)}</span><span style="font-size:24px;font-weight:500;text-align:right">${esc(d||'')}</span></div>`; }).reverse().join('');
+  S.push({bg:INK, html:`${corners(WHITE, PEONY, 'If selected')}
+    <p class="a R c" style="left:80px;right:80px;top:170px;font-size:84px;color:${WHITE}">What selected artists receive</p>
+    <div class="a" style="left:64px;right:64px;bottom:274px;display:flex;flex-direction:column;gap:10px">${stack}</div>
+    <div class="a" style="left:64px;right:64px;top:1076px;border-top:6px solid ${CREAM}"></div>`});
 
-  // Quote with name pill (Better Future quote card)
-  quote(ctx, o){ const p = P(); return { bg:o.dark ? INK : CREAM, html:`
-    <div class="a" style="left:64px;top:64px">${arrowPill(o.dark ? CREAM : INK, 96, 54)}</div>
-    <p class="a tag" style="right:64px;top:70px;color:${o.dark ? CREAM : INK};text-align:right">[ ${esc(o.tag||'In their words')} ]</p>
-    <p class="a q" style="left:64px;right:110px;top:240px;font-size:${o.size||80}px;color:${o.dark ? CREAM : INK}">“${esc(o.q)}”</p>
-    <div class="a" style="left:64px;bottom:150px;display:flex;align-items:center;gap:12px">
-      <span style="width:50px;height:50px;border-radius:50%;background:${o.dark ? CREAM : INK};display:inline-flex;align-items:center;justify-content:center">${arrowSvg(o.dark ? INK : CREAM,24)}</span>
-      <span class="pill tag" style="height:50px;padding:0 22px;background:${p.soft};color:${p.softFg}">${esc(o.role||'')}</span></div>
-    <div class="a" style="left:64px;bottom:62px"><span class="pill" style="height:70px;padding:0 34px;background:${o.dark ? CREAM : INK};color:${o.dark ? INK : CREAM};font-size:30px;font-weight:500;letter-spacing:-.02em">${esc(o.name||'Name')}</span></div>
-    <div class="a" style="right:64px;bottom:76px">${logo(o.dark ? CREAM : INK)}</div>` }; },
+  // 7 recognition
+  S.push({bg:CREAM, html:`${corners(INK, BURG, 'Recognition')}
+    <p class="a R c" style="left:80px;right:80px;top:180px;font-size:80px;color:${INK}">Three artists receive more.</p>
+    <p class="a lab c" style="left:0;right:0;top:360px;color:${C}">Winner</p>
+    <p class="a c" style="left:0;right:0;top:410px;font-size:300px;font-weight:400;letter-spacing:-.07em;line-height:.85;color:${C}">${gap(state.prize,'Award')}</p>
+    <p class="a c sub" style="left:150px;right:150px;top:700px;color:${INK}">plus ${esc(state.prizeExtra)}.</p>
+    <div class="a" style="left:120px;right:120px;top:850px;border-top:2px solid rgba(20,9,12,.18);padding-top:34px">
+      <p class="lab c" style="color:${C}">Two runners-up</p>
+      <p class="c sub" style="margin-top:10px;color:${INK}">${esc(state.runners)}</p></div>`});
 
-  // Full-bleed photo with name pill (Better Future portrait)
-  portrait(ctx, o){ const p = P(); return { bg:INK, html:`
-    ${img(o.imgKey||'imgJury','inset:0', o.imgLabel||'Portrait')}
-    <div class="a" style="left:0;right:0;bottom:0;height:540px;background:linear-gradient(180deg,rgba(42,10,18,0),rgba(42,10,18,.65))"></div>
-    <p class="a lab" style="left:64px;top:60px;color:${CREAM}">${esc(o.label||'')}</p>
-    <div class="a" style="left:64px;bottom:196px;display:flex;align-items:center;gap:12px">
-      <span style="width:56px;height:56px;border-radius:50%;background:${CREAM};display:inline-flex;align-items:center;justify-content:center">${arrowSvg(INK,26)}</span>
-      <span class="pill tag" style="height:56px;padding:0 24px;background:${CREAM};color:${INK}">${esc(o.role||'')}</span></div>
-    <div class="a" style="left:64px;right:64px;bottom:70px"><span class="pill" style="height:104px;padding:0 44px;background:${CREAM};color:${INK};font-size:50px;font-weight:500;letter-spacing:-.03em;text-transform:uppercase">${esc(o.name||'')}</span></div>` }; },
+  // 8 selection + timeline
+  const dots = Array.from({length:101}, (_,i) => i === 100
+    ? `<div style="aspect-ratio:1;border-radius:50%;background:${Tn};box-shadow:0 0 0 5px ${rgba(Tn,.25)}"></div>`
+    : `<div style="aspect-ratio:1;border-radius:50%;border:2px solid rgba(255,255,255,.35)"></div>`).join('');
+  S.push({bg:INK, html:`${corners(WHITE, PEONY, 'Selection')}
+    <p class="a R c" style="left:80px;right:80px;top:170px;font-size:80px;color:${WHITE}">${esc(state.selected)} places, chosen by<br>${state.jury ? esc(state.jury) : 'the jury'}.</p>
+    <div class="a" style="left:120px;right:120px;top:410px;display:grid;grid-template-columns:repeat(17,1fr);gap:10px">${dots}
+      <p style="grid-column:12/18;font-family:'ATH Script',serif;font-style:italic;font-size:34px;color:${Tn};align-self:center;padding-left:6px">&larr; yours?</p></div>
+    <div class="a" style="left:80px;right:80px;top:820px;display:grid;grid-template-columns:repeat(3,1fr);border-top:2px solid rgba(255,255,255,.2);padding-top:30px;color:${WHITE}">
+      <div><p class="lab" style="color:${Tn}">${short()}</p><p class="sub" style="font-size:28px;margin-top:8px">Submissions close</p></div>
+      <div style="border-left:2px solid rgba(255,255,255,.16);padding-left:30px"><p class="lab" style="color:${Tn}">${gap(state.results,'Date')}</p><p class="sub" style="font-size:28px;margin-top:8px">Results announced</p></div>
+      <div style="border-left:2px solid rgba(255,255,255,.16);padding-left:30px"><p class="lab" style="color:${Tn}">${gap(state.pub,'Month')}</p><p class="sub" style="font-size:28px;margin-top:8px">Book published</p></div></div>
+    <p class="a c sub" style="left:0;right:0;top:1080px;font-size:26px;opacity:.75;color:${WHITE}">Application fee ${gap(state.fee,'amount, or “applicable”')}</p>`});
 
-  // Big caps headline with one circled word (Better Future "Step-by-step")
-  caps(ctx, o){ const p = P(); return { bg:CREAM, html:`
-    <h2 class="a" style="left:60px;right:64px;top:70px;font-weight:400;font-size:${o.size||112}px;line-height:.98;letter-spacing:-.03em;text-transform:uppercase;color:${INK}">${o.title}</h2>
-    <div class="a" style="left:64px;top:${o.tagTop||820}px"><span class="pill tag" style="height:54px;padding:0 24px;background:#fff;color:${INK}">↗ ${esc(o.tag||'')}</span></div>
-    <div class="a" style="left:64px;bottom:60px">${arrowPill(INK)}</div>
-    <p class="a" style="right:64px;bottom:64px;width:380px;text-align:right;font-size:30px;line-height:1.2;color:${INK}"><i class="s">${o.note||''}</i></p>` }; },
+  // 9 who can apply
+  S.push({bg:CREAM, html:`${corners(INK, BURG, 'Who can apply')}
+    <p class="a R c" style="left:80px;right:80px;top:330px;font-size:100px;color:${INK}">Your work deserves the <span style="display:inline-block;background:${INK};color:${WHITE};border-radius:999px;padding:0 .3em .07em;line-height:1">spotlight.</span></p>
+    <p class="a c sub" style="left:150px;right:150px;top:720px;font-size:40px;color:${INK}">Emerging, mid-career or established.</p>
+    <p class="a c sub" style="left:170px;right:170px;top:830px;opacity:.65;font-size:30px;color:${INK}">${esc(state.elig)}</p>`});
 
-  // Answer card on colour (Better Future "Want more reach?")
-  card(ctx, o){ const p = P(); return { bg:p.bg, html:`
-    <p class="a tag" style="left:64px;top:68px;color:${p.fg}">[ ${nameOf()} ]</p>
-    <div class="a" style="right:64px;top:56px">${arrowPill(p.fg)}</div>
-    <div class="a" style="left:64px;right:64px;top:180px;bottom:220px;background:${CREAM};border-radius:40px;padding:64px 58px">
-      <p class="q" style="font-size:50px;color:${INK}">${esc(o.q)}</p>
-      <p class="h" style="font-size:${o.size||92}px;color:${INK};margin-top:42px">${o.a}</p>
-      ${o.small ? `<p class="p" style="color:${INK};opacity:.75;margin-top:34px;width:680px">${o.small}</p>` : ''}
-      <div style="position:absolute;left:58px;right:58px;bottom:58px;height:96px;border:2px solid ${INK};border-radius:999px;display:flex;align-items:center;justify-content:space-between;padding:0 12px 0 38px">
-        <span class="tag" style="font-size:16px;color:${INK}">${esc(o.cta||'Link in bio')}</span>
-        <span style="width:72px;height:72px;border-radius:50%;background:${BURG};display:inline-flex;align-items:center;justify-content:center">${arrowSvg(CREAM,32)}</span></div></div>
-    ${foot(p.fg, ctx)}` }; },
+  // 10 published artists
+  const al = lines(state.artists).map(l => l.split('|').map(x => x.trim()));
+  const card = i => { const [n,e,q] = al[i] || []; const k = 'imgA'+(i+1);
+    return `<div style="background:rgba(255,255,255,.06);border-radius:24px;padding:28px;position:relative">
+      ${state.images[k] ? `<div class="img" style="height:400px;border-radius:14px;background-image:url(${state.images[k]});background-position:center"></div>` : `<div class="ph" style="height:400px;color:${WHITE}">Their page<br>in the book</div>`}
+      <p style="font-size:30px;font-weight:600;margin-top:24px">${gap(n,'Artist name')}</p>
+      <p style="font-size:24px;opacity:.7;margin-top:10px">${gap(e,'Edition · Country')}</p>
+      <p style="font-family:'ATH Serif',serif;font-style:italic;font-size:30px;line-height:1.3;margin-top:20px;opacity:.9">“${gap(q,'One real line')}”</p></div>`; };
+  S.push({bg:INK, html:`${corners(WHITE, PEONY, 'From past editions')}
+    <p class="a R c" style="left:80px;right:80px;top:170px;font-size:80px;color:${WHITE}">Published artists</p>
+    <div class="a" style="left:64px;right:64px;top:330px;display:grid;grid-template-columns:1fr 1fr;gap:24px;color:${WHITE}">${card(0)}${card(1)}</div>`});
 
-  // Quiet rows (FoxMark "Events" / Swiss list)
-  list(ctx, o){ const p = P(); const g = o.ground === 'cream' ? {bg:CREAM, fg:INK} : {bg:p.bg, fg:p.fg};
-    const rows = o.rows.map(r => `<div style="display:grid;grid-template-columns:${o.col||'220px'} 1fr;gap:24px;align-items:baseline;padding:28px 0;border-top:2px solid ${g.fg}44">
-      <span class="lab" style="color:${g.fg};opacity:.75">${r[0]}</span><span class="h2" style="font-size:${o.rowSize||46}px;color:${g.fg}">${r[1]}</span></div>`).join('');
-    return { bg:g.bg, html:`${topL(g.fg, esc(o.label||''), nameOf())}
-    <h2 class="a h" style="left:60px;right:64px;top:150px;font-size:${o.size||110}px;color:${g.fg}">${o.title}</h2>
-    <div class="a" style="left:64px;right:64px;top:${o.top||470}px;border-bottom:2px solid ${g.fg}44">${rows}</div>
-    ${foot(g.fg, ctx)}` }; },
+  // 11 action
+  const mini = [[PEONY,250],[CREAM,280],[BURG,240],[INK,270],[PEONY,230],[CREAM,260]].map(([c,h]) => `<div style="flex:1;height:${h}px;background:${c};border-radius:3px 3px 0 0;box-shadow:inset 0 0 0 2px rgba(255,255,255,.18)"></div>`).join('');
+  S.push({bg:C, html:`${corners(WHITE, PEONY, 'Submissions open')}
+    <p class="a H c" style="left:60px;right:60px;top:180px;font-size:108px;color:${WHITE}">Take your place<br>on the shelf.</p>
+    <div class="a" style="left:250px;right:250px;top:450px;height:300px;display:flex;align-items:flex-end;gap:10px;border-bottom:6px solid ${CREAM};padding:0 14px">${mini}
+      <div style="flex:1.5;height:290px;background:${Tn};border-radius:3px 3px 0 0;box-shadow:0 0 0 6px ${rgba(Tn,.3)};position:relative">${spineLab(state.name, INK, 30)}</div></div>
+    <div class="a" style="left:110px;right:110px;top:850px;height:124px;border-radius:999px;background:${CREAM};color:${BURG};display:flex;align-items:center;justify-content:space-between;padding:0 20px 0 56px">
+      <span style="font-size:44px;font-weight:700;letter-spacing:-.02em">DM “${kw}” to apply</span>
+      <span style="width:88px;height:88px;border-radius:50%;background:${BURG};color:${CREAM};display:inline-flex;align-items:center;justify-content:center"><svg width="36" height="16" viewBox="0 0 46 20"><path d="M2 10h40M33 2l9 8-9 8" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></span></div>
+    <p class="a c" style="left:0;right:0;top:1020px;font-size:28px;opacity:.9;color:${WHITE}">or apply via link in bio</p>
+    <p class="a c" style="left:0;right:0;top:1070px;font-size:26px;opacity:.7;color:${WHITE}">artstoheartsproject.com</p>`});
 
-  // Checklist on cream
-  checklist(ctx, o){ const it = o.items.map(t => `<p style="display:flex;align-items:center;gap:26px;font-size:44px;font-weight:500;letter-spacing:-.02em;padding:26px 0;border-top:2px solid ${INK}22;color:${INK}"><i style="width:44px;height:44px;border:3px solid ${INK};border-radius:10px;display:block;flex:none"></i>${esc(t)}</p>`).join('');
-    return { bg:CREAM, html:`${topL(INK, esc(o.label||''), nameOf())}
-    <h2 class="a h" style="left:60px;right:64px;top:150px;font-size:${o.size||112}px;color:${INK}">${o.title}</h2>
-    <div class="a" style="left:64px;right:64px;top:${o.top||520}px;border-bottom:2px solid ${INK}22">${it}</div>
-    ${foot(INK, ctx)}` }; },
-
-  // Receipt (Calypso)
-  receipt(ctx, o){ const p = P(); const val = light(p) ? p.fg : p.bg;
-    const rows = o.rows.map(r => `<div style="display:flex;justify-content:space-between;gap:24px;padding:12px 0;font-size:24px;line-height:1.3"><span>${esc(r[0])}</span><b style="font-weight:600;color:${val};text-align:right;max-width:330px">${esc(r[1])}</b></div>`).join('');
-    const bars = Array.from({length:30},(_,i)=>`<i style="display:inline-block;width:${[3,6,2,8,4,3,7,2,5,9][i%10]}px;height:78px;background:${INK};margin-right:${[5,3,6,2,4][i%5]}px"></i>`).join('');
-    return { bg:p.bg, html:`
-    <div class="a" style="left:150px;right:150px;top:110px;bottom:110px;background:${CREAM};color:${INK};padding:70px 56px 0;-webkit-mask:radial-gradient(circle 14px at 50% 0,transparent 98%,#000) 0 0/36px 100% repeat-x">
-      <div style="text-align:center">${logo(INK)}</div>
-      <p class="tag" style="text-align:center;margin-top:34px;padding:22px 0;border-top:2px dashed #B9A79F;border-bottom:2px dashed #B9A79F">${esc(o.title)}</p>
-      <div style="padding:14px 0;border-bottom:2px dashed #B9A79F">${rows}</div>
-      <div style="display:flex;justify-content:space-between;padding:24px 0;border-bottom:2px dashed #B9A79F;font-size:28px;font-weight:600"><span>Total</span><span>${esc(o.total)}</span></div>
-      <div style="text-align:center;margin-top:38px">${bars}</div>
-      <p class="tag" style="text-align:center;margin-top:12px">${closesLine(ctx)}</p></div>` }; },
-
-  // Messages (Calypso chat)
-  chat(ctx, o){ const p = P(); const b = o.items.map(([q,a]) => `
-      <div style="align-self:flex-end;background:${p.bg};color:${p.fg};border-radius:34px 34px 8px 34px;padding:22px 30px;font-size:30px;line-height:1.3;max-width:740px">${esc(q)}</div>
-      <div style="align-self:flex-start;background:${CREAM};color:${INK};border-radius:34px 34px 34px 8px;padding:22px 30px;font-size:30px;line-height:1.3;max-width:740px">${a}</div>`).join('');
-    return { bg:p.soft, html:`${topL(p.softFg, esc(o.label||''), nameOf())}
-    <h2 class="a h" style="left:60px;top:140px;font-size:104px;color:${p.softFg}">${o.title}</h2>
-    <div class="a" style="left:64px;right:64px;top:340px;display:flex;flex-direction:column;gap:16px">${b}</div>
-    ${foot(p.softFg, ctx)}` }; },
-
-  // In / out on a ruled page (Calypso list)
-  inout(ctx, o){ const p = P(); const box = t => `<p style="display:flex;align-items:center;gap:20px;font-size:32px;padding:13px 0;color:${INK}"><i style="width:26px;height:26px;border:2.5px solid ${INK};border-radius:50%;display:block;flex:none"></i>${esc(t)}</p>`;
-    return { bg:'#FCFAF3', html:`
-    <div class="a" style="inset:0;background:repeating-linear-gradient(180deg,transparent 0 67px,#E9E3D5 67px 69px)"></div>
-    <div class="a" style="left:150px;top:0;bottom:0;width:3px;background:${light(p) ? p.fg : p.bg}"></div>
-    <h2 class="a h" style="left:190px;right:64px;top:110px;font-size:92px;color:${INK}">${o.title}</h2>
-    <div class="a" style="left:190px;top:${o.listTop||390}px">
-      <span class="tag" style="background:${p.soft};color:${p.softFg};padding:9px 15px;border-radius:6px">In</span>
-      <div style="margin-top:12px">${o.ins.slice(0,7).map(box).join('')}</div>
-      <span class="tag" style="display:inline-block;margin-top:28px;background:${INK};color:${CREAM};padding:9px 15px;border-radius:6px">Out</span>
-      <div style="margin-top:12px">${o.outs.map(box).join('')}</div></div>
-    ${foot(INK, ctx)}` }; },
-
-  // Stacked pills on ink (Better Future pills)
-  pills(ctx, o){ const p = P(); const acc = accentOnInk(p);
-    const rows = o.items.map((t,i) => i === o.hi ? `<div class="pill" style="height:108px;padding:0 46px;background:${acc};color:${INK};font-size:52px;font-weight:500;letter-spacing:-.03em">${esc(t)}</div>`
-      : i % 2 ? `<div class="pill" style="height:108px;padding:0 46px;border:2px solid ${CREAM}66;color:${CREAM};font-size:52px"><i class="s" style="font-size:56px">${esc(t)}</i></div>`
-      : `<div class="pill" style="height:108px;padding:0 46px;background:#E9E3DE;color:${INK};font-size:52px;font-weight:500;letter-spacing:-.03em">${esc(t)}</div>`).join('');
-    return { bg:INK, html:`${topL(CREAM, esc(o.label||''), nameOf())}
-    <div class="a" style="left:64px;right:64px;top:${o.top||240}px;display:flex;flex-direction:column;align-items:flex-start;gap:22px">${rows}</div>
-    ${foot(CREAM, ctx)}` }; },
-
-  // Tear-off calendar
-  calendar(ctx, o){ const p = P(); const d = dl(); return { bg:CREAM, html:`${topL(INK, esc(o.label||''), nameOf())}
-    <div class="a" style="left:200px;right:200px;top:150px;height:780px;background:#fff;border-radius:22px;box-shadow:0 30px 60px rgba(42,10,18,.10);overflow:hidden">
-      <div style="height:160px;background:${p.bg};display:flex;align-items:center;justify-content:center"><p class="tag" style="font-size:24px;color:${p.fg};letter-spacing:.22em">${MONTHS_L[d.getMonth()]}</p></div>
-      <p class="num" style="text-align:center;font-size:420px;color:${INK};margin-top:70px">${d.getDate()}</p>
-      <p class="tag" style="text-align:center;color:${INK};margin-top:40px">Submissions close</p></div>
-    <h2 class="a h" style="left:64px;right:64px;top:1000px;font-size:72px;color:${INK}">${o.title}</h2>
-    ${foot(INK, ctx)}` }; },
-
-  // Ticket
-  ticket(ctx, o){ const p = P(); return { bg:p.bg, html:`${topL(p.fg, esc(o.label||''), nameOf())}
-    <div class="a" style="left:100px;right:100px;top:240px;height:560px;display:flex;filter:drop-shadow(0 30px 40px rgba(0,0,0,.22))">
-      <div style="flex:1;background:${CREAM};border-radius:28px 0 0 28px;padding:56px;-webkit-mask:radial-gradient(circle 26px at 100% 0,transparent 98%,#000) top right/100% 51% no-repeat,radial-gradient(circle 26px at 100% 100%,transparent 98%,#000) bottom right/100% 51% no-repeat">
-        <p class="tag" style="color:${INK}">Admit one artist</p>
-        <p class="h" style="font-size:80px;color:${INK};margin-top:24px">${nameOf()}</p>
-        <p class="p" style="color:${INK};margin-top:24px;width:440px">${o.text}</p></div>
-      <div style="width:250px;background:${CREAM};border-left:3px dashed #C9B8AE;border-radius:0 28px 28px 0;display:flex;flex-direction:column;align-items:center;justify-content:center">
-        <p class="num" style="font-size:200px;color:${INK}">${ctx.left}</p><p class="tag" style="color:${INK};margin-top:14px">days left</p></div></div>
-    <h2 class="a h" style="left:64px;right:64px;top:900px;font-size:80px;color:${p.fg}">${o.title}</h2>
-    ${foot(p.fg, ctx)}` }; },
-
-  // Last call: the one tilted chilli tag
-  last(ctx, o){ const p = P(); return { bg:INK, html:`${topL(CREAM, nameOf(), '')}
-    <div class="a" style="right:72px;top:140px;transform:rotate(-8deg)"><span class="tag" style="display:inline-block;background:${CHILLI};color:#FFD6DE;padding:16px 26px;border-radius:12px;font-size:22px">Final day</span></div>
-    <h2 class="a h" style="left:60px;right:64px;top:300px;font-size:200px;color:${CREAM}">Closes<br><i class="s" style="color:${accentOnInk(p)}">tonight.</i></h2>
-    <p class="a p" style="left:64px;top:830px;width:640px;color:${CREAM};opacity:.8">${o.text}</p>
-    <div class="a" style="left:64px;top:1020px"><span class="pill" style="height:92px;padding:0 42px;background:${CREAM};color:${BURG};font-size:30px;font-weight:600">Submit · link in bio →</span></div>
-    ${foot(CREAM, ctx)}` }; },
-
-  // Centred statement on ink with one circled word (Better Future "converts.")
-  circle(ctx, o){ const p = P(); const acc = accentOnInk(p); return { bg:INK, html:`${topL(CREAM, nameOf(), esc(o.label||''))}
-    <div class="a" style="left:50%;top:230px;transform:translateX(-50%)">${arrowPill(acc, 110, 60)}</div>
-    <h2 class="a" style="left:90px;right:90px;top:360px;text-align:center;font-weight:400;font-size:${o.size||76}px;line-height:1.12;letter-spacing:-.03em;color:${CREAM}">${o.before} <span style="display:inline-block;border:4px solid ${CREAM};border-radius:50%;padding:0 30px;transform:rotate(-3deg)">${o.word}</span></h2>
-    <p class="a" style="left:160px;right:160px;top:${o.noteTop||1010}px;text-align:center;font-size:32px;line-height:1.25;color:${CREAM};opacity:.85"><i class="s">${o.note||''}</i></p>
-    ${foot(CREAM, ctx)}` }; },
-
-  // Figure with a ring of time remaining (Better Future "40%")
-  percent(ctx, o){ const p = P(); const val = light(p) ? p.fg : p.bg; const pct = Math.max(0, Math.min(1, o.frac)); const R = 210, C = 2*Math.PI*R;
-    return { bg:'#F4F1EE', html:`${topL(INK, nameOf(), esc(o.label||''))}
-    <p class="a" style="left:0;right:0;top:170px;text-align:center;font-size:30px;line-height:1.25;color:${INK}"><i class="s">${o.above||''}</i></p>
-    <p class="a num" style="left:0;right:0;top:250px;text-align:center;font-size:230px;color:${INK}">${o.num}</p>
-    <p class="a p" style="left:0;right:0;top:480px;text-align:center;color:${INK}">${o.below||''}</p>
-    <svg class="a" style="left:270px;top:600px" width="540" height="540" viewBox="0 0 540 540">
-      <circle cx="270" cy="270" r="${R}" fill="none" stroke="${p.soft}" stroke-width="110"/>
-      <circle cx="270" cy="270" r="${R}" fill="none" stroke="${val}" stroke-width="110" stroke-dasharray="${(C*pct).toFixed(1)} ${C.toFixed(1)}" transform="rotate(-90 270 270)"/>
-      <circle cx="270" cy="270" r="${R}" fill="none" stroke="${INK}" stroke-width="110" stroke-dasharray="14 ${C.toFixed(1)}" stroke-dashoffset="${(-C*pct+7).toFixed(1)}" transform="rotate(-90 270 270)"/></svg>
-    ${foot(INK, ctx)}` }; },
-
-  // Closing slide on every carousel: the date and one action
-  cta(ctx, o){ const p = P(); const d = dl(); return { bg:CREAM, html:`${topL(INK, esc(o.label||'Submit'), nameOf())}
-    <p class="a lab" style="left:64px;top:300px;color:${INK}">${ctx.left === 0 ? 'Submissions close tonight' : 'Submissions close'}</p>
-    <p class="a num" style="left:46px;top:350px;font-size:250px;color:${INK}">${d.getDate()} ${MONTHS[d.getMonth()]}</p>
-    <p class="a p" style="left:64px;top:620px;width:660px;color:${INK}">${o.text || 'One original artwork. Open to artists 18+ worldwide, in all media.'}</p>
-    <div class="a" style="left:64px;top:830px;display:flex;flex-direction:column;align-items:flex-start;gap:24px">
-      <span class="pill" style="height:96px;padding:0 44px;background:${BURG};color:${CREAM};font-size:31px;font-weight:600">Submit · link in bio →</span>
-      <span class="p" style="color:${INK};opacity:.75">or DM us “${KW()}” for the full brief</span></div>
-    ${foot(INK, ctx, ctx.left === 0 ? 'Final day' : `${ctx.left} ${ctx.left === 1 ? 'day' : 'days'} left`)}` }; },
-};
-
-// ---------- content helpers ----------
-function bens(){ return lines(state.benefits); }
-function benRows(){ return bens().map(b => { const i = b.indexOf(' for '); return i > 0 ? [b.slice(0,i), b.slice(i+1)] : [b, '✓']; }); }
-function awards(){ return lines(state.awards).map(l => l.split('|').map(s => s.trim())); }
-function tests(){ return lines(state.testimonials).map(l => l.split('|').map(s => s.trim())); }
-function others(){ return lines(state.others).map(l => l.split('|').map(s => s.trim())); }
-const KW = () => esc(state.keyword || 'KEYWORD');
-const SEL = () => esc(state.selected);
-const W = () => esc(state.word || 'theme');
-const juryName = () => esc(state.jury || '[Curator name]');
-
-// ---------- the month: 20 carousels, dated back from the deadline ----------
-const POSTS = [
-  {day:0, title:'Launch', slides: ctx => [
-    ['cover',{label:'Submissions open', title:`${nameOf()}.<br>Open for submissions.`}],
-    ['circle',{label:'Juried', before:`${SEL()} artists will be selected, published and`, word:'collected.', note:`A juried hardcover edition. Submissions close ${fmtLong(dl())}.`}],
-    ['bars',{title:'A growing collection', text:`${esc(state.published)} artists published across ${esc(state.editions)} editions since 2023. This is the next one.`, a:esc(state.editions), aLabel:'editions in print', b:'Next', bLabel:`${nameOf()}, open until ${fmtLong(dl())}`}],
-    ['statement',{serif:true, size:104, title:`<i>${esc(state.quote)}</i>`, text:esc(state.themeBody), label:'The theme', ruleTop:620}],
-    ['split',{label:'Selection', title:`${SEL()} artists, chosen by the jury.`, text:`Every submission is reviewed by ${state.jury ? juryName() : 'our jury'}. Results within three weeks of ${fmtLong(dl())}.`, ground:'ink'}],
-    ['receipt',{title:'What you get if selected', rows: benRows(), total:'Your name in print'}],
-    ['number',{num:esc(state.prize), text:`and a ${esc(state.feature)} for the winner, chosen by the jury.`, label:'Recognition', band:'Two runners-up receive a 2-page feature and a glass trophy.'}],
-    ['cta',{}],
-  ]},
-  {day:2, title:'The theme', slides: ctx => [
-    ['statement',{serif:true, size:104, title:`<i>${esc(state.quote)}</i>`, text:esc(state.themeBody), label:'The theme', ruleTop:620}],
-    ['split',{label:'One way in', title:`A ${W()} can be<br>a single leaf.`, text:'Close observation counts. Detail, texture and a single subject are all welcome.', ground:'soft'}],
-    ['split',{label:'Another way in', title:'Or something<br>you imagine.', text:'Abstract, symbolic and invented work is welcome. Nature can be the starting point, not the subject.', ground:'bg'}],
-    ['split',{label:'Another way in', title:'Or a memory<br>of a place.', text:'A view you grew up with, a place you return to, a feeling of growth or change.', ground:'ink'}],
-    ['inout',{title:'Does my work count?', ins:csv(state.ins), outs:csv(state.outs)}],
-    ['cta',{}],
-  ]},
-  {day:4, title:'The book', slides: ctx => [
-    ['portrait',{imgKey:'imgBook', imgLabel:'Book photo', label:'Inside the edition', role:esc(state.series), name:'Your work, in print'}],
-    ['split',{label:'The book', title:'A premium hardcover, made to keep.', text:'Printed and bound as a collectible edition, sold on Amazon, Barnes & Noble and in bookstores.', ground:'cream'}],
-    ['list',{label:'Inside', title:'More than a catalogue.', rows:[['The 101','Every selected artist, with their work'],['Interviews','Guest curator, collectors, galleries'],['The cover','A conversation with the cover artist'],['Recognition','The award-winning artists']], col:'240px', rowSize:40, top:470}],
-    ['cta',{}],
-  ]},
-  {day:6, title:'What you get', slides: ctx => [
-    ['split',{label:'If selected', title:'What selection means for your practice.', text:'Not a fee for a listing. A published credit and a place in a book collectors keep.', ground:'bg'}],
-    ['receipt',{title:'What you get if selected', rows: benRows(), total:'Your name in print'}],
-    ...bens().slice(0,3).map((b,i) => ['split',{label:`0${i+1}`, title:esc(b.split(' for ')[0]) + '.', text: b.includes(' for ') ? esc(b.slice(b.indexOf(' for ')+1)).replace(/^./, c => c.toUpperCase()) + '.' : '', ground:['soft','ink','cream'][i]}]),
-    ['cta',{}],
-  ]},
-  {day:8, title:'The award', slides: ctx => [
-    ['number',{num:esc(state.prize), text:`and a ${esc(state.feature)} for the winner, chosen by the jury.`, label:'Recognition', imgKey:'imgArt2', imgLabel:'Second artwork'}],
-    ['list',{label:'Recognition', title:'Three artists receive more.', rows: awards().map(([a,b]) => [esc(a), esc(b)]), col:'260px', rowSize:38, top:460, ground:'cream'}],
-    ['bars',{title:'Three from the 101.', text:`The jury picks three artists from the ${SEL()} in the book.`, a:SEL(), aLabel:'artists in the book', b:'3', bLabel:'receive additional recognition', h1:860, h2:300}],
-    ['cta',{}],
-  ]},
-  {day:10, title:'The jury judges the work', slides: ctx => [
-    ['circle',{label:'Your questions', before:'Most doubts about applying end with one answer: the', word:'work.', note:'Four questions artists ask us before they submit.'}],
-    ['card',{q:'Self-taught?', a:'The jury judges the work, not the CV.', size:92, cta:`DM us “${state.keyword}”`}],
-    ['card',{q:'Never been published?', a:'Most artists in our books hadn’t been, before.', size:84, cta:`DM us “${state.keyword}”`}],
-    ['card',{q:'Outside the US?', a:'Open to artists 18+, anywhere in the world.', size:88, cta:`DM us “${state.keyword}”`}],
-    ['card',{q:'Only one strong piece?', a:'One original artwork is all it takes.', size:92, cta:`DM us “${state.keyword}”`}],
-    ['cta',{}],
-  ]},
-  {day:12, title:'Artists in their words', slides: ctx => { const t = tests(); const list = t.length ? t : [['Add a real quote from a past selected artist in the form.','Artist Name','Past edition']];
-    return [['split',{label:'Selected artists', title:'In their words.', text:`Artists from past editions on what being in the book meant.`, ground:'ink'}], ...list.map(([q,n,e],i) => ['quote',{q, name:n, role:e, tag:'Selected artist', dark: i % 2 === 1}]), ['cta',{}]]; }},
-  {day:14, title:'Meet the jury', slides: ctx => [
-    ['portrait',{imgKey:'imgJury', imgLabel:'Jury portrait', label:'The jury', role:esc(state.juryRole), name:state.jury || 'Curator name'}],
-    ['quote',{q: state.juryQuote || 'Add the jury’s own words about what they look for.', name: state.jury || 'Curator name', role: state.juryRole, tag:'What the jury looks for'}],
-    ['list',{label:'Selection', title:'What the jury looks for.', rows:[['01','Originality'],['02','A considered reading of the theme'],['03','The quality of the work']], col:'120px', rowSize:52, top:470, ground:'cream'}],
-    ['split',{label:'The review', title:`Reading begins after ${fmt(dl())}.`, text:'Every eligible submission is reviewed. Results within three weeks.', ground:'bg'}],
-    ['cta',{}],
-  ]},
-  {day:15, title:'Halfway', slides: ctx => [
-    ['percent',{label:'Halfway', above:'Of the submission window,', num:`${ctx.left} days`, below:`remain. Submissions close ${fmtLong(dl())}.`, frac: ctx.left/30}],
-    ['stat',{num: state.entries || '[X]', unit:'', size: String(state.entries||'[X]').length > 4 ? 380 : 520, word:'artists have entered', text:`From ${state.countries || '[Y]'} countries. ${ctx.left} days left to join them.`, label:'Halfway'}],
-    ['bars',{title:'Halfway there.', text:`${ctx.left} days left. ${SEL()} artists will be selected.`, a:SEL(), aLabel:'places in the book', b: esc(state.entries || '[X]'), bLabel:`artists have entered so far`, h1:380, h2:860}],
-    ['cta',{}],
-  ]},
-  {day:16, title:'Is this for me?', slides: ctx => [
-    ['chat',{label:'Questions', title:'Is this for me?', items:[["I'm self-taught. Can I apply?", 'Yes. The jury judges the work, not the CV.'],['I live outside the US.', 'It’s open to artists worldwide, 18+.'],['How do I apply?', `Link in bio, or DM us <b>${KW()}</b> for the brief.`]]}],
-    ['chat',{label:'Questions', title:'And the rest.', items:[['Can I send work I’ve shown before?', 'Yes, if you hold the rights to it.'],['Is digital work welcome?', 'Yes. Traditional and digital, all media.'],['Can I use AI?', 'No. Original work only.']]}],
-    ['cta',{}],
-  ]},
-  {day:18, title:'How to apply', slides: ctx => [
-    ['caps',{title:`Three steps<br>to the ${W()}<br>edition: choose,<br>photograph,<br><span style="display:inline-block;border:5px solid ${light(P()) ? P().fg : P().bg};border-radius:50%;padding:0 26px;margin-left:-26px">submit</span>`, tag:'How to apply', note:`One original artwork is enough. Closes ${fmtLong(dl())}.`, tagTop:860}],
-    ['step',{n:'01', label:'Step one', title:'Choose one artwork.', text:'The piece that best shows how you see the theme.'}],
-    ['step',{n:'02', label:'Step two', title:'Photograph it well.', text:'Daylight, straight on, no filters. True colour matters in print.'}],
-    ['step',{n:'03', label:'Step three', title:'Submit through the link in bio.', text:`It takes about ten minutes. Closes ${fmtLong(dl())}.`}],
-    ['cta',{}],
-  ]},
-  {day:20, title:'10 days left', slides: ctx => [
-    ['percent',{label:'Ten days', above:'Two thirds of the window has passed.', num:`${ctx.left} days`, below:`left to submit. Then ${SEL()} artists are chosen.`, frac: ctx.left/30}],
-    ['stat',{num:ctx.left, unit:'days', word:'to submit', text:`In ${ctx.left} days, ${SEL()} places are filled. Submissions close ${fmtLong(dl())}.`}],
-    ['receipt',{title:'Still on the table', rows: benRows(), total:'Your name in print'}],
-    ['cta',{}],
-  ]},
-  {day:22, title:'What artists ask for', slides: ctx => [
-    ['pills',{label:'Why artists apply', items:['A publication credit','recognition','A place in print','seen by collectors'], hi:2}],
-    ['split',{label:'A place in print', title:'Your work, beyond the screen.', text:'A page in a hardcover book that collectors and galleries keep.', ground:'soft'}],
-    ['split',{label:'Recognition', title:'A credit you keep using.', text:'For your CV, website, residencies and grant applications.', ground:'ink'}],
-    ['cta',{}],
-  ]},
-  {day:23, title:'One week', slides: ctx => [
-    ['calendar',{label:'One week', title:`Submissions for the ${nameOf()} close in seven days.`}],
-    ['checklist',{label:'This week', title:'Seven days is enough.', items:['Choose one artwork','Photograph it in daylight','Submit through the link in bio']}],
-    ['cta',{}],
-  ]},
-  {day:25, title:'Open now', slides: ctx => { const now = addDays(dl(), -ctx.left); const rows = [[fmt(dl()), `${nameOf()} · DM “${KW()}”`], ...others().filter(o => o[1] && new Date(o[1]) >= now).map(o => [fmt(new Date(o[1])), `${esc(o[0])}${o[2] ? ' · DM “'+esc(o[2])+'”' : ''}`])];
-    return [['list',{label:'Open calls', title:'Open now.', rows, col:'180px', rowSize:40, top:420}],
-      ['split',{label:'Closing first', title:`The ${nameOf()} closes in ${ctx.left} days.`, text:'If you are deciding between calls, this is the one that closes first.', ground:'ink'}],
-      ['checklist',{label:'Before it closes', title:`${ctx.left} days. Three steps.`, items:['Choose one artwork','Photograph it well','Submit through the link in bio']}],
-      ['cta',{}]]; }},
-  {day:26, title:'Entries so far', slides: ctx => [
-    ['circle',{label:'Four days', before:`Every submission is read by the jury. ${SEL()} are`, word:'chosen.', note:`Four days left to be one of them. Closes ${fmtLong(dl())}.`}],
-    ['bars',{title:'Entries so far', text:`${ctx.left} days left. ${SEL()} artists will be selected.`, a:SEL(), aLabel:'places in the book', b: esc(state.entries || '[X]'), bLabel:`artists from ${esc(state.countries || '[Y]')} countries`, h1:380, h2:860}],
-    ['receipt',{title:'What the 101 receive', rows: benRows(), total:'Your name in print'}],
-    ['cta',{}],
-  ]},
-  {day:27, title:'3 days left', slides: ctx => [
-    ['ticket',{label:'Three days', title:`Your place is still open. Then ${SEL()} artists are chosen.`, text:`Submissions close ${fmtLong(dl())}.`}],
-    ['checklist',{label:'Before it closes', title:'Three days. Three steps.', items:['Choose one artwork','Photograph it well','Submit through the link in bio']}],
-    ['cta',{}],
-  ]},
-  {day:28, title:'Last questions', slides: ctx => [
-    ['card',{q:'What does it cost?', a:'[Add the entry fee]', size:92, small:'Stated up front, with nothing added later.', cta:`DM us “${state.keyword}”`}],
-    ['card',{q:'Who keeps the rights?', a:'You do.', size:120, small:'We only use the image to publish and promote the book.', cta:`DM us “${state.keyword}”`}],
-    ['card',{q:'When are results?', a:`Within three weeks of ${fmt(dl())}.`, size:84, cta:`DM us “${state.keyword}”`}],
-    ['cta',{}],
-  ]},
-  {day:29, title:'Closes tomorrow', slides: ctx => [
-    ['stat',{num:'1', unit:'day', word:'left to submit', text:`Submissions for the ${nameOf()} close tomorrow at midnight.`}],
-    ['checklist',{label:'Before tomorrow', title:'Closes tomorrow.', items:['Choose one artwork','Photograph it well','Submit through the link in bio']}],
-    ['cta',{}],
-  ]},
-  {day:30, title:'Last call', slides: ctx => [
-    ['last',{text:`Submissions for the ${nameOf()} close at midnight. The jury begins tomorrow.`}],
-    ['checklist',{label:'Tonight', title:'Ten minutes.', items:['One artwork','One good photo','Submit · link in bio']}],
-    ['cta',{}],
-  ]},
-];
-POSTS.sort((a,b) => a.day - b.day);
-// ---------- render ----------
-$('ptype').innerHTML = '<option value="all">Whole month (20 posts)</option>' + POSTS.map((p,i) => `<option value="${i}">${p.day ? 'Day '+p.day : 'Launch day'} · ${esc(p.title)}</option>`).join('');
-$('ptype').value = '0';
-let RENDERED = [];
-function ctxFor(post){ const left = 30 - post.day; return { left, date: addDays(dl(), -left) }; }
-function buildSlides(post){ const ctx = ctxFor(post); return post.slides(ctx).map(([k,o]) => ({ ...T[k](ctx,o), tpl:k })); }
-function slideNode(s){ return `<div class="post" style="background:${s.bg}">${s.html}</div>`; }
-
-function render(){
-  readForm();
-  const sel = $('ptype').value;
-  const list = sel === 'all' ? POSTS : [POSTS[Number(sel)]];
-  RENDERED = [];
-  $('out').innerHTML = list.map((post) => { const ctx = ctxFor(post); const slides = buildSlides(post);
-    const base = String(post.day).padStart(2,'0') + '-' + post.title.toLowerCase().replace(/[^a-z0-9]+/g,'-');
-    const cells = slides.map((s,j) => { const idx = RENDERED.push({ s, name: `${base}${slides.length>1 ? '-'+(j+1) : ''}.png` }) - 1;
-      return `<div class="cell"><div class="frame">${slideNode(s)}</div><div class="act"><span>${slides.length>1 ? 'Slide '+(j+1) : 'Single'}</span><button type="button" data-i="${idx}">Save PNG</button></div></div>`; }).join('');
-    return `<section class="group"><h2>${post.day ? 'Day '+post.day : 'Launch day'} · ${esc(post.title)}</h2><p class="meta">${fmtLong(ctx.date)} · ${ctx.left === 0 ? 'deadline day' : ctx.left + ' days left'} · ${slides.length > 1 ? slides.length + ' slides' : 'single post'}</p><div class="slides">${cells}</div></section>`; }).join('');
-  $('out').querySelectorAll('[data-i]').forEach(b => b.onclick = () => saveOne(Number(b.dataset.i)));
-  status(`${RENDERED.length} slide${RENDERED.length === 1 ? '' : 's'} ready.`);
+  const titles = ['cover','who-we-are','the-series','the-theme','the-book','what-you-receive','recognition','selection','who-can-apply','published-artists','apply'];
+  return S.map((s,i) => ({...s, title: titles[i]}));
 }
 
+// ---------- render + export ----------
+let RENDERED = [];
+const slideNode = s => `<div class="post" style="background:${s.bg}">${s.html}</div>`;
+function render(){
+  readForm();
+  const slides = launch();
+  const base = (state.name || 'call').toLowerCase().replace(/[^a-z0-9]+/g,'-');
+  RENDERED = slides.map((s,j) => ({ s, name: `${base}-launch-${String(j+1).padStart(2,'0')}-${s.title}.png` }));
+  const cells = RENDERED.map((r,j) => `<div class="cell"><div class="frame">${slideNode(r.s)}</div><div class="act"><span>${j+1}. ${r.s.title.replace(/-/g,' ')}</span><button type="button" data-i="${j}">Save PNG</button></div></div>`).join('');
+  $('out').innerHTML = `<section class="group"><h2>Launch carousel · ${esc(state.series)}: ${esc(state.name)}</h2><p class="meta">${slides.length} slides · closes ${short()} · DM “${KW()}”</p><div class="slides">${cells}</div></section>`;
+  $('out').querySelectorAll('[data-i]').forEach(b => b.onclick = () => saveOne(Number(b.dataset.i)));
+  status(`${RENDERED.length} slides ready.`);
+}
 async function toBlob(s){
   await document.fonts.ready;
   const stage = $('stage'); stage.innerHTML = slideNode(s); const el = stage.firstElementChild;
@@ -628,15 +387,13 @@ async function offer(filename, data){
   try { await DL.save({ filename, data }); status('Saved ' + filename + '.'); }
   catch (e) { status(e && e.code === 'declined' ? 'Save cancelled.' : 'Could not save (' + (e && e.code || 'error') + ').'); }
 }
-async function saveOne(i){ status('Rendering…'); const blob = await toBlob(RENDERED[i].s); await offer(RENDERED[i].name, blob); }
+async function saveOne(i){ status('Rendering…'); await offer(RENDERED[i].name, await toBlob(RENDERED[i].s)); }
 $('zip').onclick = async () => { if (!RENDERED.length) render(); const zip = new JSZip(); for (let i = 0; i < RENDERED.length; i++){ status(`Rendering ${i+1} of ${RENDERED.length}…`); zip.file(RENDERED[i].name, await toBlob(RENDERED[i].s)); }
-  status('Packing…'); const blob = await zip.generateAsync({ type:'blob' }); await offer((state.short || 'ath-call').toLowerCase().replace(/[^a-z0-9]+/g,'-') + '-posts.zip', blob); };
+  status('Packing…'); await offer((state.name || 'ath-call').toLowerCase().replace(/[^a-z0-9]+/g,'-') + '-launch.zip', await zip.generateAsync({ type:'blob' })); };
 $('go').onclick = render;
-$('ptype').onchange = render;
+document.querySelector('aside').addEventListener('change', e => { if (e.target.type !== 'file') render(); });
 
-// size previews to the column
-function sizePreviews(){ const w = $('out').clientWidth; const pw = Math.max(220, Math.min(320, Math.floor((w - 30) / 3))); document.documentElement.style.setProperty('--pw', pw + 'px'); document.documentElement.style.setProperty('--sc', String(pw / 1080)); }
+function sizePreviews(){ const w = $('out').clientWidth || 900; const pw = Math.max(200, Math.min(300, Math.floor((w - 32) / 3))); document.documentElement.style.setProperty('--pw', pw + 'px'); document.documentElement.style.setProperty('--sc', String(pw / 1080)); }
 window.addEventListener('resize', sizePreviews);
-
 refreshSaved(); fillForm(); sizePreviews(); document.fonts.ready.then(render);
 </script>
