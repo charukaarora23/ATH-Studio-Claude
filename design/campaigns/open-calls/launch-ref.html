@@ -25,23 +25,22 @@ body{margin:0;background:#C9D3CF;display:flex;flex-wrap:wrap;gap:40px;padding:40
 .hl{display:inline-block;background:var(--mint);color:var(--ink);border-radius:999px;padding:0 .3em .07em;line-height:1}
 .ci{display:inline-flex;align-items:center;justify-content:center;border-radius:50%}
 .c{text-align:center}
+@font-face{font-family:IS;src:url(fonts/InstrumentSerif-Italic.ttf) format("truetype");font-style:italic}
+.cn{font-size:20px;font-weight:700;letter-spacing:.16em;text-transform:uppercase}
 </style></head><body>
 <svg width="0" height="0" style="position:absolute"><symbol id="mg" viewBox="-32.00 -165.68 254.06 254.06"><g fill="currentColor"><path d="M34.2 -77.5H44.400000000000006L69.2 -17.5Q71.2 -13.100000000000001 73.35 -9.05Q75.5 -5.0 78.60000000000001 0.0H64.5Q63.900000000000006 -3.2 62.800000000000004 -7.050000000000001Q61.7 -10.9 59.1 -17.5L56.800000000000004 -23.0H21.8L19.5 -17.5Q17.0 -10.9 15.850000000000001 -7.050000000000001Q14.700000000000001 -3.2 14.100000000000001 0.0H0.0Q3.1000000000000005 -4.7 5.15 -8.55Q7.200000000000001 -12.4 9.0 -16.5ZM25.1 -31.0H53.5L39.300000000000004 -65.4Z"/><path d="M91.388 1.18Q87.37600000000002 1.18 85.48800000000001 -0.6489999999999999Q83.60000000000001 -2.4779999999999998 83.60000000000001 -6.489999999999999Q83.60000000000001 -8.85 84.42600000000002 -12.921Q85.25200000000001 -16.991999999999997 87.25800000000001 -23.836L95.99000000000001 -52.745999999999995H85.84200000000001L87.37600000000002 -58.174H97.64200000000001L103.77800000000002 -78.47H114.63400000000001L108.49800000000002 -58.174H121.36000000000001L119.70800000000001 -52.745999999999995H106.846L97.05200000000002 -20.296Q96.108 -17.11 95.57700000000001 -14.690999999999999Q95.04600000000002 -12.271999999999998 94.92800000000001 -10.62Q94.92800000000001 -9.558 95.459 -8.732Q95.99000000000001 -7.906 97.28800000000001 -7.906Q99.412 -7.906 101.772 -9.44Q104.132 -10.974 106.31500000000001 -13.274999999999999Q108.49800000000002 -15.575999999999999 110.20900000000002 -17.817999999999998Q111.92000000000002 -20.06 112.74600000000001 -21.358L116.168 -19.352Q114.162 -15.34 111.153 -11.623Q108.144 -7.906 104.66300000000001 -5.015Q101.18200000000002 -2.1239999999999997 97.70100000000002 -0.47199999999999986Q94.22000000000001 1.18 91.388 1.18Z"/><path d="M139.96 -77.5Q138.66000000000003 -72.10000000000001 138.41000000000003 -66.5Q138.16000000000003 -60.900000000000006 138.16000000000003 -55.300000000000004V-43.1H178.26000000000002V-55.300000000000004Q178.26000000000002 -60.900000000000006 178.01000000000002 -66.5Q177.76000000000002 -72.10000000000001 176.46 -77.5H190.06Q188.76000000000002 -72.10000000000001 188.51000000000002 -66.5Q188.26000000000002 -60.900000000000006 188.26000000000002 -55.300000000000004V-22.200000000000003Q188.26000000000002 -16.6 188.51000000000002 -11.0Q188.76000000000002 -5.4 190.06 0.0H176.46Q177.76000000000002 -5.4 178.01000000000002 -11.0Q178.26000000000002 -16.6 178.26000000000002 -22.200000000000003V-35.1H138.16000000000003V-22.200000000000003Q138.16000000000003 -16.6 138.41000000000003 -11.0Q138.66000000000003 -5.4 139.96 0.0H126.36000000000001Q127.66000000000001 -5.4 127.91000000000003 -11.0Q128.16000000000003 -16.6 128.16000000000003 -22.200000000000003V-55.300000000000004Q128.16000000000003 -60.900000000000006 127.91000000000003 -66.5Q127.66000000000001 -72.10000000000001 126.36000000000001 -77.5Z"/></g></symbol><symbol id="ar" viewBox="0 0 46 20"><path d="M2 10h40M33 2l9 8-9 8" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></symbol>
 <symbol id="ne" viewBox="0 0 20 20"><path d="M4 16L16 4M7 4h9v9" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></symbol></svg>
 
-<!-- 1 · COVER: full-bleed art + poster info grid -->
-<div class="s dk" id="r1">
-  <div class="a img" style="left:0;right:0;top:0;height:880px;background-image:url(art/flower-portrait.jpg);background-position:center 16%"></div>
-  <div class="a" style="left:0;right:0;top:0;height:200px;background:linear-gradient(180deg,rgba(20,9,12,.6),rgba(20,9,12,0))"></div>
-  <div class="a hdr"><span class="lg"><svg width="44" height="44" style="color:var(--pi)"><use href="#mg"/></svg>Arts to Hearts</span><span class="sm" style="opacity:.75">@artstoheartsproject</span></div>
-  <p class="a" style="right:64px;top:836px;font-size:19px;font-weight:500;opacity:.8;color:#fff">Art: [Artist name]</p>
-  <p class="a H" style="left:58px;top:915px;font-size:168px;text-transform:uppercase;letter-spacing:-.055em">Open call</p>
-  <div class="a" style="left:64px;right:64px;top:1095px;border-top:2px solid rgba(255,255,255,.25);display:grid;grid-template-columns:1.5fr 1fr 1fr;padding-top:26px">
-    <div><p style="font-size:22px;font-weight:500;opacity:.6">101 Art Book</p><p class="it" style="font-size:52px;margin-top:4px;color:var(--pi)">Garden Edition</p></div>
-    <div style="border-left:2px solid rgba(255,255,255,.18);padding-left:30px"><p style="font-size:22px;font-weight:500;opacity:.6">Edition 16</p><p style="font-size:40px;font-weight:500;letter-spacing:-.03em;margin-top:10px">101 artists</p></div>
-    <div style="border-left:2px solid rgba(255,255,255,.18);padding-left:30px"><p style="font-size:22px;font-weight:500;opacity:.6">Deadline</p><p style="font-size:40px;font-weight:500;letter-spacing:-.03em;margin-top:10px">13 Dec</p></div>
-  </div>
-  <div class="a ftr" style="font-size:21px;opacity:.75;bottom:44px"><span>Submissions now open</span><span>DM “GARDEN” for the brief</span></div>
+<!-- 1 · COVER: magazine style, option 2 (Call for artists / the Garden Edition) -->
+<div class="s" id="r1" style="color:#fff">
+  <div class="a img" style="inset:0;background-image:url(art/flower-portrait.jpg);background-position:center 6%"></div>
+  <div class="a" style="inset:0;background:linear-gradient(180deg,rgba(20,14,12,.38) 0%,rgba(20,14,12,0) 16%,rgba(20,14,12,0) 40%,rgba(20,14,12,.6) 62%,rgba(20,14,12,.8) 100%)"></div>
+  <p class="a cn" style="left:52px;top:48px">Arts to Hearts</p><p class="a cn" style="right:52px;top:48px">101 Art Book</p>
+  <div class="a" style="left:0;right:0;top:650px;display:flex;justify-content:center"><span class="cn" style="display:inline-flex;align-items:center;height:46px;padding:0 26px;background:#D0D996;color:#14090C;border-radius:999px">Edition 16</span></div>
+  <p class="a c" style="left:0;right:0;top:720px;font-size:136px;font-weight:700;letter-spacing:-.01em;line-height:.9;text-transform:uppercase">Call for<br>artists</p>
+  <p class="a c" style="left:0;right:0;top:975px;font-family:IS,serif;font-style:italic;font-size:92px;line-height:1;color:#D0D996">the Garden Edition</p>
+  <p class="a c" style="left:150px;right:150px;top:1095px;font-size:32px;font-weight:500;line-height:1.35;letter-spacing:-.01em">101 places in a juried hardcover book.</p>
+  <p class="a cn" style="left:52px;bottom:48px">DM “GARDEN”</p><p class="a cn" style="right:52px;bottom:48px">Closes 13 Dec</p>
 </div>
 
 <!-- 2 · THE QUESTION (kept) -->
