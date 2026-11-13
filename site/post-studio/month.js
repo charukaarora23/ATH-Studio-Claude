@@ -17,9 +17,10 @@ const themeTag = () => state.theme ? `Theme: ${TH()}. ` : '';
 const callName = () => `${esc(state.series)}: ${GE()}`;
 
 // a flip-clock style timer: the countdown on every cover
-const timer = (dark) => { const l = CURLEFT; const n = l > 2 ? String(l) : l > 0 ? String(l*24) : '0'; const unit = l > 2 ? 'days left' : l > 0 ? 'hours left' : 'closes tonight';
-  const box = d => `<span style="display:inline-flex;align-items:center;justify-content:center;width:62px;height:80px;border-radius:10px;background:${dark ? INK : WHITE};color:${dark ? WHITE : INK};font-size:52px;font-weight:600;letter-spacing:-.03em;box-shadow:inset 0 -40px 0 rgba(0,0,0,.08)">${d}</span>`;
-  return `<span style="display:inline-flex;align-items:center;gap:6px">${l > 0 ? n.split('').map(box).join('') : ''}<span class="cn" style="margin-left:10px;font-size:18px;color:${dark ? INK : WHITE};line-height:1.2">${unit.replace(' ','<br>')}</span></span>`; };
+const timer = (dark) => { const l = CURLEFT; const label = l > 2 ? `${l} days left` : l > 0 ? `${l*24} hours left` : 'Closes tonight';
+  const bg = isAwardStyle() ? tint(state.colour) : state.colour, fg = isAwardStyle() ? INK : WHITE;
+  return `<span class="cn" style="display:inline-flex;align-items:center;gap:12px;height:50px;padding:0 24px;border-radius:999px;background:${bg};color:${fg};font-size:20px;letter-spacing:.12em"><span style="width:10px;height:10px;border-radius:50%;background:${fg}"></span>${label}</span>`; };
+const isAwardStyle = () => state.style === 'award';
 // the open-call tag, styled as an action
 const callBtn = () => `<span style="display:inline-flex;align-items:center;gap:16px;height:64px;padding:0 10px 0 28px;border-radius:999px;background:${state.colour};color:${WHITE}">
   <span class="cn" style="font-size:19px">Open call · ${esc(state.name)}</span>
