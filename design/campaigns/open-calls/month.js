@@ -9,7 +9,8 @@ const EX = { portrait:'art/flower-portrait.jpg', bloom:'art/night-bloom.jpg', fi
 let CURLEFT = 30;
 const dateLong = () => `${dl().getDate()} ${MONTHS_L[dl().getMonth()]}`;
 const leftLabel = (l = CURLEFT) => l >= 14 && l % 7 === 0 ? `${l/7} weeks left` : l > 2 ? `${l} days left` : l === 2 ? '48 hours left' : l === 1 ? '24 hours left' : 'Closes tonight';
-const callName = () => `${esc(state.series)}: ${esc(state.name)}`;
+const GE = () => `<span class="scr" style="font-size:1.14em;letter-spacing:0;font-weight:400">${esc(state.name)}</span>`;
+const callName = () => `${esc(state.series)}: ${GE()}`;
 
 // a flip-clock style timer: the countdown on every cover
 const timer = (dark) => { const l = CURLEFT; const n = l > 2 ? String(l) : l > 0 ? String(l*24) : '0'; const unit = l > 2 ? 'days left' : l > 0 ? 'hours left' : 'closes tonight';
@@ -106,15 +107,15 @@ const T = {
   // the whole open call on one page
   brief(o = {}){
     const g = G[o.ground||'cream']();
-    const rows = [['The call', `${esc(state.series)}: ${esc(state.name)}, Edition ${esc(state.edition)}`], ['Theme', 'Garden: flowers, plants, landscapes, people and nature, abstract or imagined growth'], ['Who', 'Individual artists 18+, worldwide, any medium. Emerging, mid-career or established.'], ['Selected', `${esc(state.selected)} artists, chosen by ${state.jury ? esc(state.jury) : 'the jury'}`], ['You receive', 'Publication in a juried hardcover book, a Certificate of Recognition, worldwide sales and introductions to collectors, galleries and curators'], ['Deadline', `${dateLong()}`], ['Apply', `${VERB} “${KW()}”, or the link in bio`]];
+    const rows = [['The call', `${esc(state.series)}: ${GE()}, Edition ${esc(state.edition)}`], ['Theme', 'Garden: flowers, plants, landscapes, people and nature, abstract or imagined growth'], ['Who', 'Individual artists 18+, worldwide, any medium. Emerging, mid-career or established.'], ['Selected', `${esc(state.selected)} artists, chosen by ${state.jury ? esc(state.jury) : 'the jury'}`], ['You receive', 'Publication in a juried hardcover book, a Certificate of Recognition, worldwide sales and introductions to collectors, galleries and curators'], ['Deadline', `${dateLong()}`], ['Apply', `${VERB} “${KW()}”, or the link in bio`]];
     return {bg:g.bg, html:`${corners(g.fg, g.dm, o.tr || 'The open call')}
-      <p class="a R" style="left:76px;right:80px;top:150px;font-size:76px;color:${g.fg}">${o.head || `The ${esc(state.name)}, at a glance.`}</p>
+      <p class="a R" style="left:76px;right:80px;top:150px;font-size:76px;color:${g.fg}">${o.head || `The ${GE()}, at a glance.`}</p>
       <div class="a" style="left:80px;right:80px;top:${o.top||340}px;border-bottom:2px solid ${g.line}">${rows.map(([k,v]) => `<div style="display:grid;grid-template-columns:230px 1fr;gap:20px;padding:20px 0;border-top:2px solid ${g.line}"><span class="lab" style="color:${g.acc};padding-top:6px">${k}</span><span style="font-size:31px;line-height:1.35;color:${g.fg}">${v}</span></div>`).join('')}</div>`};
   },
   // what happens after submitting
   next(o = {}){
     const g = G[o.ground||'cream']();
-    const steps = [[dateLong(), 'Submissions close'], ['Review', 'The jury reviews every eligible entry'], [state.results ? esc(state.results) : '<span class="gap">Date</span>', `${esc(state.selected)} selected artists are announced`], [state.pub ? esc(state.pub) : '<span class="gap">Month</span>', `The ${esc(state.name)} is published`]];
+    const steps = [[dateLong(), 'Submissions close'], ['Review', 'The jury reviews every eligible entry'], [state.results ? esc(state.results) : '<span class="gap">Date</span>', `${esc(state.selected)} selected artists are announced`], [state.pub ? esc(state.pub) : '<span class="gap">Month</span>', `The ${GE()} is published`]];
     return {bg:g.bg, html:`${corners(g.fg, g.dm, o.tr || 'What happens next')}
       <p class="a R" style="left:76px;right:80px;top:170px;font-size:84px;color:${g.fg}">${o.head || 'What happens after you submit.'}</p>
       <div class="a" style="left:110px;top:470px;bottom:250px;border-left:3px solid ${g.line}"></div>
@@ -134,12 +135,30 @@ const T = {
     const b = (g.bg === CREAM ? btnCTA(BURG, CREAM, CREAM) : btnCTA(CREAM, BURG, BURG)).replace('{TOP}', 820);
     return {bg:g.bg, html:`${corners(g.fg, g.dm, o.tr||'Submissions open')}
       ${o.kicker ? `<p class="a c lab" style="left:0;right:0;top:210px;color:${g.acc}">${o.kicker}</p>` : ''}
-      <p class="a H c" style="left:60px;right:60px;top:270px;font-size:${o.size||96}px;color:${g.fg}">${o.head || `Apply to the<br>${esc(state.name)}.`}</p>
+      <p class="a H c" style="left:60px;right:60px;top:270px;font-size:${o.size||96}px;color:${g.fg}">${o.head || `Apply to the<br>${GE()}.`}</p>
       <p class="a c sub" style="left:140px;right:140px;top:${o.subTop||530}px;color:${g.fg};opacity:.92">${o.sub || `Garden-themed open call. Get published in a juried hardcover book of ${esc(state.selected)} artists.`}</p>
       <div class="a" style="left:0;right:0;top:700px;display:flex;justify-content:center"><span class="cn" style="display:inline-flex;align-items:center;height:56px;padding:0 28px;border-radius:999px;background:${g.bg === CREAM ? INK : tint(state.colour)};color:${g.bg === CREAM ? CREAM : INK};font-size:22px">Closes ${dateLong()} · ${leftLabel()}</span></div>
       ${b}
       <p class="a c" style="left:0;right:0;top:990px;font-size:30px;color:${g.fg};opacity:.92">or apply via the link in bio</p>
       <p class="a c" style="left:0;right:0;top:1042px;font-size:28px;color:${g.fg};opacity:.75">artstoheartsproject.com</p>`};
+  },
+  // scarcity: 101 places, one of them could be yours
+  stakes(o = {}){
+    const g = G[o.ground||'ink']();
+    const dots = Array.from({length:101}, (_,i) => i === 100 ? `<div style="aspect-ratio:1;border-radius:50%;background:${g.acc};box-shadow:0 0 0 5px ${rgba(tint(state.colour),.25)}"></div>` : `<div style="aspect-ratio:1;border-radius:50%;border:2px solid ${g.line}"></div>`).join('');
+    return {bg:g.bg, html:`${corners(g.fg, g.dm, o.tr || 'Selection')}
+      <p class="a R" style="left:76px;right:80px;top:160px;font-size:76px;color:${g.fg}">${o.head || `${esc(state.selected)} places in the ${GE()}.`}</p>
+      <div class="a" style="left:120px;right:120px;top:${o.top||420}px;display:grid;grid-template-columns:repeat(17,1fr);gap:10px">${dots}
+        <p style="grid-column:12/18;font-family:'ATH Script',serif;font-style:italic;font-size:36px;color:${g.acc};align-self:center;padding-left:6px">&larr; yours?</p></div>
+      <p class="a sub" style="left:80px;right:100px;top:${o.subTop||870}px;color:${g.fg};opacity:.9">${o.sub || 'Every eligible submission is reviewed. Selected artists are published, sold worldwide and introduced to collectors, galleries and curators.'}</p>`};
+  },
+  // how to apply, in three moves
+  howto(o = {}){
+    const g = G[o.ground||'cream']();
+    const steps = [['01', `${VERB} “${KW()}”`, 'We send you the full brief and your submission link.'], ['02', 'Prepare your artworks', 'Garden-themed, photographed in daylight, with title, medium and size.'], ['03', `Submit by ${dateLong()}`, 'Through your link or the link in bio. About ten minutes.']];
+    return {bg:g.bg, html:`${corners(g.fg, g.dm, o.tr || 'How to apply')}
+      <p class="a R" style="left:76px;right:80px;top:160px;font-size:80px;color:${g.fg}">${o.head || `Apply to the ${GE()} in three steps.`}</p>
+      <div class="a" style="left:80px;right:80px;top:470px;border-bottom:2px solid ${g.line}">${steps.map(([n,t,d]) => `<div style="display:grid;grid-template-columns:140px 1fr;padding:34px 0;border-top:2px solid ${g.line}"><p style="font-size:84px;letter-spacing:-.06em;line-height:.9;color:${g.acc}">${n}</p><div><p style="font-size:44px;font-weight:600;letter-spacing:-.02em;color:${g.fg}">${t}</p><p style="font-size:29px;line-height:1.4;margin-top:8px;color:${g.fg};opacity:.8">${d}</p></div></div>`).join('')}</div>`};
   },
   // a question and its answer
   qa(o){
@@ -231,7 +250,7 @@ const T = {
       <div class="a" style="left:110px;right:110px;top:660px;height:116px;border-radius:999px;background:${BURG};color:${CREAM};display:flex;align-items:center;justify-content:center"><span style="font-size:40px;font-weight:700;letter-spacing:-.02em">${o.button}</span></div>
       <div class="a" style="left:110px;right:110px;top:880px;border-top:2px solid rgba(20,9,12,.18);padding-top:36px;text-align:center">
         <p class="lab" style="color:${state.colour}">Are you an artist?</p>
-        <p class="sub" style="margin-top:12px;color:${INK}">The ${esc(state.name)} is open until ${dateLong()}.<br>${VERB} “${KW()}” to apply.</p></div>`};
+        <p class="sub" style="margin-top:12px;color:${INK}">The ${GE()} is open until ${dateLong()}.<br>${VERB} “${KW()}” to apply.</p></div>`};
   },
 };
 
@@ -243,7 +262,7 @@ const CD = {
     return {bg:g.bg, html:`${corners(INK, BURG, 'Two weeks left')}
       <div class="a" style="left:80px;top:180px"><span class="cn" style="display:inline-flex;align-items:center;height:48px;padding:0 24px;background:${INK};color:${CREAM};border-radius:999px">Open call · ${callName()}</span></div>
       <p class="a H" style="left:76px;right:80px;top:270px;font-size:120px;color:${INK}">Two weeks left<br>to apply.</p>
-      <p class="a sub" style="left:80px;right:120px;top:540px;color:${INK}">To the ${esc(state.series)}: ${esc(state.name)}. ${esc(state.selected)} artists will be published.</p>
+      <p class="a sub" style="left:80px;right:120px;top:540px;color:${INK}">To the ${esc(state.series)}: ${GE()}. ${esc(state.selected)} artists will be published.</p>
       <div class="a" style="left:80px;right:80px;top:680px;display:grid;grid-template-columns:repeat(8,1fr);gap:10px">${cells}</div>
       <p class="a lab" style="right:80px;top:930px;color:${state.colour}">${dateLong()}: submissions close</p>
       ${btnCTA(BURG, CREAM, CREAM).replace('{TOP}', 1020)}`}; },
@@ -252,7 +271,7 @@ const CD = {
     return {bg:g.bg, html:`${corners(g.fg, g.dm, h + ' hours left')}
       <div class="a" style="left:80px;top:180px"><span class="cn" style="display:inline-flex;align-items:center;height:48px;padding:0 24px;background:${g.bg === CREAM ? INK : tint(state.colour)};color:${g.bg === CREAM ? CREAM : INK};border-radius:999px">Open call · ${callName()}</span></div>
       <p class="a" style="left:60px;top:270px;font-size:440px;font-weight:400;letter-spacing:-.07em;line-height:.85;color:${g.fg}">${h}</p>
-      <p class="a R" style="left:80px;top:650px;font-size:70px;color:${g.fg}">hours left to apply to the ${esc(state.name)}.</p>
+      <p class="a R" style="left:80px;top:650px;font-size:70px;color:${g.fg}">hours left to apply to the ${GE()}.</p>
       <div class="a" style="left:80px;right:80px;top:870px;display:grid;grid-template-columns:repeat(24,1fr);gap:6px">${ticks}</div>
       ${(g.bg === CREAM ? btnCTA(BURG, CREAM, CREAM) : btnCTA(CREAM, BURG, BURG)).replace('{TOP}', rows === 2 ? 1030 : 1000)}`}; },
   lastDay(){ const g = G.call();
@@ -266,7 +285,7 @@ const CD = {
     const bars = Array.from({length:total}, (_,i) => `<div style="flex:1;height:120px;border-radius:4px;background:${i < done ? state.colour : 'rgba(20,9,12,.1)'}"></div>`).join('');
     return {bg:g.bg, html:`${corners(INK, BURG, 'Halfway')}
       <p class="a R" style="left:76px;right:80px;top:200px;font-size:84px;color:${INK}">Halfway to the deadline.</p>
-      <p class="a sub" style="left:80px;right:200px;top:400px;color:${INK};opacity:.8">Submissions for the ${esc(state.series)}: ${esc(state.name)} close ${dateLong()}. ${esc(state.selected)} artists will be published.</p>
+      <p class="a sub" style="left:80px;right:200px;top:400px;color:${INK};opacity:.8">Submissions for the ${esc(state.series)}: ${GE()} close ${dateLong()}. ${esc(state.selected)} artists will be published.</p>
       <div class="a" style="left:80px;right:80px;top:620px;display:flex;gap:6px">${bars}</div>
       <p class="a" style="left:72px;top:800px;font-size:260px;font-weight:400;letter-spacing:-.07em;line-height:.85;color:${state.colour}">${left}</p>
       <p class="a R" style="left:420px;top:880px;font-size:64px;color:${INK}">days left<br>to submit</p>
@@ -275,21 +294,21 @@ const CD = {
     return {bg:g.bg, html:`${corners(g.fg, g.dm, left + ' days left')}
       <p class="a c" style="left:0;right:0;top:170px;font-size:600px;font-weight:400;letter-spacing:-.08em;line-height:.85;color:${g.fg}">${left}</p>
       <p class="a c R" style="left:0;right:0;top:720px;font-size:80px;color:${g.fg}">days left to submit to the</p>
-      <p class="a c scr" style="left:0;right:0;top:830px;font-size:84px;color:${g.acc}">${esc(state.series)}: ${esc(state.name)}</p>
+      <p class="a c scr" style="left:0;right:0;top:830px;font-size:84px;color:${g.acc}">${esc(state.series)}: ${GE()}</p>
       ${(g.bg === CREAM ? btnCTA(BURG, CREAM, CREAM) : btnCTA(CREAM, BURG, BURG)).replace('{TOP}', 1020)}`}; },
   week(left){ const g = G.ink(); const d0 = new Date(dl()); d0.setDate(d0.getDate() - left);
     const days = Array.from({length:left+1}, (_,i) => { const d = new Date(d0); d.setDate(d.getDate()+i); const last = i === left;
       return `<div style="flex:1;height:200px;border-radius:14px;${last ? `background:${tint(state.colour)};color:${INK}` : `border:2px solid rgba(255,255,255,.3);color:${WHITE}`};display:flex;flex-direction:column;align-items:center;justify-content:center"><span style="font-size:22px;font-weight:700;letter-spacing:.1em">${['SUN','MON','TUE','WED','THU','FRI','SAT'][d.getDay()]}</span><span style="font-size:56px;font-weight:500;margin-top:8px">${d.getDate()}</span></div>`; }).join('');
     return {bg:g.bg, html:`${corners(WHITE, PEONY, 'One week')}
       <p class="a R" style="left:76px;right:80px;top:230px;font-size:130px;color:${WHITE}">One week left.</p>
-      <p class="a sub" style="left:80px;right:160px;top:430px;color:${WHITE};opacity:.9">Seven days to apply to the ${esc(state.series)}: ${esc(state.name)}. ${esc(state.selected)} artists will be published.</p>
+      <p class="a sub" style="left:80px;right:160px;top:430px;color:${WHITE};opacity:.9">Seven days to apply to the ${esc(state.series)}: ${GE()}. ${esc(state.selected)} artists will be published.</p>
       <div class="a" style="left:80px;right:80px;top:640px;display:flex;gap:10px">${days}</div>
       <p class="a lab" style="right:80px;top:870px;color:${tint(state.colour)}">Submissions close ↑</p>
       ${btnCTA(CREAM, BURG, BURG).replace('{TOP}', 1010)}`}; },
   shelf(left){ const g = G.cream();
     const sp = [[PEONY,300],[BURG,340],[INK,310],[CREAM,330]].map(([c,h]) => `<div style="width:90px;height:${h}px;background:${c};border-radius:3px 3px 0 0;box-shadow:inset 0 0 0 2px rgba(20,9,12,.12)"></div>`).join('');
     return {bg:g.bg, html:`${corners(INK, BURG, left + ' days left')}
-      <p class="a R c" style="left:80px;right:80px;top:220px;font-size:96px;color:${INK}">${left} days to take your place<br>in the ${esc(state.name)}.</p>
+      <p class="a R c" style="left:80px;right:80px;top:220px;font-size:96px;color:${INK}">${left} days to take your place<br>in the ${GE()}.</p>
       <div class="a" style="left:240px;right:240px;top:540px;height:360px;display:flex;align-items:flex-end;justify-content:center;gap:12px;border-bottom:6px solid ${INK}">${sp}
         <div style="width:130px;height:350px;border:3px dashed ${state.colour};border-bottom:none;border-radius:3px 3px 0 0;background:${rgba(tint(state.colour),.45)};position:relative">${spineLab(state.name, state.colour, 28)}</div></div>
       ${btnCTA(BURG, CREAM, CREAM).replace('{TOP}', 1010)}`}; },
@@ -297,18 +316,18 @@ const CD = {
     return {bg:g.bg, html:`${corners(WHITE, PEONY, 'Three days')}
       <div class="a" style="left:80px;right:80px;top:200px;display:grid;grid-template-columns:repeat(3,1fr);gap:20px">
         ${[3,2,1].map((n,i) => `<div style="height:520px;border-radius:24px;${i===0 ? `background:${tint(state.colour)};color:${INK}` : `border:2px solid rgba(255,255,255,.25);color:rgba(255,255,255,.4)`};display:flex;align-items:center;justify-content:center;font-size:300px;letter-spacing:-.06em">${n}</div>`).join('')}</div>
-      <p class="a R c" style="left:80px;right:80px;top:770px;font-size:70px;color:${WHITE}">Three days left to apply to<br>the ${esc(state.name)}.</p>
+      <p class="a R c" style="left:80px;right:80px;top:770px;font-size:70px;color:${WHITE}">Three days left to apply to<br>the ${GE()}.</p>
       ${btnCTA(CREAM, BURG, BURG).replace('{TOP}', 1010)}`}; },
   tomorrow(){ const g = G.call();
     return {bg:g.bg, html:`${corners(WHITE, PEONY, 'Closes tomorrow')}
       <p class="a H c" style="left:60px;right:60px;top:320px;font-size:190px;color:${WHITE}">Closes<br>tomorrow.</p>
-      <p class="a c sub" style="left:140px;right:140px;top:760px;color:${WHITE}">Submissions for the ${esc(state.name)} close ${dl().getDate()} ${MONTHS_L[dl().getMonth()]}.</p>
+      <p class="a c sub" style="left:140px;right:140px;top:760px;color:${WHITE}">Submissions for the ${GE()} close ${dl().getDate()} ${MONTHS_L[dl().getMonth()]}.</p>
       ${btnCTA(CREAM, BURG, BURG).replace('{TOP}', 940)}`}; },
   tonight(){ const CH = '#AA0003';
     return {bg:CH, html:`${corners(WHITE, PEONY, 'Final day')}
       <div class="a" style="left:0;right:0;top:220px;display:flex;justify-content:center"><span class="cn" style="display:inline-flex;align-items:center;height:48px;padding:0 24px;background:${CREAM};color:${CH};border-radius:999px">Open call · ${callName()}</span></div>
       <p class="a H c" style="left:60px;right:60px;top:320px;font-size:150px;color:${WHITE}">Final hours.<br>Closes tonight.</p>
-      <p class="a c sub" style="left:140px;right:140px;top:700px;color:${WHITE}">This is the last call to be considered for the ${esc(state.name)}.</p>
+      <p class="a c sub" style="left:140px;right:140px;top:700px;color:${WHITE}">This is the last call to be considered for the ${GE()}.</p>
       ${btnCTA(CREAM, CH, CH).replace('{TOP}', 940)}`}; },
 };
 
@@ -318,7 +337,7 @@ const kwLine = () => `${VERB === 'COMMENT' ? 'Comment' : 'DM us'} "${(state.keyw
 const closeLn = () => `Submissions close ${dl().getDate()} ${MONTHS_L[dl().getMonth()]}.`;
 const N = () => state.name, S = () => state.series, SEL = () => state.selected;
 
-function monthPosts(){ const name = esc(state.name), sel = esc(state.selected); return [
+function monthPosts(){ const name = GE(), sel = esc(state.selected); return [
  {left:30, title:'Launch', kind:'Carousel', slides:() => launch(), caption:() => caption(), pin:() => pinned()},
 
  {left:28, title:'What you can submit', kind:'Carousel · theme', slides:() => [
@@ -398,22 +417,21 @@ ${closeLn()}
 ${tags}`},
 
  {left:20, title:'Published garden artists', kind:'Carousel · proof', slides:() => [
-   T.hook({img:EX.portrait, tr:'Past editions', head:'Their garden work is in print. Yours could be next.', size:80, sub:`Artists we published in our Floral, Nature and Landscape editions.`}),
+   T.hook({img:EX.portrait, tr:'Past editions', head:`Their work is in print. Yours could be next, in the ${name}.`, size:72, sub:`Garden-themed artists we published in our Floral, Nature and Landscape editions.`}),
    T.grid({head:'Published in the Floral Edition', items:[{},{},{},{}], tr:'Past editions'}),
    T.grid({head:'Published in the Nature Edition', items:[{},{},{},{}], tr:'Past editions', ground:'ink'}),
    T.grid({head:'Published in the Landscape Edition', items:[{},{},{},{}], tr:'Past editions'}),
    T.cta({kicker:'Your work could be next'}),
- ], caption:() => `Their garden work is in print. Yours could be next.
+ ], caption:() => `Their work is in print. Yours could be next, in the ${N()}.
 
 These artists were published in our Floral, Nature and Landscape editions of the ${S()}. Every artist is credited on the slides.
 
-The ${N()} is open now, with ${SEL()} places.
+The ${N()} open call has ${SEL()} places.
 ${kwLine()}
 ${closeLn()}
 
 [Credit every artist here: Name · @handle]
 ${tags}`},
-
  {left:18, title:'Photograph your art for print', kind:'Carousel · education', slides:() => [
    T.hook({img:EX.dahlia, pos:'center 40%', tr:'For your submission', head:`Applying to the ${name}? Photograph your work like this.`, sub:'Five steps that help the jury see your work properly. Save this.'}),
    T.num({icon:'sun', n:'01', head:'Use daylight.', text:'Near a window, out of direct sun. Avoid flash and yellow indoor light.', tr:'Photo tips'}),
@@ -437,18 +455,23 @@ ${closeLn()}
 ${tags}`},
 
  {left:15, title:'15 days left', kind:'Carousel · countdown', slides:() => [
-   T.count({img:ART[1], pos:'center 40%', big:'15', unit:'days left', tr:'Halfway'}),
-   T.value(), T.cta(),
+   T.count({img:ART[1], pos:'center 40%', big:'15', unit:'days left', tr:'Halfway', info:`Halfway to the deadline. ${sel} artists will be published in a juried hardcover book.`}),
+   T.value(),
+   T.stakes(),
+   T.howto(),
+   T.cta({kicker:'15 days left', head:`Start your submission<br>to the ${name}.`}),
  ], caption:() => `Halfway. 15 days left to apply to the ${N()} open call.
 
-Theme: Garden. ${SEL()} artists will be published in a juried hardcover book.
-${kwLine()}
-${closeLn()}
+${SEL()} places. Every eligible submission is reviewed, and selected artists are published, sold worldwide and introduced to collectors, galleries and curators.
+
+How to apply:
+1. ${kwLine()}
+2. Prepare your garden-themed artworks
+3. Submit by ${dl().getDate()} ${MONTHS_L[dl().getMonth()]}
 
 ${tags}`},
-
  {left:14, title:'2 weeks left', kind:'Carousel · countdown', slides:() => [
-   T.count({img:ART[3], tone:'green', big:'2', unit:'weeks left'}),
+   T.count({img:ART[3], big:'2', unit:'weeks left'}),
    T.themeRecap(), T.cta({ground:'cream'}),
  ], caption:() => `Two weeks left to apply to the ${N()} open call.
 
@@ -459,21 +482,21 @@ ${closeLn()}
 ${tags}`},
 
  {left:13, title:'From submission to print', kind:'Carousel · artist story', slides:() => [
-   T.hook({img:ART[4], pos:'center 40%', tr:'An artist’s story', head:`From one submission to a page in print.`, sub:`How a past artist got published, and why the ${name} open call could be your turn.`}),
+   T.hook({img:ART[4], pos:'center 40%', tr:'An artist’s story', head:`Submit to the ${name} and see your work in print.`, size:76, sub:'How one past artist went from submission to a published page.'}),
    T.quote({tr:'An artist’s story'}),
    T.photo({img:null, label:'Real photo needed<br>The artwork they submitted', tr:'An artist’s story', head:'The work they sent.', sub:'<span class="gap">Title, medium, and why they chose it</span>'}),
    T.photo({img:null, label:'Real photo needed<br>Their page in the book', tr:'An artist’s story', head:'The page it became.', sub:'<span class="gap">Edition and what happened next</span>', ground:'ink'}),
-   T.cta({kicker:'Your story could start here'}),
- ], caption:() => `From one submission to a page in print.
+   T.howto(),
+   T.cta({kicker:'Your page could be next'}),
+ ], caption:() => `Submit to the ${N()} and see your work in print.
 
 [Artist name] submitted [artwork] to the [Edition]. Here is the page it became, and what happened next, in their words.
 
-The ${N()} open call is open now.
+The ${N()} open call is open now, with ${SEL()} places.
 ${kwLine()}
 ${closeLn()}
 
 ${tags}`},
-
  {left:12, title:'How selection works', kind:'Carousel · trust', slides:() => [
    T.hook({img:ART[1], pos:'center 40%', tr:'Selection', head:`How ${sel} artists are selected for the ${name}.`, sub:'What happens to your submission, step by step.'}),
    T.num({icon:'eye', n:'01', head:'Every entry is reviewed.', text:`Each eligible submission is seen by ${state.jury ? esc(state.jury) : 'the jury'}, in full.`, tr:'Selection'}),
@@ -502,57 +525,59 @@ ${closeLn()}
 
 ${tags}`},
 
- {left:9, title:'Prepare your artworks', kind:'Carousel · ease', slides:() => [
-   T.hook({img:ART[2], pos:'center 40%', tr:'Before you submit', head:`Prepare your artworks for the ${name}.`, sub:'Everything you need before you submit, in one list.'}),
-   T.check({head:'Prepare your artworks.', tr:'Before you submit', items:['Choose your strongest garden-themed works','Photograph each one in daylight','Note title, medium and size','Add your name and country','Submit through the link in bio'], foot:'Most artists finish in about ten minutes.'}),
-   T.cta({kicker:'Artworks ready? Submit them'}),
- ], caption:() => `Prepare your artworks for the ${N()}:
+ {left:9, title:'Prepare your artworks', kind:'Carousel · ease + urgency', slides:() => [
+   T.count({img:ART[2], pos:'center 40%', big:'9', unit:'days to prepare', line:`your submission to the ${esc(state.name)}`, info:'Everything you need is in this post. Save it and start today.'}),
+   T.check({head:'Prepare your artworks.', tr:'Before you submit', items:['Choose your strongest garden-themed works','Photograph each one in daylight, straight on','Note title, medium and size for each','Add your name and country','Submit through your link or the link in bio'], top:420, foot:'Most artists finish in about ten minutes.'}),
+   T.howto(),
+   T.value({ground:'cream', art:ART[0]}),
+   T.cta({kicker:'9 days left', head:`Submit to the<br>${name} today.`}),
+ ], caption:() => `9 days to prepare your submission to the ${N()}.
 
 ☐ Choose your strongest garden-themed works
 ☐ Photograph each one in daylight
 ☐ Note title, medium and size
 ☐ Add your name and country
 
-Most artists finish in about ten minutes.
+Most artists finish in about ten minutes. Don't leave it to the last day.
 ${kwLine()}
 ${closeLn()}
 
 ${tags}`},
-
  {left:8, title:'Next on the shelf', kind:'Carousel · proof', slides:() => [
-   T.hook({img:ART[3], tr:'The collection', head:`These books put their artists in print. The ${name} is next.`, size:76, sub:`${sel} places in the next edition.`}),
-   T.photo({img:null, label:'Real photo needed<br>The Nature Edition', tr:'The collection', head:'The Nature Edition.', sub:'101 artists, published and sold worldwide.'}),
-   T.photo({img:null, label:'Real photo needed<br>The Floral Edition', tr:'The collection', head:'The Floral Edition.', sub:'101 artists, published and sold worldwide.', ground:'ink'}),
+   T.hook({img:ART[3], tr:'The collection', head:`Get your work on our shelf: the ${name} is open.`, size:76, sub:`${sel} artists will join the next book in the series.`}),
+   T.photo({img:null, label:'Real photo needed<br>The Nature Edition', tr:'The collection', head:'The Nature Edition: 101 artists, published.', size:56, subTop:1060, sub:'Sold through Amazon, Barnes & Noble and the ATH Shop.'}),
+   T.photo({img:null, label:'Real photo needed<br>The Floral Edition', tr:'The collection', head:'The Floral Edition: 101 artists, published.', size:56, subTop:1060, sub:'Shared with collectors, galleries and curators.', ground:'ink'}),
+   T.value({ground:'cream', art:ART[4]}),
    T.cta({kicker:'Be in the next one'}),
- ], caption:() => `These books put their artists in print. The ${N()} is next.
+ ], caption:() => `Get your work on our shelf: the ${N()} is open.
 
-The Nature and Floral editions each published 101 artists, sold worldwide and shared with collectors, galleries and curators. The ${N()} has ${SEL()} places.
+The Nature and Floral editions each published 101 artists, sold worldwide and shared with collectors, galleries and curators. The ${N()} is the next book in the series, with ${SEL()} places.
 
 ${kwLine()}
 ${closeLn()}
 
 ${tags}`},
-
  {left:7, title:'One week left', kind:'Carousel · countdown', slides:() => [
-   T.count({img:ART[4], tone:'green', pos:'center 40%', big:'One week', bigSize:200, bigTop:400, unit:'left', unitTop:640}),
-   T.next(), T.cta(),
+   T.count({img:ART[4], pos:'center 40%', big:'One week', bigSize:200, bigTop:400, unit:'left', unitTop:640, info:`One week to put your garden work in print. ${sel} places, juried, worldwide.`}),
+   T.stakes({head:`One week. ${sel} places.`}),
+   T.next(),
+   T.cta({kicker:'7 days left', head:`Your garden work,<br>in print.`, sub:`Apply to the ${name} open call before ${dateLong()}.`}),
  ], caption:() => `One week left to apply to the ${N()} open call.
 
-Seven days to prepare your artworks, photograph them and submit.
+${SEL()} places. Seven days to prepare your garden-themed artworks and submit. Your work could be in the next book in the series.
 ${kwLine()}
 ${closeLn()}
 
 ${tags}`},
-
  {left:6, title:'Five mistakes to avoid', kind:'Carousel · education', slides:() => [
-   T.hook({img:'art/ref-palms.jpg', pos:'center 30%', tr:'Before you submit', head:`5 mistakes that cost artists a place in the ${name}.`, sub:'Six days left to get it right. Save this.'}),
+   T.hook({img:'art/ref-palms.jpg', pos:'center 30%', tr:'Before you submit', head:`Applying to the ${name}? Avoid these 5 mistakes.`, size:76, sub:'Six days left to get your submission right. Save this.'}),
    T.num({icon:'blur', n:'01', head:'A blurry or tilted photo.', text:'The jury can only judge what they can see.', tr:'Avoid this', ground:'ink'}),
    T.num({icon:'filter', n:'02', head:'Filters and editing.', text:'If the colours are wrong, the work is misread.', tr:'Avoid this'}),
    T.num({icon:'target', n:'03', head:'Ignoring the theme.', text:'Show us your reading of the garden, however personal.', tr:'Avoid this', ground:'ink'}),
    T.num({icon:'star', n:'04', head:'Holding back your best work.', text:'Send the pieces you are proudest of.', tr:'Avoid this'}),
    T.num({icon:'clock', n:'05', head:'Waiting for the last day.', text:'Submit early and get it off your list.', tr:'Avoid this', ground:'ink'}),
    T.cta({kicker:'Six days left'}),
- ], caption:() => `5 mistakes that cost artists a place in the ${N()}:
+ ], caption:() => `Applying to the ${N()}? Avoid these 5 mistakes:
 
 1. A blurry or tilted photo
 2. Filters and editing
@@ -564,51 +589,50 @@ ${kwLine()}
 ${closeLn()}
 
 ${tags}`},
-
  {left:5, title:'5 days left', kind:'Carousel · countdown', slides:() => [
-   T.count({img:ART[2], pos:'center 40%', big:'5', unit:'days left'}),
-   T.value({art:ART[0]}), T.cta(),
+   T.count({img:ART[2], pos:'center 40%', big:'5', unit:'days left', info:`Five days to get your garden work into the ${esc(state.series)}.`}),
+   T.howto({ground:'ink'}),
+   T.cta({kicker:'5 days left'}),
  ], caption:() => `5 days left to apply to the ${N()} open call.
 
-${kwLine()}
-${closeLn()}
+1. ${kwLine()}
+2. Prepare your garden-themed artworks
+3. Submit by ${dl().getDate()} ${MONTHS_L[dl().getMonth()]}
 
 ${tags}`},
-
  {left:4, title:'Why artists apply', kind:'Carousel · motivation', slides:() => [
-   T.hook({img:ART[0], pos:'center 15%', tr:'Why artists apply', head:`What being in the ${esc(state.series)} does for an artist.`, sub:'Four days left to apply to the Garden Edition.'}),
-   T.num({icon:'book', n:'01', head:'A publication credit.', text:'Galleries, residencies and grant panels look for publication history. A juried book counts.', tr:'Why artists apply'}),
-   T.num({icon:'eye', n:'02', head:'Your work in collectors’ hands.', text:'The book is sold through Amazon, Barnes & Noble and the ATH Shop, and owned by people who buy art.', tr:'Why artists apply', ground:'ink'}),
-   T.num({icon:'people', n:'03', head:'Introductions you can’t buy.', text:'Each edition is shared with collectors, galleries and curators through our network.', tr:'Why artists apply'}),
-   T.num({icon:'star', n:'04', head:'Part of a lasting record.', text:`${esc(state.published)} artists across ${esc(state.editions)} editions since ${esc(state.since)}. Your work stays in that collection.`, tr:'Why artists apply', ground:'ink'}),
+   T.hook({img:ART[0], pos:'center 15%', tr:'Why artists apply', head:`What getting published in the ${name} does for your career.`, size:72, sub:'Four days left to apply to the open call.'}),
+   T.num({icon:'book', n:'01', head:'An independent signal of quality.', text:'A juried publication is a judgement made by someone else. Curators, residencies and grant panels read it that way.', tr:'Why artists apply'}),
+   T.num({icon:'eye', n:'02', head:'Your work travels beyond your feed.', text:'The book is sold through Amazon, Barnes & Noble and the ATH Shop, into homes and studios worldwide.', tr:'Why artists apply', ground:'ink'}),
+   T.num({icon:'people', n:'03', head:'One book, many first introductions.', text:'Each edition is introduced to collectors, galleries and curators through our network.', tr:'Why artists apply'}),
+   T.num({icon:'star', n:'04', head:'Read in context, not in a scroll.', text:`Shown alongside ${Number(state.selected) - 1 || 100} other artists responding to the same theme, your work becomes part of a conversation.`, tr:'Why artists apply', ground:'ink'}),
    T.quote({tr:'Why artists apply'}),
    T.cta({kicker:'Four days left'}),
- ], caption:() => `What being in the ${S()} does for an artist:
+ ], caption:() => `What getting published in the ${N()} does for your career:
 
-· A publication credit that galleries, residencies and grant panels look for
-· Your work in collectors' hands, sold worldwide
+· An independent signal of quality that curators and grant panels recognise
+· Your work sold worldwide, beyond your feed
 · Introductions to collectors, galleries and curators
-· A place in a collection of ${state.published} artists
+· Your work read in context, alongside artists responding to the same theme
 
-Four days left to apply to the ${N()}.
+Four days left.
 ${kwLine()}
 
 ${tags}`},
-
  {left:3, title:'3 days left', kind:'Carousel · countdown', slides:() => [
-   T.count({img:ART[1], tone:'green', pos:'center 40%', big:'3', unit:'days left', info:`Three days to take your place among ${sel} published artists.`}),
-   T.check({head:'Three days. Three steps.', tr:'3 days left', items:['Choose your garden-themed works','Photograph them in daylight',`${VERB} “${KW()}” or use the link in bio`], top:470, foot:'Most artists finish in about ten minutes.'}),
-   T.cta({ground:'cream', head:`Don’t miss the<br>${name}.`}),
+   T.count({img:ART[1], pos:'center 40%', big:'3', unit:'days left', info:`Three days to take one of ${sel} places in the next book.`}),
+   T.stakes({head:`${sel} places. Three days.`}),
+   T.quote({tr:'From past editions'}),
+   T.cta({kicker:'3 days left', head:`Take your place in the<br>${name}.`, size:84, sub:'Submissions close in three days. Most artists finish in about ten minutes.'}),
  ], caption:() => `3 days left to apply to the ${N()} open call.
 
-Choose your work, photograph it, submit. Most artists finish in about ten minutes.
+${SEL()} places in the next book. Most artists finish their submission in about ten minutes.
 ${kwLine()}
 ${closeLn()}
 
 ${tags}`},
-
  {left:2, title:'48 hours: last questions', kind:'Carousel · countdown + doubts', slides:() => [
-   T.count({img:ART[3], tone:'green', big:'48', unit:'hours left', info:'Your last questions about the open call, answered inside.'}),
+   T.count({img:ART[3], big:'48', unit:'hours left', info:'Your last questions about the open call, answered inside.'}),
    T.qa({q:'Is it too late to apply?', a:`No. Submissions are open until ${dateLong()}.`, more:`${VERB} “${KW()}” and we’ll send you the brief and your link straight away.`, ground:'cream', tr:'Last questions'}),
    T.qa({q:'How long does it take?', a:'About ten minutes.', more:'Have your photos, titles, medium and sizes ready, then submit through the link in bio.', tr:'Last questions', ground:'call'}),
    T.qa({q:'Will my work really be seen?', a:'Every eligible entry is reviewed by the jury.', more:'Selected work is published, sold worldwide and shared with collectors, galleries and curators.', ground:'ink', tr:'Last questions'}),
@@ -635,7 +659,7 @@ Everything you need is in this post. ${kwLine()}
 ${tags}`},
 
  {left:0, title:'Last day', kind:'Carousel · last call', slides:() => [
-   T.count({img:ART[2], tone:'green', pos:'center 40%', big:'Last day', bigSize:190, bigTop:400, unit:'to apply', unitTop:620, info:`Submissions close tonight. Tomorrow the jury begins selecting ${sel} artists.`}),
+   T.count({img:ART[2], pos:'center 40%', big:'Last day', bigSize:190, bigTop:400, unit:'is today', unitTop:620, info:`Submissions close tonight. Tomorrow the jury begins selecting ${sel} artists.`}),
    T.brief(),
    T.themeRecap({ground:'cream', head:'Your garden work belongs in this book.'}),
    T.cta({head:'Apply today.', sub:`The ${name} open call closes tonight.`}),
@@ -649,7 +673,7 @@ ${kwLine()}
 ${tags}`},
 
  {left:0, title:'Final hours', kind:'Single · last call', slides:() => [
-   T.count({img:ART[1], tone:'chilli', pos:'center 40%', big:'Final hours', bigSize:170, bigTop:400, unit:'Closes tonight', unitTop:600, line:`${esc(state.name)} open call`, info:`${esc(state.series)}: ${esc(state.name)}. Theme: Garden. ${sel} artists will be published. Individual artists 18+, worldwide, any medium.`, infoTop:930}),
+   T.count({img:ART[1], tone:'chilli', pos:'center 40%', big:'Final hours', bigSize:170, bigTop:400, unit:'Closes tonight', unitTop:600, line:`${esc(state.name)} open call`, info:`${esc(state.series)}: ${GE()}. Theme: Garden. ${sel} artists will be published. Individual artists 18+, worldwide, any medium.`, infoTop:930}),
  ], caption:() => `Final hours. The ${N()} open call closes tonight.
 
 ${SEL()} artists will be published in a juried hardcover book. Theme: Garden. Open worldwide, any medium.
