@@ -54,6 +54,9 @@ summary{font:600 12px/1 var(--mono);letter-spacing:.1em;text-transform:uppercase
 .cell{display:flex;flex-direction:column;gap:6px}
 .frame{width:var(--pw);height:calc(var(--pw) * 1.25);overflow:hidden;border-radius:6px;box-shadow:0 1px 0 var(--line),0 8px 24px rgba(0,0,0,.08);position:relative}
 .frame>.post{transform:scale(var(--sc));transform-origin:0 0}
+.frame.tall{height:calc(var(--pw) * 1.7778)}
+.group{margin-bottom:34px}
+.capbox{max-width:720px;margin-top:10px;border-top:1px solid var(--line)}
 .cell .act{display:flex;justify-content:space-between;align-items:center;font-size:12px;color:var(--muted);width:var(--pw)}
 .cell .act button{font:600 12px/1 var(--sans);border:1px solid var(--line);background:var(--panel);color:var(--ink);border-radius:8px;padding:6px 9px;cursor:pointer}
 #stage{position:fixed;left:-30000px;top:0}
@@ -137,6 +140,7 @@ summary{font:600 12px/1 var(--mono);letter-spacing:.1em;text-transform:uppercase
       <div class="f"><label for="pub">Publication month</label><input id="pub" placeholder="e.g. March"></div>
     </div>
     <div class="f"><label for="fee">Application fee wording</label><input id="fee" placeholder="e.g. applicable"></div>
+    <div class="f"><label for="commentFrom">Switch CTA from “DM” to “COMMENT” on</label><input id="commentFrom" type="date"></div>
     <div class="f"><label for="elig">Eligibility line</label><input id="elig"></div>
   </details>
 
@@ -156,7 +160,7 @@ summary{font:600 12px/1 var(--mono);letter-spacing:.1em;text-transform:uppercase
 
 <main>
   <div class="top">
-    <div class="f"><label for="ptype">Post</label><select id="ptype"><option value="launch">Launch carousel (11 slides)</option></select></div>
+    <div class="f"><label for="ptype">Post</label><select id="ptype"></select></div>
     <button class="btn" id="go" type="button">Create posts</button>
     <button class="btn ghost" id="zip" type="button">Save all as ZIP</button>
     <p class="status" id="status" role="status"></p>
@@ -166,6 +170,7 @@ summary{font:600 12px/1 var(--mono);letter-spacing:.1em;text-transform:uppercase
 </div>
 <div id="stage" aria-hidden="true"></div>
 
+<script src="month.js"></script>
 <script>
 const $ = id => document.getElementById(id);
 // ATH brand colours: fixed on every call
@@ -183,7 +188,7 @@ const DEFAULTS = {
   bookText:'Every selected artist is published with their name, artwork title, medium and country.',
   benefits:'Published in the book | Your work in print\nCertificate of Recognition | For your CV and grant applications\nSold worldwide | Amazon · Barnes & Noble · ATH Shop\nThe book’s campaign | 190K+ followers · 100K+ email subscribers\nIntroductions | To collectors, galleries and curators',
   prize:'$500', prizeExtra:'a 4-page feature, a trophy and an Artsy listing', runners:'A 2-page feature and a trophy.',
-  jury:'', results:'', pub:'', fee:'', elig:'No degree, gallery or exhibition history needed. Individual artists, 18+, worldwide.',
+  jury:'', results:'', pub:'', fee:'', commentFrom:'2026-12-08', elig:'No degree, gallery or exhibition history needed. Individual artists, 18+, worldwide.',
   credit:'', artists:'',
 };
 const IMGKEYS = ['imgCover','imgTheme','imgBooks','imgSpread','imgA1','imgA2'];
@@ -232,12 +237,13 @@ const gap = (v, label) => v ? esc(v) : `<span class="gap">${esc(label)}</span>`;
 const photo = (k, label, style, col) => state.images[k]
   ? `<div class="a img" style="${style};background-image:url(${state.images[k]});background-position:center;border-radius:18px"></div>`
   : `<div class="a ph" style="${style};color:${col}">Real photo needed<br>${esc(label)}</div>`;
+let VERB = 'DM';
 const KW = () => esc((state.keyword || 'KEYWORD').toUpperCase());
 
 // four corner labels: the one header system on every slide
 const corners = (col, dmCol, tr) => `
   <p class="a cn" style="left:52px;top:48px;color:${col}">Arts to Hearts</p><p class="a cn" style="right:52px;top:48px;color:${col}">${esc(tr)}</p>
-  <p class="a cn" style="left:52px;bottom:48px;color:${dmCol}">DM “${KW()}”</p><p class="a cn" style="right:52px;bottom:48px;color:${col}">Closes ${short()}</p>`;
+  <p class="a cn" style="left:52px;bottom:48px;color:${dmCol}">${VERB} “${KW()}”</p><p class="a cn" style="right:52px;bottom:48px;color:${col}">Closes ${short()}</p>`;
 const spineLab = (n,f,fs) => `<span style="position:absolute;left:50%;bottom:18px;transform:translateX(-50%) rotate(-90deg);white-space:nowrap;font-family:'ATH Serif',serif;font-style:italic;font-size:${fs}px;width:0;color:${f}">${esc(n)}</span>`;
 const SPINES = [['#14090C','#F9ECE5'],['#AA0003','#FFD6DE'],['#FAD2E1','#6A0620'],['#2E4A2A','#E3E8DE'],['#E3E8DE','#14090C'],['#6A0620','#FAD2E1'],['#C9D3BE','#14090C'],['#FFD6DE','#AA0003'],['#4C4240','#F9ECE5'],['#B7D9FF','#6A0620'],['#FFF3B2','#AA0003']];
 const HEIGHTS = [360,330,370,345,380,350,335,365,375,340,360,350,370,345,380];
@@ -382,23 +388,43 @@ const pinned = () => `DM "${(state.keyword || 'KEYWORD').toUpperCase()}" for the
 
 // ---------- render + export ----------
 let RENDERED = [];
-const slideNode = s => `<div class="post" style="background:${s.bg}">${s.html}</div>`;
+const slideNode = s => `<div class="post" style="background:${s.bg};height:${s.h||1350}px">${s.html}</div>`;
+function verbFor(left){ const d = new Date(dl()); d.setDate(d.getDate() - left); const [y,m,dd] = String(state.commentFrom||'').split('-').map(Number); return (y && d >= new Date(y, m-1, dd)) ? 'COMMENT' : 'DM'; }
+function postDate(left){ const d = new Date(dl()); d.setDate(d.getDate() - left); return d.getDate() + ' ' + MONTHS[d.getMonth()]; }
+function buildPtype(){ const sel = $('ptype'), cur = sel.value;
+  sel.innerHTML = '<option value="month">Whole month (21 feed posts)</option>' + monthPosts().map((p,i) => `<option value="${i}">${postDate(p.left)} · ${esc(p.title)} (${p.kind.split(' ·')[0]})</option>`).join('') + '<option value="stories">Stories (10 frames)</option>';
+  sel.value = cur || '0'; if (!sel.value) sel.value = '0'; }
 function render(){
   readForm();
-  const slides = launch();
   const base = (state.name || 'call').toLowerCase().replace(/[^a-z0-9]+/g,'-');
-  RENDERED = slides.map((s,j) => ({ s, name: `${base}-launch-${String(j+1).padStart(2,'0')}-${s.title}.png` }));
-  const cells = RENDERED.map((r,j) => `<div class="cell"><div class="frame">${slideNode(r.s)}</div><div class="act"><span>${j+1}. ${r.s.title.replace(/-/g,' ')}</span><button type="button" data-i="${j}">Save PNG</button></div></div>`).join('');
-  $('out').innerHTML = `<section class="group"><h2>Launch carousel · ${esc(state.series)}: ${esc(state.name)}</h2><p class="meta">${slides.length} slides · closes ${short()} · DM “${KW()}”</p><div class="slides">${cells}</div></section>`;
-  $('out').insertAdjacentHTML('beforeend', `<section class="group" style="margin-top:28px"><h2>Caption</h2><p class="meta">Paste with the carousel · pin the first comment below it</p><div class="f" style="max-width:720px"><textarea id="caption" style="min-height:260px">${esc(caption())}</textarea></div><div class="f" style="max-width:720px"><label for="pin">Pinned comment</label><input id="pin" value="${esc(pinned())}"></div><button class="btn ghost" id="copyCap" type="button" style="margin-top:10px">Copy caption</button></section>`);
-  $('copyCap').onclick = async () => { try { await navigator.clipboard.writeText($('caption').value); status('Caption copied.'); } catch { $('caption').select(); status('Select-all done: press copy.'); } };
+  const pick = $('ptype').value || '0';
+  const groups = [];
+  if (pick === 'stories') {
+    stories().forEach((ph,pi) => { VERB = verbFor([30,15,3][pi]); const frames = ph.frames; VERB = 'DM';
+      groups.push({title:'Stories · ' + ph.phase, meta: frames.length + ' frames · 1080 × 1920 · add the stickers in Instagram', slides: frames.map((f,j) => ({...f, title: ph.phase.toLowerCase().replace(/[^a-z]+/g,'-') + '-' + (j+1)})), story:true}); });
+    // re-render final week with the right verb
+    VERB = verbFor(3); groups[2].slides = stories()[2].frames.map((f,j) => ({...f, title:'final-week-' + (j+1)})); VERB = 'DM';
+  } else {
+    const all = monthPosts(); const list = pick === 'month' ? all : [all[Number(pick)]];
+    list.forEach(p => { VERB = verbFor(p.left);
+      const slides = p.slides(); const cap = p.caption(); const pin = p.pin ? p.pin() : `${VERB === 'COMMENT' ? 'Comment' : 'DM us'} "${(state.keyword||'').toUpperCase()}" for the brief and your link. Closes ${short()}.`;
+      groups.push({title: `${postDate(p.left)} · ${p.title}`, meta: `${p.kind} · ${slides.length} slide${slides.length>1?'s':''} · ${p.left === 0 ? 'deadline day' : p.left + ' days left'} · ${VERB} “${KW()}”`, slides: slides.map((s,j) => ({...s, title: s.title || (p.title.toLowerCase().replace(/[^a-z0-9]+/g,'-') + (slides.length>1 ? '-'+(j+1) : ''))})), cap, pin, left:p.left});
+      VERB = 'DM'; });
+  }
+  RENDERED = [];
+  $('out').innerHTML = groups.map((g,gi) => {
+    const cells = g.slides.map((s,j) => { const i = RENDERED.push({ s, name: `${base}-${g.left !== undefined ? String(30-g.left).padStart(2,'0')+'-' : 'story-'}${s.title}.png` }) - 1;
+      return `<div class="cell"><div class="frame${s.h ? ' tall' : ''}">${slideNode(s)}</div><div class="act"><span>${g.slides.length>1 ? 'Slide ' + (j+1) : 'Single'}</span><button type="button" data-i="${i}">Save PNG</button></div></div>`; }).join('');
+    const capBox = g.cap ? `<details class="capbox"><summary>Caption and pinned comment</summary><div class="f"><textarea id="cap${gi}" style="min-height:220px">${esc(g.cap)}</textarea></div><div class="f"><label>Pinned comment</label><input value="${esc(g.pin)}"></div><button class="btn ghost" type="button" data-cap="cap${gi}" style="margin-top:8px">Copy caption</button></details>` : '';
+    return `<section class="group"><h2>${esc(g.title)}</h2><p class="meta">${esc(g.meta)}</p><div class="slides">${cells}</div>${capBox}</section>`; }).join('');
   $('out').querySelectorAll('[data-i]').forEach(b => b.onclick = () => saveOne(Number(b.dataset.i)));
-  status(`${RENDERED.length} slides ready.`);
+  $('out').querySelectorAll('[data-cap]').forEach(b => b.onclick = async () => { const t = $(b.dataset.cap); try { await navigator.clipboard.writeText(t.value); status('Caption copied.'); } catch { t.select(); status('Selected: press copy.'); } });
+  status(`${RENDERED.length} images ready.`);
 }
 async function toBlob(s){
   await document.fonts.ready;
   const stage = $('stage'); stage.innerHTML = slideNode(s); const el = stage.firstElementChild;
-  const canvas = await html2canvas(el, { scale:1, width:1080, height:1350, backgroundColor:null, useCORS:true, logging:false });
+  const canvas = await html2canvas(el, { scale:1, width:1080, height:(s.h||1350), backgroundColor:null, useCORS:true, logging:false });
   stage.innerHTML = '';
   return await new Promise(r => canvas.toBlob(r, 'image/png'));
 }
@@ -420,11 +446,11 @@ function preflight(){
 }
 async function saveOne(i){ if (!preflight()) return; status('Rendering…'); await offer(RENDERED[i].name, await toBlob(RENDERED[i].s)); }
 $('zip').onclick = async () => { if (!RENDERED.length) render(); if (!preflight()) return; const zip = new JSZip(); for (let i = 0; i < RENDERED.length; i++){ status(`Rendering ${i+1} of ${RENDERED.length}…`); zip.file(RENDERED[i].name, await toBlob(RENDERED[i].s)); }
-  status('Packing…'); await offer((state.name || 'ath-call').toLowerCase().replace(/[^a-z0-9]+/g,'-') + '-launch.zip', await zip.generateAsync({ type:'blob' })); };
+  status('Packing…'); await offer((state.name || 'ath-call').toLowerCase().replace(/[^a-z0-9]+/g,'-') + '-posts.zip', await zip.generateAsync({ type:'blob' })); };
 $('go').onclick = render;
-document.querySelector('aside').addEventListener('change', e => { if (e.target.type !== 'file') render(); });
+document.querySelector('aside').addEventListener('change', e => { if (e.target.type !== 'file') { readForm(); buildPtype(); render(); } });
 
 function sizePreviews(){ const w = $('out').clientWidth || 900; const pw = Math.max(200, Math.min(300, Math.floor((w - 32) / 3))); document.documentElement.style.setProperty('--pw', pw + 'px'); document.documentElement.style.setProperty('--sc', String(pw / 1080)); }
 window.addEventListener('resize', sizePreviews);
-refreshSaved(); fillForm(); sizePreviews(); document.fonts.ready.then(render);
+refreshSaved(); fillForm(); buildPtype(); $('ptype').value = '0'; $('ptype').onchange = render; sizePreviews(); document.fonts.ready.then(render);
 </script>
