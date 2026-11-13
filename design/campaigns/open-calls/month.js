@@ -139,7 +139,7 @@ const T = {
     const b = (g.bg === CREAM ? btnCTA(BURG, CREAM, CREAM) : btnCTA(CREAM, BURG, BURG)).replace('{TOP}', 820);
     return {bg:g.bg, html:`${corners(g.fg, g.dm, o.tr||'Submissions open')}
       ${o.kicker ? `<p class="a c lab" style="left:0;right:0;top:210px;color:${g.acc}">${o.kicker}</p>` : ''}
-      <p class="a H c" style="left:60px;right:60px;top:270px;font-size:${o.size||96}px;color:${g.fg}">${o.head || `Apply to the<br>${GE()}.`}</p>
+      <p class="a H c" style="left:60px;right:60px;top:${String(state.name).length > 16 ? 240 : 270}px;font-size:${Math.round((o.size||96) * (String(state.name).length > 16 ? .8 : 1))}px;color:${g.fg}">${o.head || `Apply to the<br>${GE()}.`}</p>
       <p class="a c sub" style="left:140px;right:140px;top:${o.subTop||530}px;color:${g.fg};opacity:.92">${o.sub || `${state.theme ? 'Theme: ' + TH() + '. ' : ''}Get published in a juried hardcover book of ${esc(state.selected)} artists.`}</p>
       <div class="a" style="left:0;right:0;top:700px;display:flex;justify-content:center"><span class="cn" style="display:inline-flex;align-items:center;height:56px;padding:0 28px;border-radius:999px;background:${g.bg === CREAM ? INK : tint(state.colour)};color:${g.bg === CREAM ? CREAM : INK};font-size:22px">Closes ${dateLong()} · ${leftLabel()}</span></div>
       ${b}
@@ -258,6 +258,60 @@ const T = {
   },
 };
 
+
+// ---------- per-call visual identity ----------
+// 'gallery' (default): full-bleed artwork, grotesk numerals, open layouts.
+// 'award': a certificate world. Gold double frame on every slide, framed artwork,
+// serif numerals, medallion countdowns, deep ink-brown grounds.
+const AWARD_BG = '#1C130B';
+const isAward = () => state.style === 'award';
+const G0 = {...G};
+G.call = () => isAward() ? ({bg:AWARD_BG, fg:CREAM, acc:tint(state.colour), dm:PEONY, line:'rgba(249,236,229,.18)'}) : G0.call();
+G.ink  = () => isAward() ? ({bg:INK, fg:CREAM, acc:tint(state.colour), dm:PEONY, line:'rgba(249,236,229,.18)'}) : G0.ink();
+
+const gold = () => tint(state.colour);
+const frame = (c) => `<div class="a" style="inset:26px;border:2px solid ${c};pointer-events:none"></div><div class="a" style="inset:36px;border:1px solid ${c};opacity:.45;pointer-events:none"></div>`;
+const laurel = (c, w=520) => `<svg class="a" style="left:50%;top:${'{TOP}'}px;transform:translateX(-50%)" width="${w}" height="${w}" viewBox="0 0 200 200" fill="none" stroke="${c}" stroke-width="1.3">
+  <circle cx="100" cy="100" r="92"/><circle cx="100" cy="100" r="84" stroke-dasharray="2 4"/>
+  ${''}${[].map ? '' : Array.from({length:9}, (_,i) => { const a = (200 + i*14) * Math.PI/180, x = 100 + 70*Math.cos(a), y = 100 + 70*Math.sin(a); return `<ellipse cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" rx="9" ry="4" transform="rotate(${(200 + i*14 + 60).toFixed(0)} ${x.toFixed(1)} ${y.toFixed(1)})"/>`; }).join('')}
+  ${[].map ? '' : Array.from({length:9}, (_,i) => { const a = (340 - i*14) * Math.PI/180, x = 100 + 70*Math.cos(a), y = 100 + 70*Math.sin(a); return `<ellipse cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" rx="9" ry="4" transform="rotate(${(340 - i*14 - 60).toFixed(0)} ${x.toFixed(1)} ${y.toFixed(1)})"/>`; }).join('')}
+</svg>`;
+const framedArt = (src, style, pos) => `<div class="a" style="${style};background:#F4EBDD;padding:22px;box-shadow:0 30px 50px -20px rgba(0,0,0,.6);outline:2px solid ${gold()};outline-offset:10px">
+  <div class="img" style="width:100%;height:100%;background-image:url(${src});background-size:cover;background-position:${pos || 'center 30%'}"></div></div>`;
+const serifNum = (n, size, c) => `<span style="font-family:'ATH Serif',serif;font-style:italic;font-weight:400;font-size:${size}px;line-height:.85;letter-spacing:-.03em;color:${c}">${n}</span>`;
+const strip = (fg, acc) => `<div class="a" style="left:90px;right:90px;top:1140px;display:flex;justify-content:space-between;align-items:center;padding-top:22px;border-top:1px solid ${acc}">
+  <span style="font-size:27px;font-weight:600;color:${fg}">Closes ${dateLong()}</span><span style="font-size:27px;font-weight:700;color:${acc}">${VERB} “${KW()}” to apply</span></div>`;
+const awardTag = () => `<span class="cn" style="display:inline-flex;align-items:center;height:52px;padding:0 26px;border:1.5px solid ${gold()};color:${gold()};border-radius:999px;font-size:18px">Open call · ${esc(state.name)}</span>`;
+
+const AW = {
+  hook(o){ const c = gold();
+    return {bg:AWARD_BG, html:`${frame(c)}${corners(CREAM, PEONY, o.tr)}
+      ${framedArt(o.img || o.art || ART[0], 'left:300px;right:300px;top:140px;height:520px', o.pos || o.artPos)}
+      <div class="a c" style="left:0;right:0;top:720px">${awardTag()}</div>
+      <p class="a c H" style="left:110px;right:110px;top:800px;font-size:${Math.round((o.size||80)*.78)}px;color:${CREAM}">${o.head}</p>
+      ${o.sub ? `<p class="a c sub" style="left:160px;right:160px;top:1035px;font-size:28px;color:${CREAM};opacity:.85">${o.sub}</p>` : ''}
+      ${strip(CREAM, c)}`};
+  },
+  count(o){ const c = gold(); const tone = o.tone === 'chilli' ? '#5A0A0A' : AWARD_BG;
+    const big = String(o.big); const size = big.length <= 2 ? 300 : big.length <= 8 ? 120 : 96;
+    return {bg:tone, html:`${frame(c)}${corners(CREAM, PEONY, o.tr || leftLabel())}
+      <div class="a c" style="left:0;right:0;top:150px">${awardTag()}</div>
+      ${laurel(c, 600).replace('{TOP}', 230)}
+      <div class="a c" style="left:0;right:0;top:${big.length <= 2 ? 360 : 440}px">${serifNum(big, size, CREAM)}</div>
+      <p class="a c lab" style="left:0;right:0;top:${big.length <= 2 ? 640 : 610}px;color:${c};font-size:26px">${esc(o.unit)}</p>
+      <p class="a c R" style="left:110px;right:110px;top:870px;font-size:52px;color:${CREAM}">to apply to the ${GE()}</p>
+      <p class="a c sub" style="left:160px;right:160px;top:${o.infoTop ? o.infoTop + 40 : 990}px;font-size:28px;color:${CREAM};opacity:.85">${o.info || `${esc(state.selected)} artists will be published in a juried hardcover book.`}</p>
+      ${strip(CREAM, c)}`};
+  },
+};
+const T0 = {...T};
+T.hook = o => isAward() ? AW.hook(o) : T0.hook(o);
+T.count = o => isAward() ? AW.count(o) : T0.count(o);
+T.num = o => { const s = T0.num(o); if (!isAward() || o.img !== undefined) return s;
+  s.html = s.html.replace(/<p class="a" style="left:66px;top:170px;font-size:300px;font-weight:400;letter-spacing:-\.07em;line-height:\.8;color:([^"]+)">([^<]*)<\/p>/, (m, col, n) => `<p class="a" style="left:66px;top:150px">${serifNum(n, 300, col)}</p>`); return s; };
+// every slide in the award style sits inside the gold certificate frame
+const decorate = (s) => (isAward() && !s.html.includes('inset:26px;border:2px')) ? {...s, html: frame(gold()) + s.html} : s;
+
 // ---------- countdown singles: a different idea at every milestone ----------
 const CD = {
   weeks(left){ const g = G.cream(); const n = left; const d0 = new Date(dl()); d0.setDate(d0.getDate() - left);
@@ -342,7 +396,7 @@ const closeLn = () => `Submissions close ${dl().getDate()} ${MONTHS_L[dl().getMo
 const N = () => state.name, S = () => state.series, SEL = () => state.selected;
 
 function monthPosts(){ const name = GE(), sel = esc(state.selected); return [
- {left:30, title:'Launch', kind:'Carousel', slides:() => launch(), caption:() => caption(), pin:() => pinned()},
+ {left:30, title:'Launch', kind:'Carousel', slides:() => { const s = launch(); if (isAward()) s[0] = {...AW.hook({img:state.images.imgCover, tr:esc(state.series), head:`${esc(state.headline || 'Call for artists')}<br>${GE()}`, size:120, sub:esc(state.coverLine)}), title:'cover'}; return s; }, caption:() => caption(), pin:() => pinned()},
 
  {left:28, title:'What you can submit', kind:'Carousel · theme', slides:() => [
    T.hook({img:EX.bloom, tr:'The theme', head:`What can you submit to the ${name}?`, sub:`Five kinds of ${TW()} the jury wants to see. ${sel} will be published.`}),
