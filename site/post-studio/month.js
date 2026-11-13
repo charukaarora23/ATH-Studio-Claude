@@ -133,18 +133,16 @@ const T = {
       <p class="a R" style="left:76px;right:80px;top:150px;font-size:76px;color:${g.fg}">${o.head || `${state.theme ? 'Theme: ' + TH() + '. ' : ''}All of this counts.`}</p>
       ${items.map(([src,l],i) => { const x = i%2 ? 556 : 80, y = i<2 ? 360 : 780; return `${imgDiv(src, `left:${x}px;top:${y}px;width:444px;height:330px;border-radius:16px`, 'center 30%')}<p class="a" style="left:${x}px;top:${y+346}px;font-size:28px;font-weight:600;color:${g.fg}">${l}</p>`; }).join('')}`};
   },
-  // every carousel closes on this: the same clear action, with the theme
+  // every carousel closes on this: one headline, the date, one button
   cta(o = {}){
     const g = G[o.ground||'call']();
-    const b = (g.bg === CREAM ? btnCTA(BURG, CREAM, CREAM) : btnCTA(CREAM, BURG, BURG)).replace('{TOP}', 820);
+    const b = (g.bg === CREAM ? btnCTA(BURG, CREAM, CREAM) : btnCTA(CREAM, BURG, BURG)).replace('{TOP}', 760);
+    const long = String(state.name).length > 16;
     return {bg:g.bg, html:`${corners(g.fg, g.dm, o.tr||'Submissions open')}
-      ${o.kicker ? `<p class="a c lab" style="left:0;right:0;top:210px;color:${g.acc}">${o.kicker}</p>` : ''}
-      <p class="a H c" style="left:60px;right:60px;top:${String(state.name).length > 16 ? 240 : 270}px;font-size:${Math.round((o.size||96) * (String(state.name).length > 16 ? .8 : 1))}px;color:${g.fg}">${o.head || `Apply to the<br>${GE()}.`}</p>
-      <p class="a c sub" style="left:140px;right:140px;top:${o.subTop||530}px;color:${g.fg};opacity:.92">${o.sub || `${state.theme ? 'Theme: ' + TH() + '. ' : ''}Get published in a juried hardcover book of ${esc(state.selected)} artists.`}</p>
-      <div class="a" style="left:0;right:0;top:700px;display:flex;justify-content:center"><span class="cn" style="display:inline-flex;align-items:center;height:56px;padding:0 28px;border-radius:999px;background:${g.bg === CREAM ? INK : tint(state.colour)};color:${g.bg === CREAM ? CREAM : INK};font-size:22px">Closes ${dateLong()} · ${leftLabel()}</span></div>
+      <p class="a H c" style="left:70px;right:70px;top:${long ? 300 : 330}px;font-size:${Math.round((o.size||100) * (long ? .8 : 1))}px;color:${g.fg}">${o.head || `Apply to the<br>${GE()}.`}</p>
+      <p class="a c" style="left:0;right:0;top:620px;font-size:34px;font-weight:600;letter-spacing:-.01em;color:${g.acc}">${CURLEFT === 0 ? `Closes tonight, ${dateLong()}` : `Closes ${dateLong()} · ${leftLabel()}`}</p>
       ${b}
-      <p class="a c" style="left:0;right:0;top:990px;font-size:30px;color:${g.fg};opacity:.92">or apply via the link in bio</p>
-      <p class="a c" style="left:0;right:0;top:1042px;font-size:28px;color:${g.fg};opacity:.75">artstoheartsproject.com</p>`};
+      <p class="a c" style="left:0;right:0;top:930px;font-size:28px;color:${g.fg};opacity:.8">or apply via the link in bio</p>`};
   },
   // scarcity: 101 places, one of them could be yours
   stakes(o = {}){
@@ -285,11 +283,12 @@ const awardTag = () => `<span class="cn" style="display:inline-flex;align-items:
 
 const AW = {
   hook(o){ const c = gold();
-    return {bg:AWARD_BG, html:`${frame(c)}${corners(CREAM, PEONY, o.tr)}
-      ${framedArt(o.img || o.art || ART[0], 'left:300px;right:300px;top:140px;height:520px', o.pos || o.artPos)}
-      <div class="a c" style="left:0;right:0;top:720px">${awardTag()}</div>
-      <p class="a c H" style="left:110px;right:110px;top:800px;font-size:${Math.round((o.size||80)*.78)}px;color:${CREAM}">${o.head}</p>
-      ${o.sub ? `<p class="a c sub" style="left:160px;right:160px;top:1035px;font-size:28px;color:${CREAM};opacity:.85">${o.sub}</p>` : ''}
+    return {bg:AWARD_BG, html:`${imgDiv(o.img || o.art || ART[0], 'left:40px;right:40px;top:40px;bottom:40px', o.pos || o.artPos || 'center 30%')}
+      <div class="a" style="left:40px;right:40px;top:40px;bottom:40px;background:linear-gradient(180deg,rgba(28,19,11,.5) 0%,rgba(28,19,11,0) 22%,rgba(28,19,11,0) 40%,rgba(28,19,11,.88) 64%,#1C130B 100%)"></div>
+      ${frame(c)}${corners(CREAM, PEONY, o.tr)}
+      <div class="a" style="left:90px;top:700px">${awardTag()}</div>
+      <p class="a H" style="left:86px;right:90px;top:780px;font-size:${Math.round((o.size||80)*.8)}px;color:${CREAM}">${o.head}</p>
+      ${o.sub ? `<p class="a sub" style="left:90px;right:150px;top:1040px;font-size:28px;color:${CREAM};opacity:.85">${o.sub}</p>` : ''}
       ${strip(CREAM, c)}`};
   },
   count(o){ const c = gold(); const tone = o.tone === 'chilli' ? '#5A0A0A' : AWARD_BG;
@@ -303,6 +302,15 @@ const AW = {
       <p class="a c sub" style="left:160px;right:160px;top:${o.infoTop ? o.infoTop + 40 : 990}px;font-size:28px;color:${CREAM};opacity:.85">${o.info || `${esc(state.selected)} artists will be published in a juried hardcover book.`}</p>
       ${strip(CREAM, c)}`};
   },
+};
+// final day: one message, nothing else
+T.urgent = (o) => { const award = isAward(); const bg = o.chilli ? '#AA0003' : (award ? AWARD_BG : INK); const acc = o.chilli ? CREAM : tint(state.colour);
+  const btn = btnCTA(CREAM, o.chilli ? '#AA0003' : BURG, o.chilli ? '#AA0003' : BURG).replace('{TOP}', 1000);
+  return {bg, html:`${award ? frame(gold()) : ''}${corners(CREAM, PEONY, o.tr || 'Final day')}
+    <p class="a c lab" style="left:0;right:0;top:250px;color:${acc};font-size:26px">${GE()} · open call</p>
+    <p class="a c" style="left:40px;right:40px;top:330px;font-size:${o.size||230}px;font-weight:700;letter-spacing:-.055em;line-height:.88;color:${CREAM}">${o.head}</p>
+    <p class="a c" style="left:120px;right:120px;top:${o.subTop||800}px;font-size:40px;font-weight:500;letter-spacing:-.015em;color:${CREAM}">${o.sub}</p>
+    ${btn}`};
 };
 const T0 = {...T};
 T.hook = o => isAward() ? AW.hook(o) : T0.hook(o);
@@ -709,24 +717,20 @@ Everything you need is in this post. ${kwLine()}
 ${tags}`},
 
  {left:0, title:'Last day', kind:'Carousel · last call', slides:() => [
-   T.count({img:ART[2], pos:'center 40%', big:'Last day', bigSize:190, bigTop:400, unit:'is today', unitTop:620, info:`Submissions close tonight. Tomorrow the jury begins selecting ${sel} artists.`}),
+   T.urgent({head:'Last<br>day.', sub:'Submissions close at midnight tonight.', tr:'Last day'}),
    T.brief(),
-   T.themeRecap({ground:'cream', head:`Your ${TW()} belongs in this book.`}),
-   T.cta({head:'Apply today.', sub:`The ${name} open call closes tonight.`}),
+   T.cta({head:'Apply today.'}),
  ], caption:() => `Last day to apply to the ${N()} open call.
 
-${themeTag()}${SEL()} artists will be selected and published in a juried hardcover book, sold worldwide and shared with collectors, galleries and curators.
-
-Open to individual artists 18+, worldwide, in any medium.
+Submissions close at midnight tonight. ${SEL()} artists will be selected and published in a juried hardcover book.
 ${kwLine()}
 
 ${tags}`},
 
  {left:0, title:'Final hours', kind:'Single · last call', slides:() => [
-   T.count({img:ART[1], tone:'chilli', pos:'center 40%', big:'Final hours', bigSize:170, bigTop:400, unit:'Closes tonight', unitTop:600, line:`${esc(state.name)} open call`, info:`${esc(state.series)}: ${GE()}. ${themeTag()}${sel} artists will be published. Individual artists 18+, worldwide, any medium.`, infoTop:930}),
- ], caption:() => `Final hours. The ${N()} open call closes tonight.
+   T.urgent({chilli:true, head:'Closes<br>tonight.', sub:'Final hours to submit. The jury starts tomorrow.', tr:'Final hours'}),
+ ], caption:() => `Final hours. The ${N()} open call closes at midnight tonight.
 
-${SEL()} artists will be published in a juried hardcover book. ${themeTag()}Open worldwide, any medium.
 ${kwLine()}
 
 ${tags}`},
