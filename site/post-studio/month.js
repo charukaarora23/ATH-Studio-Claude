@@ -44,6 +44,15 @@ const ICON = {
 };
 const icon = (k, c, size=220) => `<svg width="${size}" height="${size}" viewBox="0 0 120 120" fill="none" stroke="${c}" stroke-width="4" stroke-linecap="round" stroke-linejoin="round">${ICON[k]||''}</svg>`;
 
+// big OPEN CALL label: the keyword artists scan for
+const OPENCALL = (c, center) => `<p style="font-size:38px;font-weight:800;letter-spacing:.16em;line-height:1;color:${c};${center ? 'text-align:center' : ''}">OPEN CALL</p>`;
+// the action: keyword + time left in one button
+const actionBtn = (top, chilli) => { const fg = chilli ? '#AA0003' : BURG;
+  return `<div class="a" style="left:80px;right:80px;top:${top}px;height:108px;border-radius:999px;background:${CREAM};color:${fg};display:flex;align-items:center;justify-content:space-between;padding:0 14px 0 46px;box-shadow:0 14px 30px -12px rgba(0,0,0,.45)">
+    <span style="font-size:38px;font-weight:800;letter-spacing:-.02em">${VERB} “${KW()}” to apply</span>
+    <span style="display:flex;align-items:center;gap:18px"><span class="cn" style="font-size:19px;color:${fg}">${leftLabel()}</span>
+    <span style="width:80px;height:80px;border-radius:50%;background:${fg};color:${CREAM};display:inline-flex;align-items:center;justify-content:center"><svg width="32" height="14" viewBox="0 0 46 20"><path d="M2 10h40M33 2l9 8-9 8" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span></span></div>`; };
+
 // ---------- grounds ----------
 const G = {
   ink:   () => ({bg:INK,   fg:WHITE, acc:tint(state.colour), dm:PEONY, line:'rgba(255,255,255,.2)'}),
@@ -92,21 +101,20 @@ const T = {
   // countdown cover: artwork, the open call, one big number, what it is for
   count(o){
     const tone = o.tone || 'ink';
-    const shade = tone === 'green' ? `linear-gradient(180deg,${rgba(state.colour,.55)} 0%,${rgba(state.colour,.2)} 30%,${rgba(state.colour,.85)} 62%,${state.colour} 100%)`
-      : tone === 'chilli' ? 'linear-gradient(180deg,rgba(120,0,2,.6) 0%,rgba(120,0,2,.25) 30%,rgba(150,0,3,.9) 62%,#AA0003 100%)'
-      : 'linear-gradient(180deg,rgba(20,9,12,.6) 0%,rgba(20,9,12,.2) 30%,rgba(20,9,12,.85) 62%,rgba(20,9,12,.97) 100%)';
+    const shade = tone === 'green' ? `linear-gradient(180deg,${rgba(state.colour,.55)} 0%,${rgba(state.colour,.25)} 30%,${rgba(state.colour,.9)} 60%,${state.colour} 100%)`
+      : tone === 'chilli' ? 'linear-gradient(180deg,rgba(120,0,2,.6) 0%,rgba(120,0,2,.3) 30%,rgba(150,0,3,.92) 60%,#AA0003 100%)'
+      : 'linear-gradient(180deg,rgba(20,9,12,.6) 0%,rgba(20,9,12,.3) 30%,rgba(20,9,12,.88) 58%,rgba(20,9,12,.97) 100%)';
     const acc = tone === 'ink' ? tint(state.colour) : CREAM;
+    const big = String(o.big), size = big.length <= 2 ? 480 : big.length <= 8 ? 220 : 170;
     return {bg:INK, html:`${imgDiv(o.img || ART[0], 'inset:0', o.pos || 'center 25%')}
       <div class="a" style="inset:0;background:${shade}"></div>
       ${corners(WHITE, PEONY, o.tr || leftLabel())}
-      <div class="a" style="left:0;right:0;top:190px;display:flex;justify-content:center">${callBtn()}</div>
-      <p class="a c" style="left:0;right:0;top:${o.bigTop||330}px;font-size:${o.bigSize||400}px;font-weight:500;letter-spacing:-.06em;line-height:.85;color:${WHITE}">${o.big}</p>
-      <p class="a c R" style="left:60px;right:60px;top:${o.unitTop||690}px;font-size:${o.unitSize||84}px;color:${WHITE}">${o.unit}</p>
-      <p class="a c scr" style="left:60px;right:60px;top:${(o.unitTop||690)+(o.unitGap||110)}px;font-size:60px;line-height:1.05;color:${acc}">${o.line || `to apply · ${esc(state.name)} open call`}</p>
-      <p class="a c sub" style="left:140px;right:140px;top:${o.infoTop||990}px;font-size:30px;color:${WHITE};opacity:.9">${o.info || `${themeTag()}${esc(state.selected)} artists will be published in a juried hardcover book.`}</p>
-      <div class="a" style="left:80px;right:80px;top:1150px;display:flex;justify-content:space-between;align-items:center;padding-top:22px;border-top:2px solid rgba(255,255,255,.3)">
-        <span style="font-size:28px;font-weight:600;color:${WHITE}">Closes ${dateLong()}</span>
-        <span style="font-size:28px;font-weight:700;color:${acc}">${VERB} “${KW()}” to apply</span></div>`};
+      <div class="a" style="left:0;right:0;top:150px">${OPENCALL(acc, true)}</div>
+      <p class="a c scr" style="left:0;right:0;top:205px;font-size:58px;color:${WHITE}">${esc(state.name)}</p>
+      <p class="a c" style="left:0;right:0;top:${big.length <= 2 ? 300 : 380}px;font-size:${size}px;font-weight:700;letter-spacing:-.06em;line-height:.85;color:${WHITE}">${big}</p>
+      <p class="a c" style="left:0;right:0;top:${big.length <= 2 ? 720 : 640}px;font-size:56px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:${acc}">${esc(o.unit)}</p>
+      <p class="a c" style="left:120px;right:120px;top:${big.length <= 2 ? 820 : 760}px;font-size:40px;font-weight:500;letter-spacing:-.015em;color:${WHITE}">${o.info || `to get your work into a juried hardcover book of ${esc(state.selected)} artists.`}</p>
+      ${actionBtn(1110, tone === 'chilli')}`};
   },
   // the whole open call on one page
   brief(o = {}){
@@ -213,25 +221,19 @@ const T = {
   // closing slide of every carousel: one clear action
   // every carousel opens on this: what it is, why it matters, when it closes, how to act
   hook(o){
-    const strip = (fg, acc) => `
-      <div class="a" style="left:80px;right:80px;top:1150px;display:flex;justify-content:space-between;align-items:center;padding-top:22px;border-top:2px solid ${fg === WHITE ? 'rgba(255,255,255,.3)' : 'rgba(20,9,12,.2)'}">
-        <span style="font-size:28px;font-weight:600;color:${fg}">Closes ${dateLong()}</span>
-        <span style="font-size:28px;font-weight:700;color:${acc}">${VERB} “${KW()}” to apply</span></div>`;
+    const shrink = String(state.name).length > 16 ? .86 : 1;
+    const head = (fg, acc, timerDark) => `
+      <div class="a" style="left:80px;right:80px;top:600px;display:flex;justify-content:space-between;align-items:center">${OPENCALL(acc)}${timer(timerDark)}</div>
+      <p class="a H" style="left:76px;right:80px;top:680px;font-size:${Math.round((o.size||84) * shrink)}px;color:${fg}">${o.head}</p>
+      ${o.sub ? `<p class="a sub" style="left:80px;right:140px;top:${o.subTop||970}px;font-size:29px;color:${fg};opacity:.9">${o.sub}</p>` : ''}
+      ${actionBtn(1110)}`;
     if (o.img) return {bg:INK, html:`${imgDiv(o.img,'inset:0',o.pos||'center 30%')}
-      <div class="a" style="inset:0;background:linear-gradient(180deg,rgba(20,9,12,.45) 0%,rgba(20,9,12,0) 18%,rgba(20,9,12,0) 34%,rgba(20,9,12,.82) 58%,rgba(20,9,12,.95) 100%)"></div>
-      ${corners(WHITE, PEONY, o.tr)}
-      <div class="a" style="left:80px;right:80px;top:620px;display:flex;justify-content:space-between;align-items:center">${callBtn()}${timer(false)}</div>
-      <p class="a H" style="left:76px;right:80px;top:740px;font-size:${Math.round((o.size||88) * (String(state.name).length > 16 ? .86 : 1))}px;color:${WHITE}">${o.head}</p>
-      ${o.sub ? `<p class="a sub" style="left:80px;right:140px;top:${o.subTop||1030}px;color:${WHITE};opacity:.9">${o.sub}</p>` : ''}
-      ${strip(WHITE, tint(state.colour))}`};
+      <div class="a" style="inset:0;background:linear-gradient(180deg,rgba(20,9,12,.45) 0%,rgba(20,9,12,0) 16%,rgba(20,9,12,0) 30%,rgba(20,9,12,.85) 52%,rgba(20,9,12,.96) 100%)"></div>
+      ${corners(WHITE, PEONY, o.tr)}${head(WHITE, tint(state.colour), false)}`};
     const g = G[o.ground||'ink']();
-    const pic = o.img2 !== undefined ? slot(o.img2, o.imgLabel || 'Real photo needed', 'left:80px;right:80px;top:140px;height:440px', g.fg)
-      : imgDiv(o.art || ART[0], 'left:80px;right:80px;top:140px;height:440px;border-radius:18px', o.artPos || 'center 30%');
-    return {bg:g.bg, html:`${corners(g.fg, g.dm, o.tr)}${pic}
-      <div class="a" style="left:80px;right:80px;top:620px;display:flex;justify-content:space-between;align-items:center">${callBtn()}${timer(g.bg === CREAM)}</div>
-      <p class="a H" style="left:76px;right:80px;top:740px;font-size:${Math.round((o.size||80) * (String(state.name).length > 16 ? .86 : 1))}px;color:${g.fg}">${o.head}</p>
-      ${o.sub ? `<p class="a sub" style="left:80px;right:140px;top:${o.subTop||1030}px;color:${g.fg};opacity:.85">${o.sub}</p>` : ''}
-      ${strip(g.fg, g.acc)}`};
+    const pic = o.img2 !== undefined ? slot(o.img2, o.imgLabel || 'Real photo needed', 'left:80px;right:80px;top:130px;height:430px', g.fg)
+      : imgDiv(o.art || ART[0], 'left:80px;right:80px;top:130px;height:430px;border-radius:18px', o.artPos || 'center 30%');
+    return {bg:g.bg, html:`${corners(g.fg, g.dm, o.tr)}${pic}${head(g.fg, g.acc, g.bg === CREAM)}`};
   },
   // after every countdown: what the deadline is for
   value(o = {}){
@@ -284,30 +286,32 @@ const awardTag = () => `<span class="cn" style="display:inline-flex;align-items:
 const AW = {
   hook(o){ const c = gold();
     return {bg:AWARD_BG, html:`${imgDiv(o.img || o.art || ART[0], 'left:40px;right:40px;top:40px;bottom:40px', o.pos || o.artPos || 'center 30%')}
-      <div class="a" style="left:40px;right:40px;top:40px;bottom:40px;background:linear-gradient(180deg,rgba(28,19,11,.5) 0%,rgba(28,19,11,0) 22%,rgba(28,19,11,0) 40%,rgba(28,19,11,.88) 64%,#1C130B 100%)"></div>
+      <div class="a" style="left:40px;right:40px;top:40px;bottom:40px;background:linear-gradient(180deg,rgba(28,19,11,.5) 0%,rgba(28,19,11,0) 18%,rgba(28,19,11,0) 30%,rgba(28,19,11,.9) 52%,#1C130B 100%)"></div>
       ${frame(c)}${corners(CREAM, PEONY, o.tr)}
-      <div class="a" style="left:90px;top:700px">${awardTag()}</div>
-      <p class="a H" style="left:86px;right:90px;top:780px;font-size:${Math.round((o.size||80)*.8)}px;color:${CREAM}">${o.head}</p>
-      ${o.sub ? `<p class="a sub" style="left:90px;right:150px;top:1040px;font-size:28px;color:${CREAM};opacity:.85">${o.sub}</p>` : ''}
-      ${strip(CREAM, c)}`};
+      <div class="a" style="left:90px;right:90px;top:600px;display:flex;justify-content:space-between;align-items:center">${OPENCALL(c)}${timer(false)}</div>
+      <p class="a H" style="left:86px;right:90px;top:680px;font-size:${Math.round((o.size||80)*.8)}px;color:${CREAM}">${o.head}</p>
+      ${o.sub ? `<p class="a sub" style="left:90px;right:150px;top:970px;font-size:28px;color:${CREAM};opacity:.85">${o.sub}</p>` : ''}
+      ${actionBtn(1110)}`};
   },
-  count(o){ const c = gold(); const tone = o.tone === 'chilli' ? '#5A0A0A' : AWARD_BG;
-    const big = String(o.big); const size = big.length <= 2 ? 300 : big.length <= 8 ? 120 : 96;
-    return {bg:tone, html:`${frame(c)}${corners(CREAM, PEONY, o.tr || leftLabel())}
-      <div class="a c" style="left:0;right:0;top:150px">${awardTag()}</div>
-      ${laurel(c, 600).replace('{TOP}', 230)}
-      <div class="a c" style="left:0;right:0;top:${big.length <= 2 ? 360 : 440}px">${serifNum(big, size, CREAM)}</div>
-      <p class="a c lab" style="left:0;right:0;top:${big.length <= 2 ? 640 : 610}px;color:${c};font-size:26px">${esc(o.unit)}</p>
-      <p class="a c R" style="left:110px;right:110px;top:870px;font-size:52px;color:${CREAM}">to apply to the ${GE()}</p>
-      <p class="a c sub" style="left:160px;right:160px;top:${o.infoTop ? o.infoTop + 40 : 990}px;font-size:28px;color:${CREAM};opacity:.85">${o.info || `${esc(state.selected)} artists will be published in a juried hardcover book.`}</p>
-      ${strip(CREAM, c)}`};
+  count(o){ const c = gold(); const chilli = o.tone === 'chilli'; const bg = chilli ? '#5A0A0A' : AWARD_BG;
+    const big = String(o.big), size = big.length <= 2 ? 460 : big.length <= 8 ? 200 : 150;
+    return {bg, html:`${imgDiv(o.img || ART[0], 'left:40px;right:40px;top:40px;bottom:40px', o.pos || 'center 30%')}
+      <div class="a" style="left:40px;right:40px;top:40px;bottom:40px;background:${chilli ? 'rgba(90,10,10,.9)' : 'rgba(28,19,11,.86)'}"></div>
+      ${frame(c)}${corners(CREAM, PEONY, o.tr || leftLabel())}
+      <div class="a" style="left:0;right:0;top:150px">${OPENCALL(c, true)}</div>
+      <p class="a c scr" style="left:0;right:0;top:205px;font-size:58px;color:${CREAM}">${esc(state.name)}</p>
+      <p class="a c" style="left:0;right:0;top:${big.length <= 2 ? 300 : 380}px;font-size:${size}px;font-weight:700;letter-spacing:-.05em;line-height:.85;color:${CREAM}">${big}</p>
+      <p class="a c" style="left:0;right:0;top:${big.length <= 2 ? 710 : 630}px;font-size:56px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:${c}">${esc(o.unit)}</p>
+      <div class="a" style="left:300px;right:300px;top:${big.length <= 2 ? 800 : 730}px;border-top:2px solid ${c}"></div>
+      <p class="a c" style="left:120px;right:120px;top:${big.length <= 2 ? 840 : 770}px;font-size:40px;font-weight:500;letter-spacing:-.015em;color:${CREAM}">${o.info || `to get your work into a juried hardcover book of ${esc(state.selected)} artists.`}</p>
+      ${actionBtn(1110, chilli)}`};
   },
 };
 // final day: one message, nothing else
 T.urgent = (o) => { const award = isAward(); const bg = o.chilli ? '#AA0003' : (award ? AWARD_BG : INK); const acc = o.chilli ? CREAM : tint(state.colour);
-  const btn = btnCTA(CREAM, o.chilli ? '#AA0003' : BURG, o.chilli ? '#AA0003' : BURG).replace('{TOP}', 1000);
+  const btn = actionBtn(1060, o.chilli);
   return {bg, html:`${award ? frame(gold()) : ''}${corners(CREAM, PEONY, o.tr || 'Final day')}
-    <p class="a c lab" style="left:0;right:0;top:250px;color:${acc};font-size:26px">${GE()} · open call</p>
+    <div class="a" style="left:0;right:0;top:200px">${OPENCALL(acc, true)}</div><p class="a c scr" style="left:0;right:0;top:255px;font-size:56px;color:${CREAM}">${esc(state.name)}</p>
     <p class="a c" style="left:40px;right:40px;top:330px;font-size:${o.size||230}px;font-weight:700;letter-spacing:-.055em;line-height:.88;color:${CREAM}">${o.head}</p>
     <p class="a c" style="left:120px;right:120px;top:${o.subTop||800}px;font-size:40px;font-weight:500;letter-spacing:-.015em;color:${CREAM}">${o.sub}</p>
     ${btn}`};
