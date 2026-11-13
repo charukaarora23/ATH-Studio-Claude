@@ -1,0 +1,48 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>Garden cover variations</title>
+<style>
+@font-face{font-family:HG;src:url(fonts/ath/HankenGrotesk.woff2) format("woff2");font-weight:100 900}
+@font-face{font-family:NR;src:url(fonts/ath/Newsreader.woff2) format("woff2");font-weight:200 800}
+@font-face{font-family:IS;src:url(fonts/InstrumentSerif-Italic.ttf) format("truetype");font-style:italic}
+@font-face{font-family:IS;src:url(fonts/InstrumentSerif-Regular.ttf) format("truetype")}
+@font-face{font-family:DM;src:url(fonts/ath/DMMono-Medium.woff2) format("woff2")}
+body{margin:0;background:#C9D3CF;display:flex;flex-wrap:wrap;gap:40px;padding:40px}
+.s{position:relative;width:1080px;height:1350px;overflow:hidden;font-family:HG,sans-serif;-webkit-font-smoothing:antialiased;color:#fff}
+.s *{margin:0;box-sizing:border-box}
+.a{position:absolute}.c{text-align:center}
+.img{background-size:cover;background-repeat:no-repeat}
+.cn{font-size:20px;font-weight:700;letter-spacing:.16em;text-transform:uppercase}
+.T{font-weight:700;letter-spacing:-.01em;line-height:.9;text-transform:uppercase}
+.line{font-size:32px;font-weight:500;line-height:1.35;letter-spacing:-.01em}
+.tag{display:inline-flex;align-items:center;height:46px;padding:0 26px;background:#D0D996;color:#14090C;border-radius:999px}
+</style></head><body>
+<script>
+const art = ['art/flower-portrait.jpg','center 6%'];
+const shade = `<div class="a" style="inset:0;background:linear-gradient(180deg,rgba(20,14,12,.38) 0%,rgba(20,14,12,0) 16%,rgba(20,14,12,0) 40%,rgba(20,14,12,.6) 62%,rgba(20,14,12,.8) 100%)"></div>`;
+const corners = `<p class="a cn" style="left:52px;top:48px">Arts to Hearts</p><p class="a cn" style="right:52px;top:48px">101 Art Book</p>
+  <p class="a cn" style="left:52px;bottom:48px">DM “GARDEN”</p><p class="a cn" style="right:52px;bottom:48px">Closes 13 Dec</p>`;
+const tag = t => `<div class="a" style="left:0;right:0;top:650px;display:flex;justify-content:center"><span class="cn tag">${t}</span></div>`;
+const line = (t, top) => `<p class="a line c" style="left:150px;right:150px;top:${top}px">${t}</p>`;
+const V = [
+  // 1 · OPEN CALL, edition name in spaced grotesk caps
+  tag('Edition 16') + `<p class="a T c" style="left:0;right:0;top:730px;font-size:190px">Open call</p>
+   <p class="a c" style="left:0;right:0;top:920px;font-size:40px;font-weight:300;letter-spacing:.42em;color:#D0D996">GARDEN EDITION</p>`
+   + line('101 artists will be published in a juried hardcover book.', 1030),
+  // 2 · CALL FOR ARTISTS, edition name in Instrument Serif italic
+  tag('Edition 16') + `<p class="a T c" style="left:0;right:0;top:720px;font-size:136px">Call for<br>artists</p>
+   <p class="a c" style="left:0;right:0;top:975px;font-family:IS,serif;font-style:italic;font-size:92px;line-height:1;color:#D0D996">the Garden Edition</p>`
+   + line('101 places in a juried hardcover book.', 1095),
+  // 3 · GET PUBLISHED, edition name upright serif
+  tag('Open call · Edition 16') + `<p class="a T c" style="left:0;right:0;top:720px;font-size:150px">Get<br>published</p>
+   <p class="a c" style="left:0;right:0;top:1030px;font-family:NR,serif;font-size:52px;letter-spacing:-.01em;color:#D0D996">101 Art Book: Garden Edition</p>`
+   + line('Juried. Hardcover. Open to artists worldwide.', 1110),
+  // 4 · SUBMISSIONS OPEN, edition name in mono label
+  `<p class="a c" style="left:0;right:0;top:640px;font-family:DM,monospace;font-size:28px;letter-spacing:.2em;color:#D0D996">101 ART BOOK — GARDEN EDITION</p>
+   <p class="a T c" style="left:0;right:0;top:760px;font-size:140px">Submissions<br>open</p>`
+   + line('101 artists will be selected and published in a hardcover book.', 1040),
+];
+V.forEach((v,i) => { const d = document.createElement('div'); d.className='s'; d.id='v'+(i+1);
+  d.innerHTML = `<div class="a img" style="inset:0;background-image:url(${art[0]});background-position:${art[1]}"></div>${shade}${corners}${v}`;
+  document.body.appendChild(d); });
+</script>
+</body></html>
