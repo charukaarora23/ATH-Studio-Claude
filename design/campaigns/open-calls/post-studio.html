@@ -1,0 +1,542 @@
+<title>ATH Post Studio</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Faculty+Glyphic&family=Hanken+Grotesk:wght@400;500;600;700&family=Newsreader:ital,opsz,wght@0,6..72,300;0,6..72,400;1,6..72,300;1,6..72,400&family=Playfair+Display:ital@1&display=swap">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<style>
+/* Layout: a working tool. Call details on the left, generated posts in a grid on the right. */
+:root{
+  --bg:#F6F1EC; --panel:#FFFCF8; --ink:#2A0A12; --muted:#6E5F5A; --line:#E4D8CF; --accent:#6A0620; --field:#FFFFFF;
+  --sans:"Hanken Grotesk",system-ui,-apple-system,"Segoe UI",sans-serif; --mono:"DM Mono",ui-monospace,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#161112;--panel:#211A1B;--ink:#F4EAE4;--muted:#B5A6A1;--line:#3A2F2F;--accent:#F2A8BC;--field:#2A2223;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#161112;--panel:#211A1B;--ink:#F4EAE4;--muted:#B5A6A1;--line:#3A2F2F;--accent:#F2A8BC;--field:#2A2223;color-scheme:dark}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font:400 14px/1.45 var(--sans)}
+.app{display:grid;grid-template-columns:380px minmax(0,1fr);min-height:100%}
+aside{background:var(--panel);border-right:1px solid var(--line);padding-block:20px;padding-left:max(18px,env(safe-area-inset-left,0px));padding-right:18px;overflow:auto;max-height:100vh;position:sticky;top:0}
+main{padding-block:20px;padding-left:24px;padding-right:max(20px,env(safe-area-inset-right,0px));min-width:0}
+h1{font:700 20px/1.1 var(--sans);letter-spacing:-.02em;margin:0 0 4px}
+.sub{color:var(--muted);font-size:13px;margin:0 0 16px}
+details{border-top:1px solid var(--line);padding:12px 0}
+summary{font:600 12px/1 var(--mono);letter-spacing:.1em;text-transform:uppercase;cursor:pointer;color:var(--accent)}
+.f{display:flex;flex-direction:column;gap:4px;margin-top:10px}
+.f label{font-size:12px;color:var(--muted)}
+.f input,.f textarea,.f select{font:inherit;color:var(--ink);background:var(--field);border:1px solid var(--line);border-radius:8px;padding:8px 10px;width:100%}
+.f textarea{min-height:64px;resize:vertical}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.sw{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
+.sw button{width:34px;height:34px;border-radius:8px;border:2px solid transparent;cursor:pointer;padding:0;overflow:hidden;display:flex}
+.sw button span{flex:1}
+.sw button[aria-pressed="true"]{border-color:var(--ink)}
+.img-in{display:flex;align-items:center;gap:8px}
+.img-in .th{width:44px;height:44px;border-radius:6px;background:var(--line) center/cover;flex:none}
+.top{display:flex;flex-wrap:wrap;gap:10px;align-items:end;margin-bottom:18px}
+.top .f{margin:0;min-width:260px}
+.btn{font:600 14px/1 var(--sans);border-radius:10px;padding:11px 16px;border:1px solid var(--ink);background:var(--ink);color:var(--bg);cursor:pointer}
+.btn.ghost{background:transparent;color:var(--ink)}
+.btn:focus-visible,.sw button:focus-visible,summary:focus-visible{outline:3px solid #FFA1C2;outline-offset:2px}
+.status{font-size:13px;color:var(--muted);min-height:18px}
+.group{margin-bottom:30px}
+.group h2{font:600 16px/1.2 var(--sans);margin:0 0 2px}
+.group .meta{font:400 12px/1.3 var(--mono);color:var(--muted);margin-bottom:10px;text-transform:uppercase;letter-spacing:.06em}
+.slides{display:flex;gap:14px;overflow-x:auto;padding-bottom:8px}
+.cell{flex:none;width:var(--pw);display:flex;flex-direction:column;gap:6px}
+.frame{width:var(--pw);height:calc(var(--pw) * 1.25);overflow:hidden;border-radius:6px;box-shadow:0 1px 0 var(--line),0 8px 24px rgba(0,0,0,.08);position:relative}
+.frame>.post{transform:scale(var(--sc));transform-origin:0 0}
+.cell .act{display:flex;justify-content:space-between;align-items:center;font-size:12px;color:var(--muted)}
+.cell .act button{font:600 12px/1 var(--sans);border:1px solid var(--line);background:var(--panel);color:var(--ink);border-radius:8px;padding:6px 9px;cursor:pointer}
+.empty{border:1px dashed var(--line);border-radius:12px;padding:40px;text-align:center;color:var(--muted)}
+#stage{position:fixed;left:-30000px;top:0}
+@media (max-width:900px){.app{grid-template-columns:1fr}aside{position:static;max-height:none;border-right:0;border-bottom:1px solid var(--line)}}
+
+/* ===== POSTS (1080 x 1350) — fixed brand values, never themed ===== */
+.post{position:relative;width:1080px;height:1350px;overflow:hidden;font-family:"Hanken Grotesk",sans-serif;-webkit-font-smoothing:antialiased;color:#2A0A12}
+.post *{box-sizing:border-box;margin:0}
+.post .a{position:absolute}
+.post .big{font-weight:500;letter-spacing:-.065em;line-height:.8}
+.post .h{font-weight:500;letter-spacing:-.045em;line-height:.95}
+.post .p{font-weight:400;font-size:27px;line-height:1.32;letter-spacing:-.01em}
+.post .lab{font-weight:400;font-size:24px;letter-spacing:-.01em}
+.post .mono{font-family:"DM Mono",monospace;font-size:19px;letter-spacing:.08em;text-transform:uppercase}
+.post .serif{font-family:"Newsreader",serif;font-weight:300;letter-spacing:-.02em;line-height:1.02}
+.post .serif i,.post i.s{font-family:"Newsreader",serif;font-style:italic;font-weight:300}
+.post .logo{font-family:"Faculty Glyphic",serif;font-size:36px;letter-spacing:-.01em;line-height:1;white-space:nowrap}
+.post .logo i{font-family:"Playfair Display",serif;font-style:italic;font-size:38px}
+.post .grain{position:absolute;inset:0;opacity:.07;pointer-events:none}
+.post .img{background-size:cover;background-position:center}
+.post .ph{background:repeating-linear-gradient(135deg,rgba(0,0,0,.05) 0 14px,rgba(0,0,0,.09) 14px 28px);display:flex;align-items:center;justify-content:center}
+.post .ph span{font-family:"DM Mono",monospace;font-size:20px;letter-spacing:.08em;text-transform:uppercase;opacity:.6}
+.post .strip{position:absolute;left:64px;right:64px;bottom:56px;display:flex;justify-content:space-between;align-items:flex-end}
+.post .pill{display:inline-flex;align-items:center;gap:14px;border-radius:999px;white-space:nowrap}
+</style>
+
+<div class="app">
+<aside>
+  <h1>ATH Post Studio</h1>
+  <p class="sub">Fill in one open call, pick a post or the whole month, and the posts render on the right.</p>
+
+  <div class="f"><label for="saved">Saved calls (this browser)</label>
+    <div class="row2"><select id="saved"></select><button class="btn ghost" id="saveCall" type="button">Save call</button></div></div>
+
+  <details open><summary>The call</summary>
+    <div class="f"><label for="name">Full name</label><input id="name"></div>
+    <div class="row2">
+      <div class="f"><label for="short">Short name</label><input id="short"></div>
+      <div class="f"><label for="word">Theme word</label><input id="word"></div>
+    </div>
+    <div class="row2">
+      <div class="f"><label for="series">Series label</label><input id="series"></div>
+      <div class="f"><label for="keyword">DM keyword</label><input id="keyword"></div>
+    </div>
+    <div class="row2">
+      <div class="f"><label for="deadline">Deadline</label><input id="deadline" type="date"></div>
+      <div class="f"><label for="selected">Artists selected</label><input id="selected"></div>
+    </div>
+    <div class="f"><label>Call colour (ATH palette)</label><div class="sw" id="palettes"></div></div>
+  </details>
+
+  <details><summary>Offer and proof</summary>
+    <div class="row2">
+      <div class="f"><label for="prize">Top award</label><input id="prize"></div>
+      <div class="f"><label for="feature">Winner feature</label><input id="feature"></div>
+    </div>
+    <div class="row2">
+      <div class="f"><label for="published">Artists published</label><input id="published"></div>
+      <div class="f"><label for="editions">Editions in print</label><input id="editions"></div>
+    </div>
+    <div class="f"><label for="benefits">What selected artists get (one per line)</label><textarea id="benefits"></textarea></div>
+    <div class="f"><label for="awards">Awards (one per line: Title | details)</label><textarea id="awards"></textarea></div>
+    <div class="row2">
+      <div class="f"><label for="entries">Entries so far</label><input id="entries"></div>
+      <div class="f"><label for="countries">Countries so far</label><input id="countries"></div>
+    </div>
+  </details>
+
+  <details><summary>Theme and voice</summary>
+    <div class="f"><label for="quote">Curatorial line</label><textarea id="quote"></textarea></div>
+    <div class="f"><label for="themeBody">Theme paragraph</label><textarea id="themeBody"></textarea></div>
+    <div class="f"><label for="ins">What counts (comma separated)</label><textarea id="ins"></textarea></div>
+    <div class="f"><label for="outs">What doesn't (comma separated)</label><input id="outs"></div>
+  </details>
+
+  <details><summary>Jury and artists</summary>
+    <div class="row2">
+      <div class="f"><label for="jury">Jury / curator name</label><input id="jury"></div>
+      <div class="f"><label for="juryRole">Role</label><input id="juryRole"></div>
+    </div>
+    <div class="f"><label for="juryQuote">Jury quote</label><textarea id="juryQuote"></textarea></div>
+    <div class="f"><label for="testimonials">Artist quotes (one per line: Quote | Name | Edition)</label><textarea id="testimonials"></textarea></div>
+  </details>
+
+  <details><summary>Images</summary>
+    <div class="f"><label for="imgHero">Hero artwork</label><div class="img-in"><span class="th" id="th-imgHero"></span><input id="imgHero" type="file" accept="image/*"></div></div>
+    <div class="f"><label for="imgCredit">Hero credit (Artist · Title · Medium · City)</label><input id="imgCredit"></div>
+    <div class="f"><label for="imgBook">Book photo</label><div class="img-in"><span class="th" id="th-imgBook"></span><input id="imgBook" type="file" accept="image/*"></div></div>
+    <div class="f"><label for="imgJury">Jury portrait</label><div class="img-in"><span class="th" id="th-imgJury"></span><input id="imgJury" type="file" accept="image/*"></div></div>
+    <div class="f"><label for="imgArt2">Second artwork</label><div class="img-in"><span class="th" id="th-imgArt2"></span><input id="imgArt2" type="file" accept="image/*"></div></div>
+  </details>
+
+  <details><summary>Other open calls</summary>
+    <div class="f"><label for="others">One per line: Name | Deadline (YYYY-MM-DD) | Keyword</label><textarea id="others"></textarea></div>
+  </details>
+</aside>
+
+<main>
+  <div class="top">
+    <div class="f"><label for="ptype">Post</label><select id="ptype"></select></div>
+    <button class="btn" id="go" type="button">Create posts</button>
+    <button class="btn ghost" id="zip" type="button">Save all as ZIP</button>
+    <p class="status" id="status" role="status"></p>
+  </div>
+  <div id="out"></div>
+</main>
+</div>
+<div id="stage" aria-hidden="true"></div>
+
+<script>
+const $ = id => document.getElementById(id);
+const CREAM='#F9ECE5', INK='#2A0A12', BURG='#6A0620', CHILLI='#AA0003', PEONY='#FAD2E1', COCOA='#4C4240';
+
+// Call colour presets from the ATH palette: ground, type on ground, soft ground, type on soft
+const PALETTES = {
+  petrol:   {label:'Petrol + Pistachio', bg:'#025054', fg:'#D0D996', soft:'#E9ECD3', softFg:'#025054'},
+  burgundy: {label:'Burgundy + Peony',   bg:'#6A0620', fg:'#FAD2E1', soft:'#F8DFE6', softFg:'#6A0620'},
+  ink:      {label:'Ink + Hot Rose',     bg:'#2A0A12', fg:'#FFA1C2', soft:'#F9ECE5', softFg:'#2A0A12'},
+  chilli:   {label:'Chilli + Ballet',    bg:'#AA0003', fg:'#FFD6DE', soft:'#FFE7EB', softFg:'#AA0003'},
+  sky:      {label:'Sky + Burgundy',     bg:'#B7D9FF', fg:'#6A0620', soft:'#E4F0FF', softFg:'#6A0620'},
+  lemon:    {label:'Lemon + Chilli',     bg:'#FFF3B2', fg:'#AA0003', soft:'#FFF8D6', softFg:'#AA0003'},
+};
+
+const DEFAULTS = {
+  name:'101 Art Book: Garden Edition', short:'Garden Edition', word:'garden', series:'101 Art Book · Vol. 16', keyword:'GARDEN',
+  deadline:'2026-12-13', selected:'101', palette:'petrol',
+  prize:'$500', feature:'4-page feature', published:'1,300+', editions:'15',
+  benefits:'Publication credit for your CV, website and grant applications\nCertificate of Recognition\nSold on Amazon, Barnes & Noble and in bookstores\nIntroduction to collectors, curators and galleries\nPromotion to our 190,000+ community',
+  awards:'Winner | $500 · 4-page feature · glass trophy · Artsy listing\nFirst runner-up | 2-page feature · glass trophy · Artsy listing\nSecond runner-up | 2-page feature · glass trophy · Artsy listing',
+  entries:'', countries:'',
+  quote:'A garden is more than a place where things grow.',
+  themeBody:'A single flower, the shape of a leaf, an overgrown landscape, or a world that exists only in memory. We want to see how you interpret it.',
+  ins:'Flowers and plants, Trees and forests, Butterflies and birds, Landscapes, Abstract or imagined nature, Any medium',
+  outs:'AI-generated work',
+  jury:'', juryRole:'Guest curator', juryQuote:'',
+  testimonials:'',
+  imgCredit:'Artist Name · Title · Oil · City',
+  others:'Artist of the Year 2026 | 2026-11-16 | NOMINATE\nWoman Artist Award · 7th | 2026-11-30 | AWARD',
+};
+const IMGKEYS = ['imgHero','imgBook','imgJury','imgArt2'];
+const FIELDS = Object.keys(DEFAULTS).filter(k => k !== 'palette');
+let state = {...DEFAULTS, images:{}};
+
+// ---------- form wiring ----------
+function fillForm(){ FIELDS.forEach(k => { if ($(k)) $(k).value = state[k] ?? ''; }); renderSwatches(); IMGKEYS.forEach(k => { $('th-'+k).style.backgroundImage = state.images[k] ? `url(${state.images[k]})` : ''; }); }
+function readForm(){ FIELDS.forEach(k => { if ($(k)) state[k] = $(k).value; }); }
+function renderSwatches(){
+  $('palettes').innerHTML = Object.entries(PALETTES).map(([k,p]) => `<button type="button" title="${p.label}" aria-label="${p.label}" aria-pressed="${state.palette===k}" data-k="${k}"><span style="background:${p.bg}"></span><span style="background:${p.fg}"></span></button>`).join('');
+  $('palettes').querySelectorAll('button').forEach(b => b.onclick = () => { state.palette = b.dataset.k; renderSwatches(); });
+}
+IMGKEYS.forEach(k => $(k).addEventListener('change', e => {
+  const file = e.target.files[0]; if (!file) return;
+  const r = new FileReader(); r.onload = () => { state.images[k] = r.result; $('th-'+k).style.backgroundImage = `url(${r.result})`; }; r.readAsDataURL(file);
+}));
+
+function loadSaved(){ try { return JSON.parse(localStorage.getItem('athStudioCalls') || '{}'); } catch { return {}; } }
+function refreshSaved(){ const s = loadSaved(); $('saved').innerHTML = '<option value="">Garden Edition (example)</option>' + Object.keys(s).map(n => `<option>${esc(n)}</option>`).join(''); }
+$('saved').onchange = () => { const s = loadSaved(); const v = $('saved').value; state = v && s[v] ? {...DEFAULTS, ...s[v], images: s[v].images || {}} : {...DEFAULTS, images:{}}; fillForm(); };
+$('saveCall').onclick = () => { readForm(); const s = loadSaved(); s[state.short || state.name] = state;
+  try { localStorage.setItem('athStudioCalls', JSON.stringify(s)); status('Saved "' + (state.short || state.name) + '" in this browser.'); }
+  catch { const lite = {...state, images:{}}; s[state.short || state.name] = lite; try { localStorage.setItem('athStudioCalls', JSON.stringify(s)); status('Saved without images (too large for browser storage).'); } catch { status('Could not save in this browser.'); } }
+  refreshSaved(); $('saved').value = state.short || state.name; };
+
+// ---------- helpers ----------
+function esc(s){ return String(s ?? '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+function status(t){ $('status').textContent = t; }
+const lines = s => String(s || '').split('\n').map(x => x.trim()).filter(Boolean);
+const csv = s => String(s || '').split(',').map(x => x.trim()).filter(Boolean);
+const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+const MONTHS_L = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+function dl(){ const [y,m,d] = state.deadline.split('-').map(Number); return new Date(y, m-1, d); }
+function fmt(d){ return d.getDate() + ' ' + MONTHS[d.getMonth()]; }
+function fmtLong(d){ return d.getDate() + ' ' + MONTHS_L[d.getMonth()]; }
+function dot(d){ return String(d.getDate()).padStart(2,'0') + '.' + String(d.getMonth()+1).padStart(2,'0'); }
+function addDays(d, n){ const x = new Date(d); x.setDate(x.getDate() + n); return x; }
+let GRAIN = '';
+(function(){ const c = document.createElement('canvas'); c.width = c.height = 256; const g = c.getContext('2d'); const im = g.createImageData(256,256); for (let i=0;i<im.data.length;i+=4){ const v = Math.random()*255; im.data[i]=im.data[i+1]=im.data[i+2]=v; im.data[i+3]=255; } g.putImageData(im,0,0); GRAIN = c.toDataURL(); })();
+
+// ---------- shared post pieces ----------
+const P = () => PALETTES[state.palette] || PALETTES.petrol;
+const logo = c => `<span class="logo" style="color:${c}">arts <i>to</i> hearts</span>`;
+const grain = () => `<div class="grain" style="background-image:url(${GRAIN})"></div>`;
+const img = (k, style, label) => state.images[k] ? `<div class="a img" style="${style};background-image:url(${state.images[k]})"></div>` : `<div class="a ph" style="${style}"><span>${label}</span></div>`;
+const strip = (c, left) => `<div class="strip"><span class="mono" style="color:${c};font-size:17px">${left}</span>${logo(c)}</div>`;
+const deadlineLine = (ctx) => `${ctx.left === 0 ? 'Closes tonight' : ctx.left + (ctx.left === 1 ? ' day' : ' days') + ' left'} · Deadline ${dot(dl())} · Link in bio`;
+const arrowSvg = (c, w=44) => `<svg width="${w}" height="${Math.round(w*.55)}" viewBox="0 0 44 24"><path d="M2 12h38M30 3l10 9-10 9" fill="none" stroke="${c}" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+
+// ---------- templates (each returns one 1080x1350 slide) ----------
+const T = {
+  // Photo on top, colour panel below (ref: Foremark "Strategy is a choice")
+  cover(ctx, o){ const p = P(); return { bg:p.bg, html:`
+    ${img('imgHero','left:0;top:0;width:1080px;height:760px','Hero artwork')}
+    <p class="a mono" style="left:64px;top:784px;color:${p.fg};font-size:15px;opacity:.85">${esc(state.imgCredit)}</p>
+    <p class="a lab" style="left:64px;top:862px;color:${p.fg}">${esc(o.label || 'Submissions open')}</p>
+    <h1 class="a h" style="left:480px;right:64px;top:850px;font-size:96px;color:${p.fg}">${o.title}</h1>
+    ${grain()}${strip(p.fg, deadlineLine(ctx))}` }; },
+
+  // Huge number on colour with an image band (ref: Foremark "+27%")
+  number(ctx, o){ const p = P(); return { bg:p.bg, html:`
+    <p class="a big" style="left:36px;top:40px;font-size:${o.size||560}px;color:${p.fg}">${o.num}</p>
+    <p class="a p" style="left:64px;top:${o.textTop||640}px;width:470px;color:${p.fg}">${o.text}</p>
+    <p class="a lab" style="right:64px;top:${(o.textTop||640)+4}px;color:${p.fg}">${esc(o.label||'')}</p>
+    ${img(o.imgKey||'imgHero','left:0;right:0;bottom:0;height:470px', o.imgLabel||'Artwork')}
+    <div class="a" style="left:0;bottom:470px;width:1080px">${''}</div>${grain()}` }; },
+
+  // Statement on soft ground with folded light (ref: Foremark "Market rewards clarity")
+  statement(ctx, o){ const p = P(); const fold = `radial-gradient(70% 55% at 112% 18%, rgba(255,255,255,0) 55%, rgba(255,255,255,.6) 62%, rgba(255,255,255,0) 72%),radial-gradient(90% 75% at 118% 32%, rgba(0,0,0,0) 58%, ${p.bg}22 66%, rgba(0,0,0,0) 78%),radial-gradient(120% 100% at 125% 45%, rgba(255,255,255,0) 60%, rgba(255,255,255,.45) 68%, rgba(255,255,255,0) 80%)`;
+    return { bg:p.soft, html:`<div class="a" style="inset:0;background:${fold}"></div>
+    <h2 class="a ${o.serif?'serif':'h'}" style="left:60px;right:120px;top:90px;font-size:${o.size||140}px;color:${p.softFg}">${o.title}</h2>
+    <div class="a" style="left:64px;top:${o.ruleTop||560}px;width:440px;border-top:2px solid ${p.softFg}"></div>
+    <p class="a p" style="left:64px;top:${(o.ruleTop||560)+28}px;width:440px;color:${p.softFg}">${o.text}</p>
+    <p class="a lab" style="left:64px;bottom:64px;color:${p.softFg}">${esc(o.label||'')}</p>
+    <div class="a" style="right:64px;bottom:64px">${logo(p.softFg)}</div>${grain()}` }; },
+
+  // Two bars (ref: Foremark "$900K / $1.8M")
+  bars(ctx, o){ const p = P(); return { bg:p.soft, html:`
+    <h2 class="a h" style="left:60px;top:80px;width:620px;font-size:96px;color:${p.softFg}">${o.title}</h2>
+    <div class="a" style="left:64px;top:${o.ruleTop||300}px;width:420px;border-top:2px solid ${p.softFg}"></div>
+    <p class="a p" style="left:64px;top:${(o.ruleTop||300)+26}px;width:420px;color:${p.softFg}">${o.text}</p>
+    <div class="a" style="left:64px;bottom:64px;width:430px;height:${o.h1||420}px;background:${INK};padding:34px"><p class="h" style="font-size:92px;color:${CREAM}">${o.a}</p><p class="p" style="color:${CREAM};margin-top:12px">${o.aLabel}</p></div>
+    <div class="a" style="right:64px;bottom:64px;width:430px;height:${o.h2||860}px;background:${p.bg};padding:34px"><p class="h" style="font-size:92px;color:${p.fg}">${o.b}</p><p class="p" style="color:${p.fg};margin-top:12px">${o.bLabel}</p></div>${grain()}` }; },
+
+  // Dark stat (ref: Better Future "2.4K Companies")
+  stat(ctx, o){ const p = P(); const acc = p.bg === INK ? p.fg : (p.bg === '#B7D9FF' || p.bg === '#FFF3B2' ? p.fg : p.fg);
+    return { bg:INK, html:`
+    <p class="a lab" style="left:64px;top:64px;color:${CREAM}">${esc(state.short)}</p><p class="a lab" style="right:64px;top:64px;color:${CREAM}">${esc(o.label||'Open call')}</p>
+    <p class="a big" style="left:40px;top:${o.top||230}px;font-size:${o.size||(String(o.num).length>1?440:600)}px;color:${CREAM};white-space:nowrap">${o.num}<span style="font-size:${o.unitSize||(String(o.num).length>1?160:200)}px;color:${acc};letter-spacing:-.04em;margin-left:14px">${o.unit||''}</span></p>
+    <div class="a" style="left:64px;top:860px;display:flex;align-items:center;gap:26px">
+      <span style="display:inline-flex;align-items:center;justify-content:center;width:110px;height:62px;border:2.5px solid ${acc};border-radius:999px">${arrowSvg(acc)}</span>
+      <i class="s" style="font-size:72px;color:${CREAM}">${o.word}</i></div>
+    <p class="a p" style="left:64px;top:1000px;width:640px;color:${CREAM};opacity:.85">${o.text}</p>${grain()}` }; },
+
+  // Quote card on cream with name pill (ref: Better Future quote)
+  quote(ctx, o){ const p = P(); return { bg:CREAM, html:`
+    <div class="a" style="left:64px;top:72px;display:inline-flex;align-items:center;justify-content:center;width:96px;height:54px;border:2.5px solid ${INK};border-radius:999px">${arrowSvg(INK,40)}</div>
+    <p class="a mono" style="right:64px;top:80px;color:${INK};font-size:15px;text-align:right;line-height:1.4">[ ${esc(o.tag||'In their words')} ]</p>
+    <p class="a serif" style="left:64px;right:120px;top:230px;font-size:${o.size||82}px;color:${INK}">“${esc(o.q)}”</p>
+    <div class="a" style="left:64px;bottom:150px;display:flex;align-items:center;gap:12px">
+      <span style="width:52px;height:52px;border-radius:50%;background:${INK};display:inline-flex;align-items:center;justify-content:center">${arrowSvg(CREAM,26)}</span>
+      <span class="pill mono" style="height:52px;padding:0 22px;background:${p.soft};color:${p.softFg};font-size:15px">${esc(o.role||'')}</span></div>
+    <div class="a" style="left:64px;bottom:64px"><span class="pill" style="height:72px;padding:0 34px;background:${INK};color:${CREAM};font-size:32px;font-weight:500;letter-spacing:-.02em">${esc(o.name||'Name')}</span></div>
+    <div class="a" style="right:64px;bottom:72px">${logo(INK)}</div>` }; },
+
+  // Portrait with white name pill (ref: Better Future "Francis Fulmer")
+  portrait(ctx, o){ const p = P(); return { bg:INK, html:`
+    ${img(o.imgKey||'imgJury','inset:0', o.imgLabel||'Portrait')}
+    <div class="a" style="left:0;right:0;bottom:0;height:520px;background:linear-gradient(180deg,rgba(42,10,18,0),rgba(42,10,18,.7))"></div>
+    <p class="a lab" style="left:64px;top:64px;color:${CREAM}">${esc(o.label||'')}</p>
+    <div class="a" style="left:64px;bottom:200px;display:flex;align-items:center;gap:12px">
+      <span style="width:58px;height:58px;border-radius:50%;background:${p.bg === INK ? p.fg : p.bg};display:inline-flex;align-items:center;justify-content:center">${arrowSvg(p.bg === INK ? INK : p.fg,28)}</span>
+      <span class="pill mono" style="height:58px;padding:0 24px;background:${CREAM};color:${INK};font-size:16px">${esc(o.role||'')}</span></div>
+    <div class="a" style="left:64px;right:64px;bottom:72px"><span class="pill" style="height:104px;padding:0 44px;background:${CREAM};color:${INK};font-size:52px;font-weight:500;letter-spacing:-.03em;text-transform:uppercase">${esc(o.name||'')}</span></div>` }; },
+
+  // Big caps list with one circled word (ref: Better Future "Step-by-step")
+  caps(ctx, o){ const p = P(); return { bg:CREAM, html:`
+    <h2 class="a" style="left:60px;right:64px;top:70px;font-weight:400;font-size:${o.size||118}px;line-height:.98;letter-spacing:-.03em;text-transform:uppercase;color:${INK}">${o.title}</h2>
+    <div class="a" style="left:64px;top:${o.tagTop||900}px"><span class="pill mono" style="height:56px;padding:0 24px;background:#fff;color:${INK};font-size:16px">↗ ${esc(o.tag||'')}</span></div>
+    <div class="a" style="left:64px;bottom:64px;display:inline-flex;align-items:center;justify-content:center;width:110px;height:62px;border:2.5px solid ${INK};border-radius:999px">${arrowSvg(INK)}</div>
+    <p class="a serif" style="right:64px;bottom:64px;width:360px;text-align:right;font-size:30px;color:${INK}"><i>${o.note||''}</i></p>` }; },
+
+  // Chat bubbles (ref: Calypso chat)
+  chat(ctx, o){ const p = P(); const b = o.items.map(([q,a]) => `
+      <div style="align-self:flex-end;background:${p.bg};color:${p.fg};border-radius:34px 34px 8px 34px;padding:24px 32px;font-size:31px;line-height:1.3;max-width:740px">${esc(q)}</div>
+      <div style="align-self:flex-start;background:${CREAM};color:${INK};border-radius:34px 34px 34px 8px;padding:24px 32px;font-size:31px;line-height:1.3;max-width:740px">${a}</div>`).join('');
+    return { bg:p.soft, html:`
+    <h2 class="a h" style="left:60px;top:90px;font-size:112px;color:${p.softFg}">${o.title}</h2>
+    <div class="a" style="left:64px;right:64px;top:300px;display:flex;flex-direction:column;gap:16px">${b}</div>
+    ${strip(p.softFg, deadlineLine(ctx))}` }; },
+
+  // Receipt (ref: Calypso "Why we're not cheap")
+  receipt(ctx, o){ const p = P(); const rows = o.rows.map(r => `<div style="display:flex;justify-content:space-between;gap:20px;padding:12px 0;font-size:25px"><span>${esc(r[0])}</span><b style="font-weight:600;color:${p.bg === '#B7D9FF' || p.bg === '#FFF3B2' ? p.fg : p.bg};text-align:right">${esc(r[1])}</b></div>`).join('');
+    const bars = Array.from({length:30},(_,i)=>`<i style="display:inline-block;width:${[3,6,2,8,4,3,7,2,5,9][i%10]}px;height:80px;background:${INK};margin-right:${[5,3,6,2,4][i%5]}px"></i>`).join('');
+    return { bg:p.bg, html:`
+    <div class="a" style="left:150px;right:150px;top:110px;bottom:110px;background:${CREAM};color:${INK};padding:72px 58px 0;-webkit-mask:radial-gradient(circle 14px at 50% 0,transparent 98%,#000) 0 0/36px 100% repeat-x">
+      <div style="text-align:center">${logo(INK)}</div>
+      <p class="mono" style="text-align:center;margin-top:36px;padding:24px 0;border-top:2px dashed #B9A79F;border-bottom:2px dashed #B9A79F;font-size:18px">${esc(o.title)}</p>
+      <div style="padding:14px 0;border-bottom:2px dashed #B9A79F">${rows}</div>
+      <div style="display:flex;justify-content:space-between;padding:26px 0;border-bottom:2px dashed #B9A79F;font-size:28px;font-weight:600"><span>Total</span><span>${esc(o.total)}</span></div>
+      <div style="text-align:center;margin-top:40px">${bars}</div>
+      <p class="mono" style="text-align:center;margin-top:14px;font-size:16px">${deadlineLine(ctx)}</p>
+    </div>${grain()}` }; },
+
+  // IN / OUT notebook (ref: Calypso list)
+  inout(ctx, o){ const p = P(); const box = t => `<p style="display:flex;align-items:center;gap:20px;font-size:33px;padding:13px 0;color:${INK}"><i style="width:28px;height:28px;border:2.5px solid ${INK};border-radius:50%;display:block;flex:none"></i>${esc(t)}</p>`;
+    return { bg:'#FCFAF3', html:`
+    <div class="a" style="inset:0;background:repeating-linear-gradient(180deg,transparent 0 67px,#E7E1D3 67px 69px)"></div>
+    <div class="a" style="left:150px;top:0;bottom:0;width:3px;background:${p.bg}"></div>
+    <h2 class="a h" style="left:190px;right:64px;top:110px;font-size:96px;color:${INK}">${o.title}</h2>
+    <div class="a" style="left:190px;top:${o.listTop||400}px">
+      <span class="mono" style="background:${p.soft};color:${p.softFg};padding:10px 16px;border-radius:6px;font-size:18px">In</span>
+      <div style="margin-top:14px">${o.ins.map(box).join('')}</div>
+      <span class="mono" style="display:inline-block;margin-top:30px;background:${INK};color:${CREAM};padding:10px 16px;border-radius:6px;font-size:18px">Out</span>
+      <div style="margin-top:14px">${o.outs.map(box).join('')}</div></div>
+    ${strip(INK, deadlineLine(ctx))}` }; },
+
+  // Pills stack on ink (ref: Better Future pills)
+  pills(ctx, o){ const p = P(); const acc = p.bg === INK ? p.fg : (p.bg === '#B7D9FF' || p.bg === '#FFF3B2' ? p.bg : p.fg);
+    const rows = o.items.map((t,i) => i === o.hi ? `<div class="pill" style="height:112px;padding:0 48px;background:${acc};color:${INK};font-size:54px;font-weight:500;letter-spacing:-.03em">${esc(t)}</div>`
+      : i % 2 ? `<div class="pill" style="height:112px;padding:0 48px;border:2px solid ${CREAM}66;color:${CREAM};font-size:54px"><i class="s" style="font-size:58px">${esc(t)}</i></div>`
+      : `<div class="pill" style="height:112px;padding:0 48px;background:#E9E3DE;color:${INK};font-size:54px;font-weight:500;letter-spacing:-.03em">${esc(t)}</div>`).join('');
+    return { bg:INK, html:`
+    <p class="a lab" style="left:64px;top:64px;color:${CREAM}">${esc(o.label||'')}</p>${''}
+    <div class="a" style="left:64px;right:64px;top:${o.top||250}px;display:flex;flex-direction:column;align-items:flex-start;gap:22px">${rows}</div>
+    ${strip(CREAM, deadlineLine(ctx))}` }; },
+
+  // White card on colour (ref: Better Future "Want more reach?")
+  card(ctx, o){ const p = P(); return { bg:p.bg, html:`
+    <p class="a mono" style="left:64px;top:64px;color:${p.fg};font-size:15px;line-height:1.4">[ ${esc(state.short)} ]</p>
+    <div class="a" style="right:64px;top:56px;display:inline-flex;align-items:center;justify-content:center;width:110px;height:62px;border:2.5px solid ${p.fg};border-radius:999px">${arrowSvg(p.fg)}</div>
+    <div class="a" style="left:64px;right:64px;top:190px;bottom:240px;background:${CREAM};border-radius:40px;padding:64px 60px">
+      <p class="serif" style="font-size:52px;color:${INK}">${esc(o.q)}</p>
+      <p class="h" style="font-size:${o.size||100}px;color:${INK};margin-top:44px">${o.a}</p>
+      <div style="position:absolute;left:60px;right:60px;bottom:60px;height:100px;border:2px solid ${INK};border-radius:999px;display:flex;align-items:center;justify-content:space-between;padding:0 14px 0 40px">
+        <span class="mono" style="font-size:20px;color:${INK}">${esc(o.cta||'Link in bio')}</span>
+        <span style="width:74px;height:74px;border-radius:50%;background:${BURG};display:inline-flex;align-items:center;justify-content:center">${arrowSvg(CREAM,34)}</span></div>
+    </div>
+    <p class="a" style="left:64px;bottom:80px;font-size:72px;color:${p.fg};line-height:1">✳</p>
+    <p class="a mono" style="right:64px;bottom:90px;color:${p.fg};font-size:16px">${deadlineLine(ctx)}</p>` }; },
+
+  // Rows list (ref: FoxMark "Events")
+  list(ctx, o){ const p = P(); const rows = o.rows.map(r => `<div style="display:grid;grid-template-columns:190px 1fr auto;gap:24px;align-items:baseline;padding:30px 0;border-top:2px solid ${p.fg}55">
+      <span class="mono" style="font-size:22px;color:${p.fg}">${esc(r[0])}</span><span class="h" style="font-size:52px;color:${p.fg}">${esc(r[1])}</span><span class="mono" style="font-size:20px;color:${p.fg}">${esc(r[2])}</span></div>`).join('');
+    return { bg:p.bg, html:`
+    <h2 class="a h" style="left:60px;right:64px;top:110px;font-size:120px;color:${p.fg}">${o.title}</h2>
+    <div class="a" style="left:64px;right:64px;top:${o.top||420}px;border-bottom:2px solid ${p.fg}55">${rows}</div>
+    ${strip(p.fg, o.foot || 'DM us the call’s word · Link in bio')}${grain()}` }; },
+
+  // Tear-off calendar page
+  calendar(ctx, o){ const p = P(); const d = dl(); return { bg:CREAM, html:`
+    <div class="a" style="left:190px;right:190px;top:130px;height:820px;background:#fff;border-radius:22px;box-shadow:0 30px 60px rgba(42,10,18,.12);overflow:hidden">
+      <div style="height:170px;background:${p.bg};display:flex;align-items:center;justify-content:center"><p class="mono" style="font-size:30px;color:${p.fg};letter-spacing:.2em">${MONTHS_L[d.getMonth()]}</p></div>
+      <p class="big" style="text-align:center;font-size:440px;color:${INK};margin-top:60px">${d.getDate()}</p>
+      <p class="mono" style="text-align:center;font-size:20px;color:${INK};margin-top:30px">Submissions close</p></div>
+    <h2 class="a h" style="left:64px;right:64px;top:1010px;font-size:76px;color:${INK}">${o.title}</h2>
+    ${strip(INK, deadlineLine(ctx))}` }; },
+
+  // Ticket
+  ticket(ctx, o){ const p = P(); return { bg:p.bg, html:`
+    <p class="a lab" style="left:64px;top:64px;color:${p.fg}">${esc(state.short)}</p>
+    <div class="a" style="left:110px;right:110px;top:260px;height:560px;display:flex;filter:drop-shadow(0 30px 40px rgba(0,0,0,.25))">
+      <div style="flex:1;background:${CREAM};border-radius:28px 0 0 28px;padding:56px;-webkit-mask:radial-gradient(circle 26px at 100% 0,transparent 98%,#000) top right/100% 51% no-repeat,radial-gradient(circle 26px at 100% 100%,transparent 98%,#000) bottom right/100% 51% no-repeat">
+        <p class="mono" style="font-size:18px;color:${INK}">Admit one artist</p>
+        <p class="h" style="font-size:84px;color:${INK};margin-top:24px">${esc(state.short)}</p>
+        <p class="p" style="color:${INK};margin-top:24px;width:440px">${o.text}</p></div>
+      <div style="width:250px;background:${CREAM};border-left:3px dashed #C9B8AE;border-radius:0 28px 28px 0;display:flex;flex-direction:column;align-items:center;justify-content:center">
+        <p class="big" style="font-size:200px;color:${INK}">${ctx.left}</p><p class="mono" style="font-size:18px;color:${INK};margin-top:14px">days left</p></div>
+    </div>
+    <h2 class="a h" style="left:64px;right:64px;top:930px;font-size:84px;color:${p.fg}">${o.title}</h2>
+    ${strip(p.fg, deadlineLine(ctx))}${grain()}` }; },
+
+  // Checklist
+  checklist(ctx, o){ const p = P(); const it = o.items.map(t => `<p style="display:flex;align-items:center;gap:28px;font-size:46px;font-weight:500;letter-spacing:-.02em;padding:26px 0;border-top:2px solid ${INK}22;color:${INK}"><i style="width:46px;height:46px;border:3px solid ${INK};border-radius:10px;display:block;flex:none"></i>${esc(t)}</p>`).join('');
+    return { bg:CREAM, html:`
+    <p class="a lab" style="left:64px;top:64px;color:${INK}">${esc(state.short)}</p>
+    <h2 class="a h" style="left:60px;right:64px;top:150px;font-size:118px;color:${INK}">${o.title}</h2>
+    <div class="a" style="left:64px;right:64px;top:520px;border-bottom:2px solid ${INK}22">${it}</div>
+    <div class="a" style="left:64px;top:1080px"><span class="pill" style="height:96px;padding:0 44px;background:${BURG};color:${CREAM};font-size:32px;font-weight:600">Submit · link in bio →</span></div>
+    ${strip(INK, deadlineLine(ctx))}` }; },
+
+  // Last call (ink, the one tilted chilli tag)
+  last(ctx, o){ const p = P(); return { bg:INK, html:`
+    <p class="a lab" style="left:64px;top:64px;color:${CREAM}">${esc(state.short)}</p>
+    <div class="a" style="right:72px;top:150px;transform:rotate(-8deg)"><span class="mono" style="display:inline-block;background:${CHILLI};color:#FFD6DE;padding:18px 28px;border-radius:12px;font-size:24px">Final day</span></div>
+    <h2 class="a h" style="left:60px;right:64px;top:300px;font-size:200px;color:${CREAM}">Closes<br><i class="s" style="color:${p.bg === INK ? p.fg : (p.bg==='#B7D9FF'||p.bg==='#FFF3B2' ? p.bg : p.fg)}">tonight.</i></h2>
+    <p class="a p" style="left:64px;top:820px;width:640px;color:${CREAM};opacity:.85">${o.text}</p>
+    <div class="a" style="left:64px;top:1020px"><span class="pill" style="height:96px;padding:0 44px;background:${CREAM};color:${BURG};font-size:32px;font-weight:600">Submit · link in bio →</span></div>
+    ${strip(CREAM, deadlineLine(ctx))}${grain()}` }; },
+};
+
+// ---------- the month: 20 posts, dated back from the deadline ----------
+function bens(){ return lines(state.benefits); }
+function awards(){ return lines(state.awards).map(l => l.split('|').map(s => s.trim())); }
+function tests(){ return lines(state.testimonials).map(l => l.split('|').map(s => s.trim())); }
+function others(){ return lines(state.others).map(l => l.split('|').map(s => s.trim())); }
+const KW = () => esc(state.keyword || 'KEYWORD');
+const POSTS = [
+  {day:0, title:'Launch carousel', slides: ctx => [
+    ['cover',{title:`${esc(state.name.split(':').pop().trim() || state.short)}.<br>Submissions open.`}],
+    ['bars',{title:'A growing collection', text:`${esc(state.published)} artists published across ${esc(state.editions)} editions. This is the next one.`, a:esc(state.editions), aLabel:'editions in print', b:'Next', bLabel:`${esc(state.short)}, open until ${fmtLong(dl())}`}],
+    ['statement',{serif:true, size:110, title:`<i>${esc(state.quote)}</i>`, text:esc(state.themeBody), label:'The theme', ruleTop:640}],
+    ['card',{q:'How is work selected?', a:`Every submission is reviewed by our jury. ${esc(state.selected)} artists are chosen.`, size:84, cta:`Results within three weeks of ${fmt(dl())}`}],
+    ['receipt',{title:'What you get if selected', rows: bens().map(b => { const [a,...r] = b.split(' for '); return r.length ? [a, 'for '+r.join(' for ')] : [b, '✓']; }), total:'Your name in print'}],
+    ['number',{num:esc(state.prize), size:Math.min(520, Math.floor(1900/Math.max(3,String(state.prize).length))), text:`and a ${esc(state.feature)} for the winner, chosen by the jury.`, label:'Recognition', imgKey:'imgArt2', imgLabel:'Second artwork'}],
+    ['stat',{num:ctx.left, unit:'days', word:'to submit', text:`Submissions close ${fmtLong(dl())}. Apply through the link in bio, or DM us “${KW()}” for the brief.`}],
+  ]},
+  {day:3, title:'The theme', slides: ctx => [
+    ['statement',{serif:true, size:110, title:`<i>${esc(state.quote)}</i>`, text:esc(state.themeBody), label:'The theme', ruleTop:640}],
+    ['inout',{title:'Does my work count?', ins:csv(state.ins), outs:csv(state.outs)}],
+  ]},
+  {day:5, title:'The book in your hands', slides: ctx => [
+    ['portrait',{imgKey:'imgBook', imgLabel:'Book photo', label:'Inside the edition', role:'Hardcover · '+esc(state.series), name:'Your work, in print'}],
+  ]},
+  {day:7, title:'What you get', slides: ctx => [
+    ['receipt',{title:'What you get if selected', rows: bens().map(b => { const [a,...r] = b.split(' for '); return r.length ? [a, 'for '+r.join(' for ')] : [b, '✓']; }), total:'Your name in print'}],
+  ]},
+  {day:9, title:'The award', slides: ctx => [
+    ['number',{num:esc(state.prize), size:Math.min(520, Math.floor(1900/Math.max(3,String(state.prize).length))), text:`and a ${esc(state.feature)} for the winner, chosen by the jury.`, label:'Recognition', imgKey:'imgArt2', imgLabel:'Second artwork'}],
+  ]},
+  {day:11, title:'The jury judges the work', slides: ctx => [
+    ['card',{q:'Self-taught? Never published?', a:'The jury judges the work, not the CV.', size:96, cta:`DM us “${state.keyword}” for the brief`}],
+  ]},
+  {day:12, title:'Artists in their words', slides: ctx => { const t = tests(); return (t.length ? t : [['Add a real quote from a past selected artist in the form.','Artist Name','Past edition']]).map(([q,n,e]) => ['quote',{q, name:n, role:e, tag:'Selected artist'}]); }},
+  {day:14, title:'Meet the jury', slides: ctx => [
+    ['portrait',{imgKey:'imgJury', imgLabel:'Jury portrait', label:'The jury', role:esc(state.juryRole), name:state.jury || 'Curator name'}],
+    ['quote',{q: state.juryQuote || 'Add the jury’s own words about what they look for.', name: state.jury || 'Curator name', role: state.juryRole, tag:'What the jury looks for'}],
+  ]},
+  {day:16, title:'Is this for me?', slides: ctx => [
+    ['chat',{title:'Is this for me?', items:[["I'm self-taught. Can I apply?", 'Yes. The jury judges the work, not the CV.'],['I live outside the US.', 'It’s open to artists worldwide, 18+.'],['How do I apply?', `Link in bio, or DM us <b>${KW()}</b> for the brief.`]]}],
+  ]},
+  {day:18, title:'How to apply', slides: ctx => [
+    ['caps',{title:`Three steps<br>to the ${esc(state.word)}<br>edition: choose,<br>photograph,<br><span style="display:inline-block;border:5px solid ${P().bg};border-radius:50%;padding:0 26px;margin-left:-26px">submit</span>`, tag:'How to apply', note:`One original artwork is enough. Closes ${fmtLong(dl())}.`}],
+  ]},
+  {day:15, title:'Halfway', slides: ctx => [
+    ['stat',{num: state.entries || '[X]', unit:'', size: String(state.entries||'[X]').length > 4 ? 420 : 560, word:'artists have entered', text:`From ${state.countries || '[Y]'} countries so far. ${ctx.left} days left to join them.`, label:'Halfway'}],
+  ]},
+  {day:20, title:'10 days left', slides: ctx => [
+    ['stat',{num:ctx.left, unit:'days', word:'to submit', text:`In ${ctx.left} days, ${esc(state.selected)} places are filled. Submissions close ${fmtLong(dl())}.`}],
+  ]},
+  {day:22, title:'What artists ask for', slides: ctx => [
+    ['pills',{label:esc(state.short), items:['A publication credit','recognition','A place in print','Seen by collectors'], hi:2}],
+  ]},
+  {day:23, title:'One week', slides: ctx => [
+    ['calendar',{title:`One week. Submissions for the ${esc(state.short)} close for good.`}],
+  ]},
+  {day:25, title:'Open now: all calls', slides: ctx => { const rows = [[fmt(dl()), state.short, state.keyword], ...others().filter(o => o[1] && new Date(o[1]) >= addDays(dl(), -(30-25))).map(o => [fmt(new Date(o[1])), o[0], o[2]||''])].sort((a,b)=>0);
+    return [['list',{title:'Open now.', rows}]]; }},
+  {day:26, title:'Entries so far', slides: ctx => [
+    ['bars',{title:'Entries so far', text:`${ctx.left} days left. ${esc(state.selected)} artists will be selected.`, a:esc(state.selected), aLabel:'places in the book', b: esc(state.entries || '[X]'), bLabel:`artists from ${esc(state.countries || '[Y]')} countries have entered`, h1:380, h2:860}],
+  ]},
+  {day:27, title:'3 days left', slides: ctx => [
+    ['ticket',{title:`Your place is still open. Then ${esc(state.selected)} artists are chosen.`, text:`Submissions close ${fmtLong(dl())}.`}],
+  ]},
+  {day:28, title:'Last questions', slides: ctx => [
+    ['card',{q:'Any last questions?', a:'One original artwork is all it takes.', size:96, cta:`DM us “${state.keyword}”`}],
+  ]},
+  {day:29, title:'Closes tomorrow', slides: ctx => [
+    ['checklist',{title:'Closes tomorrow.', items:['Choose one artwork','Photograph it well','Submit through the link in bio']}],
+  ]},
+  {day:30, title:'Last call', slides: ctx => [
+    ['last',{text:`Submissions for the ${esc(state.short)} close at midnight. The jury begins tomorrow.`}],
+  ]},
+];
+
+POSTS.sort((a,b) => a.day - b.day);
+// ---------- render ----------
+$('ptype').innerHTML = '<option value="all">Whole month (20 posts)</option>' + POSTS.map((p,i) => `<option value="${i}">${p.day ? 'Day '+p.day : 'Launch day'} · ${esc(p.title)}</option>`).join('');
+$('ptype').value = '0';
+let RENDERED = [];
+function ctxFor(post){ const left = 30 - post.day; return { left, date: addDays(dl(), -left) }; }
+function buildSlides(post){ const ctx = ctxFor(post); return post.slides(ctx).map(([k,o]) => ({ ...T[k](ctx,o), tpl:k })); }
+function slideNode(s){ return `<div class="post" style="background:${s.bg}">${s.html}</div>`; }
+
+function render(){
+  readForm();
+  const sel = $('ptype').value;
+  const list = sel === 'all' ? POSTS : [POSTS[Number(sel)]];
+  RENDERED = [];
+  $('out').innerHTML = list.map((post) => { const ctx = ctxFor(post); const slides = buildSlides(post);
+    const base = String(post.day).padStart(2,'0') + '-' + post.title.toLowerCase().replace(/[^a-z0-9]+/g,'-');
+    const cells = slides.map((s,j) => { const idx = RENDERED.push({ s, name: `${base}${slides.length>1 ? '-'+(j+1) : ''}.png` }) - 1;
+      return `<div class="cell"><div class="frame">${slideNode(s)}</div><div class="act"><span>${slides.length>1 ? 'Slide '+(j+1) : 'Single'}</span><button type="button" data-i="${idx}">Save PNG</button></div></div>`; }).join('');
+    return `<section class="group"><h2>${post.day ? 'Day '+post.day : 'Launch day'} · ${esc(post.title)}</h2><p class="meta">${fmtLong(ctx.date)} · ${ctx.left === 0 ? 'deadline day' : ctx.left + ' days left'} · ${slides.length > 1 ? slides.length + ' slides' : 'single post'}</p><div class="slides">${cells}</div></section>`; }).join('');
+  $('out').querySelectorAll('[data-i]').forEach(b => b.onclick = () => saveOne(Number(b.dataset.i)));
+  status(`${RENDERED.length} slide${RENDERED.length === 1 ? '' : 's'} ready.`);
+}
+
+async function toBlob(s){
+  await document.fonts.ready;
+  const stage = $('stage'); stage.innerHTML = slideNode(s); const el = stage.firstElementChild;
+  const canvas = await html2canvas(el, { scale:1, width:1080, height:1350, backgroundColor:null, useCORS:true, logging:false });
+  stage.innerHTML = '';
+  return await new Promise(r => canvas.toBlob(r, 'image/png'));
+}
+let DL = null; const dlReady = (async () => { try { DL = await window.claude?.use?.('downloads'); } catch { DL = null; } })();
+async function offer(filename, data){
+  await dlReady;
+  if (!DL) { status('Saving files isn’t available in this view. Open the page in claude.ai to save.'); return; }
+  try { await DL.save({ filename, data }); status('Saved ' + filename + '.'); }
+  catch (e) { status(e && e.code === 'declined' ? 'Save cancelled.' : 'Could not save (' + (e && e.code || 'error') + ').'); }
+}
+async function saveOne(i){ status('Rendering…'); const blob = await toBlob(RENDERED[i].s); await offer(RENDERED[i].name, blob); }
+$('zip').onclick = async () => { if (!RENDERED.length) render(); const zip = new JSZip(); for (let i = 0; i < RENDERED.length; i++){ status(`Rendering ${i+1} of ${RENDERED.length}…`); zip.file(RENDERED[i].name, await toBlob(RENDERED[i].s)); }
+  status('Packing…'); const blob = await zip.generateAsync({ type:'blob' }); await offer((state.short || 'ath-call').toLowerCase().replace(/[^a-z0-9]+/g,'-') + '-posts.zip', blob); };
+$('go').onclick = render;
+$('ptype').onchange = render;
+
+// size previews to the column
+function sizePreviews(){ const w = $('out').clientWidth; const pw = Math.max(220, Math.min(320, Math.floor((w - 30) / 3))); document.documentElement.style.setProperty('--pw', pw + 'px'); document.documentElement.style.setProperty('--sc', String(pw / 1080)); }
+window.addEventListener('resize', sizePreviews);
+
+refreshSaved(); fillForm(); sizePreviews(); document.fonts.ready.then(render);
+</script>
