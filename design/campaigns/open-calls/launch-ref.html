@@ -4,123 +4,113 @@
 @font-face{font-family:HG;src:url(fonts/ath/HankenGrotesk.woff2) format("woff2");font-weight:100 900}
 @font-face{font-family:NR;src:url(fonts/ath/Newsreader-Italic.woff2) format("woff2");font-style:italic;font-weight:200 800}
 @font-face{font-family:NR;src:url(fonts/ath/Newsreader.woff2) format("woff2");font-weight:200 800}
-/* Reference roles mapped to Garden: black -> ink, orange/yellow accent -> pistachio, mint-grey -> mint, asterisk -> ATH monogram */
-:root{--ink:#14090C;--pet:#025054;--pi:#D0D996;--mint:#E3E8DE;--grey:#F2F1EE;--white:#fff}
+:root{--ink:#14090C;--pet:#025054;--pi:#D0D996;--mint:#E3E8DE;--grey:#F2F1EE}
 body{margin:0;background:#C9D3CF;display:flex;flex-wrap:wrap;gap:40px;padding:40px}
 .s{position:relative;width:1080px;height:1350px;overflow:hidden;font-family:HG,sans-serif;-webkit-font-smoothing:antialiased}
 .s *{margin:0;box-sizing:border-box}
 .a{position:absolute}
+.dk{background:var(--ink);color:#fff}.lt{background:var(--grey);color:var(--ink)}
 .img{background-size:cover;background-repeat:no-repeat;background-position:center}
 .H{font-weight:600;letter-spacing:-.045em;line-height:1}
-.R{font-weight:400;letter-spacing:-.04em;line-height:1.02}
+.R{font-weight:400;letter-spacing:-.04em;line-height:1.1}
 .it{font-family:NR,serif;font-style:italic;font-weight:400;letter-spacing:-.015em}
 .sf{font-family:NR,serif;font-weight:400;letter-spacing:-.02em}
 .sm{font-size:24px;font-weight:600}
 .tag{font-size:17px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;line-height:1.25}
 .hdr{left:64px;right:64px;top:56px;display:flex;justify-content:space-between;align-items:center}
 .ftr{left:64px;right:64px;bottom:52px;display:flex;justify-content:space-between;align-items:center;font-size:23px;font-weight:600}
-.mono{display:inline-block;-webkit-mask:url(art/monogram_burgundy.svg) center/contain no-repeat;mask:url(art/monogram_burgundy.svg) center/contain no-repeat}
 .lg{display:inline-flex;align-items:center;gap:14px;font-size:26px;font-weight:600}
 .ap{display:inline-flex;align-items:center;justify-content:center;width:120px;height:62px;border:2.5px solid currentColor;border-radius:999px}
 .pill{display:inline-flex;align-items:center;border-radius:999px;white-space:nowrap}
+.hl{display:inline-block;background:var(--mint);color:var(--ink);border-radius:999px;padding:0 .3em .07em;line-height:1}
 .ci{display:inline-flex;align-items:center;justify-content:center;border-radius:50%}
+.c{text-align:center}
 </style></head><body>
-<svg width="0" height="0" style="position:absolute"><symbol id="ar" viewBox="0 0 46 20"><path d="M2 10h40M33 2l9 8-9 8" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></symbol>
-<symbol id="mg" viewBox="-32.00 -165.68 254.06 254.06"><g fill="currentColor"><path d="M34.2 -77.5H44.400000000000006L69.2 -17.5Q71.2 -13.100000000000001 73.35 -9.05Q75.5 -5.0 78.60000000000001 0.0H64.5Q63.900000000000006 -3.2 62.800000000000004 -7.050000000000001Q61.7 -10.9 59.1 -17.5L56.800000000000004 -23.0H21.8L19.5 -17.5Q17.0 -10.9 15.850000000000001 -7.050000000000001Q14.700000000000001 -3.2 14.100000000000001 0.0H0.0Q3.1000000000000005 -4.7 5.15 -8.55Q7.200000000000001 -12.4 9.0 -16.5ZM25.1 -31.0H53.5L39.300000000000004 -65.4Z"/><path d="M91.388 1.18Q87.37600000000002 1.18 85.48800000000001 -0.6489999999999999Q83.60000000000001 -2.4779999999999998 83.60000000000001 -6.489999999999999Q83.60000000000001 -8.85 84.42600000000002 -12.921Q85.25200000000001 -16.991999999999997 87.25800000000001 -23.836L95.99000000000001 -52.745999999999995H85.84200000000001L87.37600000000002 -58.174H97.64200000000001L103.77800000000002 -78.47H114.63400000000001L108.49800000000002 -58.174H121.36000000000001L119.70800000000001 -52.745999999999995H106.846L97.05200000000002 -20.296Q96.108 -17.11 95.57700000000001 -14.690999999999999Q95.04600000000002 -12.271999999999998 94.92800000000001 -10.62Q94.92800000000001 -9.558 95.459 -8.732Q95.99000000000001 -7.906 97.28800000000001 -7.906Q99.412 -7.906 101.772 -9.44Q104.132 -10.974 106.31500000000001 -13.274999999999999Q108.49800000000002 -15.575999999999999 110.20900000000002 -17.817999999999998Q111.92000000000002 -20.06 112.74600000000001 -21.358L116.168 -19.352Q114.162 -15.34 111.153 -11.623Q108.144 -7.906 104.66300000000001 -5.015Q101.18200000000002 -2.1239999999999997 97.70100000000002 -0.47199999999999986Q94.22000000000001 1.18 91.388 1.18Z"/><path d="M139.96 -77.5Q138.66000000000003 -72.10000000000001 138.41000000000003 -66.5Q138.16000000000003 -60.900000000000006 138.16000000000003 -55.300000000000004V-43.1H178.26000000000002V-55.300000000000004Q178.26000000000002 -60.900000000000006 178.01000000000002 -66.5Q177.76000000000002 -72.10000000000001 176.46 -77.5H190.06Q188.76000000000002 -72.10000000000001 188.51000000000002 -66.5Q188.26000000000002 -60.900000000000006 188.26000000000002 -55.300000000000004V-22.200000000000003Q188.26000000000002 -16.6 188.51000000000002 -11.0Q188.76000000000002 -5.4 190.06 0.0H176.46Q177.76000000000002 -5.4 178.01000000000002 -11.0Q178.26000000000002 -16.6 178.26000000000002 -22.200000000000003V-35.1H138.16000000000003V-22.200000000000003Q138.16000000000003 -16.6 138.41000000000003 -11.0Q138.66000000000003 -5.4 139.96 0.0H126.36000000000001Q127.66000000000001 -5.4 127.91000000000003 -11.0Q128.16000000000003 -16.6 128.16000000000003 -22.200000000000003V-55.300000000000004Q128.16000000000003 -60.900000000000006 127.91000000000003 -66.5Q127.66000000000001 -72.10000000000001 126.36000000000001 -77.5Z"/></g></symbol><symbol id="ne" viewBox="0 0 20 20"><path d="M4 16L16 4M7 4h9v9" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></symbol></svg>
+<svg width="0" height="0" style="position:absolute"><symbol id="mg" viewBox="-32.00 -165.68 254.06 254.06"><g fill="currentColor"><path d="M34.2 -77.5H44.400000000000006L69.2 -17.5Q71.2 -13.100000000000001 73.35 -9.05Q75.5 -5.0 78.60000000000001 0.0H64.5Q63.900000000000006 -3.2 62.800000000000004 -7.050000000000001Q61.7 -10.9 59.1 -17.5L56.800000000000004 -23.0H21.8L19.5 -17.5Q17.0 -10.9 15.850000000000001 -7.050000000000001Q14.700000000000001 -3.2 14.100000000000001 0.0H0.0Q3.1000000000000005 -4.7 5.15 -8.55Q7.200000000000001 -12.4 9.0 -16.5ZM25.1 -31.0H53.5L39.300000000000004 -65.4Z"/><path d="M91.388 1.18Q87.37600000000002 1.18 85.48800000000001 -0.6489999999999999Q83.60000000000001 -2.4779999999999998 83.60000000000001 -6.489999999999999Q83.60000000000001 -8.85 84.42600000000002 -12.921Q85.25200000000001 -16.991999999999997 87.25800000000001 -23.836L95.99000000000001 -52.745999999999995H85.84200000000001L87.37600000000002 -58.174H97.64200000000001L103.77800000000002 -78.47H114.63400000000001L108.49800000000002 -58.174H121.36000000000001L119.70800000000001 -52.745999999999995H106.846L97.05200000000002 -20.296Q96.108 -17.11 95.57700000000001 -14.690999999999999Q95.04600000000002 -12.271999999999998 94.92800000000001 -10.62Q94.92800000000001 -9.558 95.459 -8.732Q95.99000000000001 -7.906 97.28800000000001 -7.906Q99.412 -7.906 101.772 -9.44Q104.132 -10.974 106.31500000000001 -13.274999999999999Q108.49800000000002 -15.575999999999999 110.20900000000002 -17.817999999999998Q111.92000000000002 -20.06 112.74600000000001 -21.358L116.168 -19.352Q114.162 -15.34 111.153 -11.623Q108.144 -7.906 104.66300000000001 -5.015Q101.18200000000002 -2.1239999999999997 97.70100000000002 -0.47199999999999986Q94.22000000000001 1.18 91.388 1.18Z"/><path d="M139.96 -77.5Q138.66000000000003 -72.10000000000001 138.41000000000003 -66.5Q138.16000000000003 -60.900000000000006 138.16000000000003 -55.300000000000004V-43.1H178.26000000000002V-55.300000000000004Q178.26000000000002 -60.900000000000006 178.01000000000002 -66.5Q177.76000000000002 -72.10000000000001 176.46 -77.5H190.06Q188.76000000000002 -72.10000000000001 188.51000000000002 -66.5Q188.26000000000002 -60.900000000000006 188.26000000000002 -55.300000000000004V-22.200000000000003Q188.26000000000002 -16.6 188.51000000000002 -11.0Q188.76000000000002 -5.4 190.06 0.0H176.46Q177.76000000000002 -5.4 178.01000000000002 -11.0Q178.26000000000002 -16.6 178.26000000000002 -22.200000000000003V-35.1H138.16000000000003V-22.200000000000003Q138.16000000000003 -16.6 138.41000000000003 -11.0Q138.66000000000003 -5.4 139.96 0.0H126.36000000000001Q127.66000000000001 -5.4 127.91000000000003 -11.0Q128.16000000000003 -16.6 128.16000000000003 -22.200000000000003V-55.300000000000004Q128.16000000000003 -60.900000000000006 127.91000000000003 -66.5Q127.66000000000001 -72.10000000000001 126.36000000000001 -77.5Z"/></g></symbol><symbol id="ar" viewBox="0 0 46 20"><path d="M2 10h40M33 2l9 8-9 8" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+<symbol id="ne" viewBox="0 0 20 20"><path d="M4 16L16 4M7 4h9v9" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></symbol></svg>
 
-<!-- 1 · COVER  ← Pixel "Your Brand Is a First Impression" (image card + caption strip + bold headline + body + handle footer) -->
-<div class="s" id="r1" style="background:var(--ink);color:#fff">
-  <div class="a hdr"><span class="lg"><svg width="44" height="44" style="color:var(--pi);flex:none"><use href="#mg"/></svg>Arts to Hearts</span><span class="sm" style="opacity:.8">@artstoheartsproject</span></div>
-  <div class="a img" style="left:64px;right:64px;top:140px;height:560px;border-radius:26px;background-image:url(art/flower-portrait.jpg);background-position:center 18%"></div>
-  <div class="a" style="left:64px;right:64px;top:640px;height:84px;border-radius:20px;background:var(--pi);color:var(--ink);display:flex;align-items:center;justify-content:space-between;padding:0 30px">
-    <span style="font-size:26px;font-weight:500">Edition 16 · Submissions now open</span><svg width="40" height="40" style="color:var(--ink);flex:none"><use href="#mg"/></svg></div>
-  <p class="a H" style="left:64px;right:64px;top:800px;font-size:150px;text-transform:uppercase;letter-spacing:-.05em">Open call</p>
-  <p class="a" style="left:64px;right:64px;top:960px;font-size:62px;letter-spacing:-.03em;font-weight:500">101 Art Book: <span class="it" style="color:var(--pi)">Garden Edition</span></p>
-  <p class="a" style="left:64px;right:200px;top:1070px;font-size:28px;line-height:1.45;opacity:.8">101 artists will be selected and published in a hardcover collectible book. Closes 13 December.</p>
-  <div class="a ftr"><span>DM “GARDEN”</span><span style="opacity:.8">artstoheartsproject.com</span></div>
+<!-- 1 · COVER: full-bleed artwork, OPEN CALL loudest -->
+<div class="s dk" id="r1">
+  <div class="a img" style="inset:0;background-image:url(art/flower-portrait.jpg);background-position:center 14%"></div>
+  <div class="a" style="inset:0;background:linear-gradient(180deg,rgba(20,9,12,.55) 0%,rgba(20,9,12,0) 16%,rgba(20,9,12,0) 42%,rgba(20,9,12,.82) 64%,rgba(20,9,12,.96) 100%)"></div>
+  <div class="a hdr"><span class="lg"><svg width="44" height="44" style="color:var(--pi)"><use href="#mg"/></svg>Arts to Hearts</span><span class="sm" style="opacity:.85">@artstoheartsproject</span></div>
+  <p class="a H c" style="left:0;right:0;top:830px;font-size:184px;text-transform:uppercase;letter-spacing:-.05em">Open call</p>
+  <div class="a" style="left:0;right:0;top:1020px;display:flex;justify-content:center"><span class="pill" style="height:92px;padding:0 44px;background:var(--mint);color:var(--ink);font-size:44px;font-weight:500;letter-spacing:-.025em">101 Art Book:&nbsp;<span class="it">Garden Edition</span></span></div>
+  <p class="a c" style="left:0;right:0;top:1150px;font-size:28px;opacity:.8">Edition 16 · Submissions now open · Closes 13 December</p>
+  <div class="a ftr" style="opacity:.75;font-size:21px"><span>Art: [Artist name]</span><span>DM “GARDEN”</span></div>
 </div>
 
-<!-- 2 · THE QUESTION  ← Better Future "…engages, and converts." (dark, centred, arrow pill, circled word, serif note) -->
-<div class="s" id="r2" style="background:var(--ink);color:#fff">
+<!-- 2 · THE QUESTION (kept) -->
+<div class="s dk" id="r2">
   <div class="a" style="left:0;right:0;top:250px;display:flex;justify-content:center"><span class="ap" style="color:var(--pi)"><svg width="46" height="20"><use href="#ar"/></svg></span></div>
-  <p class="a R" style="left:90px;right:90px;top:380px;text-align:center;font-size:76px;line-height:1.16">What happens when 101 artists from around the world come together around a
+  <p class="a R c" style="left:90px;right:90px;top:380px;font-size:76px;line-height:1.16">What happens when 101 artists from around the world come together around a
     <span style="position:relative;display:inline-block">single idea?<svg style="position:absolute;left:-7%;top:-12%;width:114%;height:128%;overflow:visible" viewBox="0 0 300 110" preserveAspectRatio="none"><path d="M168 10C92 4 14 22 10 58c-4 34 92 48 168 44 70-4 116-22 112-52C286 20 210 6 120 14" fill="none" stroke="#D0D996" stroke-width="3.4" stroke-linecap="round"/></svg></span></p>
-  <p class="a it" style="left:160px;right:160px;top:1020px;text-align:center;font-size:40px;line-height:1.25;opacity:.85">The question behind the 101 Art Book,<br>since 2023.</p>
-  <p class="a tag" style="left:64px;bottom:56px;color:var(--pi)">[ Arts to<br>&nbsp;&nbsp;Hearts ]</p>
-  <p class="a tag" style="right:64px;bottom:56px;text-align:right;opacity:.7">DM “GARDEN”</p>
+  <p class="a it c" style="left:160px;right:160px;top:1020px;font-size:40px;line-height:1.25;opacity:.85">The question behind the 101 Art Book,<br>since 2023.</p>
+  <div class="a ftr" style="opacity:.75"><span>@artstoheartsproject</span><span>DM “GARDEN”</span></div>
 </div>
 
-<!-- 3 · THE COLLECTION  ← mint/black "Standing still is the fastest way…" (image corners top & bottom, centred text with grey second line, arrow circle + outlined pill) -->
-<div class="s" id="r3" style="background:var(--grey);color:var(--ink)">
-  <div class="a" style="left:0;right:0;top:0;height:300px;display:grid;grid-template-columns:1fr 1fr;gap:14px">
-    <div style="border-radius:0 0 26px 0;background:#6A0620;position:relative"><p class="a tag" style="left:40px;top:180px;color:#FAD2E1">101 Art Book</p><p class="a it" style="left:40px;top:208px;color:#FAD2E1;font-size:46px">Portrait</p></div>
-    <div style="border-radius:0 0 0 26px;background:#025054;position:relative"><p class="a tag" style="left:40px;top:180px;color:#D0D996">101 Art Book</p><p class="a it" style="left:40px;top:208px;color:#D0D996;font-size:46px">Landscape</p></div></div>
-  <p class="a R" style="left:90px;right:90px;top:420px;text-align:center;font-size:80px">15 editions. 1,300+ artists. <span style="color:#A9ADA7">The sixteenth is now open.</span></p>
-  <div class="a" style="left:0;right:0;top:780px;display:flex;justify-content:center;gap:16px">
-    <span class="ci" style="width:76px;height:76px;border:2px solid var(--ink)"><svg width="24" height="24"><use href="#ne"/></svg></span>
-    <span class="pill tag" style="height:76px;padding:0 34px;border:2px solid var(--ink);font-size:20px">Since 2023</span></div>
-  <div class="a" style="left:0;right:0;bottom:0;height:300px;display:grid;grid-template-columns:1fr 1fr;gap:14px">
-    <div style="border-radius:0 26px 0 0;background:#FAD2E1;position:relative"><p class="a tag" style="left:40px;top:40px;color:#6A0620">101 Art Book</p><p class="a it" style="left:40px;top:68px;color:#6A0620;font-size:46px">Floral</p></div>
-    <div style="border-radius:26px 0 0 0;background:#14090C;position:relative"><p class="a tag" style="left:40px;top:40px;color:#F2F1EE">101 Art Book</p><p class="a it" style="left:40px;top:68px;color:#F2F1EE;font-size:46px">Nature</p></div></div>
+<!-- 3 · THE COLLECTION: a shelf of 15 spines, one gap -->
+<div class="s lt" id="r3">
+  <div class="a hdr"><span class="lg"><svg width="44" height="44" style="color:var(--pet)"><use href="#mg"/></svg>Arts to Hearts</span><span class="sm" style="opacity:.6">#TheCollection</span></div>
+  <p class="a R c" style="left:80px;right:80px;top:250px;font-size:88px">15 editions. 1,300+ artists. The <span class="hl" style="background:var(--ink);color:#fff">sixteenth</span> is now open.</p>
+  <div class="a" id="shelf" style="left:64px;right:64px;top:720px;height:420px;display:flex;align-items:flex-end;gap:8px;border-bottom:6px solid var(--ink);padding:0 10px"></div>
+  <div class="a ftr" style="opacity:.7"><span>Since 2023</span><span>DM “GARDEN”</span></div>
 </div>
 
-<!-- 4 · PROOF IN NUMBERS  ← Pixel "93% / 2.7x / 5s" stat rows -->
-<div class="s" id="r4" style="background:var(--ink);color:#fff">
-  <div class="a hdr"><span class="lg"><svg width="44" height="44" style="color:var(--pi);flex:none"><use href="#mg"/></svg>Arts to Hearts</span><span class="sm" style="opacity:.8">#TheCollection</span></div>
-  <div class="a" style="left:64px;right:64px;top:200px">
-    <div style="display:grid;grid-template-columns:1fr 380px;align-items:center;padding:60px 0;border-bottom:2px solid rgba(255,255,255,.15)"><p class="H" style="font-size:170px;color:var(--pi)">35+</p><p style="font-size:32px;font-weight:600;line-height:1.3">curated art books published</p></div>
-    <div style="display:grid;grid-template-columns:1fr 380px;align-items:center;padding:60px 0;border-bottom:2px solid rgba(255,255,255,.15)"><p class="H" style="font-size:170px;color:var(--pi)">10K+</p><p style="font-size:32px;font-weight:600;line-height:1.3">artists featured worldwide</p></div>
-    <div style="display:grid;grid-template-columns:1fr 380px;align-items:center;padding:60px 0"><p class="H" style="font-size:170px;color:var(--pi)">290K+</p><p style="font-size:32px;font-weight:600;line-height:1.3">followers and email subscribers</p></div>
+<!-- 4 · THE THEME: full-bleed, quote held in the dark top -->
+<div class="s dk" id="r4">
+  <div class="a img" style="inset:0;background-image:url(art/night-bloom.jpg);background-position:center 44%"></div>
+  <div class="a" style="inset:0;background:linear-gradient(180deg,rgba(20,9,12,.92) 0%,rgba(20,9,12,.6) 30%,rgba(20,9,12,0) 48%,rgba(20,9,12,0) 84%,rgba(20,9,12,.7) 100%)"></div>
+  <div class="a" style="left:0;right:0;top:110px;display:flex;justify-content:center"><span class="pill tag" style="height:48px;padding:0 24px;border:2px solid var(--pi);color:var(--pi)">Edition 16 · The theme</span></div>
+  <p class="a it c" style="left:90px;right:90px;top:200px;font-size:84px;line-height:1.08">“A garden is more than a place where things grow.”</p>
+  <div class="a ftr" style="opacity:.8;font-size:21px"><span>Art: [Artist name]</span><span>DM “GARDEN”</span></div>
+</div>
+
+<!-- 5 · THE RECORD (typographic, no book image) -->
+<div class="s lt" id="r5">
+  <div class="a hdr"><span class="lg"><svg width="44" height="44" style="color:var(--pet)"><use href="#mg"/></svg>Arts to Hearts</span><span class="sm" style="opacity:.6">#101ArtBook</span></div>
+  <p class="a R c" style="left:90px;right:90px;top:360px;font-size:84px">We’re not just a book. We’re a record of contemporary art, made by artists</p>
+  <div class="a" style="left:0;right:0;top:780px;display:flex;justify-content:center"><span class="pill" style="height:116px;padding:0 50px;background:var(--ink);color:#fff;font-size:84px;font-weight:400;letter-spacing:-.04em">like you.</span></div>
+  <div class="a ftr" style="opacity:.7"><span>@artstoheartsproject</span><span>DM “GARDEN”</span></div>
+</div>
+
+<!-- 6 · WHAT SELECTION BRINGS: centred title + straight pills -->
+<div class="s dk" id="r6">
+  <div class="a hdr"><span class="lg"><svg width="44" height="44" style="color:var(--pi)"><use href="#mg"/></svg>Arts to Hearts</span><span class="sm" style="opacity:.7">If selected</span></div>
+  <p class="a R c" style="left:80px;right:80px;top:200px;font-size:96px">What selection <span class="hl">brings</span></p>
+  <div class="a" style="left:0;right:0;top:440px;display:flex;flex-direction:column;align-items:center;gap:22px">
+    <span class="pill" style="height:104px;padding:0 48px;background:var(--pi);color:var(--ink);font-size:44px;font-weight:500;letter-spacing:-.02em">Your work in a hardcover book</span>
+    <span class="pill" style="height:104px;padding:0 48px;border:2px solid rgba(255,255,255,.4);font-size:44px;font-weight:500;letter-spacing:-.02em">Certificate of Recognition</span>
+    <span class="pill" style="height:104px;padding:0 48px;border:2px solid rgba(255,255,255,.4);font-size:44px;font-weight:500;letter-spacing:-.02em">Sold on Amazon &amp; Barnes &amp; Noble</span>
+    <span class="pill" style="height:104px;padding:0 48px;border:2px solid rgba(255,255,255,.4);font-size:44px;font-weight:500;letter-spacing:-.02em">The book’s own PR campaign</span>
+    <span class="pill" style="height:104px;padding:0 48px;border:2px solid rgba(255,255,255,.4);font-size:44px;font-weight:500;letter-spacing:-.02em">Introductions to galleries &amp; curators</span>
   </div>
-  <div class="a ftr"><span>DM “GARDEN”</span><span style="opacity:.8">artstoheartsproject.com</span></div>
+  <div class="a ftr" style="opacity:.75"><span>@artstoheartsproject</span><span>DM “GARDEN”</span></div>
 </div>
 
-<!-- 5 · THE THEME  ← Better Future "Great design isn't just visual…" (dark top: italic serif + circled word + arrow pill; image bottom) -->
-<div class="s" id="r5" style="background:var(--pet);color:#fff">
-  <p class="a it" style="left:64px;right:250px;top:90px;font-size:76px;line-height:1.08">A garden is more than a place where things
-    <span style="position:relative;display:inline-block">grow.<svg style="position:absolute;left:-14%;top:-6%;width:128%;height:118%;overflow:visible" viewBox="0 0 300 110" preserveAspectRatio="none"><path d="M168 10C92 4 14 22 10 58c-4 34 92 48 168 44 70-4 116-22 112-52C286 20 210 6 120 14" fill="none" stroke="#D0D996" stroke-width="3.4" stroke-linecap="round"/></svg></span></p>
-  <p class="a tag" style="right:64px;top:104px;text-align:right;color:var(--pi)">[ Edition 16<br>&nbsp;&nbsp;The theme ]</p>
-  <div class="a" style="right:64px;top:400px"><span class="ap"><svg width="46" height="20"><use href="#ar"/></svg></span></div>
-  <div class="a img" style="left:40px;right:40px;top:500px;bottom:40px;border-radius:30px;background-image:url(art/night-bloom.jpg);background-position:center 38%"></div>
+<!-- 7 · REACH: one centred stat ("Your first 1k") -->
+<div class="s lt" id="r7">
+  <div class="a hdr"><span class="lg"><svg width="44" height="44" style="color:var(--pet)"><use href="#mg"/></svg>Arts to Hearts</span><span class="sm" style="opacity:.6">The campaign</span></div>
+  <p class="a R c" style="left:0;right:0;top:250px;font-size:60px">Your work, introduced to</p>
+  <p class="a c" style="left:0;right:0;top:360px;font-size:360px;font-weight:400;letter-spacing:-.07em;line-height:.85;color:var(--pet)">290K+</p>
+  <p class="a R c" style="left:120px;right:120px;top:720px;font-size:56px">artists, collectors and art lovers.</p>
+  <div class="a" style="left:0;right:0;top:920px;display:flex;justify-content:center"><span class="pill" style="height:76px;padding:0 36px;background:var(--mint);font-size:28px;font-weight:500">190K+ social community · 100K+ email subscribers</span></div>
+  <div class="a ftr" style="opacity:.7"><span>@artstoheartsproject</span><span>DM “GARDEN”</span></div>
 </div>
 
-<!-- 6 · THE PROOF  ← mint/black "We're not just a company… like yours" (image top, centred statement, highlighted pill, get-to-know-us pill + logo) -->
-<div class="s" id="r6" style="background:var(--grey);color:var(--ink)">
-  <div class="a" style="left:0;right:0;top:0;height:560px;background:#D6D2C8">
-    <div class="a" style="left:120px;right:120px;top:90px;height:400px;box-shadow:0 30px 50px -20px rgba(0,0,0,.4);transform:rotate(-2deg)">
-      <div class="a img" style="left:0;top:0;width:50%;height:100%;background-image:url(art/flower-portrait.jpg);background-position:center 25%"></div>
-      <div class="a" style="right:0;top:0;width:50%;height:100%;background:linear-gradient(90deg,#E6DFD2,#FFFDF8 14%)"><p class="a tag" style="left:40px;top:40px;opacity:.5;font-size:13px">Nature Edition</p><p class="a sf" style="left:40px;top:230px;font-size:34px">Artist name</p><p class="a" style="left:40px;top:278px;font-size:15px;opacity:.6">Title · Medium · Country</p></div></div></div>
-  <p class="a R" style="left:90px;right:90px;top:640px;text-align:center;font-size:68px">We’re not just a book. We’re a record of contemporary art, made by artists</p>
-  <div class="a" style="left:0;right:0;top:880px;display:flex;justify-content:center"><span class="pill R" style="height:100px;padding:0 44px;background:var(--ink);color:#fff;font-size:68px">like you.</span></div>
-  <div class="a ftr"><span class="pill tag" style="height:58px;padding:0 26px;border:2px solid var(--ink);font-size:17px">See the Nature Edition</span><span class="lg" style="font-size:22px"><svg width="36" height="36" style="color:var(--ink);flex:none"><use href="#mg"/></svg>Arts to Hearts</span></div>
-</div>
-
-<!-- 7 · WHAT SELECTION BRINGS  ← Better Future pill stack ("More visibility / more results / More engagement / Get started") -->
-<div class="s" id="r7" style="background:var(--ink);color:#fff">
-  <p class="a tag" style="left:64px;top:64px;color:var(--pi)">[ If you are<br>&nbsp;&nbsp;selected ]</p>
-  <div class="a" style="left:64px;right:64px;top:230px;display:flex;flex-direction:column;align-items:flex-start;gap:24px">
-    <div class="pill" style="height:124px;padding:0 50px;background:var(--mint);color:var(--ink);font-size:58px;letter-spacing:-.03em;gap:24px"><svg width="40" height="40" viewBox="0 0 40 40"><rect x="7" y="5" width="26" height="30" rx="3" fill="none" stroke="currentColor" stroke-width="3"/><path d="M13 13h14M13 20h14M13 27h8" stroke="currentColor" stroke-width="3"/></svg>Published in print</div>
-    <div style="display:flex;gap:18px;align-items:center"><span class="ci" style="width:124px;height:124px;border:2px solid rgba(255,255,255,.45);color:var(--pi)"><svg width="36" height="36"><use href="#ne"/></svg></span><span class="pill it" style="height:124px;padding:0 50px;border:2px solid rgba(255,255,255,.45);font-size:64px">on record</span></div>
-    <div class="pill" style="height:124px;padding:0 50px;background:var(--pi);color:var(--ink);font-size:58px;letter-spacing:-.03em">Seen by 290K+</div>
-    <div style="display:flex;gap:18px;align-items:center"><span class="pill it" style="height:124px;padding:0 50px;border:2px solid rgba(255,255,255,.45);font-size:64px">on the shelf</span><span class="ci" style="width:124px;height:124px;border:2px solid rgba(255,255,255,.45);color:var(--pi)"><svg width="36" height="36"><use href="#ne"/></svg></span></div>
-  </div>
-  <p class="a" style="left:64px;right:180px;top:1000px;font-size:28px;line-height:1.45;opacity:.75">Hardcover publication, a Certificate of Recognition, the book’s campaign, and distribution via Amazon and Barnes &amp; Noble.</p>
-  <p class="a tag" style="right:64px;bottom:56px;opacity:.7">DM “GARDEN”</p>
-</div>
-
-<!-- 8 · WHO IT'S FOR  ← mint/black "Your business deserves the spotlight." (centred, highlighted word pill, corner arrow circles) -->
-<div class="s" id="r8" style="background:var(--ink);color:#fff">
+<!-- 8 · SPOTLIGHT (kept) -->
+<div class="s dk" id="r8">
   <span class="a ci" style="left:64px;top:64px;width:64px;height:64px;border:2px solid rgba(255,255,255,.5)"><svg width="20" height="20" style="transform:rotate(90deg)"><use href="#ne"/></svg></span>
   <span class="a ci" style="right:64px;top:150px;width:48px;height:48px;border:2px solid rgba(255,255,255,.5)"><svg width="16" height="16" style="transform:rotate(180deg)"><use href="#ne"/></svg></span>
-  <p class="a R" style="left:80px;right:80px;top:290px;text-align:center;font-size:96px;line-height:1.1">Your work deserves the <span class="pill" style="background:var(--mint);color:var(--ink);padding:0 30px 8px;font-size:96px;line-height:1">spotlight.</span> Emerging, mid-career or established.</p>
-  <p class="a" style="left:160px;right:160px;top:920px;text-align:center;font-size:30px;line-height:1.45;opacity:.75">No degree, gallery or exhibition history needed. Open to individual artists 18+, worldwide.</p>
+  <p class="a R c" style="left:80px;right:80px;top:290px;font-size:96px">Your work deserves the <span class="hl">spotlight.</span> Emerging, mid-career or established.</p>
+  <p class="a c" style="left:160px;right:160px;top:920px;font-size:30px;line-height:1.45;opacity:.75">No degree, gallery or exhibition history needed. Open to individual artists 18+, worldwide.</p>
   <span class="a ci" style="left:120px;bottom:180px;width:48px;height:48px;border:2px solid rgba(255,255,255,.5)"><svg width="16" height="16"><use href="#ne"/></svg></span>
   <span class="a ci" style="right:64px;bottom:64px;width:64px;height:64px;border:2px solid rgba(255,255,255,.5)"><svg width="20" height="20" style="transform:rotate(-90deg)"><use href="#ne"/></svg></span>
-  <div class="a" style="left:0;right:0;bottom:76px;display:flex;justify-content:center"><span class="lg" style="font-size:22px"><svg width="36" height="36" style="color:#fff;flex:none"><use href="#mg"/></svg>Arts to Hearts</span></div>
+  <div class="a" style="left:0;right:0;bottom:76px;display:flex;justify-content:center"><span class="lg" style="font-size:22px"><svg width="36" height="36" style="color:#fff"><use href="#mg"/></svg>Arts to Hearts</span></div>
 </div>
 
-<!-- 9 · ARTIST VOICE  ← Better Future quote card (arrow pill, serif quote, arrow circle + role pill, name pill) -->
-<div class="s" id="r9" style="background:var(--grey);color:var(--ink)">
+<!-- 9 · ARTIST VOICE (kept) -->
+<div class="s lt" id="r9">
   <div class="a" style="left:64px;top:64px"><span class="ap"><svg width="46" height="20"><use href="#ar"/></svg></span></div>
   <p class="a tag" style="right:64px;top:70px;text-align:right">[ From the<br>&nbsp;&nbsp;collection ]</p>
   <p class="a sf" style="left:64px;right:110px;top:250px;font-size:84px;line-height:1.06">“[One real line from a past artist about what being in the book meant.]”</p>
@@ -128,25 +118,37 @@ body{margin:0;background:#C9D3CF;display:flex;flex-wrap:wrap;gap:40px;padding:40
     <span class="ci" style="width:58px;height:58px;background:var(--ink);color:#fff"><svg width="20" height="20"><use href="#ne"/></svg></span>
     <span class="pill tag" style="height:58px;padding:0 26px;background:var(--mint)">[X] Edition artist</span></div>
   <div class="a" style="left:64px;bottom:80px"><span class="pill" style="height:96px;padding:0 46px;background:var(--ink);color:#fff;font-size:38px;font-weight:500;letter-spacing:-.02em">[Artist name]</span></div>
-  <div class="a" style="right:64px;bottom:80px"><svg width="90" height="90" style="color:var(--pet);flex:none"><use href="#mg"/></svg></div>
+  <div class="a" style="right:64px;bottom:80px"><svg width="90" height="90" style="color:var(--pet)"><use href="#mg"/></svg></div>
 </div>
 
-<!-- 10 · THE AWARD  ← Better Future "2.4K Companies" (huge figure, accent unit, arrow pill + italic word, line with accent figure) -->
-<div class="s" id="r10" style="background:var(--ink);color:#fff">
-  <div class="a" style="left:64px;top:64px;display:flex;align-items:center;gap:30px"><svg width="56" height="56" style="color:var(--pi);flex:none"><use href="#mg"/></svg><p class="tag" style="opacity:.8">[ Arts to<br>&nbsp;&nbsp;Hearts ]</p></div>
-  <p class="a R" style="left:40px;top:250px;font-size:560px;letter-spacing:-.07em;line-height:.8">101</p>
-  <div class="a" style="left:64px;top:820px;display:flex;align-items:center;gap:30px"><span class="ap" style="color:var(--pi)"><svg width="46" height="20"><use href="#ar"/></svg></span><span class="it" style="font-size:92px">Places</span></div>
-  <p class="a" style="left:64px;right:120px;top:980px;font-size:36px;line-height:1.38">chosen by the jury. The winner receives <span style="color:var(--pi)">$500</span>, a 4-page feature, a trophy and an Artsy listing.</p>
+<!-- 10 · SELECTION + AWARD: centred -->
+<div class="s dk" id="r10">
+  <div class="a hdr"><span class="lg"><svg width="44" height="44" style="color:var(--pi)"><use href="#mg"/></svg>Arts to Hearts</span><span class="sm" style="opacity:.7">Selection</span></div>
+  <p class="a R c" style="left:0;right:0;top:240px;font-size:64px">Only</p>
+  <p class="a c" style="left:0;right:0;top:330px;font-size:380px;font-weight:400;letter-spacing:-.07em;line-height:.85">101</p>
+  <p class="a R c" style="left:0;right:0;top:690px;font-size:64px">places, chosen by <span class="hl">the jury.</span></p>
+  <div class="a" style="left:120px;right:120px;top:880px;border-top:2px solid rgba(255,255,255,.2);padding-top:40px">
+    <p class="c" style="font-size:34px;line-height:1.45">The winner receives <b style="color:var(--pi);font-weight:600">$500</b>, a 4-page feature, a trophy and an Artsy listing.</p>
+    <p class="c" style="font-size:28px;line-height:1.45;opacity:.7;margin-top:16px">Two runners-up receive a 2-page feature and a trophy.</p></div>
+  <div class="a ftr" style="opacity:.75"><span>@artstoheartsproject</span><span>DM “GARDEN”</span></div>
 </div>
 
-<!-- 11 · CTA  ← Pixel "Ready To Stand Out?" (centred mark, bold question, line, button, handle footer) -->
-<div class="s" id="r11" style="background:var(--ink);color:#fff">
-  <div class="a hdr"><span class="lg"><svg width="44" height="44" style="color:var(--pi);flex:none"><use href="#mg"/></svg>Arts to Hearts</span><span class="sm" style="opacity:.8">#OpenCall</span></div>
-  <div class="a" style="left:0;right:0;top:330px;display:flex;justify-content:center"><svg width="150" height="150" style="color:var(--pi);flex:none"><use href="#mg"/></svg></div>
-  <p class="a H" style="left:80px;right:80px;top:530px;text-align:center;font-size:118px">Ready to join<br>the collection?</p>
-  <p class="a" style="left:160px;right:160px;top:820px;text-align:center;font-size:34px;line-height:1.4;opacity:.85">Submissions for the Garden Edition close 13 December.</p>
+<!-- 11 · CTA (kept) -->
+<div class="s dk" id="r11">
+  <div class="a hdr"><span class="lg"><svg width="44" height="44" style="color:var(--pi)"><use href="#mg"/></svg>Arts to Hearts</span><span class="sm" style="opacity:.8">#OpenCall</span></div>
+  <div class="a" style="left:0;right:0;top:330px;display:flex;justify-content:center"><svg width="150" height="150" style="color:var(--pi)"><use href="#mg"/></svg></div>
+  <p class="a H c" style="left:80px;right:80px;top:530px;font-size:118px">Ready to join<br>the collection?</p>
+  <p class="a c" style="left:160px;right:160px;top:820px;font-size:34px;line-height:1.4;opacity:.85">Submissions for the Garden Edition close 13 December.</p>
   <div class="a" style="left:0;right:0;top:960px;display:flex;justify-content:center"><span class="pill" style="height:104px;padding:0 16px 0 46px;background:var(--pi);color:var(--ink);font-size:38px;font-weight:700;gap:26px;letter-spacing:-.02em">DM “GARDEN”<span class="ci" style="width:74px;height:74px;background:var(--ink);color:#fff"><svg width="34" height="16"><use href="#ar"/></svg></span></span></div>
-  <p class="a" style="left:0;right:0;top:1100px;text-align:center;font-size:26px;opacity:.65">or apply via the link in bio · Application fee applicable</p>
+  <p class="a c" style="left:0;right:0;top:1100px;font-size:26px;opacity:.65">or apply via the link in bio · Application fee applicable</p>
   <div class="a ftr"><span>@artstoheartsproject</span><span style="opacity:.8">artstoheartsproject.com</span></div>
 </div>
+
+<script>
+// shelf: 15 published spines + the open Garden slot
+const EDS=[['Photography','#14090C','#F2F1EE',360],['Food','#AA0003','#FFD6DE',330],['Collage','#FAD2E1','#6A0620',370],['Landscape','#025054','#D0D996',345],['Abstract','#E3E8DE','#14090C',380],['Portrait','#6A0620','#FAD2E1',350],['Animal','#D0D996','#025054',335],['Floral','#FFD6DE','#AA0003',365],['Nature','#2E4A2A','#E3E8DE',375],['Dogs','#B7D9FF','#6A0620',340],['Pattern','#14090C','#D0D996',360],['Colors','#FFF3B2','#AA0003',350],['Faces','#4C4240','#F2F1EE',370],['Texture','#C9D3CF','#14090C',345],['Artist of the Year','#6A0620','#F2F1EE',380]];
+const sh=document.getElementById('shelf');
+sh.innerHTML = EDS.map(([n,b,f,h])=>`<div style="flex:1;height:${h}px;background:${b};color:${f};border-radius:3px 3px 0 0;position:relative;box-shadow:inset -3px 0 0 rgba(0,0,0,.12)"><span style="position:absolute;left:50%;bottom:18px;transform:translateX(-50%) rotate(-90deg);transform-origin:center;white-space:nowrap;font-family:NR,serif;font-style:italic;font-size:22px;width:0;display:flex;justify-content:flex-start"><span style="transform:translateX(0)">${n}</span></span></div>`).join('')
+ + `<div style="flex:1.3;height:390px;border:3px dashed #025054;border-bottom:none;border-radius:3px 3px 0 0;position:relative;background:rgba(208,217,150,.35)"><span style="position:absolute;left:50%;bottom:20px;transform:translateX(-50%) rotate(-90deg);white-space:nowrap;font-family:NR,serif;font-style:italic;font-size:26px;width:0;color:#025054">Garden</span></div>`;
+</script>
 </body></html>
