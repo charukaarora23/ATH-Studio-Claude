@@ -329,32 +329,32 @@ const G1 = {...G};
 G.cream = () => isEd() ? ({bg:ED_PAPER, fg:INK, acc:state.colour, dm:BURG, line:'rgba(20,9,12,.16)'}) : G1.cream();
 G.ink   = () => isEd() ? ({bg:mix(state.colour, '#000000', .55), fg:CREAM, acc:tint(state.colour), dm:PEONY, line:'rgba(249,236,229,.2)'}) : G1.ink();
 const ED = {
+  // magazine cover: full-bleed portrait, masthead across the top, cover lines at the bottom
+  mast(){ const acc = tint(state.colour);
+    return `<p class="a c cn" style="left:0;right:0;top:118px;color:${CREAM};font-size:20px;letter-spacing:.3em">Open call · ${esc(state.editionLabel || '')}</p>
+      <p class="a c scr" style="left:40px;right:40px;top:150px;font-size:${String(state.name).length > 18 ? 96 : 112}px;line-height:1;white-space:nowrap;color:${CREAM};text-shadow:0 4px 30px rgba(0,0,0,.35)">${esc(state.name)}</p>
+      <div class="a" style="left:80px;right:80px;top:290px;border-top:2px solid ${acc}"></div>`; },
+  shade(){ return `<div class="a" style="inset:0;background:linear-gradient(180deg,${rgba(mix(state.colour,'#000000',.5),.75)} 0%,rgba(0,0,0,.05) 30%,rgba(0,0,0,0) 45%,${rgba(mix(state.colour,'#000000',.5),.9)} 72%,${mix(state.colour,'#000000',.55)} 100%)"></div>`; },
   hook(o){ const acc = tint(state.colour);
-    return {bg:state.colour, html:`${imgDiv(o.img || o.art || ART[0], 'left:0;top:0;bottom:0;width:500px', o.pos || o.artPos || 'center 25%')}
-      <div class="a" style="left:500px;top:0;bottom:0;width:6px;background:${acc}"></div>
-      ${corners(CREAM, PEONY, o.tr)}
-      <div class="a" style="left:560px;right:60px;top:170px">${OPENCALL(acc)}</div>
-      <p class="a scr" style="left:560px;right:60px;top:224px;font-size:46px;color:${CREAM}">${esc(state.name)}</p>
-      <p class="a H" style="left:556px;right:60px;top:330px;font-size:${Math.round((o.size||80)*.72)}px;line-height:1.04;color:${CREAM}">${o.head}</p>
-      ${o.sub ? `<p class="a sub" style="left:560px;right:60px;top:${o.subTop||760}px;font-size:27px;color:${CREAM};opacity:.85">${o.sub}</p>` : ''}
-      <div class="a" style="left:560px;top:960px">${timer(false)}</div>
-      <div class="a" style="left:560px;right:60px;top:1060px;padding-top:22px;border-top:1.5px solid rgba(255,255,255,.35)">
-        <p style="font-size:26px;color:${CREAM};opacity:.85">Closes ${dateLong()}</p>
-        <p style="font-size:30px;font-weight:700;letter-spacing:-.01em;color:${acc};margin-top:8px">${VERB} “${KW()}” to apply&nbsp;&rarr;</p></div>`};
+    return {bg:INK, html:`${imgDiv(o.img || o.art || ART[0], 'inset:0', o.pos || o.artPos || 'center 22%')}${ED.shade()}
+      ${corners(CREAM, PEONY, o.tr)}${ED.mast()}
+      <div class="a" style="left:80px;right:80px;top:${o.top || 760}px;display:flex;justify-content:space-between;align-items:center">${OPENCALL(acc)}${timer(false)}</div>
+      <p class="a H" style="left:76px;right:80px;top:${(o.top || 760) + 76}px;font-size:${Math.round((o.size||80)*.8)}px;color:${CREAM}">${o.head}</p>
+      ${o.sub ? `<p class="a sub" style="left:80px;right:150px;top:${o.subTop || 1040}px;font-size:28px;color:${CREAM};opacity:.9">${o.sub}</p>` : ''}
+      ${coverCTA(1140, CREAM, acc)}`};
   },
-  count(o){ const acc = tint(state.colour); const chilli = o.tone === 'chilli'; const bg = chilli ? '#AA0003' : state.colour;
+  count(o){ const acc = tint(state.colour); const chilli = o.tone === 'chilli';
     const big = String(o.big), size = big.length <= 2 ? 300 : big.length <= 8 ? 140 : 110;
-    return {bg, html:`${imgDiv(o.img || ART[0], 'left:0;right:0;top:0;height:520px', o.pos || 'center 25%')}
-      <div class="a" style="left:0;right:0;top:0;height:520px;background:linear-gradient(180deg,rgba(0,0,0,.45),rgba(0,0,0,0) 45%,${rgba(bg,.6)})"></div>
-      ${corners(CREAM, PEONY, o.tr || leftLabel())}
-      <div class="a" style="left:80px;top:150px">${OPENCALL(CREAM)}</div>
-      <p class="a scr" style="left:80px;top:204px;font-size:52px;color:${CREAM}">${esc(state.name)}</p>
-      <p class="a scr" style="left:70px;top:${big.length <= 2 ? 580 : 600}px;font-size:${size}px;line-height:.85;color:${CREAM}">${big}</p>
-      <p class="a" style="left:${big.length <= 2 ? 460 : 80}px;top:${big.length <= 2 ? 700 : 760}px;font-size:48px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:${chilli ? CREAM : acc}">${esc(o.unit)}</p>
-      <p class="a" style="left:${big.length <= 2 ? 460 : 80}px;right:80px;top:${big.length <= 2 ? 780 : 840}px;font-size:34px;line-height:1.3;color:${CREAM}">${o.info || `to be published in ${esc(state.bookName || 'the book')}.`}</p>
+    return {bg:INK, html:`${imgDiv(o.img || ART[0], 'inset:0', o.pos || 'center 22%')}${ED.shade()}
+      ${chilli ? '<div class="a" style="inset:0;background:rgba(170,0,3,.55)"></div>' : ''}
+      ${corners(CREAM, PEONY, o.tr || leftLabel())}${ED.mast()}
+      <p class="a scr" style="left:70px;top:${big.length <= 2 ? 690 : 760}px;font-size:${size}px;line-height:.85;color:${CREAM}">${big}</p>
+      <p class="a" style="left:${big.length <= 2 ? 470 : 80}px;top:${big.length <= 2 ? 790 : 900}px;font-size:46px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:${chilli ? CREAM : acc}">${esc(o.unit)}</p>
+      <p class="a" style="left:${big.length <= 2 ? 470 : 80}px;right:80px;top:${big.length <= 2 ? 860 : 970}px;font-size:32px;line-height:1.3;color:${CREAM}">${o.info || `to be published in ${esc(state.bookName || 'the book')}.`}</p>
       ${coverCTA(1140, CREAM, chilli ? CREAM : acc)}`};
   },
 };
+
 const T0 = {...T};
 T.hook = o => isAward() ? AW.hook(o) : isEd() ? ED.hook(o) : T0.hook(o);
 T.count = o => isAward() ? AW.count(o) : isEd() ? ED.count(o) : T0.count(o);
@@ -447,7 +447,7 @@ const closeLn = () => `Submissions close ${dl().getDate()} ${MONTHS_L[dl().getMo
 const N = () => state.name, S = () => state.series, SEL = () => state.selected;
 
 function monthPosts(){ const name = GE(), sel = esc(state.selected); return [
- {left:30, title:'Launch', kind:'Carousel', slides:() => { const s = launch(); if (isAward() || isEd()) s[0] = {...(isEd() ? ED : AW).hook({img:state.images.imgCover, tr:esc(state.series), head:`${esc(state.headline || 'Call for artists')}<br>${GE()}`, size:(isEd() ? 82 : 120), subTop:(isEd() ? 820 : undefined), sub:esc(state.coverLine)}), title:'cover'}; return s; }, caption:() => caption(), pin:() => pinned()},
+ {left:30, title:'Launch', kind:'Carousel', slides:() => { const s = launch(); if (isAward() || isEd()) s[0] = {...(isEd() ? ED : AW).hook({img:state.images.imgCover, tr:esc(state.series), head: isEd() ? esc(state.headline || 'Call for artists') : `${esc(state.headline || 'Call for artists')}<br>${GE()}`, size: isEd() ? 112 : 120, sub:esc(state.coverLine)}), title:'cover'}; return s; }, caption:() => caption(), pin:() => pinned()},
 
  {left:28, title:'What you can submit', kind:'Carousel · theme', slides:() => [
    T.hook({img:EX.bloom, tr:'The theme', head:`What can you submit to the ${name}?`, sub:`Five kinds of ${TW()} the jury wants to see. ${sel} will be published.`}),
