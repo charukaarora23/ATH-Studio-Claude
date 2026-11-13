@@ -431,7 +431,7 @@ async function toBlob(s){
 let DL = null; const dlReady = (async () => { try { DL = await window.claude?.use?.('downloads'); } catch { DL = null; } })();
 async function offer(filename, data){
   await dlReady;
-  if (!DL) { status('Saving files isn’t available in this view. Open the page in claude.ai to save.'); return; }
+  if (!DL) { const url = URL.createObjectURL(data); const a = document.createElement('a'); a.href = url; a.download = filename; document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(url), 4000); status('Downloaded ' + filename + '.'); return; }
   try { await DL.save({ filename, data }); status('Saved ' + filename + '.'); }
   catch (e) { status(e && e.code === 'declined' ? 'Save cancelled.' : 'Could not save (' + (e && e.code || 'error') + ').'); }
 }

@@ -1,0 +1,460 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ATH Post Studio</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Hanken+Grotesk:wght@400;500;600;700&display=swap">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<style>
+/* Post fonts ship with the page so previews and exported PNGs match exactly */
+@font-face{font-family:"ATH Grotesk";src:url(fonts/ath/HankenGrotesk.woff2) format("woff2");font-weight:100 900}
+@font-face{font-family:"ATH Serif";src:url(fonts/ath/Newsreader-Italic.woff2) format("woff2");font-style:italic;font-weight:200 800}
+@font-face{font-family:"ATH Script";src:url(fonts/InstrumentSerif-Italic.ttf) format("truetype");font-style:italic}
+
+/* ===== Studio UI ===== */
+:root{
+  --bg:#F6F1EC; --panel:#FFFCF8; --ink:#2A0A12; --muted:#6E5F5A; --line:#E4D8CF; --accent:#6A0620; --field:#FFFFFF;
+  --sans:"Hanken Grotesk",system-ui,-apple-system,"Segoe UI",sans-serif; --mono:"DM Mono",ui-monospace,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#161112;--panel:#211A1B;--ink:#F4EAE4;--muted:#B5A6A1;--line:#3A2F2F;--accent:#F2A8BC;--field:#2A2223;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#161112;--panel:#211A1B;--ink:#F4EAE4;--muted:#B5A6A1;--line:#3A2F2F;--accent:#F2A8BC;--field:#2A2223;color-scheme:dark}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font:400 14px/1.45 var(--sans)}
+.app{display:grid;grid-template-columns:390px minmax(0,1fr);min-height:100%}
+aside{background:var(--panel);border-right:1px solid var(--line);padding-block:20px;padding-left:max(18px,env(safe-area-inset-left,0px));padding-right:18px;overflow:auto;max-height:100vh;position:sticky;top:0}
+main{padding-block:20px;padding-left:24px;padding-right:max(20px,env(safe-area-inset-right,0px));min-width:0}
+h1{font:700 20px/1.1 var(--sans);letter-spacing:-.02em;margin:0 0 4px}
+.sub{color:var(--muted);font-size:13px;margin:0 0 16px}
+details{border-top:1px solid var(--line);padding:12px 0}
+summary{font:600 12px/1 var(--mono);letter-spacing:.1em;text-transform:uppercase;cursor:pointer;color:var(--accent)}
+.f{display:flex;flex-direction:column;gap:4px;margin-top:10px}
+.f label{font-size:12px;color:var(--muted)}
+.f input,.f textarea,.f select{font:inherit;color:var(--ink);background:var(--field);border:1px solid var(--line);border-radius:8px;padding:8px 10px;width:100%}
+.f textarea{min-height:64px;resize:vertical}
+.hint{font-size:12px;color:var(--muted);margin:6px 0 0}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+.sw{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px;align-items:center}
+.sw button{width:34px;height:34px;border-radius:8px;border:2px solid transparent;cursor:pointer;padding:0;overflow:hidden;display:flex}
+.sw button span{flex:1}
+.sw button[aria-pressed="true"]{border-color:var(--ink)}
+.sw input[type=color]{width:34px;height:34px;padding:0;border:1px solid var(--line);border-radius:8px;background:none}
+.img-in{display:flex;align-items:center;gap:8px}
+.img-in .th{width:44px;height:44px;border-radius:6px;background:var(--line) center/cover;flex:none}
+.top{display:flex;flex-wrap:wrap;gap:10px;align-items:end;margin-bottom:18px}
+.top .f{margin:0;min-width:260px}
+.btn{font:600 14px/1 var(--sans);border-radius:10px;padding:11px 16px;border:1px solid var(--ink);background:var(--ink);color:var(--bg);cursor:pointer}
+.btn.ghost{background:transparent;color:var(--ink)}
+.btn:focus-visible,.sw button:focus-visible,summary:focus-visible{outline:3px solid #FFA1C2;outline-offset:2px}
+.status{font-size:13px;color:var(--muted);min-height:18px}
+.group h2{font:600 16px/1.2 var(--sans);margin:0 0 2px}
+.group .meta{font:400 12px/1.3 var(--mono);color:var(--muted);margin-bottom:10px;text-transform:uppercase;letter-spacing:.06em}
+.slides{display:grid;grid-template-columns:repeat(auto-fill,minmax(var(--pw),1fr));gap:16px}
+.cell{display:flex;flex-direction:column;gap:6px}
+.frame{width:var(--pw);height:calc(var(--pw) * 1.25);overflow:hidden;border-radius:6px;box-shadow:0 1px 0 var(--line),0 8px 24px rgba(0,0,0,.08);position:relative}
+.frame>.post{transform:scale(var(--sc));transform-origin:0 0}
+.frame.tall{height:calc(var(--pw) * 1.7778)}
+.group{margin-bottom:34px}
+.capbox{max-width:720px;margin-top:10px;border-top:1px solid var(--line)}
+.cell .act{display:flex;justify-content:space-between;align-items:center;font-size:12px;color:var(--muted);width:var(--pw)}
+.cell .act button{font:600 12px/1 var(--sans);border:1px solid var(--line);background:var(--panel);color:var(--ink);border-radius:8px;padding:6px 9px;cursor:pointer}
+#stage{position:fixed;left:-30000px;top:0}
+@media (max-width:900px){.app{grid-template-columns:1fr}aside{position:static;max-height:none;border-right:0;border-bottom:1px solid var(--line)}}
+
+/* ===== POSTS (1080 x 1350): ATH brand colours + one call colour ===== */
+.post{position:relative;width:1080px;height:1350px;overflow:hidden;font-family:"ATH Grotesk","Hanken Grotesk",sans-serif;-webkit-font-smoothing:antialiased;color:#14090C}
+.post *{margin:0;box-sizing:border-box}
+.post .a{position:absolute}.post .c{text-align:center}
+.post .img{background-size:cover;background-repeat:no-repeat}
+.post .cn{font-size:20px;font-weight:700;letter-spacing:.16em;text-transform:uppercase}
+.post .H{font-weight:600;letter-spacing:-.045em;line-height:1.02}
+.post .R{font-weight:400;letter-spacing:-.04em;line-height:1.1}
+.post .sub{color:inherit;font-size:32px;font-weight:500;line-height:1.38;letter-spacing:-.01em}
+.post .scr{font-family:"ATH Script",serif;font-style:italic;font-weight:400}
+.post .ser{font-family:"ATH Serif",serif;font-style:italic;font-weight:400}
+.post .lab{font-size:22px;font-weight:700;letter-spacing:.12em;text-transform:uppercase}
+/* gap = information still to be supplied; visible on purpose */
+.post .gap{display:inline-block;border:2px dashed currentColor;border-radius:8px;padding:0 .3em;opacity:.75}
+.post .ph{display:flex;align-items:center;justify-content:center;text-align:center;border:3px dashed currentColor;border-radius:18px;opacity:.6;font-size:24px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;line-height:1.5}
+</style>
+</head><body>
+
+<div class="app">
+<aside>
+  <h1>ATH Post Studio</h1>
+  <p class="sub">Fill in one open call and the launch carousel renders on the right in ATH colours plus the call’s own colour. Dashed boxes mark details still to supply.</p>
+
+  <div class="f"><label for="saved">Saved calls (this browser)</label>
+    <div class="row2"><select id="saved"></select><button class="btn ghost" id="saveCall" type="button">Save call</button></div></div>
+
+  <details open><summary>The call</summary>
+    <div class="row2">
+      <div class="f"><label for="series">Series</label><input id="series"></div>
+      <div class="f"><label for="edition">Edition number</label><input id="edition"></div>
+    </div>
+    <div class="f"><label for="name">Edition name</label><input id="name"></div>
+    <div class="row2">
+      <div class="f"><label for="keyword">DM keyword</label><input id="keyword"></div>
+      <div class="f"><label for="deadline">Deadline</label><input id="deadline" type="date"></div>
+    </div>
+    <div class="row2">
+      <div class="f"><label for="selected">Artists selected</label><input id="selected"></div>
+      <div class="f"><label for="headline">Cover headline</label><select id="headline"><option>Call for artists</option><option>Open call</option><option>Get published</option><option>Submissions open</option></select></div>
+    </div>
+    <div class="f"><label for="coverLine">Cover line</label><input id="coverLine"></div>
+    <div class="f"><label>Call colour (one colour that matches the theme)</label><div class="sw" id="colours"></div></div>
+  </details>
+
+  <details><summary>About ATH</summary>
+    <div class="row2">
+      <div class="f"><label for="books">Books published</label><input id="books"></div>
+      <div class="f"><label for="featured">Artists featured</label><input id="featured"></div>
+    </div>
+    <div class="row3">
+      <div class="f"><label for="editions">Editions</label><input id="editions"></div>
+      <div class="f"><label for="published">Artists in series</label><input id="published"></div>
+      <div class="f"><label for="since">Since</label><input id="since"></div>
+    </div>
+    <div class="f"><label for="shelf">Past editions on the shelf (comma separated)</label><textarea id="shelf"></textarea></div>
+  </details>
+
+  <details><summary>Theme</summary>
+    <div class="f"><label for="quote">Theme line</label><textarea id="quote"></textarea></div>
+    <div class="f"><label for="submit">What artists can submit</label><textarea id="submit"></textarea></div>
+  </details>
+
+  <details><summary>What selected artists receive</summary>
+    <div class="f"><label for="bookText">The book (one sentence)</label><textarea id="bookText"></textarea></div>
+    <div class="f"><label for="benefits">Benefits, one per line: Title | detail (first line sits at the bottom of the stack)</label><textarea id="benefits" style="min-height:130px"></textarea></div>
+    <div class="row2">
+      <div class="f"><label for="prize">Winner award</label><input id="prize"></div>
+      <div class="f"><label for="runners">Runners-up</label><input id="runners"></div>
+    </div>
+    <div class="f"><label for="prizeExtra">Winner also receives</label><input id="prizeExtra"></div>
+  </details>
+
+  <details><summary>Selection and timeline</summary>
+    <div class="f"><label for="jury">Jury (leave empty for “the jury”)</label><input id="jury"></div>
+    <div class="row2">
+      <div class="f"><label for="results">Results date</label><input id="results" placeholder="e.g. 10 Jan"></div>
+      <div class="f"><label for="pub">Publication month</label><input id="pub" placeholder="e.g. March"></div>
+    </div>
+    <div class="f"><label for="fee">Application fee wording</label><input id="fee" placeholder="e.g. applicable"></div>
+    <div class="f"><label for="commentFrom">Switch CTA from “DM” to “COMMENT” on</label><input id="commentFrom" type="date"></div>
+    <div class="f"><label for="elig">Eligibility line</label><input id="elig"></div>
+  </details>
+
+  <details><summary>Images and past artists</summary>
+    <div class="f"><label for="imgCover">Cover artwork</label><div class="img-in"><span class="th" id="th-imgCover"></span><input id="imgCover" type="file" accept="image/*"></div></div>
+    <div class="f"><label for="credit">Cover credit</label><input id="credit" placeholder="Artist name, Title"></div>
+    <div class="f"><label for="imgTheme">Theme artwork</label><div class="img-in"><span class="th" id="th-imgTheme"></span><input id="imgTheme" type="file" accept="image/*"></div></div>
+    <div class="f"><label for="imgBooks">Photo: the books together</label><div class="img-in"><span class="th" id="th-imgBooks"></span><input id="imgBooks" type="file" accept="image/*"></div></div>
+    <div class="f"><label for="imgSpread">Photo: an open spread</label><div class="img-in"><span class="th" id="th-imgSpread"></span><input id="imgSpread" type="file" accept="image/*"></div></div>
+    <div class="f"><label for="artists">Past artists, one per line: Name | Edition · Country | One line</label><textarea id="artists"></textarea></div>
+    <div class="row2">
+      <div class="f"><label for="imgA1">Artist 1 page</label><div class="img-in"><span class="th" id="th-imgA1"></span><input id="imgA1" type="file" accept="image/*"></div></div>
+      <div class="f"><label for="imgA2">Artist 2 page</label><div class="img-in"><span class="th" id="th-imgA2"></span><input id="imgA2" type="file" accept="image/*"></div></div>
+    </div>
+  </details>
+</aside>
+
+<main>
+  <div class="top">
+    <div class="f"><label for="ptype">Post</label><select id="ptype"></select></div>
+    <button class="btn" id="go" type="button">Create posts</button>
+    <button class="btn ghost" id="zip" type="button">Save all as ZIP</button>
+    <p class="status" id="status" role="status"></p>
+  </div>
+  <div id="out"></div>
+</main>
+</div>
+<div id="stage" aria-hidden="true"></div>
+
+<script src="month.js"></script>
+<script>
+const $ = id => document.getElementById(id);
+// ATH brand colours: fixed on every call
+const INK='#14090C', CREAM='#F9ECE5', BURG='#6A0620', PEONY='#FAD2E1', WHITE='#FFFFFF';
+// one colour per call, matched to its theme
+const COLOURS = { Emerald:'#0E6B4A', Cobalt:'#1E4FA3', Plum:'#5B2A6E', Teal:'#0B6E79', Ochre:'#9A6A12' };
+
+const DEFAULTS = {
+  series:'101 Art Book', edition:'16', name:'Garden Edition', keyword:'GARDEN', deadline:'2026-12-13', selected:'101',
+  headline:'Call for artists', coverLine:'Get published in a juried hardcover book of 101 artists.', colour:'#0E6B4A',
+  books:'35+', featured:'10K+', editions:'15', published:'1,300+', since:'2023',
+  shelf:'Photography, Food, Collage, Landscape, Abstract, Portrait, Animal, Floral, Nature, Dogs, Pattern, Colors, Faces, Texture, Artist of the Year',
+  quote:'A garden is more than a place where things grow.',
+  submit:'Flowers, butterflies, trees, leaves, landscapes or imagined nature. Any medium. Original work only, no AI.',
+  bookText:'Every selected artist is published with their name, artwork title, medium and country.',
+  benefits:'Published in the book | Your work in print\nCertificate of Recognition | For your CV and grant applications\nSold worldwide | Amazon · Barnes & Noble · ATH Shop\nThe book’s campaign | 190K+ followers · 100K+ email subscribers\nIntroductions | To collectors, galleries and curators',
+  prize:'$500', prizeExtra:'a 4-page feature, a trophy and an Artsy listing', runners:'A 2-page feature and a trophy.',
+  jury:'', results:'', pub:'', fee:'', commentFrom:'2026-12-08', elig:'No degree, gallery or exhibition history needed. Individual artists, 18+, worldwide.',
+  credit:'', artists:'',
+};
+const IMGKEYS = ['imgCover','imgTheme','imgBooks','imgSpread','imgA1','imgA2'];
+const FIELDS = Object.keys(DEFAULTS).filter(k => k !== 'colour');
+const DEFAULT_IMAGES = { imgCover:'art/flower-portrait.jpg', imgTheme:'art/night-bloom.jpg' };
+let state = {...DEFAULTS, images:{...DEFAULT_IMAGES}};
+
+// ---------- form ----------
+function fillForm(){ FIELDS.forEach(k => { if ($(k)) $(k).value = state[k] ?? ''; }); renderColours(); IMGKEYS.forEach(k => { $('th-'+k).style.backgroundImage = state.images[k] ? `url(${state.images[k]})` : ''; }); }
+function readForm(){ FIELDS.forEach(k => { if ($(k)) state[k] = $(k).value; }); }
+function renderColours(){
+  $('colours').innerHTML = Object.entries(COLOURS).map(([n,c]) => `<button type="button" title="${n}" aria-label="${n}" aria-pressed="${state.colour.toLowerCase()===c.toLowerCase()}" data-c="${c}"><span style="background:${c}"></span><span style="background:${tint(c)}"></span></button>`).join('')
+    + `<input type="color" id="customColour" aria-label="Custom call colour" value="${state.colour}">`;
+  $('colours').querySelectorAll('button').forEach(b => b.onclick = () => { state.colour = b.dataset.c; renderColours(); render(); });
+  $('customColour').oninput = e => { state.colour = e.target.value; render(); };
+  $('customColour').onchange = () => renderColours();
+}
+IMGKEYS.forEach(k => $(k).addEventListener('change', e => {
+  const file = e.target.files[0]; if (!file) return;
+  const r = new FileReader(); r.onload = () => { state.images[k] = r.result; $('th-'+k).style.backgroundImage = `url(${r.result})`; render(); }; r.readAsDataURL(file);
+}));
+function loadSaved(){ try { return JSON.parse(localStorage.getItem('athStudioCalls2') || '{}'); } catch { return {}; } }
+function refreshSaved(){ const s = loadSaved(); $('saved').innerHTML = '<option value="">Garden Edition (example)</option>' + Object.keys(s).map(n => `<option>${esc(n)}</option>`).join(''); }
+$('saved').onchange = () => { const s = loadSaved(); const v = $('saved').value; state = v && s[v] ? {...DEFAULTS, ...s[v], images: s[v].images || {}} : {...DEFAULTS, images:{...DEFAULT_IMAGES}}; fillForm(); render(); };
+$('saveCall').onclick = () => { readForm(); const s = loadSaved(); const key = state.name || 'Call'; s[key] = state;
+  try { localStorage.setItem('athStudioCalls2', JSON.stringify(s)); status('Saved "' + key + '" in this browser.'); }
+  catch { s[key] = {...state, images:{}}; try { localStorage.setItem('athStudioCalls2', JSON.stringify(s)); status('Saved without images (too large for browser storage).'); } catch { status('Could not save in this browser.'); } }
+  refreshSaved(); $('saved').value = key; };
+
+// ---------- helpers ----------
+function esc(s){ return String(s ?? '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+function status(t){ $('status').textContent = t; }
+const lines = s => String(s || '').split('\n').map(x => x.trim()).filter(Boolean);
+const csv = s => String(s || '').split(',').map(x => x.trim()).filter(Boolean);
+const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+const MONTHS_L = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+function dl(){ const [y,m,d] = String(state.deadline||'2026-12-13').split('-').map(Number); return new Date(y, m-1, d); }
+const ORD = ['','first','second','third','fourth','fifth','sixth','seventh','eighth','ninth','tenth','eleventh','twelfth','thirteenth','fourteenth','fifteenth','sixteenth','seventeenth','eighteenth','nineteenth','twentieth','twenty-first','twenty-second','twenty-third','twenty-fourth','twenty-fifth'];
+const ordinal = n => ORD[Number(n)] || (n + 'th');
+const short = () => dl().getDate() + ' ' + MONTHS[dl().getMonth()];
+function mix(hex, to, t){ const a = hex.replace('#',''), b = to.replace('#',''); const p = i => parseInt(a.substr(i,2),16), q = i => parseInt(b.substr(i,2),16);
+  return '#' + [0,2,4].map(i => Math.round(p(i) + (q(i)-p(i))*t).toString(16).padStart(2,'0')).join(''); }
+const tint = c => mix(c, '#FFFFFF', .72);         // light version of the call colour, for text on dark
+const rgba = (hex, a) => { const h = hex.replace('#',''); return `rgba(${parseInt(h.substr(0,2),16)},${parseInt(h.substr(2,2),16)},${parseInt(h.substr(4,2),16)},${a})`; };
+const gap = (v, label) => v ? esc(v) : `<span class="gap">${esc(label)}</span>`;
+const photo = (k, label, style, col) => state.images[k]
+  ? `<div class="a img" style="${style};background-image:url(${state.images[k]});background-position:center;border-radius:18px"></div>`
+  : `<div class="a ph" style="${style};color:${col}">Real photo needed<br>${esc(label)}</div>`;
+let VERB = 'DM';
+const KW = () => esc((state.keyword || 'KEYWORD').toUpperCase());
+
+// four corner labels: the one header system on every slide
+const corners = (col, dmCol, tr) => `
+  <p class="a cn" style="left:52px;top:48px;color:${col}">Arts to Hearts</p><p class="a cn" style="right:52px;top:48px;color:${col}">${esc(tr)}</p>
+  <p class="a cn" style="left:52px;bottom:48px;color:${dmCol}">${VERB} “${KW()}”</p><p class="a cn" style="right:52px;bottom:48px;color:${col}">Closes ${short()}</p>`;
+const spineLab = (n,f,fs) => `<span style="position:absolute;left:50%;bottom:18px;transform:translateX(-50%) rotate(-90deg);white-space:nowrap;font-family:'ATH Serif',serif;font-style:italic;font-size:${fs}px;width:0;color:${f}">${esc(n)}</span>`;
+const SPINES = [['#14090C','#F9ECE5'],['#AA0003','#FFD6DE'],['#FAD2E1','#6A0620'],['#2E4A2A','#E3E8DE'],['#E3E8DE','#14090C'],['#6A0620','#FAD2E1'],['#C9D3BE','#14090C'],['#FFD6DE','#AA0003'],['#4C4240','#F9ECE5'],['#B7D9FF','#6A0620'],['#FFF3B2','#AA0003']];
+const HEIGHTS = [360,330,370,345,380,350,335,365,375,340,360,350,370,345,380];
+
+// ---------- the launch carousel ----------
+function launch(){
+  const C = state.colour, Tn = tint(C), S = [];
+  const name = esc(state.name), kw = KW();
+  const head = esc(state.headline || 'Call for artists').split(' ');
+  const headHtml = head.length > 2 ? head.slice(0, Math.ceil(head.length/2)).join(' ') + '<br>' + head.slice(Math.ceil(head.length/2)).join(' ') : head.join('<br>');
+
+  // 1 cover
+  S.push({bg:INK, html:`
+    <div class="a img" style="inset:0;background-image:url(${state.images.imgCover || ''});background-position:center 6%"></div>
+    <div class="a" style="inset:0;background:linear-gradient(180deg,rgba(20,14,12,.38) 0%,rgba(20,14,12,0) 16%,rgba(20,14,12,0) 40%,rgba(20,14,12,.6) 62%,rgba(20,14,12,.82) 100%)"></div>
+    ${corners(WHITE, WHITE, state.series)}
+    <div class="a" style="left:0;right:0;top:650px;display:flex;justify-content:center"><span class="cn" style="display:inline-flex;align-items:center;height:46px;padding:0 26px;background:${Tn};color:${INK};border-radius:999px">Open call · Edition ${esc(state.edition)}</span></div>
+    <p class="a c" style="left:0;right:0;top:720px;font-size:136px;font-weight:700;letter-spacing:-.01em;line-height:.9;text-transform:uppercase;color:${WHITE}">${headHtml}</p>
+    <p class="a c scr" style="left:0;right:0;top:975px;font-size:88px;line-height:1;color:${Tn}">the ${name}</p>
+    <p class="a c sub" style="left:150px;right:150px;top:1095px;color:${WHITE}">${esc(state.coverLine)}</p>`});
+
+  // 2 who we are
+  S.push({bg:INK, html:`${corners(WHITE, PEONY, 'Who we are')}
+    <p class="a lab" style="left:80px;top:180px;color:${Tn}">Arts to Hearts Project</p>
+    <div class="a" style="left:80px;right:80px;top:240px;display:grid;grid-template-columns:1fr 1fr;gap:40px;color:${WHITE}">
+      <div><p style="font-size:150px;font-weight:400;letter-spacing:-.06em;line-height:.9">${esc(state.books)}</p><p class="sub" style="margin-top:14px;opacity:.85">curated art books published</p></div>
+      <div><p style="font-size:150px;font-weight:400;letter-spacing:-.06em;line-height:.9">${esc(state.featured)}</p><p class="sub" style="margin-top:14px;opacity:.85">artists featured worldwide</p></div></div>
+    ${photo('imgBooks', 'The books together', 'left:80px;right:80px;top:560px;height:620px', WHITE)}`});
+
+  // 3 the series: shelf with this call's empty slot
+  const eds = csv(state.shelf);
+  const spines = eds.map((n,i) => { const [b,f] = SPINES[i % SPINES.length]; return `<div style="flex:1;height:${HEIGHTS[i % HEIGHTS.length]}px;background:${b};border-radius:3px 3px 0 0;position:relative;box-shadow:inset -3px 0 0 rgba(0,0,0,.12)">${spineLab(n,f,22)}</div>`; }).join('');
+  S.push({bg:CREAM, html:`${corners(INK, BURG, 'The series')}
+    <p class="a R c" style="left:80px;right:80px;top:200px;font-size:84px;color:${INK}">${esc(state.editions)} editions. ${esc(state.published)} artists.<br>The <span style="color:${C};font-weight:600">${ordinal(state.edition)}</span> is open.</p>
+    <div class="a" style="left:64px;right:64px;top:640px;height:420px;display:flex;align-items:flex-end;gap:8px;border-bottom:6px solid ${INK};padding:0 10px">${spines}
+      <div style="flex:1.3;height:390px;border:3px dashed ${C};border-bottom:none;border-radius:3px 3px 0 0;position:relative;background:${rgba(Tn,.45)}">${spineLab(state.name, C, 26)}</div></div>
+    <p class="a c sub" style="left:0;right:0;top:1110px;font-size:28px;opacity:.7;color:${INK}">Publishing contemporary artists since ${esc(state.since)}.</p>`});
+
+  // 4 the theme
+  S.push({bg:INK, html:`
+    <div class="a img" style="inset:0;background-image:url(${state.images.imgTheme || ''});background-position:center 44%"></div>
+    <div class="a" style="inset:0;background:linear-gradient(180deg,rgba(20,9,12,.9) 0%,rgba(20,9,12,.5) 26%,rgba(20,9,12,0) 42%,rgba(20,9,12,0) 62%,rgba(20,9,12,.85) 80%,rgba(20,9,12,.95) 100%)"></div>
+    ${corners(WHITE, PEONY, 'The theme')}
+    <p class="a c ser" style="left:100px;right:100px;top:160px;font-size:76px;line-height:1.08;letter-spacing:-.015em;color:${WHITE}">“${esc(state.quote)}”</p>
+    <p class="a lab c" style="left:0;right:0;top:1000px;color:${Tn}">What you can submit</p>
+    <p class="a c sub" style="left:110px;right:110px;top:1044px;font-size:30px;color:${WHITE}">${esc(state.submit)}</p>`});
+
+  // 5 the book
+  S.push({bg:CREAM, html:`${corners(INK, BURG, 'The book')}
+    ${photo('imgSpread', 'An open spread of a past edition', 'left:80px;right:80px;top:150px;height:640px', INK)}
+    <p class="a R" style="left:80px;right:80px;top:850px;font-size:76px;color:${INK}">A juried hardcover edition.</p>
+    <p class="a sub" style="left:80px;right:140px;top:960px;color:${INK}">${esc(state.bookText)}</p>`});
+
+  // 6 what selected artists receive: the stack
+  const bl = lines(state.benefits).slice(0,6).map(l => l.split('|').map(x => x.trim()));
+  const fills = [[C,WHITE],[CREAM,INK],[BURG,WHITE],[PEONY,BURG],[Tn,INK],[CREAM,INK]];
+  const widths = [952,926,910,944,930,900], offs = [0,12,-4,6,-8,10];
+  const stack = bl.map(([t,d],i) => { const [bg,fg] = fills[i]; const w = widths[i];
+    return `<div style="width:${w}px;height:106px;margin-left:${(952-w)/2+offs[i]}px;background:${bg};color:${fg};border-radius:6px;display:flex;align-items:center;justify-content:space-between;padding:0 38px;box-shadow:inset 0 -5px 0 rgba(0,0,0,.14)"><span style="font-size:38px;font-weight:600;letter-spacing:-.025em">${esc(t)}</span><span style="font-size:24px;font-weight:500;text-align:right">${esc(d||'')}</span></div>`; }).reverse().join('');
+  S.push({bg:INK, html:`${corners(WHITE, PEONY, 'If selected')}
+    <p class="a R c" style="left:80px;right:80px;top:170px;font-size:84px;color:${WHITE}">What selected artists receive</p>
+    <div class="a" style="left:64px;right:64px;bottom:274px;display:flex;flex-direction:column;gap:10px">${stack}</div>
+    <div class="a" style="left:64px;right:64px;top:1076px;border-top:6px solid ${CREAM}"></div>`});
+
+  // 7 recognition
+  S.push({bg:CREAM, html:`${corners(INK, BURG, 'Recognition')}
+    <p class="a R c" style="left:80px;right:80px;top:180px;font-size:80px;color:${INK}">Three artists receive more.</p>
+    <p class="a lab c" style="left:0;right:0;top:360px;color:${C}">Winner</p>
+    <p class="a c" style="left:0;right:0;top:410px;font-size:300px;font-weight:400;letter-spacing:-.07em;line-height:.85;color:${C}">${gap(state.prize,'Award')}</p>
+    <p class="a c sub" style="left:150px;right:150px;top:700px;color:${INK}">plus ${esc(state.prizeExtra)}.</p>
+    <div class="a" style="left:120px;right:120px;top:850px;border-top:2px solid rgba(20,9,12,.18);padding-top:34px">
+      <p class="lab c" style="color:${C}">Two runners-up</p>
+      <p class="c sub" style="margin-top:10px;color:${INK}">${esc(state.runners)}</p></div>`});
+
+  // 8 selection + timeline
+  const dots = Array.from({length:101}, (_,i) => i === 100
+    ? `<div style="aspect-ratio:1;border-radius:50%;background:${Tn};box-shadow:0 0 0 5px ${rgba(Tn,.25)}"></div>`
+    : `<div style="aspect-ratio:1;border-radius:50%;border:2px solid rgba(255,255,255,.35)"></div>`).join('');
+  S.push({bg:INK, html:`${corners(WHITE, PEONY, 'Selection')}
+    <p class="a R c" style="left:80px;right:80px;top:170px;font-size:80px;color:${WHITE}">${esc(state.selected)} places, chosen by<br>${state.jury ? esc(state.jury) : 'the jury'}.</p>
+    <div class="a" style="left:120px;right:120px;top:410px;display:grid;grid-template-columns:repeat(17,1fr);gap:10px">${dots}
+      <p style="grid-column:12/18;font-family:'ATH Script',serif;font-style:italic;font-size:34px;color:${Tn};align-self:center;padding-left:6px">&larr; yours?</p></div>
+    <div class="a" style="left:80px;right:80px;top:820px;display:grid;grid-template-columns:repeat(3,1fr);border-top:2px solid rgba(255,255,255,.2);padding-top:30px;color:${WHITE}">
+      <div><p class="lab" style="color:${Tn}">${short()}</p><p class="sub" style="font-size:28px;margin-top:8px">Submissions close</p></div>
+      <div style="border-left:2px solid rgba(255,255,255,.16);padding-left:30px"><p class="lab" style="color:${Tn}">${gap(state.results,'Date')}</p><p class="sub" style="font-size:28px;margin-top:8px">Results announced</p></div>
+      <div style="border-left:2px solid rgba(255,255,255,.16);padding-left:30px"><p class="lab" style="color:${Tn}">${gap(state.pub,'Month')}</p><p class="sub" style="font-size:28px;margin-top:8px">Book published</p></div></div>
+    <p class="a c sub" style="left:0;right:0;top:1080px;font-size:26px;opacity:.75;color:${WHITE}">Application fee ${gap(state.fee,'amount, or “applicable”')}</p>`});
+
+  // 9 who can apply
+  S.push({bg:CREAM, html:`${corners(INK, BURG, 'Who can apply')}
+    <p class="a R c" style="left:80px;right:80px;top:330px;font-size:100px;color:${INK}">Your work deserves the <span style="display:inline-block;background:${INK};color:${WHITE};border-radius:999px;padding:0 .3em .07em;line-height:1">spotlight.</span></p>
+    <p class="a c sub" style="left:150px;right:150px;top:720px;font-size:40px;color:${INK}">Emerging, mid-career or established.</p>
+    <p class="a c sub" style="left:170px;right:170px;top:830px;opacity:.65;font-size:30px;color:${INK}">${esc(state.elig)}</p>`});
+
+  // 10 published artists
+  const al = lines(state.artists).map(l => l.split('|').map(x => x.trim()));
+  const card = i => { const [n,e,q] = al[i] || []; const k = 'imgA'+(i+1);
+    return `<div style="background:rgba(255,255,255,.06);border-radius:24px;padding:28px;position:relative">
+      ${state.images[k] ? `<div class="img" style="height:400px;border-radius:14px;background-image:url(${state.images[k]});background-position:center"></div>` : `<div class="ph" style="height:400px;color:${WHITE}">Their page<br>in the book</div>`}
+      <p style="font-size:30px;font-weight:600;margin-top:24px">${gap(n,'Artist name')}</p>
+      <p style="font-size:24px;opacity:.7;margin-top:10px">${gap(e,'Edition · Country')}</p>
+      <p style="font-family:'ATH Serif',serif;font-style:italic;font-size:30px;line-height:1.3;margin-top:20px;opacity:.9">“${gap(q,'One real line')}”</p></div>`; };
+  S.push({bg:INK, html:`${corners(WHITE, PEONY, 'From past editions')}
+    <p class="a R c" style="left:80px;right:80px;top:170px;font-size:80px;color:${WHITE}">Published artists</p>
+    <div class="a" style="left:64px;right:64px;top:330px;display:grid;grid-template-columns:1fr 1fr;gap:24px;color:${WHITE}">${card(0)}${card(1)}</div>`});
+
+  // 11 action
+  const mini = [[PEONY,250],[CREAM,280],[BURG,240],[INK,270],[PEONY,230],[CREAM,260]].map(([c,h]) => `<div style="flex:1;height:${h}px;background:${c};border-radius:3px 3px 0 0;box-shadow:inset 0 0 0 2px rgba(255,255,255,.18)"></div>`).join('');
+  S.push({bg:C, html:`${corners(WHITE, PEONY, 'Submissions open')}
+    <p class="a H c" style="left:60px;right:60px;top:180px;font-size:108px;color:${WHITE}">Take your place<br>on the shelf.</p>
+    <div class="a" style="left:250px;right:250px;top:450px;height:300px;display:flex;align-items:flex-end;gap:10px;border-bottom:6px solid ${CREAM};padding:0 14px">${mini}
+      <div style="flex:1.5;height:290px;background:${Tn};border-radius:3px 3px 0 0;box-shadow:0 0 0 6px ${rgba(Tn,.3)};position:relative">${spineLab(state.name, INK, 30)}</div></div>
+    <div class="a" style="left:110px;right:110px;top:850px;height:124px;border-radius:999px;background:${CREAM};color:${BURG};display:flex;align-items:center;justify-content:space-between;padding:0 20px 0 56px">
+      <span style="font-size:44px;font-weight:700;letter-spacing:-.02em">DM “${kw}” to apply</span>
+      <span style="width:88px;height:88px;border-radius:50%;background:${BURG};color:${CREAM};display:inline-flex;align-items:center;justify-content:center"><svg width="36" height="16" viewBox="0 0 46 20"><path d="M2 10h40M33 2l9 8-9 8" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></span></div>
+    <p class="a c" style="left:0;right:0;top:1020px;font-size:28px;opacity:.9;color:${WHITE}">or apply via link in bio</p>
+    <p class="a c" style="left:0;right:0;top:1070px;font-size:26px;opacity:.7;color:${WHITE}">artstoheartsproject.com</p>`});
+
+  const titles = ['cover','who-we-are','the-series','the-theme','the-book','what-you-receive','recognition','selection','who-can-apply','published-artists','apply'];
+  return S.map((s,i) => ({...s, title: titles[i]}));
+}
+
+// ---------- caption ----------
+function caption(){
+  const kw = (state.keyword || 'KEYWORD').toUpperCase();
+  return `What happens when ${state.selected} artists from around the world come together around a single idea?
+
+${state.series}: ${state.name} is now open for submissions. Edition ${state.edition} of a series that has published ${state.published} artists since ${state.since}.
+
+${state.selected} artists will be selected by ${state.jury || 'the jury'} and published in a juried hardcover book, distributed through Amazon, Barnes & Noble and the ATH Shop, and introduced to collectors, galleries and curators.
+
+Open to individual artists 18+, worldwide, in any medium.
+
+DM us "${kw}" for the full brief, or apply through the link in bio.
+Submissions close ${dl().getDate()} ${MONTHS_L[dl().getMonth()]}.
+
+Know an artist whose work belongs in this book? Send this to them.
+
+#ArtsToHeartsProject #OpenCall #CallForArtists #101ArtBook`;
+}
+const pinned = () => `DM "${(state.keyword || 'KEYWORD').toUpperCase()}" for the full brief and your submission link. Closes ${short()}.`;
+
+// ---------- render + export ----------
+let RENDERED = [];
+const slideNode = s => `<div class="post" style="background:${s.bg};height:${s.h||1350}px">${s.html}</div>`;
+function verbFor(left){ const d = new Date(dl()); d.setDate(d.getDate() - left); const [y,m,dd] = String(state.commentFrom||'').split('-').map(Number); return (y && d >= new Date(y, m-1, dd)) ? 'COMMENT' : 'DM'; }
+function postDate(left){ const d = new Date(dl()); d.setDate(d.getDate() - left); return d.getDate() + ' ' + MONTHS[d.getMonth()]; }
+function buildPtype(){ const sel = $('ptype'), cur = sel.value;
+  sel.innerHTML = '<option value="month">Whole month (${monthPosts().length} feed posts)</option>' + monthPosts().map((p,i) => `<option value="${i}">${postDate(p.left)} · ${esc(p.title)} (${p.kind.split(' ·')[0]})</option>`).join('') + '<option value="stories">Stories (10 frames)</option>';
+  sel.value = cur || '0'; if (!sel.value) sel.value = '0'; }
+function render(){
+  readForm();
+  const base = (state.name || 'call').toLowerCase().replace(/[^a-z0-9]+/g,'-');
+  const pick = $('ptype').value || '0';
+  const groups = [];
+  if (pick === 'stories') {
+    stories().forEach((ph,pi) => { VERB = verbFor([30,15,3][pi]); const frames = ph.frames; VERB = 'DM';
+      groups.push({title:'Stories · ' + ph.phase, meta: frames.length + ' frames · 1080 × 1920 · add the stickers in Instagram', slides: frames.map((f,j) => ({...f, title: ph.phase.toLowerCase().replace(/[^a-z]+/g,'-') + '-' + (j+1)})), story:true}); });
+    // re-render final week with the right verb
+    VERB = verbFor(3); groups[2].slides = stories()[2].frames.map((f,j) => ({...f, title:'final-week-' + (j+1)})); VERB = 'DM';
+  } else {
+    const all = monthPosts(); const list = pick === 'month' ? all : [all[Number(pick)]];
+    list.forEach((p,pi) => { VERB = verbFor(p.left); CURLEFT = p.left;
+      const slides = p.slides(); const cap = p.caption(); const pin = p.pin ? p.pin() : `${VERB === 'COMMENT' ? 'Comment' : 'DM us'} "${(state.keyword||'').toUpperCase()}" for the brief and your link. Closes ${short()}.`;
+      groups.push({title: `${postDate(p.left)} · ${p.title}`, meta: `${p.kind} · ${slides.length} slide${slides.length>1?'s':''} · ${p.left === 0 ? 'deadline day' : p.left + ' days left'} · ${VERB} “${KW()}”`, slides: slides.map((s,j) => ({...s, title: s.title || (p.title.toLowerCase().replace(/[^a-z0-9]+/g,'-') + (slides.length>1 ? '-'+(j+1) : ''))})), cap, pin, left:p.left, idx:pi});
+      VERB = 'DM'; });
+  }
+  RENDERED = [];
+  $('out').innerHTML = groups.map((g,gi) => {
+    const cells = g.slides.map((s,j) => { const i = RENDERED.push({ s, name: `${base}-${g.left !== undefined ? String(g.idx+1).padStart(2,'0')+'-' : 'story-'}${s.title}.png` }) - 1;
+      return `<div class="cell"><div class="frame${s.h ? ' tall' : ''}">${slideNode(s)}</div><div class="act"><span>${g.slides.length>1 ? 'Slide ' + (j+1) : 'Single'}</span><button type="button" data-i="${i}">Save PNG</button></div></div>`; }).join('');
+    const capBox = g.cap ? `<details class="capbox"><summary>Caption and pinned comment</summary><div class="f"><textarea id="cap${gi}" style="min-height:220px">${esc(g.cap)}</textarea></div><div class="f"><label>Pinned comment</label><input value="${esc(g.pin)}"></div><button class="btn ghost" type="button" data-cap="cap${gi}" style="margin-top:8px">Copy caption</button></details>` : '';
+    return `<section class="group"><h2>${esc(g.title)}</h2><p class="meta">${esc(g.meta)}</p><div class="slides">${cells}</div>${capBox}</section>`; }).join('');
+  $('out').querySelectorAll('[data-i]').forEach(b => b.onclick = () => saveOne(Number(b.dataset.i)));
+  $('out').querySelectorAll('[data-cap]').forEach(b => b.onclick = async () => { const t = $(b.dataset.cap); try { await navigator.clipboard.writeText(t.value); status('Caption copied.'); } catch { t.select(); status('Selected: press copy.'); } });
+  status(`${RENDERED.length} images ready.`);
+}
+async function toBlob(s){
+  await document.fonts.ready;
+  const stage = $('stage'); stage.innerHTML = slideNode(s); const el = stage.firstElementChild;
+  const canvas = await html2canvas(el, { scale:1, width:1080, height:(s.h||1350), backgroundColor:null, useCORS:true, logging:false });
+  stage.innerHTML = '';
+  return await new Promise(r => canvas.toBlob(r, 'image/png'));
+}
+let DL = null; const dlReady = (async () => { try { DL = await window.claude?.use?.('downloads'); } catch { DL = null; } })();
+async function offer(filename, data){
+  await dlReady;
+  if (!DL) { const url = URL.createObjectURL(data); const a = document.createElement('a'); a.href = url; a.download = filename; document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(url), 4000); status('Downloaded ' + filename + '.'); return; }
+  try { await DL.save({ filename, data }); status('Saved ' + filename + '.'); }
+  catch (e) { status(e && e.code === 'declined' ? 'Save cancelled.' : 'Could not save (' + (e && e.code || 'error') + ').'); }
+}
+function preflight(){
+  const issues = [];
+  const today = new Date(); today.setHours(0,0,0,0);
+  if (dl() < today) issues.push('the deadline (' + short() + ') has already passed');
+  const gaps = document.querySelectorAll('#out .gap, #out .ph').length;
+  if (gaps) issues.push(gaps + ' detail' + (gaps === 1 ? ' is' : 's are') + ' still dashed (missing)');
+  if (!issues.length) return true;
+  return confirm('Before you save: ' + issues.join(' and ') + '. Save anyway?');
+}
+async function saveOne(i){ if (!preflight()) return; status('Rendering…'); await offer(RENDERED[i].name, await toBlob(RENDERED[i].s)); }
+$('zip').onclick = async () => { if (!RENDERED.length) render(); if (!preflight()) return; const zip = new JSZip(); for (let i = 0; i < RENDERED.length; i++){ status(`Rendering ${i+1} of ${RENDERED.length}…`); zip.file(RENDERED[i].name, await toBlob(RENDERED[i].s)); }
+  status('Packing…'); await offer((state.name || 'ath-call').toLowerCase().replace(/[^a-z0-9]+/g,'-') + '-posts.zip', await zip.generateAsync({ type:'blob' })); };
+$('go').onclick = render;
+document.querySelector('aside').addEventListener('change', e => { if (e.target.type !== 'file') { readForm(); buildPtype(); render(); } });
+
+function sizePreviews(){ const w = $('out').clientWidth || 900; const pw = Math.max(200, Math.min(300, Math.floor((w - 32) / 3))); document.documentElement.style.setProperty('--pw', pw + 'px'); document.documentElement.style.setProperty('--sc', String(pw / 1080)); }
+window.addEventListener('resize', sizePreviews);
+refreshSaved(); fillForm(); buildPtype(); $('ptype').value = '0'; $('ptype').onchange = render; sizePreviews(); document.fonts.ready.then(render);
+</script>
+</body></html>
