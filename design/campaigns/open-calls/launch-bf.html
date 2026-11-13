@@ -3,134 +3,141 @@
 <style>
 @font-face{font-family:HG;src:url(fonts/ath/HankenGrotesk.woff2) format("woff2");font-weight:100 900}
 @font-face{font-family:NR;src:url(fonts/ath/Newsreader-Italic.woff2) format("woff2");font-style:italic;font-weight:200 800}
-:root{--pet:#025054;--pet2:#013C3F;--pi:#D0D996;--mint:#E7EBDD;--ink:#16080C;--burg:#6A0620;--paper:#FAF8F3}
+@font-face{font-family:NR;src:url(fonts/ath/Newsreader.woff2) format("woff2");font-weight:200 800}
+:root{--pet:#025054;--pet2:#013C3F;--pi:#D0D996;--mint:#E8EBDF;--ink:#16080C;--paper:#FAF8F3}
 body{margin:0;background:#C9D3CF;display:flex;flex-wrap:wrap;gap:40px;padding:40px}
 .s{position:relative;width:1080px;height:1350px;overflow:hidden;font-family:HG,sans-serif;-webkit-font-smoothing:antialiased}
 .s *{margin:0;box-sizing:border-box}
 .a{position:absolute}
 .dk{background:var(--pet);color:#fff}.lt{background:var(--mint);color:var(--ink)}
-/* type: bold grotesk for headlines, one italic serif accent at most */
-.H{font-weight:700;letter-spacing:-.045em;line-height:.98}
-.H2{font-weight:600;letter-spacing:-.035em;line-height:1.05}
+.H{font-weight:600;letter-spacing:-.042em;line-height:1}
 .it{font-family:NR,serif;font-style:italic;font-weight:400;letter-spacing:-.02em}
-.p{font-size:32px;font-weight:500;line-height:1.38;letter-spacing:-.01em}
-.l{font-size:24px;font-weight:600;letter-spacing:-.005em}
-.mk{display:inline-block;background:var(--pi);color:var(--ink);padding:0 .18em .04em;border-radius:8px;transform:rotate(-1.5deg)}
+.p{font-size:32px;font-weight:400;line-height:1.4;letter-spacing:-.01em}
+.l{font-size:24px;font-weight:500}
 .img{background-size:cover;background-repeat:no-repeat}
 .top{left:72px;right:72px;top:62px;display:flex;justify-content:space-between;align-items:center}
-.top img{height:56px}
-.bot{left:72px;right:72px;bottom:56px;display:flex;justify-content:space-between;align-items:center}
-.btn{display:inline-flex;align-items:center;gap:22px;height:96px;padding:0 14px 0 40px;border-radius:999px;font-size:33px;font-weight:700;letter-spacing:-.02em;white-space:nowrap}
-.btn i{width:68px;height:68px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-style:normal}
-.tag{display:inline-flex;align-items:center;height:56px;padding:0 26px;border-radius:999px;font-size:23px;font-weight:600;white-space:nowrap}
+.top img{height:54px}
+.bot{left:72px;right:72px;bottom:58px;display:flex;justify-content:space-between;align-items:center;font-size:24px;font-weight:500}
+.bot span:last-child{opacity:.7}
+.btn{display:inline-flex;align-items:center;gap:22px;height:100px;padding:0 14px 0 44px;border-radius:999px;font-size:34px;font-weight:600;letter-spacing:-.02em;white-space:nowrap}
+.btn i{width:72px;height:72px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-style:normal}
+.row{display:grid;grid-template-columns:70px 1fr;align-items:baseline;padding:30px 0;border-top:1.5px solid currentColor}
 </style></head><body>
 <svg width="0" height="0" style="position:absolute"><symbol id="ar" viewBox="0 0 46 20"><path d="M2 10h40M33 2l9 8-9 8" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></symbol></svg>
 
-<!-- 1 · HOOK -->
+<!-- 1 · COVER: one image, one line, one action -->
 <div class="s dk" id="s1">
-  <div class="a top"><img src="art/logo-no-project_peony.svg"><span class="tag" style="background:var(--pi);color:var(--ink)">Open call · 30 days left</span></div>
-  <div class="a img" style="left:72px;right:72px;top:150px;height:560px;border-radius:30px;background-image:url(art/flower-portrait.jpg);background-position:center 16%"></div>
-  <div class="a" style="left:96px;right:96px;top:640px;height:96px;border-radius:22px;background:var(--pi);color:var(--ink);display:flex;align-items:center;justify-content:space-between;padding:0 34px">
-    <span style="font-size:28px;font-weight:600">101 Art Book: Garden Edition</span><span style="font-size:26px;font-weight:500">Art: [Artist name]</span></div>
-  <h1 class="a H" style="left:72px;right:60px;top:800px;font-size:104px">Calling all artists inspired by <span class="mk">nature.</span></h1>
-  <p class="a p" style="left:72px;right:120px;top:1040px;opacity:.9">Get published in a juried hardcover book. Win $500.</p>
-  <div class="a bot"><span class="btn" style="background:#fff;color:var(--ink)">DM “GARDEN” to apply<i style="background:var(--pet);color:#fff"><svg width="34" height="16"><use href="#ar"/></svg></i></span><span class="l">Closes 13 Dec →</span></div>
+  <div class="a top"><img src="art/logo-no-project_peony.svg"><span class="l" style="opacity:.85">Open call</span></div>
+  <div class="a img" style="left:72px;right:72px;top:160px;height:700px;border-radius:28px;background-image:url(art/flower-portrait.jpg);background-position:center 14%"></div>
+  <h1 class="a H" style="left:72px;right:72px;top:910px;font-size:96px">Calling all artists inspired by <span class="it" style="color:var(--pi)">nature.</span></h1>
+  <div class="a bot"><span>DM “GARDEN” to apply</span><span>Closes 13 Dec</span></div>
 </div>
 
-<!-- 2 · WHAT YOU GET (Pixel list) -->
-<div class="s dk" id="s2">
-  <div class="a top"><img src="art/logo-no-project_peony.svg"><span class="l" style="opacity:.8">If you’re selected</span></div>
-  <h2 class="a H" style="left:72px;right:72px;top:190px;font-size:100px;text-align:center">What selected<br>artists <span class="mk">receive</span></h2>
-  <div class="a" style="left:0;right:0;top:520px;display:flex;flex-direction:column;align-items:center;gap:30px">
-    <span class="mk H2" style="font-size:48px;padding:10px 26px;transform:rotate(-1.5deg)">Published in a hardcover book</span>
-    <span class="mk H2" style="font-size:48px;padding:10px 26px;transform:rotate(1.2deg)">Sold on Amazon &amp; Barnes &amp; Noble</span>
-    <span class="mk H2" style="font-size:48px;padding:10px 26px;transform:rotate(-1deg)">Certificate of Recognition</span>
-    <span class="mk H2" style="font-size:48px;padding:10px 26px;transform:rotate(1.5deg)">Seen by 190,000+ art lovers</span>
-    <span class="mk H2" style="font-size:48px;padding:10px 26px;transform:rotate(-1.2deg)">“Published artist” on your CV</span>
-  </div>
-  <div class="a bot"><span class="l">DM “GARDEN” to apply</span><span class="l" style="opacity:.8">Closes 13 Dec</span></div>
+<!-- 2 · PATTERN BREAK: the reason to care -->
+<div class="s" id="s2" style="background:var(--ink);color:#fff">
+  <div class="a top"><img src="art/logo-no-project_peony.svg"><span class="l" style="opacity:.7">Garden Edition</span></div>
+  <p class="a H" style="left:72px;right:72px;top:430px;font-size:120px;opacity:.35">A post scrolls away.</p>
+  <p class="a H" style="left:72px;right:72px;top:690px;font-size:120px">A book <span class="it" style="color:var(--pi)">stays.</span></p>
+  <p class="a p" style="left:72px;right:300px;top:960px;opacity:.75">This winter, 101 artists will be published in print.</p>
+  <div class="a bot"><span>DM “GARDEN” to apply</span><span>Closes 13 Dec</span></div>
 </div>
 
-<!-- 3 · THE AWARD (92% style) -->
+<!-- 3 · THE BOOK -->
 <div class="s lt" id="s3">
-  <div class="a top"><img src="art/logo-no-project_burgundy.svg"><span class="tag" style="border:2px solid var(--ink)">The award</span></div>
-  <span class="a tag" style="left:50%;top:330px;transform:translateX(-50%);height:70px;padding:0 36px;font-size:30px;background:var(--pet);color:#fff">Winner</span>
-  <p class="a H" style="left:0;right:0;top:440px;text-align:center;font-size:330px;font-weight:500;letter-spacing:-.06em">$500</p>
-  <p class="a p" style="left:180px;right:180px;top:780px;text-align:center">for the winner, plus a 4-page feature, glass trophy and Artsy listing.</p>
-  <p class="a l" style="left:0;right:0;top:930px;text-align:center;color:var(--pet)">Two runners-up: 2-page feature + glass trophy</p>
-  <div class="a bot"><span class="l">DM “GARDEN” to apply</span><span class="l" style="opacity:.7">Closes 13 Dec</span></div>
-</div>
-
-<!-- 4 · THE THEME (image + pill stack) -->
-<div class="s" id="s4" style="color:#fff">
-  <div class="a img" style="inset:0;background-image:url(art/night-bloom.jpg);background-position:center 40%"></div>
-  <div class="a" style="inset:0;background:linear-gradient(180deg,rgba(10,6,8,.55),rgba(10,6,8,0) 28%,rgba(10,6,8,0) 60%,rgba(10,6,8,.75))"></div>
-  <div class="a top"><img src="art/logo-no-project_peony.svg"><span class="l">The theme</span></div>
-  <div class="a" style="left:72px;right:72px;top:760px;display:flex;flex-direction:column;align-items:flex-start;gap:16px">
-    <span class="tag H2" style="height:108px;padding:0 44px;font-size:54px;background:var(--mint);color:var(--ink)">A garden is more</span>
-    <span class="tag" style="height:108px;padding:0 44px;font-size:58px;background:#fff;color:var(--ink)"><span class="it">than a place where</span></span>
-    <span class="tag H2" style="height:108px;padding:0 44px;font-size:54px;background:var(--pi);color:var(--ink)">things grow.</span>
-  </div>
-  <div class="a bot"><span class="l">Show us what a garden means to you</span><span class="l" style="opacity:.8">Art: [Artist name]</span></div>
-</div>
-
-<!-- 5 · THE BOOK -->
-<div class="s lt" id="s5">
-  <div class="a top"><img src="art/logo-no-project_burgundy.svg"><span class="tag" style="border:2px solid var(--ink)">The book</span></div>
-  <div class="a" style="left:360px;top:170px;width:360px;height:480px;border-radius:3px 8px 8px 3px;overflow:hidden;box-shadow:0 50px 70px -26px rgba(22,8,12,.5)">
+  <div class="a top"><img src="art/logo-no-project_burgundy.svg"><span class="l" style="opacity:.7">The book</span></div>
+  <div class="a" style="left:340px;top:180px;width:400px;height:530px;border-radius:3px 8px 8px 3px;overflow:hidden;box-shadow:0 60px 80px -30px rgba(22,8,12,.5),0 8px 18px rgba(22,8,12,.15)">
     <div class="a img" style="inset:0;background-image:url(art/night-bloom.jpg);background-position:center 35%"></div>
-    <div class="a" style="left:0;top:0;bottom:0;width:22px;background:linear-gradient(90deg,rgba(0,0,0,.4),rgba(255,255,255,.12) 60%,rgba(0,0,0,.12))"></div>
-    <div class="a" style="left:0;right:0;top:0;height:130px;background:linear-gradient(180deg,rgba(20,6,10,.8),rgba(20,6,10,0))"></div>
-    <p class="a" style="left:44px;top:30px;color:#fff;font-size:14px;font-weight:700;letter-spacing:.16em">101 ART BOOK · VOL. 16</p>
-    <p class="a it" style="left:44px;top:52px;color:#fff;font-size:42px">Garden</p>
+    <div class="a" style="left:0;top:0;bottom:0;width:24px;background:linear-gradient(90deg,rgba(0,0,0,.4),rgba(255,255,255,.12) 60%,rgba(0,0,0,.12))"></div>
+    <div class="a" style="left:0;right:0;top:0;height:140px;background:linear-gradient(180deg,rgba(20,6,10,.8),rgba(20,6,10,0))"></div>
+    <p class="a" style="left:48px;top:32px;color:#fff;font-size:15px;font-weight:700;letter-spacing:.16em">101 ART BOOK · VOL. 16</p>
+    <p class="a it" style="left:48px;top:56px;color:#fff;font-size:44px">Garden</p>
   </div>
-  <h2 class="a H" style="left:72px;right:72px;top:730px;font-size:92px;text-align:center">Your work, in <span class="tag" style="height:auto;padding:0 30px 6px;font-size:92px;font-weight:700;letter-spacing:-.045em;background:var(--ink);color:#fff">print.</span></h2>
-  <p class="a p" style="left:150px;right:150px;top:900px;text-align:center">Join 1,300+ artists already published across 15 editions of the 101 Art Book.</p>
-  <div class="a" style="left:0;right:0;top:1060px;display:flex;justify-content:center"><span class="btn" style="background:var(--ink);color:#fff">DM “GARDEN” for the brief<i style="background:var(--pi);color:var(--ink)"><svg width="34" height="16"><use href="#ar"/></svg></i></span></div>
-  <div class="a bot"><span class="l">DM “GARDEN” to apply</span><span class="l" style="opacity:.7">Closes 13 Dec</span></div>
+  <h2 class="a H" style="left:72px;right:72px;top:800px;font-size:84px;text-align:center">101 artists.<br>One hardcover book.</h2>
+  <p class="a p" style="left:160px;right:160px;top:1000px;text-align:center;opacity:.75">Juried, and sold on Amazon, Barnes &amp; Noble and in bookstores.</p>
+  <div class="a bot"><span>DM “GARDEN” to apply</span><span>Closes 13 Dec</span></div>
 </div>
 
-<!-- 6 · WHO CAN APPLY (Pixel card) -->
-<div class="s dk" id="s6">
-  <div class="a top"><img src="art/logo-no-project_peony.svg"><span class="l" style="opacity:.8">Who can apply</span></div>
-  <div class="a" style="left:96px;right:96px;top:200px;height:900px;border-radius:44px;background:var(--pi);color:var(--ink);padding:80px 70px">
-    <p class="H" style="font-size:112px">Any artist.<br>Any medium.<br>Anywhere.</p>
-    <p class="p" style="margin-top:50px;width:640px">18+, worldwide. Traditional or digital. Self-taught artists welcome.</p>
-    <span class="btn" style="position:absolute;left:70px;bottom:70px;background:var(--ink);color:#fff;height:88px;font-size:30px">DM “GARDEN”<i style="background:var(--pi);color:var(--ink);width:62px;height:62px"><svg width="32" height="16"><use href="#ar"/></svg></i></span>
+<!-- 4 · PATTERN BREAK: picture yourself in it -->
+<div class="s dk" id="s4" style="background:var(--pet2)">
+  <div class="a top"><img src="art/logo-no-project_peony.svg"><span class="l" style="opacity:.7">Inside the edition</span></div>
+  <div class="a" style="left:72px;right:72px;top:190px;height:600px;box-shadow:0 50px 70px -26px rgba(0,0,0,.55);transform:perspective(2000px) rotateX(8deg)">
+    <div class="a" style="left:0;top:0;width:50%;height:100%;background:linear-gradient(90deg,#FFFDF8 78%,#E6DFD2);border-radius:6px 0 0 6px;color:var(--ink)">
+      <p class="a" style="left:60px;top:70px;font-size:18px;font-weight:600;letter-spacing:.14em;opacity:.5">GARDEN EDITION</p>
+      <p class="a it" style="left:60px;bottom:140px;font-size:60px">Your name</p>
+      <p class="a" style="left:60px;bottom:96px;font-size:20px;opacity:.6">Title of work · Medium · Country</p>
+      <p class="a" style="left:60px;bottom:40px;font-size:17px;opacity:.4">48</p></div>
+    <div class="a" style="right:0;top:0;width:50%;height:100%;background:linear-gradient(90deg,#E6DFD2,#FFFDF8 16%);border-radius:0 6px 6px 0">
+      <div class="a img" style="left:56px;top:60px;right:50px;bottom:60px;background-image:url(art/call-garden.jpg);background-position:30% 40%"></div></div>
   </div>
-  <div class="a bot"><span class="l">Juried · 101 places</span><span class="l" style="opacity:.8">Closes 13 Dec</span></div>
+  <h2 class="a H" style="left:72px;right:72px;top:880px;font-size:96px">Imagine your name<br>on this page.</h2>
+  <div class="a bot"><span>DM “GARDEN” to apply</span><span>Closes 13 Dec</span></div>
 </div>
 
-<!-- 7 · PROOF IN NUMBERS (Pixel stats) -->
-<div class="s dk" id="s7" style="background:var(--pet2)">
-  <div class="a top"><img src="art/logo-no-project_peony.svg"><span class="l" style="opacity:.8">The series</span></div>
-  <div class="a" style="left:72px;right:72px;top:200px">
-    <div style="display:grid;grid-template-columns:1fr 360px;align-items:center;padding:44px 0;border-bottom:2px solid rgba(255,255,255,.18)"><p class="H" style="font-size:180px;font-weight:600;color:var(--pi)">1,300+</p><p class="p">artists published in the series</p></div>
-    <div style="display:grid;grid-template-columns:1fr 360px;align-items:center;padding:44px 0;border-bottom:2px solid rgba(255,255,255,.18)"><p class="H" style="font-size:180px;font-weight:600;color:var(--pi)">190K+</p><p class="p">art lovers across our platforms</p></div>
-    <div style="display:grid;grid-template-columns:1fr 360px;align-items:center;padding:44px 0"><p class="H" style="font-size:180px;font-weight:600;color:var(--pi)">101</p><p class="p">places in the Garden Edition</p></div>
-  </div>
-  <div class="a bot"><span class="l">DM “GARDEN” to apply</span><span class="l" style="opacity:.8">Closes 13 Dec</span></div>
+<!-- 5 · THE THEME: artwork left fully visible -->
+<div class="s dk" id="s5">
+  <div class="a img" style="left:0;right:0;top:0;height:900px;background-image:url(art/night-bloom.jpg);background-position:center 42%"></div>
+  <img class="a" src="art/logo-no-project_peony.svg" style="left:72px;top:62px;height:54px">
+  <p class="a l" style="left:72px;top:950px;color:var(--pi)">The theme</p>
+  <p class="a" style="left:72px;right:72px;top:1000px;font-family:NR,serif;font-size:66px;line-height:1.06;letter-spacing:-.02em">“A garden is more than a place where things <i>grow.</i>”</p>
+  <div class="a bot"><span>DM “GARDEN” to apply</span><span>Art: [Artist name]</span></div>
 </div>
 
-<!-- 8 · HOW TO APPLY: the DM is step one -->
+<!-- 6 · PATTERN BREAK: does my work count? (visual) -->
+<div class="s lt" id="s6">
+  <div class="a top"><img src="art/logo-no-project_burgundy.svg"><span class="l" style="opacity:.7">Eligible work</span></div>
+  <h2 class="a H" style="left:72px;right:72px;top:180px;font-size:92px">Does your work fit?<br><span style="opacity:.4">Probably.</span></h2>
+  <div class="a" style="left:72px;right:72px;top:470px;display:grid;grid-template-columns:repeat(3,1fr);gap:18px">
+    <div><div class="img" style="height:520px;border-radius:22px;background-image:url(art/ref-dahlias.jpg);background-position:40% 30%;background-size:auto 130%"></div><p class="l" style="margin-top:20px">Flowers &amp; plants</p></div>
+    <div><div class="img" style="height:520px;border-radius:22px;background-image:url(art/ref-reid.jpg);background-position:30% center;background-size:auto 100%"></div><p class="l" style="margin-top:20px">Landscapes</p></div>
+    <div><div class="img" style="height:520px;border-radius:22px;background-image:url(art/flower-portrait.jpg);background-position:center 20%"></div><p class="l" style="margin-top:20px">Imagined worlds</p></div>
+  </div>
+  <p class="a p" style="left:72px;right:72px;top:1090px;opacity:.75">Any medium, traditional or digital. Not AI-generated.</p>
+  <div class="a bot"><span>DM “GARDEN” to apply</span><span>Closes 13 Dec</span></div>
+</div>
+
+<!-- 7 · WHAT YOU RECEIVE: quiet list -->
+<div class="s dk" id="s7">
+  <div class="a top"><img src="art/logo-no-project_peony.svg"><span class="l" style="opacity:.7">If selected</span></div>
+  <h2 class="a H" style="left:72px;right:72px;top:180px;font-size:92px">What selected artists receive</h2>
+  <div class="a" style="left:72px;right:72px;top:460px;border-bottom:1.5px solid rgba(255,255,255,.3)">
+    <div class="row" style="border-color:rgba(255,255,255,.3)"><span class="l" style="color:var(--pi)">01</span><p class="H" style="font-size:46px;font-weight:500">Your work, published in print</p></div>
+    <div class="row" style="border-color:rgba(255,255,255,.3)"><span class="l" style="color:var(--pi)">02</span><p class="H" style="font-size:46px;font-weight:500">Sold on Amazon and Barnes &amp; Noble</p></div>
+    <div class="row" style="border-color:rgba(255,255,255,.3)"><span class="l" style="color:var(--pi)">03</span><p class="H" style="font-size:46px;font-weight:500">Certificate of Recognition</p></div>
+    <div class="row" style="border-color:rgba(255,255,255,.3)"><span class="l" style="color:var(--pi)">04</span><p class="H" style="font-size:46px;font-weight:500">Seen by 190,000+ art lovers</p></div>
+    <div class="row" style="border-color:rgba(255,255,255,.3)"><span class="l" style="color:var(--pi)">05</span><p class="H" style="font-size:46px;font-weight:500">A publication credit for your CV</p></div>
+  </div>
+  <div class="a bot"><span>DM “GARDEN” to apply</span><span>Closes 13 Dec</span></div>
+</div>
+
+<!-- 8 · THE AWARD -->
 <div class="s lt" id="s8">
-  <div class="a top"><img src="art/logo-no-project_burgundy.svg"><span class="tag" style="border:2px solid var(--ink)">How to apply</span></div>
-  <h2 class="a H" style="left:72px;right:72px;top:180px;font-size:100px">Three steps.<br><span style="opacity:.35">Ten minutes.</span></h2>
-  <div class="a" style="left:72px;right:72px;top:470px;display:flex;flex-direction:column;gap:20px">
-    <div style="background:var(--ink);color:#fff;border-radius:30px;padding:38px 44px;display:grid;grid-template-columns:100px 1fr;align-items:center"><p class="H" style="font-size:80px;color:var(--pi)">1</p><div><p class="H2" style="font-size:46px">DM us “GARDEN”</p><p class="p" style="font-size:28px;opacity:.75;margin-top:4px">We send the full brief and your link.</p></div></div>
-    <div style="background:#fff;border-radius:30px;padding:38px 44px;display:grid;grid-template-columns:100px 1fr;align-items:center"><p class="H" style="font-size:80px;color:var(--pet)">2</p><div><p class="H2" style="font-size:46px">Choose one artwork</p><p class="p" style="font-size:28px;opacity:.7;margin-top:4px">Photographed in daylight, no filters.</p></div></div>
-    <div style="background:#fff;border-radius:30px;padding:38px 44px;display:grid;grid-template-columns:100px 1fr;align-items:center"><p class="H" style="font-size:80px;color:var(--pet)">3</p><div><p class="H2" style="font-size:46px">Submit before 13 Dec</p><p class="p" style="font-size:28px;opacity:.7;margin-top:4px">Or apply directly via the link in bio.</p></div></div>
-  </div>
-  <div class="a bot"><span class="l" style="opacity:.7">Application fee applicable</span><span class="l" style="opacity:.7">Closes 13 Dec</span></div>
+  <div class="a top"><img src="art/logo-no-project_burgundy.svg"><span class="l" style="opacity:.7">The award</span></div>
+  <p class="a l" style="left:0;right:0;top:330px;text-align:center;color:var(--pet)">For the winner</p>
+  <p class="a H" style="left:0;right:0;top:390px;text-align:center;font-size:330px;font-weight:500;letter-spacing:-.06em;line-height:.85">$500</p>
+  <p class="a p" style="left:200px;right:200px;top:720px;text-align:center">plus a 4-page feature, a glass trophy and an Artsy listing.</p>
+  <p class="a p" style="left:200px;right:200px;top:890px;text-align:center;opacity:.6;font-size:28px">Two runners-up receive a 2-page feature and a glass trophy.</p>
+  <div class="a bot"><span>DM “GARDEN” to apply</span><span>Closes 13 Dec</span></div>
 </div>
 
-<!-- 9 · CTA (Pixel "Ready to stand out?") -->
+<!-- 9 · HOW TO APPLY -->
 <div class="s dk" id="s9">
-  <div class="a top"><img src="art/logo-no-project_peony.svg"><span class="tag" style="background:var(--pi);color:var(--ink)">30 days left</span></div>
-  <div class="a img" style="left:340px;top:190px;width:400px;height:400px;border-radius:50%;background-image:url(art/flower-portrait.jpg);background-position:center 18%;border:8px solid var(--pi)"></div>
-  <h2 class="a H" style="left:72px;right:72px;top:660px;font-size:112px;text-align:center">Ready to be<br><span class="mk">published?</span></h2>
-  <p class="a p" style="left:160px;right:160px;top:930px;text-align:center;opacity:.9">101 places. Submissions close 13 December.</p>
-  <div class="a" style="left:0;right:0;top:1030px;display:flex;justify-content:center"><span class="btn" style="background:var(--pi);color:var(--ink);height:110px;font-size:38px">DM “GARDEN” to apply<i style="background:var(--ink);color:#fff;width:80px;height:80px"><svg width="36" height="16"><use href="#ar"/></svg></i></span></div>
-  <div class="a bot"><span class="l" style="opacity:.8">Or apply via link in bio</span><span class="l" style="opacity:.8">Send this to an artist friend</span></div>
+  <div class="a top"><img src="art/logo-no-project_peony.svg"><span class="l" style="opacity:.7">How to apply</span></div>
+  <h2 class="a H" style="left:72px;right:72px;top:180px;font-size:92px">Three steps.<br><span style="opacity:.45">About ten minutes.</span></h2>
+  <div class="a" style="left:72px;right:72px;top:470px;border-bottom:1.5px solid rgba(255,255,255,.3)">
+    <div class="row" style="border-color:rgba(255,255,255,.3)"><span class="l" style="color:var(--pi)">1</span><div><p class="H" style="font-size:46px;font-weight:500">DM us “GARDEN”</p><p class="p" style="font-size:28px;opacity:.7;margin-top:6px">We’ll send the full brief and your link.</p></div></div>
+    <div class="row" style="border-color:rgba(255,255,255,.3)"><span class="l" style="color:var(--pi)">2</span><div><p class="H" style="font-size:46px;font-weight:500">Choose one artwork</p><p class="p" style="font-size:28px;opacity:.7;margin-top:6px">Photographed in daylight, no filters.</p></div></div>
+    <div class="row" style="border-color:rgba(255,255,255,.3)"><span class="l" style="color:var(--pi)">3</span><div><p class="H" style="font-size:46px;font-weight:500">Submit before 13 December</p><p class="p" style="font-size:28px;opacity:.7;margin-top:6px">Open to artists 18+, worldwide.</p></div></div>
+  </div>
+  <div class="a bot"><span>Application fee applicable</span><span>Closes 13 Dec</span></div>
+</div>
+
+<!-- 10 · CTA -->
+<div class="s" id="s10" style="background:var(--ink);color:#fff">
+  <div class="a top"><img src="art/logo-no-project_peony.svg"><span class="l" style="opacity:.7">30 days left</span></div>
+  <h2 class="a H" style="left:72px;right:72px;top:360px;font-size:120px">101 places.<br>Will one be <span class="it" style="color:var(--pi)">yours?</span></h2>
+  <p class="a p" style="left:72px;right:200px;top:700px;opacity:.75">Submissions close 13 December.</p>
+  <div class="a" style="left:72px;top:820px"><span class="btn" style="background:var(--pi);color:var(--ink)">DM “GARDEN” to apply<i style="background:var(--ink);color:#fff"><svg width="34" height="16"><use href="#ar"/></svg></i></span></div>
+  <p class="a p" style="left:72px;top:960px;font-size:28px;opacity:.65">Or apply through the link in bio.</p>
+  <div class="a bot"><span>Know an artist who paints gardens? Send this.</span><span></span></div>
 </div>
 </body></html>
