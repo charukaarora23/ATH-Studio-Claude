@@ -84,6 +84,7 @@ summary{font:600 12px/1 var(--mono);letter-spacing:.1em;text-transform:uppercase
   <h1>ATH Post Studio</h1>
   <p class="sub">Fill in one open call and the launch carousel renders on the right in ATH colours plus the call’s own colour. Dashed boxes mark details still to supply.</p>
 
+  <div class="f"><label for="preset">Open call</label><select id="preset"></select></div>
   <div class="f"><label for="saved">Saved calls (this browser)</label>
     <div class="row2"><select id="saved"></select><button class="btn ghost" id="saveCall" type="button">Save call</button></div></div>
 
@@ -91,6 +92,10 @@ summary{font:600 12px/1 var(--mono);letter-spacing:.1em;text-transform:uppercase
     <div class="row2">
       <div class="f"><label for="series">Series</label><input id="series"></div>
       <div class="f"><label for="edition">Edition number</label><input id="edition"></div>
+    </div>
+    <div class="row2">
+      <div class="f"><label for="editionLabel">Edition label (cover tag)</label><input id="editionLabel"></div>
+      <div class="f"><label for="seriesNoun">Count noun (“editions”, “books”)</label><input id="seriesNoun"></div>
     </div>
     <div class="f"><label for="name">Edition name</label><input id="name"></div>
     <div class="row2">
@@ -119,6 +124,14 @@ summary{font:600 12px/1 var(--mono);letter-spacing:.1em;text-transform:uppercase
   </details>
 
   <details><summary>Theme</summary>
+    <div class="row2">
+      <div class="f"><label for="theme">Theme (short)</label><input id="theme"></div>
+      <div class="f"><label for="themeWork">“Your … work” phrase</label><input id="themeWork" placeholder="garden work"></div>
+    </div>
+    <div class="f"><label for="themeLine">Theme, described</label><textarea id="themeLine"></textarea></div>
+    <div class="f"><label for="kinds">Five kinds of work to submit, one per line: Title | line</label><textarea id="kinds" style="min-height:120px"></textarea></div>
+    <div class="f"><label for="juryLooks">What the jury looks for</label><textarea id="juryLooks"></textarea></div>
+    <div class="f"><label for="pastEds">Past editions on this theme (comma separated)</label><input id="pastEds"></div>
     <div class="f"><label for="quote">Theme line</label><textarea id="quote"></textarea></div>
     <div class="f"><label for="submit">What artists can submit</label><textarea id="submit"></textarea></div>
   </details>
@@ -190,6 +203,31 @@ const DEFAULTS = {
   prize:'$500', prizeExtra:'a 4-page feature, a trophy and an Artsy listing', runners:'A 2-page feature and a trophy.',
   jury:'', results:'', pub:'', fee:'', commentFrom:'2026-12-08', elig:'No degree, gallery or exhibition history needed. Individual artists, 18+, worldwide.',
   credit:'', artists:'',
+  editionLabel:'Edition 16', seriesNoun:'editions',
+  theme:'Garden', themeWork:'garden work', themeLine:'flowers, plants, landscapes, people and nature, abstract or imagined growth',
+  juryLooks:'Originality, a considered reading of the garden theme, and the quality of the work.',
+  kinds:'A single bloom | Close looking counts. One flower or leaf, made with care.\nA landscape | Fields, hedgerows, the view from a window you grew up with.\nPeople and nature | Figures and faces intertwined with the growing world.\nAbstract growth | Colour, rhythm and form that feel alive, without a single petal.\nA garden remembered | An imagined or remembered place. Memory is a garden too.',
+  pastEds:'Floral, Nature, Landscape',
+};
+// ready-made calls: pick one, then adjust the dates and details
+const PRESETS = {
+  'Garden Edition': {},
+  'Artist of the Year 2026': {
+    series:'Arts to Hearts', edition:'2026', editionLabel:'Hardcover collectible book', name:'Artist of the Year 2026', keyword:'NOMINATE', deadline:'2026-11-16', selected:'100',
+    headline:'Call for artists', coverLine:'Get published in the Artist of the Year 2026 hardcover book. 100 artists.', colour:'#9A6A12',
+    editions:'35+', seriesNoun:'books', published:'10,000+',
+    quote:'No single subject, medium, or direction. The full range of what artists are making today.',
+    submit:'Any subject, any medium, any style. Emerging, mid-career or established. Original work only, no AI.',
+    theme:'Open', themeWork:'best work', themeLine:'Open. No single subject, medium or direction: the full range of creative practice today',
+    juryLooks:'Originality, a distinct artistic voice, and the quality and ambition of the work.',
+    kinds:'Painting | Oil, acrylic, watercolour, gouache: on any surface.\nPhotography | Documentary, fine art, experimental.\nDrawing and illustration | Graphite, ink, pastel and digital.\nSculpture and textile | Three-dimensional work, ceramics, fibre and installation.\nMixed media and digital | Collage, mixed media and digital art.',
+    pastEds:'Artists of the Year 2025',
+    jury:'Guest Curator Jennifer Rizzo', bookText:'Every selected artist receives a 2-page spread in the book, with their name, artwork, medium and country.',
+    benefits:'A 2-page spread in the book | Your work in print\nCertificate of Recognition | An official record of your selection\nPromotion to 200,000+ | Our community and email newsletter\nSold worldwide | Amazon · Barnes & Noble · ATH Shop\nIntroductions | To collectors, galleries and curators',
+    prize:'$500', prizeExtra:'the title Artist of the Year 2026, a 4-page feature, a trophy and an Artsy listing', runners:'A 4-page feature, a trophy and certificate, and an Artsy listing.',
+    commentFrom:'2026-12-08', images:{imgCover:'art/flower-portrait.jpg', imgTheme:'art/ref-palms.jpg'},
+  },
+  'New call (blank)': { series:'', edition:'', editionLabel:'', name:'', keyword:'', selected:'', coverLine:'', quote:'', submit:'', theme:'', themeWork:'work', themeLine:'', juryLooks:'', kinds:'', pastEds:'', jury:'', images:{} },
 };
 const IMGKEYS = ['imgCover','imgTheme','imgBooks','imgSpread','imgA1','imgA2'];
 const FIELDS = Object.keys(DEFAULTS).filter(k => k !== 'colour');
@@ -211,7 +249,7 @@ IMGKEYS.forEach(k => $(k).addEventListener('change', e => {
   const r = new FileReader(); r.onload = () => { state.images[k] = r.result; $('th-'+k).style.backgroundImage = `url(${r.result})`; render(); }; r.readAsDataURL(file);
 }));
 function loadSaved(){ try { return JSON.parse(localStorage.getItem('athStudioCalls2') || '{}'); } catch { return {}; } }
-function refreshSaved(){ const s = loadSaved(); $('saved').innerHTML = '<option value="">Garden Edition (example)</option>' + Object.keys(s).map(n => `<option>${esc(n)}</option>`).join(''); }
+function refreshSaved(){ const s = loadSaved(); $('saved').innerHTML = '<option value="">Choose a saved call</option>' + Object.keys(s).map(n => `<option>${esc(n)}</option>`).join(''); }
 $('saved').onchange = () => { const s = loadSaved(); const v = $('saved').value; state = v && s[v] ? {...DEFAULTS, ...s[v], images: s[v].images || {}} : {...DEFAULTS, images:{...DEFAULT_IMAGES}}; fillForm(); render(); };
 $('saveCall').onclick = () => { readForm(); const s = loadSaved(); const key = state.name || 'Call'; s[key] = state;
   try { localStorage.setItem('athStudioCalls2', JSON.stringify(s)); status('Saved "' + key + '" in this browser.'); }
@@ -260,7 +298,7 @@ function launch(){
     <div class="a img" style="inset:0;background-image:url(${state.images.imgCover || ''});background-position:center 6%"></div>
     <div class="a" style="inset:0;background:linear-gradient(180deg,rgba(20,14,12,.38) 0%,rgba(20,14,12,0) 16%,rgba(20,14,12,0) 40%,rgba(20,14,12,.6) 62%,rgba(20,14,12,.82) 100%)"></div>
     ${corners(WHITE, WHITE, state.series)}
-    <div class="a" style="left:0;right:0;top:650px;display:flex;justify-content:center"><span class="cn" style="display:inline-flex;align-items:center;height:46px;padding:0 26px;background:${Tn};color:${INK};border-radius:999px">Open call · Edition ${esc(state.edition)}</span></div>
+    <div class="a" style="left:0;right:0;top:650px;display:flex;justify-content:center"><span class="cn" style="display:inline-flex;align-items:center;height:46px;padding:0 26px;background:${Tn};color:${INK};border-radius:999px">Open call · ${esc(state.editionLabel || ('Edition ' + state.edition))}</span></div>
     <p class="a c" style="left:0;right:0;top:720px;font-size:136px;font-weight:700;letter-spacing:-.01em;line-height:.9;text-transform:uppercase;color:${WHITE}">${headHtml}</p>
     <p class="a c scr" style="left:0;right:0;top:975px;font-size:88px;line-height:1;color:${Tn}">the ${name}</p>
     <p class="a c sub" style="left:150px;right:150px;top:1095px;color:${WHITE}">${esc(state.coverLine)}</p>`});
@@ -277,7 +315,7 @@ function launch(){
   const eds = csv(state.shelf);
   const spines = eds.map((n,i) => { const [b,f] = SPINES[i % SPINES.length]; return `<div style="flex:1;height:${HEIGHTS[i % HEIGHTS.length]}px;background:${b};border-radius:3px 3px 0 0;position:relative;box-shadow:inset -3px 0 0 rgba(0,0,0,.12)">${spineLab(n,f,22)}</div>`; }).join('');
   S.push({bg:CREAM, html:`${corners(INK, BURG, 'The series')}
-    <p class="a R c" style="left:80px;right:80px;top:200px;font-size:84px;color:${INK}">${esc(state.editions)} editions. ${esc(state.published)} artists.<br>The <span style="color:${C};font-weight:600">${ordinal(state.edition)}</span> is open.</p>
+    <p class="a R c" style="left:80px;right:80px;top:200px;font-size:84px;color:${INK}">${esc(state.editions)} ${esc(state.seriesNoun || 'editions')}. ${esc(state.published)} artists.<br>The <span style="color:${C};font-weight:600">${Number(state.edition) < 30 ? ordinal(state.edition) : 'next edition'}</span> is open.</p>
     <div class="a" style="left:64px;right:64px;top:640px;height:420px;display:flex;align-items:flex-end;gap:8px;border-bottom:6px solid ${INK};padding:0 10px">${spines}
       <div style="flex:1.3;height:390px;border:3px dashed ${C};border-bottom:none;border-radius:3px 3px 0 0;position:relative;background:${rgba(Tn,.45)}">${spineLab(state.name, C, 26)}</div></div>
     <p class="a c sub" style="left:0;right:0;top:1110px;font-size:28px;opacity:.7;color:${INK}">Publishing contemporary artists since ${esc(state.since)}.</p>`});
@@ -452,5 +490,7 @@ document.querySelector('aside').addEventListener('change', e => { if (e.target.t
 
 function sizePreviews(){ const w = $('out').clientWidth || 900; const pw = Math.max(200, Math.min(300, Math.floor((w - 32) / 3))); document.documentElement.style.setProperty('--pw', pw + 'px'); document.documentElement.style.setProperty('--sc', String(pw / 1080)); }
 window.addEventListener('resize', sizePreviews);
+$('preset').innerHTML = Object.keys(PRESETS).map(k => `<option>${esc(k)}</option>`).join('');
+$('preset').onchange = () => { const p = PRESETS[$('preset').value] || {}; state = {...DEFAULTS, ...p, images: {...(p.images || DEFAULT_IMAGES)}}; fillForm(); buildPtype(); render(); };
 refreshSaved(); fillForm(); buildPtype(); $('ptype').value = '0'; $('ptype').onchange = render; sizePreviews(); document.fonts.ready.then(render);
 </script>
