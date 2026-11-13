@@ -392,7 +392,7 @@ const slideNode = s => `<div class="post" style="background:${s.bg};height:${s.h
 function verbFor(left){ const d = new Date(dl()); d.setDate(d.getDate() - left); const [y,m,dd] = String(state.commentFrom||'').split('-').map(Number); return (y && d >= new Date(y, m-1, dd)) ? 'COMMENT' : 'DM'; }
 function postDate(left){ const d = new Date(dl()); d.setDate(d.getDate() - left); return d.getDate() + ' ' + MONTHS[d.getMonth()]; }
 function buildPtype(){ const sel = $('ptype'), cur = sel.value;
-  sel.innerHTML = '<option value="month">Whole month (21 feed posts)</option>' + monthPosts().map((p,i) => `<option value="${i}">${postDate(p.left)} · ${esc(p.title)} (${p.kind.split(' ·')[0]})</option>`).join('') + '<option value="stories">Stories (10 frames)</option>';
+  sel.innerHTML = '<option value="month">Whole month (${monthPosts().length} feed posts)</option>' + monthPosts().map((p,i) => `<option value="${i}">${postDate(p.left)} · ${esc(p.title)} (${p.kind.split(' ·')[0]})</option>`).join('') + '<option value="stories">Stories (10 frames)</option>';
   sel.value = cur || '0'; if (!sel.value) sel.value = '0'; }
 function render(){
   readForm();
@@ -406,14 +406,14 @@ function render(){
     VERB = verbFor(3); groups[2].slides = stories()[2].frames.map((f,j) => ({...f, title:'final-week-' + (j+1)})); VERB = 'DM';
   } else {
     const all = monthPosts(); const list = pick === 'month' ? all : [all[Number(pick)]];
-    list.forEach(p => { VERB = verbFor(p.left);
+    list.forEach((p,pi) => { VERB = verbFor(p.left); CURLEFT = p.left;
       const slides = p.slides(); const cap = p.caption(); const pin = p.pin ? p.pin() : `${VERB === 'COMMENT' ? 'Comment' : 'DM us'} "${(state.keyword||'').toUpperCase()}" for the brief and your link. Closes ${short()}.`;
-      groups.push({title: `${postDate(p.left)} · ${p.title}`, meta: `${p.kind} · ${slides.length} slide${slides.length>1?'s':''} · ${p.left === 0 ? 'deadline day' : p.left + ' days left'} · ${VERB} “${KW()}”`, slides: slides.map((s,j) => ({...s, title: s.title || (p.title.toLowerCase().replace(/[^a-z0-9]+/g,'-') + (slides.length>1 ? '-'+(j+1) : ''))})), cap, pin, left:p.left});
+      groups.push({title: `${postDate(p.left)} · ${p.title}`, meta: `${p.kind} · ${slides.length} slide${slides.length>1?'s':''} · ${p.left === 0 ? 'deadline day' : p.left + ' days left'} · ${VERB} “${KW()}”`, slides: slides.map((s,j) => ({...s, title: s.title || (p.title.toLowerCase().replace(/[^a-z0-9]+/g,'-') + (slides.length>1 ? '-'+(j+1) : ''))})), cap, pin, left:p.left, idx:pi});
       VERB = 'DM'; });
   }
   RENDERED = [];
   $('out').innerHTML = groups.map((g,gi) => {
-    const cells = g.slides.map((s,j) => { const i = RENDERED.push({ s, name: `${base}-${g.left !== undefined ? String(30-g.left).padStart(2,'0')+'-' : 'story-'}${s.title}.png` }) - 1;
+    const cells = g.slides.map((s,j) => { const i = RENDERED.push({ s, name: `${base}-${g.left !== undefined ? String(g.idx+1).padStart(2,'0')+'-' : 'story-'}${s.title}.png` }) - 1;
       return `<div class="cell"><div class="frame${s.h ? ' tall' : ''}">${slideNode(s)}</div><div class="act"><span>${g.slides.length>1 ? 'Slide ' + (j+1) : 'Single'}</span><button type="button" data-i="${i}">Save PNG</button></div></div>`; }).join('');
     const capBox = g.cap ? `<details class="capbox"><summary>Caption and pinned comment</summary><div class="f"><textarea id="cap${gi}" style="min-height:220px">${esc(g.cap)}</textarea></div><div class="f"><label>Pinned comment</label><input value="${esc(g.pin)}"></div><button class="btn ghost" type="button" data-cap="cap${gi}" style="margin-top:8px">Copy caption</button></details>` : '';
     return `<section class="group"><h2>${esc(g.title)}</h2><p class="meta">${esc(g.meta)}</p><div class="slides">${cells}</div>${capBox}</section>`; }).join('');
