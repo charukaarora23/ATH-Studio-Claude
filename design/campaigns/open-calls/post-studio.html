@@ -181,7 +181,7 @@ const DEFAULTS = {
   quote:'A garden is more than a place where things grow.',
   submit:'Flowers, butterflies, trees, leaves, landscapes or imagined nature. Any medium. Original work only, no AI.',
   bookText:'Every selected artist is published with their name, artwork title, medium and country.',
-  benefits:'Published in the book | Your work in print\nCertificate of Recognition | For your CV and grant applications\nThe book’s campaign | 190K+ followers · 100K+ email subscribers\nSold worldwide | Amazon · Barnes & Noble · ATH Shop\nIntroductions | To collectors, galleries and curators\nCopies for you | Available at a subsidised rate',
+  benefits:'Published in the book | Your work in print\nCertificate of Recognition | For your CV and grant applications\nSold worldwide | Amazon · Barnes & Noble · ATH Shop\nThe book’s campaign | 190K+ followers · 100K+ email subscribers\nIntroductions | To collectors, galleries and curators',
   prize:'$500', prizeExtra:'a 4-page feature, a trophy and an Artsy listing', runners:'A 2-page feature and a trophy.',
   jury:'', results:'', pub:'', fee:'', elig:'No degree, gallery or exhibition history needed. Individual artists, 18+, worldwide.',
   credit:'', artists:'',
@@ -293,7 +293,7 @@ function launch(){
 
   // 6 what selected artists receive: the stack
   const bl = lines(state.benefits).slice(0,6).map(l => l.split('|').map(x => x.trim()));
-  const fills = [[C,WHITE],[CREAM,INK],[PEONY,BURG],[BURG,WHITE],[Tn,INK],[CREAM,INK]];
+  const fills = [[C,WHITE],[CREAM,INK],[BURG,WHITE],[PEONY,BURG],[Tn,INK],[CREAM,INK]];
   const widths = [952,926,910,944,930,900], offs = [0,12,-4,6,-8,10];
   const stack = bl.map(([t,d],i) => { const [bg,fg] = fills[i]; const w = widths[i];
     return `<div style="width:${w}px;height:106px;margin-left:${(952-w)/2+offs[i]}px;background:${bg};color:${fg};border-radius:6px;display:flex;align-items:center;justify-content:space-between;padding:0 38px;box-shadow:inset 0 -5px 0 rgba(0,0,0,.14)"><span style="font-size:38px;font-weight:600;letter-spacing:-.025em">${esc(t)}</span><span style="font-size:24px;font-weight:500;text-align:right">${esc(d||'')}</span></div>`; }).reverse().join('');
@@ -360,6 +360,26 @@ function launch(){
   return S.map((s,i) => ({...s, title: titles[i]}));
 }
 
+// ---------- caption ----------
+function caption(){
+  const kw = (state.keyword || 'KEYWORD').toUpperCase();
+  return `What happens when ${state.selected} artists from around the world come together around a single idea?
+
+${state.series}: ${state.name} is now open for submissions. Edition ${state.edition} of a series that has published ${state.published} artists since ${state.since}.
+
+${state.selected} artists will be selected by ${state.jury || 'the jury'} and published in a juried hardcover book, distributed through Amazon, Barnes & Noble and the ATH Shop, and introduced to collectors, galleries and curators.
+
+Open to individual artists 18+, worldwide, in any medium.
+
+DM us "${kw}" for the full brief, or apply through the link in bio.
+Submissions close ${dl().getDate()} ${MONTHS_L[dl().getMonth()]}.
+
+Know an artist whose work belongs in this book? Send this to them.
+
+#ArtsToHeartsProject #OpenCall #CallForArtists #101ArtBook`;
+}
+const pinned = () => `DM "${(state.keyword || 'KEYWORD').toUpperCase()}" for the full brief and your submission link. Closes ${short()}.`;
+
 // ---------- render + export ----------
 let RENDERED = [];
 const slideNode = s => `<div class="post" style="background:${s.bg}">${s.html}</div>`;
@@ -370,6 +390,8 @@ function render(){
   RENDERED = slides.map((s,j) => ({ s, name: `${base}-launch-${String(j+1).padStart(2,'0')}-${s.title}.png` }));
   const cells = RENDERED.map((r,j) => `<div class="cell"><div class="frame">${slideNode(r.s)}</div><div class="act"><span>${j+1}. ${r.s.title.replace(/-/g,' ')}</span><button type="button" data-i="${j}">Save PNG</button></div></div>`).join('');
   $('out').innerHTML = `<section class="group"><h2>Launch carousel · ${esc(state.series)}: ${esc(state.name)}</h2><p class="meta">${slides.length} slides · closes ${short()} · DM “${KW()}”</p><div class="slides">${cells}</div></section>`;
+  $('out').insertAdjacentHTML('beforeend', `<section class="group" style="margin-top:28px"><h2>Caption</h2><p class="meta">Paste with the carousel · pin the first comment below it</p><div class="f" style="max-width:720px"><textarea id="caption" style="min-height:260px">${esc(caption())}</textarea></div><div class="f" style="max-width:720px"><label for="pin">Pinned comment</label><input id="pin" value="${esc(pinned())}"></div><button class="btn ghost" id="copyCap" type="button" style="margin-top:10px">Copy caption</button></section>`);
+  $('copyCap').onclick = async () => { try { await navigator.clipboard.writeText($('caption').value); status('Caption copied.'); } catch { $('caption').select(); status('Select-all done: press copy.'); } };
   $('out').querySelectorAll('[data-i]').forEach(b => b.onclick = () => saveOne(Number(b.dataset.i)));
   status(`${RENDERED.length} slides ready.`);
 }
@@ -387,8 +409,17 @@ async function offer(filename, data){
   try { await DL.save({ filename, data }); status('Saved ' + filename + '.'); }
   catch (e) { status(e && e.code === 'declined' ? 'Save cancelled.' : 'Could not save (' + (e && e.code || 'error') + ').'); }
 }
-async function saveOne(i){ status('Rendering…'); await offer(RENDERED[i].name, await toBlob(RENDERED[i].s)); }
-$('zip').onclick = async () => { if (!RENDERED.length) render(); const zip = new JSZip(); for (let i = 0; i < RENDERED.length; i++){ status(`Rendering ${i+1} of ${RENDERED.length}…`); zip.file(RENDERED[i].name, await toBlob(RENDERED[i].s)); }
+function preflight(){
+  const issues = [];
+  const today = new Date(); today.setHours(0,0,0,0);
+  if (dl() < today) issues.push('the deadline (' + short() + ') has already passed');
+  const gaps = document.querySelectorAll('#out .gap, #out .ph').length;
+  if (gaps) issues.push(gaps + ' detail' + (gaps === 1 ? ' is' : 's are') + ' still dashed (missing)');
+  if (!issues.length) return true;
+  return confirm('Before you save: ' + issues.join(' and ') + '. Save anyway?');
+}
+async function saveOne(i){ if (!preflight()) return; status('Rendering…'); await offer(RENDERED[i].name, await toBlob(RENDERED[i].s)); }
+$('zip').onclick = async () => { if (!RENDERED.length) render(); if (!preflight()) return; const zip = new JSZip(); for (let i = 0; i < RENDERED.length; i++){ status(`Rendering ${i+1} of ${RENDERED.length}…`); zip.file(RENDERED[i].name, await toBlob(RENDERED[i].s)); }
   status('Packing…'); await offer((state.name || 'ath-call').toLowerCase().replace(/[^a-z0-9]+/g,'-') + '-launch.zip', await zip.generateAsync({ type:'blob' })); };
 $('go').onclick = render;
 document.querySelector('aside').addEventListener('change', e => { if (e.target.type !== 'file') render(); });
