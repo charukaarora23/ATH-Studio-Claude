@@ -1,0 +1,85 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>ATH open call kit</title>
+<style>
+@font-face{font-family:HG;src:url(fonts/ath/HankenGrotesk.woff2) format("woff2");font-weight:100 900}
+@font-face{font-family:NR;src:url(fonts/ath/Newsreader-Italic.woff2) format("woff2");font-style:italic;font-weight:200 800}
+@font-face{font-family:NR;src:url(fonts/ath/Newsreader.woff2) format("woff2");font-weight:200 800}
+/* ATH LAYER: fixed for every call */
+:root{--ink:#14090C;--paper:#F2F1EE;--cream:#F9ECE5;--burg:#6A0620;--hl:#E3E8DE}
+body{margin:0;background:#C9D3CF;display:flex;flex-wrap:wrap;gap:40px;padding:40px}
+.s{position:relative;width:1080px;height:1350px;overflow:hidden;font-family:HG,sans-serif;-webkit-font-smoothing:antialiased}
+.s *{margin:0;box-sizing:border-box}
+.a{position:absolute}.c{text-align:center}
+.img{background-size:cover;background-repeat:no-repeat;background-position:center}
+.H{font-weight:600;letter-spacing:-.045em;line-height:1}
+.R{font-weight:400;letter-spacing:-.04em;line-height:1.1}
+.it{font-family:NR,serif;font-style:italic;font-weight:400;letter-spacing:-.015em}
+.hdr{left:64px;right:64px;top:56px;display:flex;justify-content:space-between;align-items:center;font-size:24px;font-weight:600}
+.lg{display:inline-flex;align-items:center;gap:14px;font-size:26px;font-weight:600}
+.ftr{left:64px;right:64px;bottom:52px;display:flex;justify-content:space-between;align-items:center;font-size:23px;font-weight:600}
+.hl{display:inline-block;background:var(--hl);color:var(--ink);border-radius:999px;padding:0 .3em .07em;line-height:1}
+.btn{display:flex;align-items:center;justify-content:space-between;height:124px;border-radius:999px;padding:0 20px 0 56px;font-size:44px;font-weight:700;letter-spacing:-.02em}
+.btn i{width:88px;height:88px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center}
+</style></head><body>
+<svg width="0" height="0" style="position:absolute" id="defs"><symbol id="mg" viewBox="-32.00 -165.68 254.06 254.06"><g fill="currentColor"><path d="M34.2 -77.5H44.400000000000006L69.2 -17.5Q71.2 -13.100000000000001 73.35 -9.05Q75.5 -5.0 78.60000000000001 0.0H64.5Q63.900000000000006 -3.2 62.800000000000004 -7.050000000000001Q61.7 -10.9 59.1 -17.5L56.800000000000004 -23.0H21.8L19.5 -17.5Q17.0 -10.9 15.850000000000001 -7.050000000000001Q14.700000000000001 -3.2 14.100000000000001 0.0H0.0Q3.1000000000000005 -4.7 5.15 -8.55Q7.200000000000001 -12.4 9.0 -16.5ZM25.1 -31.0H53.5L39.300000000000004 -65.4Z"/><path d="M91.388 1.18Q87.37600000000002 1.18 85.48800000000001 -0.6489999999999999Q83.60000000000001 -2.4779999999999998 83.60000000000001 -6.489999999999999Q83.60000000000001 -8.85 84.42600000000002 -12.921Q85.25200000000001 -16.991999999999997 87.25800000000001 -23.836L95.99000000000001 -52.745999999999995H85.84200000000001L87.37600000000002 -58.174H97.64200000000001L103.77800000000002 -78.47H114.63400000000001L108.49800000000002 -58.174H121.36000000000001L119.70800000000001 -52.745999999999995H106.846L97.05200000000002 -20.296Q96.108 -17.11 95.57700000000001 -14.690999999999999Q95.04600000000002 -12.271999999999998 94.92800000000001 -10.62Q94.92800000000001 -9.558 95.459 -8.732Q95.99000000000001 -7.906 97.28800000000001 -7.906Q99.412 -7.906 101.772 -9.44Q104.132 -10.974 106.31500000000001 -13.274999999999999Q108.49800000000002 -15.575999999999999 110.20900000000002 -17.817999999999998Q111.92000000000002 -20.06 112.74600000000001 -21.358L116.168 -19.352Q114.162 -15.34 111.153 -11.623Q108.144 -7.906 104.66300000000001 -5.015Q101.18200000000002 -2.1239999999999997 97.70100000000002 -0.47199999999999986Q94.22000000000001 1.18 91.388 1.18Z"/><path d="M139.96 -77.5Q138.66000000000003 -72.10000000000001 138.41000000000003 -66.5Q138.16000000000003 -60.900000000000006 138.16000000000003 -55.300000000000004V-43.1H178.26000000000002V-55.300000000000004Q178.26000000000002 -60.900000000000006 178.01000000000002 -66.5Q177.76000000000002 -72.10000000000001 176.46 -77.5H190.06Q188.76000000000002 -72.10000000000001 188.51000000000002 -66.5Q188.26000000000002 -60.900000000000006 188.26000000000002 -55.300000000000004V-22.200000000000003Q188.26000000000002 -16.6 188.51000000000002 -11.0Q188.76000000000002 -5.4 190.06 0.0H176.46Q177.76000000000002 -5.4 178.01000000000002 -11.0Q178.26000000000002 -16.6 178.26000000000002 -22.200000000000003V-35.1H138.16000000000003V-22.200000000000003Q138.16000000000003 -16.6 138.41000000000003 -11.0Q138.66000000000003 -5.4 139.96 0.0H126.36000000000001Q127.66000000000001 -5.4 127.91000000000003 -11.0Q128.16000000000003 -16.6 128.16000000000003 -22.200000000000003V-55.300000000000004Q128.16000000000003 -60.900000000000006 127.91000000000003 -66.5Q127.66000000000001 -72.10000000000001 126.36000000000001 -77.5Z"/></g></symbol><symbol id="ar" viewBox="0 0 46 20"><path d="M2 10h40M33 2l9 8-9 8" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></symbol></svg>
+<div id="out" style="display:contents"></div>
+<script>
+// CALL LAYER: the only things that change
+const CALLS = [
+ {id:'g', name:'Garden Edition', series:'101 Art Book', kw:'GARDEN', dl:'13 Dec', dlLong:'13 December', dark:'#025054', acc:'#D0D996',
+  img:'art/flower-portrait.jpg', pos:'center 16%', grid:[['Edition 16','101 artists'],['Deadline','13 Dec']], motif:'shelf',
+  spot:'Your work deserves the', place:'on the shelf.'},
+ {id:'y', name:'Artist of the Year 2026', series:'Hardcover book', kw:'NOMINATE', dl:'16 Nov', dlLong:'16 November', dark:'#14090C', acc:'#FFF3B2',
+  img:'art/call-aoty.jpg', pos:'40% 30%', grid:[['2026 edition','100 artists'],['Deadline','16 Nov']], motif:'shelf',
+  spot:'A year of work deserves the', place:'in the 2026 book.'},
+ {id:'w', name:'Woman Artist Award', series:'7th Edition', kw:'AWARD', dl:'30 Nov', dlLong:'30 November', dark:'#6A0620', acc:'#FAD2E1',
+  img:'art/call-women.jpg', pos:'60% 40%', grid:[['Open to','Women artists'],['Deadline','30 Nov']], motif:'wall',
+  spot:'Women artists deserve the', place:'on the wall.'},
+];
+const MG = document.getElementById('defs');
+const hdr = (c, right, col) => `<div class="a hdr" style="color:${col}"><span class="lg"><svg width="44" height="44" style="color:${c}"><use href="#mg"/></svg>Arts to Hearts</span><span style="opacity:.75">${right}</span></div>`;
+const ftr = (k, col, right) => `<div class="a ftr" style="color:${col};opacity:.75"><span>@artstoheartsproject</span><span>${right || 'DM “'+k.kw+'”'}</span></div>`;
+// ATH action button: cream on dark, burgundy on light. Never the call colour.
+const btn = (k, onDark) => `<div class="btn" style="background:${onDark?'var(--cream)':'var(--burg)'};color:${onDark?'var(--burg)':'var(--cream)'}"><span>DM “${k.kw}” to apply</span><i style="background:${onDark?'var(--burg)':'var(--cream)'};color:${onDark?'var(--cream)':'var(--burg)'}"><svg width="36" height="16"><use href="#ar"/></svg></i></div>`;
+
+function cover(k){ return `<div class="s" style="background:${k.dark};color:#fff">
+  <div class="a img" style="left:0;right:0;top:0;height:860px;background-image:url(${k.img});background-position:${k.pos}"></div>
+  <div class="a" style="left:0;right:0;top:0;height:200px;background:linear-gradient(180deg,rgba(14,8,10,.55),rgba(14,8,10,0))"></div>
+  ${hdr(k.acc,'@artstoheartsproject','#fff')}
+  <p class="a H" style="left:58px;top:905px;font-size:168px;text-transform:uppercase;letter-spacing:-.055em">Open call</p>
+  <div class="a" style="left:64px;right:64px;top:1085px;border-top:2px solid rgba(255,255,255,.25);display:grid;grid-template-columns:1.5fr 1fr 1fr;padding-top:26px">
+    <div><p style="font-size:22px;font-weight:500;opacity:.6">${k.series}</p><p class="it" style="font-size:${k.name.length>16?40:52}px;margin-top:4px;color:${k.acc};line-height:1.05">${k.name}</p></div>
+    ${k.grid.map(([a,b])=>`<div style="border-left:2px solid rgba(255,255,255,.18);padding-left:30px"><p style="font-size:22px;font-weight:500;opacity:.6">${a}</p><p style="font-size:38px;font-weight:500;letter-spacing:-.03em;margin-top:10px">${b}</p></div>`).join('')}
+  </div>
+  ${ftr(k,'#fff','Submissions now open')}</div>`; }
+
+function spot(k){ return `<div class="s" style="background:var(--ink);color:#fff">
+  ${hdr(k.acc, k.name, '#fff')}
+  <p class="a R c" style="left:80px;right:80px;top:330px;font-size:96px">${k.spot} <span class="hl">spotlight.</span> Emerging, mid-career or established.</p>
+  <p class="a c" style="left:160px;right:160px;top:920px;font-size:30px;line-height:1.45;opacity:.75">No degree, gallery or exhibition history needed. Open to individual artists 18+, worldwide.</p>
+  ${ftr(k,'#fff')}</div>`; }
+
+function motif(k){
+  if (k.motif === 'wall') {
+    const fr = [[0,40,150,190,'#2A0A12'],[170,0,130,160,'#F2F1EE'],[320,60,170,130,'#025054'],[180,190,120,150,'#FFD6DE'],[20,250,130,120,'#AA0003'],[320,210,110,140,'#14090C']];
+    return fr.map(([x,y,w,h,c])=>`<div class="a" style="left:${x}px;top:${y}px;width:${w}px;height:${h}px;background:${c};border:8px solid #F2F1EE;box-shadow:0 10px 18px rgba(0,0,0,.3)"></div>`).join('')
+      + `<div class="a" style="left:470px;top:20px;width:150px;height:200px;border:4px dashed ${k.acc};background:rgba(255,255,255,.08);display:flex;align-items:center;justify-content:center"><span class="it" style="font-size:30px;color:${k.acc}">yours</span></div>`;
+  }
+  const sp = [['#AA0003',250],['#FAD2E1',280],['#F2F1EE',240],['#025054',270],['#D0D996',230],['#B7D9FF',260]];
+  return `<div style="position:absolute;left:0;right:0;bottom:0;height:300px;display:flex;align-items:flex-end;gap:10px;border-bottom:6px solid #F2F1EE;padding:0 14px">`
+   + sp.map(([c,h])=>`<div style="flex:1;height:${h}px;background:${c};border-radius:3px 3px 0 0;box-shadow:inset 0 0 0 2px rgba(255,255,255,.18)"></div>`).join('')
+   + `<div style="flex:1.5;height:290px;background:${k.acc};border-radius:3px 3px 0 0;position:relative"><span style="position:absolute;left:50%;bottom:22px;transform:translateX(-50%) rotate(-90deg);white-space:nowrap;font-family:NR,serif;font-style:italic;font-size:28px;width:0;color:#14090C">yours</span></div></div>`;
+}
+
+function cta(k){ return `<div class="s" style="background:${k.dark};color:#fff">
+  ${hdr(k.acc,'','#fff')}
+  <p class="a H c" style="left:60px;right:60px;top:190px;font-size:108px">Take your place<br>${k.place}</p>
+  <div class="a" style="left:250px;right:250px;top:470px;height:${k.motif==='wall'?380:300}px">${motif(k)}</div>
+  <div class="a" style="left:110px;right:110px;top:880px">${btn(k,true)}</div>
+  <p class="a c" style="left:0;right:0;top:1050px;font-size:30px">Closes <b style="font-weight:600;color:${k.acc}">${k.dlLong}</b> · or apply via link in bio</p>
+  ${ftr(k,'#fff','Application fee applicable')}</div>`; }
+
+const out = document.getElementById('out');
+CALLS.forEach(k => [cover, spot, cta].forEach((fn,i) => { const d = document.createElement('div'); d.style.display='contents'; d.innerHTML = fn(k); d.firstElementChild.id = k.id + (i+1); out.appendChild(d.firstElementChild); }));
+</script>
+</body></html>
