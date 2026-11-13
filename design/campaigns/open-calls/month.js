@@ -331,27 +331,26 @@ G.ink   = () => isEd() ? ({bg:mix(state.colour, '#000000', .55), fg:CREAM, acc:t
 const ED = {
   // magazine cover: full-bleed portrait, masthead across the top, cover lines at the bottom
   mast(){ const acc = tint(state.colour);
-    return `<p class="a c cn" style="left:0;right:0;top:118px;color:${CREAM};font-size:20px;letter-spacing:.3em">Open call · ${esc(state.editionLabel || '')}</p>
-      <p class="a c scr" style="left:40px;right:40px;top:150px;font-size:${String(state.name).length > 18 ? 96 : 112}px;line-height:1;white-space:nowrap;color:${CREAM};text-shadow:0 4px 30px rgba(0,0,0,.35)">${esc(state.name)}</p>
-      <div class="a" style="left:80px;right:80px;top:290px;border-top:2px solid ${acc}"></div>`; },
+    return `<p class="a c cn" style="left:0;right:0;top:70px;color:${CREAM};font-size:19px;letter-spacing:.32em;opacity:.85">Arts to Hearts · ${esc(state.editionLabel || '')}</p>
+      <p class="a c scr" style="left:40px;right:40px;top:104px;font-size:${String(state.name).length > 18 ? 96 : 112}px;line-height:1;white-space:nowrap;color:${CREAM};text-shadow:0 4px 30px rgba(0,0,0,.35)">${esc(state.name)}</p>
+      <div class="a" style="left:80px;right:80px;top:244px;border-top:2px solid ${acc}"></div>`; },
   shade(){ return `<div class="a" style="inset:0;background:linear-gradient(180deg,${rgba(mix(state.colour,'#000000',.5),.75)} 0%,rgba(0,0,0,.05) 30%,rgba(0,0,0,0) 45%,${rgba(mix(state.colour,'#000000',.5),.9)} 72%,${mix(state.colour,'#000000',.55)} 100%)"></div>`; },
   hook(o){ const acc = tint(state.colour);
     return {bg:INK, html:`${imgDiv(o.img || o.art || ART[0], 'inset:0', o.pos || o.artPos || 'center 22%')}${ED.shade()}
-      ${corners(CREAM, PEONY, o.tr)}${ED.mast()}
-      <div class="a" style="left:80px;right:80px;top:${o.top || 760}px;display:flex;justify-content:space-between;align-items:center">${OPENCALL(acc)}${timer(false)}</div>
-      <p class="a H" style="left:76px;right:80px;top:${(o.top || 760) + 76}px;font-size:${Math.round((o.size||80)*.8)}px;color:${CREAM}">${o.head}</p>
-      ${o.sub ? `<p class="a sub" style="left:80px;right:150px;top:${o.subTop || 1040}px;font-size:28px;color:${CREAM};opacity:.9">${o.sub}</p>` : ''}
-      ${coverCTA(1140, CREAM, acc)}`};
+      ${ED.mast()}
+      <div class="a" style="left:80px;right:80px;top:${o.top || 850}px;display:flex;justify-content:space-between;align-items:center">${OPENCALL(acc)}${timer(false)}</div>
+      <p class="a H" style="left:76px;right:80px;top:${(o.top || 850) + 76}px;font-size:${Math.round((o.size||80)*.8)}px;color:${CREAM}">${o.head}</p>
+      ${coverCTA(1180, CREAM, acc)}`};
   },
   count(o){ const acc = tint(state.colour); const chilli = o.tone === 'chilli';
     const big = String(o.big), size = big.length <= 2 ? 300 : big.length <= 8 ? 140 : 110;
     return {bg:INK, html:`${imgDiv(o.img || ART[0], 'inset:0', o.pos || 'center 22%')}${ED.shade()}
       ${chilli ? '<div class="a" style="inset:0;background:rgba(170,0,3,.55)"></div>' : ''}
-      ${corners(CREAM, PEONY, o.tr || leftLabel())}${ED.mast()}
-      <p class="a scr" style="left:70px;top:${big.length <= 2 ? 690 : 760}px;font-size:${size}px;line-height:.85;color:${CREAM}">${big}</p>
-      <p class="a" style="left:${big.length <= 2 ? 470 : 80}px;top:${big.length <= 2 ? 790 : 900}px;font-size:46px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:${chilli ? CREAM : acc}">${esc(o.unit)}</p>
-      <p class="a" style="left:${big.length <= 2 ? 470 : 80}px;right:80px;top:${big.length <= 2 ? 860 : 970}px;font-size:32px;line-height:1.3;color:${CREAM}">${o.info || `to be published in ${esc(state.bookName || 'the book')}.`}</p>
-      ${coverCTA(1140, CREAM, chilli ? CREAM : acc)}`};
+      ${ED.mast()}
+      <p class="a scr" style="left:70px;top:${big.length <= 2 ? 760 : 840}px;font-size:${size}px;line-height:.85;color:${CREAM}">${big}</p>
+      <p class="a" style="left:${big.length <= 2 ? 470 : 80}px;top:${big.length <= 2 ? 870 : 980}px;font-size:46px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:${chilli ? CREAM : acc}">${esc(o.unit)}</p>
+      <p class="a" style="left:${big.length <= 2 ? 470 : 80}px;right:80px;top:${big.length <= 2 ? 940 : 1050}px;font-size:30px;line-height:1.3;color:${CREAM};opacity:.9">to apply · ${esc(state.selected)} places</p>
+      ${coverCTA(1180, CREAM, chilli ? CREAM : acc)}`};
   },
 };
 
