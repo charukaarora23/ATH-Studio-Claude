@@ -54,6 +54,11 @@ const actionBtn = (top, chilli) => { const fg = chilli ? '#AA0003' : BURG;
     <span style="display:flex;align-items:center;gap:18px"><span class="cn" style="font-size:19px;color:${fg}">${leftLabel()}</span>
     <span style="width:80px;height:80px;border-radius:50%;background:${fg};color:${CREAM};display:inline-flex;align-items:center;justify-content:center"><svg width="32" height="14" viewBox="0 0 46 20"><path d="M2 10h40M33 2l9 8-9 8" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span></span></div>`; };
 
+// covers: a quiet action line instead of a big button
+const coverCTA = (top, fg, acc) => `<div class="a" style="left:80px;right:80px;top:${top}px;display:flex;justify-content:space-between;align-items:center;padding-top:24px;border-top:1.5px solid ${rgba(fg === INK ? '#14090C' : '#FFFFFF', .35)}">
+  <span style="font-size:28px;font-weight:500;color:${fg};opacity:.85">Closes ${dateLong()}</span>
+  <span style="font-size:30px;font-weight:700;letter-spacing:-.01em;color:${acc}">${VERB} “${KW()}” to apply&nbsp;&rarr;</span></div>`;
+
 // ---------- grounds ----------
 const G = {
   ink:   () => ({bg:INK,   fg:WHITE, acc:tint(state.colour), dm:PEONY, line:'rgba(255,255,255,.2)'}),
@@ -115,7 +120,7 @@ const T = {
       <p class="a c" style="left:0;right:0;top:${big.length <= 2 ? 350 : 400}px;font-size:${size}px;font-weight:700;letter-spacing:-.06em;line-height:.85;color:${WHITE}">${big}</p>
       <p class="a c" style="left:0;right:0;top:620px;font-size:48px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:${acc}">${esc(o.unit)}</p>
       <p class="a c" style="left:120px;right:120px;top:760px;font-size:38px;font-weight:500;letter-spacing:-.015em;color:${WHITE}">${o.info || `to get your work into a juried hardcover book of ${esc(state.selected)} artists.`}</p>
-      ${actionBtn(1110, tone === 'chilli')}`};
+      ${coverCTA(1140, WHITE, acc)}`};
   },
   // the whole open call on one page
   brief(o = {}){
@@ -227,7 +232,7 @@ const T = {
       <div class="a" style="left:80px;right:80px;top:600px;display:flex;justify-content:space-between;align-items:center">${OPENCALL(acc)}${timer(timerDark)}</div>
       <p class="a H" style="left:76px;right:80px;top:680px;font-size:${Math.round((o.size||84) * shrink)}px;color:${fg}">${o.head}</p>
       ${o.sub ? `<p class="a sub" style="left:80px;right:140px;top:${o.subTop||970}px;font-size:29px;color:${fg};opacity:.9">${o.sub}</p>` : ''}
-      ${actionBtn(1110)}`;
+      ${coverCTA(1140, fg, acc)}`;
     if (o.img) return {bg:INK, html:`${imgDiv(o.img,'inset:0',o.pos||'center 30%')}
       <div class="a" style="inset:0;background:linear-gradient(180deg,rgba(20,9,12,.45) 0%,rgba(20,9,12,0) 16%,rgba(20,9,12,0) 30%,rgba(20,9,12,.85) 52%,rgba(20,9,12,.96) 100%)"></div>
       ${corners(WHITE, PEONY, o.tr)}${head(WHITE, tint(state.colour), false)}`};
@@ -292,7 +297,7 @@ const AW = {
       <div class="a" style="left:90px;right:90px;top:600px;display:flex;justify-content:space-between;align-items:center">${OPENCALL(c)}${timer(false)}</div>
       <p class="a H" style="left:86px;right:90px;top:680px;font-size:${Math.round((o.size||80)*.8)}px;color:${CREAM}">${o.head}</p>
       ${o.sub ? `<p class="a sub" style="left:90px;right:150px;top:970px;font-size:28px;color:${CREAM};opacity:.85">${o.sub}</p>` : ''}
-      ${actionBtn(1110)}`};
+      ${coverCTA(1140, CREAM, c)}`};
   },
   count(o){ const c = gold(); const chilli = o.tone === 'chilli'; const bg = chilli ? '#5A0A0A' : AWARD_BG;
     const big = String(o.big), size = big.length <= 2 ? 300 : big.length <= 8 ? 150 : 120;
@@ -305,7 +310,7 @@ const AW = {
       <p class="a c" style="left:0;right:0;top:620px;font-size:48px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:${c}">${esc(o.unit)}</p>
       <div class="a" style="left:380px;right:380px;top:710px;border-top:2px solid ${c}"></div>
       <p class="a c" style="left:120px;right:120px;top:760px;font-size:38px;font-weight:500;letter-spacing:-.015em;color:${CREAM}">${o.info || `to get your work into a juried hardcover book of ${esc(state.selected)} artists.`}</p>
-      ${actionBtn(1110, chilli)}`};
+      ${coverCTA(1140, CREAM, c)}`};
   },
 };
 // final day: one message, nothing else
