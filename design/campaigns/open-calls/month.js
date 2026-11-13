@@ -125,7 +125,7 @@ const T = {
   // the whole open call on one page
   brief(o = {}){
     const g = G[o.ground||'cream']();
-    const rows = [['The call', `${esc(state.series)}: ${GE()} · ${esc(state.editionLabel || ('Edition ' + state.edition))}`], ['Theme', state.themeLine ? esc(state.themeLine) : TH()], ['Who', 'Individual artists 18+, worldwide, any medium. Emerging, mid-career or established.'], ['Selected', `${esc(state.selected)} artists, chosen by ${state.jury ? esc(state.jury) : 'the jury'}`], ['You receive', lines(state.benefits).map(l => esc(l.split('|')[0].trim())).join(', ')], ['Deadline', `${dateLong()}`], ['Apply', `${VERB} “${KW()}”, or the link in bio`]];
+    const rows = [['The call', `${esc(state.series)}: ${GE()} · ${esc(state.editionLabel || ('Edition ' + state.edition))}`], ['Theme', state.themeLine ? esc(state.themeLine) : TH()], ['Who', esc(state.elig || '')], ['Selected', `${esc(state.selected)} artists, chosen by ${state.jury ? esc(state.jury) : 'the jury'}`], ['You receive', lines(state.benefits).map(l => esc(l.split('|')[0].trim())).join(', ')], ['Deadline', `${dateLong()}`], ['Apply', `${VERB} “${KW()}”, or the link in bio`]];
     return {bg:g.bg, html:`${corners(g.fg, g.dm, o.tr || 'The open call')}
       <p class="a R" style="left:76px;right:80px;top:150px;font-size:76px;color:${g.fg}">${o.head || `The ${GE()}, at a glance.`}</p>
       <div class="a" style="left:80px;right:80px;top:${o.top||340}px;border-bottom:2px solid ${g.line}">${rows.map(([k,v]) => `<div style="display:grid;grid-template-columns:230px 1fr;gap:20px;padding:20px 0;border-top:2px solid ${g.line}"><span class="lab" style="color:${g.acc};padding-top:6px">${k}</span><span style="font-size:31px;line-height:1.35;color:${g.fg}">${v}</span></div>`).join('')}</div>`};
@@ -322,9 +322,42 @@ T.urgent = (o) => { const award = isAward(); const bg = o.chilli ? '#AA0003' : (
     <p class="a c" style="left:120px;right:120px;top:${o.subTop||800}px;font-size:40px;font-weight:500;letter-spacing:-.015em;color:${CREAM}">${o.sub}</p>
     ${btn}`};
 };
+// ---------- editorial style: magazine split layouts ----------
+const isEd = () => state.style === 'editorial';
+const ED_PAPER = '#F7E9EC';
+const G1 = {...G};
+G.cream = () => isEd() ? ({bg:ED_PAPER, fg:INK, acc:state.colour, dm:BURG, line:'rgba(20,9,12,.16)'}) : G1.cream();
+G.ink   = () => isEd() ? ({bg:mix(state.colour, '#000000', .55), fg:CREAM, acc:tint(state.colour), dm:PEONY, line:'rgba(249,236,229,.2)'}) : G1.ink();
+const ED = {
+  hook(o){ const acc = tint(state.colour);
+    return {bg:state.colour, html:`${imgDiv(o.img || o.art || ART[0], 'left:0;top:0;bottom:0;width:500px', o.pos || o.artPos || 'center 25%')}
+      <div class="a" style="left:500px;top:0;bottom:0;width:6px;background:${acc}"></div>
+      ${corners(CREAM, PEONY, o.tr)}
+      <div class="a" style="left:560px;right:60px;top:170px">${OPENCALL(acc)}</div>
+      <p class="a scr" style="left:560px;right:60px;top:224px;font-size:46px;color:${CREAM}">${esc(state.name)}</p>
+      <p class="a H" style="left:556px;right:60px;top:330px;font-size:${Math.round((o.size||80)*.72)}px;line-height:1.04;color:${CREAM}">${o.head}</p>
+      ${o.sub ? `<p class="a sub" style="left:560px;right:60px;top:${o.subTop||760}px;font-size:27px;color:${CREAM};opacity:.85">${o.sub}</p>` : ''}
+      <div class="a" style="left:560px;top:960px">${timer(false)}</div>
+      <div class="a" style="left:560px;right:60px;top:1060px;padding-top:22px;border-top:1.5px solid rgba(255,255,255,.35)">
+        <p style="font-size:26px;color:${CREAM};opacity:.85">Closes ${dateLong()}</p>
+        <p style="font-size:30px;font-weight:700;letter-spacing:-.01em;color:${acc};margin-top:8px">${VERB} “${KW()}” to apply&nbsp;&rarr;</p></div>`};
+  },
+  count(o){ const acc = tint(state.colour); const chilli = o.tone === 'chilli'; const bg = chilli ? '#AA0003' : state.colour;
+    const big = String(o.big), size = big.length <= 2 ? 300 : big.length <= 8 ? 140 : 110;
+    return {bg, html:`${imgDiv(o.img || ART[0], 'left:0;right:0;top:0;height:520px', o.pos || 'center 25%')}
+      <div class="a" style="left:0;right:0;top:0;height:520px;background:linear-gradient(180deg,rgba(0,0,0,.45),rgba(0,0,0,0) 45%,${rgba(bg,.6)})"></div>
+      ${corners(CREAM, PEONY, o.tr || leftLabel())}
+      <div class="a" style="left:80px;top:150px">${OPENCALL(CREAM)}</div>
+      <p class="a scr" style="left:80px;top:204px;font-size:52px;color:${CREAM}">${esc(state.name)}</p>
+      <p class="a scr" style="left:70px;top:${big.length <= 2 ? 580 : 600}px;font-size:${size}px;line-height:.85;color:${CREAM}">${big}</p>
+      <p class="a" style="left:${big.length <= 2 ? 460 : 80}px;top:${big.length <= 2 ? 700 : 760}px;font-size:48px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:${chilli ? CREAM : acc}">${esc(o.unit)}</p>
+      <p class="a" style="left:${big.length <= 2 ? 460 : 80}px;right:80px;top:${big.length <= 2 ? 780 : 840}px;font-size:34px;line-height:1.3;color:${CREAM}">${o.info || `to be published in ${esc(state.bookName || 'the book')}.`}</p>
+      ${coverCTA(1140, CREAM, chilli ? CREAM : acc)}`};
+  },
+};
 const T0 = {...T};
-T.hook = o => isAward() ? AW.hook(o) : T0.hook(o);
-T.count = o => isAward() ? AW.count(o) : T0.count(o);
+T.hook = o => isAward() ? AW.hook(o) : isEd() ? ED.hook(o) : T0.hook(o);
+T.count = o => isAward() ? AW.count(o) : isEd() ? ED.count(o) : T0.count(o);
 T.num = o => { const s = T0.num(o); if (!isAward() || o.img !== undefined) return s;
   s.html = s.html.replace(/<p class="a" style="left:66px;top:170px;font-size:300px;font-weight:400;letter-spacing:-\.07em;line-height:\.8;color:([^"]+)">([^<]*)<\/p>/, (m, col, n) => `<p class="a" style="left:66px;top:150px">${serifNum(n, 300, col)}</p>`); return s; };
 // every slide in the award style sits inside the gold certificate frame
@@ -414,7 +447,7 @@ const closeLn = () => `Submissions close ${dl().getDate()} ${MONTHS_L[dl().getMo
 const N = () => state.name, S = () => state.series, SEL = () => state.selected;
 
 function monthPosts(){ const name = GE(), sel = esc(state.selected); return [
- {left:30, title:'Launch', kind:'Carousel', slides:() => { const s = launch(); if (isAward()) s[0] = {...AW.hook({img:state.images.imgCover, tr:esc(state.series), head:`${esc(state.headline || 'Call for artists')}<br>${GE()}`, size:120, sub:esc(state.coverLine)}), title:'cover'}; return s; }, caption:() => caption(), pin:() => pinned()},
+ {left:30, title:'Launch', kind:'Carousel', slides:() => { const s = launch(); if (isAward() || isEd()) s[0] = {...(isEd() ? ED : AW).hook({img:state.images.imgCover, tr:esc(state.series), head:`${esc(state.headline || 'Call for artists')}<br>${GE()}`, size:(isEd() ? 82 : 120), subTop:(isEd() ? 820 : undefined), sub:esc(state.coverLine)}), title:'cover'}; return s; }, caption:() => caption(), pin:() => pinned()},
 
  {left:28, title:'What you can submit', kind:'Carousel · theme', slides:() => [
    T.hook({img:EX.bloom, tr:'The theme', head:`What can you submit to the ${name}?`, sub:`Five kinds of ${TW()} the jury wants to see. ${sel} will be published.`}),
@@ -447,7 +480,7 @@ ${tags}`},
    T.hook({ground:'ink', img2: state.images.imgSpread || null, imgLabel:'Real photo needed<br>A spread from a past edition', size:72, tr:'Inside the book', head:'This is what being published with us looks like.', sub:`Selected artists appear in the ${name} exactly like this.`}),
    T.photo({img:state.images.imgSpread, label:'Real photo needed<br>A spread from a past edition', tr:'Inside the book', head:'Every artist, in print.', sub:'Name, artwork title, medium and country, on the page.'}),
    T.photo({img:null, label:'Real photo needed<br>A second spread', tr:'Inside the book', head:'Juried and curated.', sub:'Each edition is selected by a jury and laid out as one collection.', ground:'ink'}),
-   T.photo({img:null, label:'Real photo needed<br>The book on a shelf or in a shop', tr:'Inside the book', head:'Sold worldwide.', sub:'Through Amazon, Barnes & Noble and the ATH Shop.'}),
+   T.photo({img:null, label:'Real photo needed<br>The book on a shelf or in a shop', tr:'Inside the book', head:'Seen worldwide.', sub:`Through ${esc(state.distribution || 'Amazon, Barnes & Noble and the ATH Shop')}.`}),
    T.photo({img:null, label:'Real photo needed<br>An artist holding their copy', tr:'Inside the book', head:'Introduced beyond the feed.', sub:'Each book is shared with collectors, galleries and curators.', ground:'ink'}),
    T.cta({kicker:'Your page could be next'}),
  ], caption:() => `This is what being published with Arts to Hearts looks like.
@@ -463,7 +496,7 @@ ${tags}`},
  {left:22, title:'Your questions, answered', kind:'Carousel · doubts', slides:() => [
    T.hook({img:EX.meadow, pos:'center 40%', tr:'Your questions', head:`Thinking of applying to the ${name}? Read this first.`, sub:'The seven questions artists ask us most, answered.'}),
    T.qa({q:'I’m self-taught. Can I apply?', a:'Yes. No degree, gallery or exhibition history needed.', more:'The jury judges the work, not the CV.', ground:'call'}),
-   T.qa({q:'I don’t live in the US.', a:'Open to artists worldwide, 18 and over.', more:'Past editions include artists from every continent.', ground:'cream'}),
+   T.qa({q:'I don’t live in the US.', a:`Open to ${esc(state.who || 'artists')} worldwide, 18 and over.`, more:'Past editions include artists from every continent.', ground:'cream'}),
    T.qa({q:'Is digital work accepted?', a:'Yes. Any medium, traditional or digital.', more:'Painting, photography, illustration, textile, sculpture, mixed media.', ground:'call'}),
    T.qa({q:'Can I submit AI-generated work?', a:'No. Original work only.', ground:'cream'}),
    T.qa({q:'Is there a fee?', a:`An application fee applies${state.fee ? ': ' + esc(state.fee) : ''}.`, more: state.fee ? '' : '<span class="gap">Add the fee wording in the form</span>'}),
@@ -613,13 +646,13 @@ ${closeLn()}
 ${tags}`},
  {left:8, title:'Next on the shelf', kind:'Carousel · proof', slides:() => [
    T.hook({img:ART[3], tr:'The collection', head:`Get your work on our shelf: the ${name} is open.`, size:76, sub:`${sel} artists will join the next book in the series.`}),
-   T.photo({img:null, label:'Real photo needed<br>The Nature Edition', tr:'The collection', head:'The Nature Edition: 101 artists, published.', size:56, subTop:1060, sub:'Sold through Amazon, Barnes & Noble and the ATH Shop.'}),
-   T.photo({img:null, label:'Real photo needed<br>The Floral Edition', tr:'The collection', head:'The Floral Edition: 101 artists, published.', size:56, subTop:1060, sub:'Shared with collectors, galleries and curators.', ground:'ink'}),
+   T.photo({img:null, label:`Real photo needed<br>${esc(PAST()[0] || 'A past edition')}`, tr:'The collection', head:`${esc(PAST()[0] || 'A past edition')}: published.`, size:56, subTop:1060, sub:`Seen through ${esc(state.distribution || 'Amazon, Barnes & Noble and the ATH Shop')}.`}),
+   T.photo({img:null, label:`Real photo needed<br>${esc(PAST()[1] || PAST()[0] || 'Another past edition')}`, tr:'The collection', head:`${esc(PAST()[1] || PAST()[0] || 'Another past edition')}: published.`, size:56, subTop:1060, sub:'Shared with collectors, galleries and curators.', ground:'ink'}),
    T.value({ground:'cream', art:ART[4]}),
    T.cta({kicker:'Be in the next one'}),
  ], caption:() => `Get your work on our shelf: the ${N()} is open.
 
-The Nature and Floral editions each published 101 artists, sold worldwide and shared with collectors, galleries and curators. The ${N()} is the next book in the series, with ${SEL()} places.
+Our past editions (${PAST().join(', ')}) put their artists in print and in front of collectors, galleries and curators. The ${N()} is next, with ${SEL()} places.
 
 ${kwLine()}
 ${closeLn()}
@@ -671,7 +704,7 @@ ${tags}`},
  {left:4, title:'Why artists apply', kind:'Carousel · motivation', slides:() => [
    T.hook({img:ART[0], pos:'center 15%', tr:'Why artists apply', head:`What getting published in the ${name} does for your career.`, size:72, sub:'Four days left to apply to the open call.'}),
    T.num({icon:'book', n:'01', head:'An independent signal of quality.', text:'A juried publication is a judgement made by someone else. Curators, residencies and grant panels read it that way.', tr:'Why artists apply'}),
-   T.num({icon:'eye', n:'02', head:'Your work travels beyond your feed.', text:'The book is sold through Amazon, Barnes & Noble and the ATH Shop, into homes and studios worldwide.', tr:'Why artists apply', ground:'ink'}),
+   T.num({icon:'eye', n:'02', head:'Your work travels beyond your feed.', text:`Your work reaches people through ${esc(state.distribution || 'Amazon, Barnes & Noble and the ATH Shop')}, worldwide.`, tr:'Why artists apply', ground:'ink'}),
    T.num({icon:'people', n:'03', head:'One book, many first introductions.', text:'Each edition is introduced to collectors, galleries and curators through our network.', tr:'Why artists apply'}),
    T.num({icon:'star', n:'04', head:'Read in context, not in a scroll.', text:`Shown alongside ${Number(state.selected) - 1 || 100} other artists responding to the same theme, your work becomes part of a conversation.`, tr:'Why artists apply', ground:'ink'}),
    T.quote({tr:'Why artists apply'}),

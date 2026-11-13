@@ -97,7 +97,7 @@ summary{font:600 12px/1 var(--mono);letter-spacing:.1em;text-transform:uppercase
       <div class="f"><label for="editionLabel">Edition label (cover tag)</label><input id="editionLabel"></div>
       <div class="f"><label for="seriesNoun">Count noun (“editions”, “books”)</label><input id="seriesNoun"></div>
     </div>
-    <div class="f"><label for="style">Visual style (so calls never look alike)</label><select id="style"><option value="gallery">Gallery: full-bleed artwork</option><option value="award">Award: gold certificate frame, medallion countdowns</option></select></div>
+    <div class="f"><label for="style">Visual style (so calls never look alike)</label><select id="style"><option value="gallery">Gallery: full-bleed artwork</option><option value="award">Award: gold certificate frame, medallion countdowns</option><option value="editorial">Editorial: magazine split layouts, plum and peony</option></select></div>
     <div class="f"><label for="name">Edition name</label><input id="name"></div>
     <div class="row2">
       <div class="f"><label for="keyword">DM keyword</label><input id="keyword"></div>
@@ -105,7 +105,7 @@ summary{font:600 12px/1 var(--mono);letter-spacing:.1em;text-transform:uppercase
     </div>
     <div class="row2">
       <div class="f"><label for="selected">Artists selected</label><input id="selected"></div>
-      <div class="f"><label for="headline">Cover headline</label><select id="headline"><option>Call for artists</option><option>Open call</option><option>Get published</option><option>Submissions open</option></select></div>
+      <div class="f"><label for="headline">Cover headline</label><select id="headline"><option>Call for artists</option><option>Open call</option><option>Get published</option><option>Submissions open</option><option>Calling all women artists</option></select></div>
     </div>
     <div class="f"><label for="coverLine">Cover line</label><input id="coverLine"></div>
     <div class="f"><label>Call colour (one colour that matches the theme)</label><div class="sw" id="colours"></div></div>
@@ -156,6 +156,14 @@ summary{font:600 12px/1 var(--mono);letter-spacing:.1em;text-transform:uppercase
     <div class="f"><label for="fee">Application fee wording</label><input id="fee" placeholder="e.g. applicable"></div>
     <div class="f"><label for="commentFrom">Switch CTA from “DM” to “COMMENT” on</label><input id="commentFrom" type="date"></div>
     <div class="f"><label for="elig">Eligibility line</label><input id="elig"></div>
+    <div class="row2">
+      <div class="f"><label for="who">Who (e.g. artists, women artists)</label><input id="who"></div>
+      <div class="f"><label for="levels">Career levels line</label><input id="levels"></div>
+    </div>
+    <div class="row2">
+      <div class="f"><label for="bookName">Book name</label><input id="bookName"></div>
+      <div class="f"><label for="distribution">Where the work is seen</label><input id="distribution"></div>
+    </div>
   </details>
 
   <details><summary>Images and past artists</summary>
@@ -209,6 +217,7 @@ const DEFAULTS = {
   juryLooks:'Originality, a considered reading of the garden theme, and the quality of the work.',
   kinds:'A single bloom | Close looking counts. One flower or leaf, made with care.\nA landscape | Fields, hedgerows, the view from a window you grew up with.\nPeople and nature | Figures and faces intertwined with the growing world.\nAbstract growth | Colour, rhythm and form that feel alive, without a single petal.\nA garden remembered | An imagined or remembered place. Memory is a garden too.',
   pastEds:'Floral, Nature, Landscape',
+  who:'artists', levels:'Emerging, mid-career or established.', distribution:'Amazon, Barnes & Noble and the ATH Shop', bookName:'',
 };
 // ready-made calls: pick one, then adjust the dates and details
 const PRESETS = {
@@ -227,6 +236,23 @@ const PRESETS = {
     benefits:'A 2-page spread in the book | Your work in print\nCertificate of Recognition | An official record of your selection\nPromotion to 200,000+ | Our community and email newsletter\nSold worldwide | Amazon · Barnes & Noble · ATH Shop\nIntroductions | To collectors, galleries and curators',
     prize:'$500', prizeExtra:'the title Artist of the Year 2026, a 4-page feature, a trophy and an Artsy listing', runners:'A 4-page feature, a trophy and certificate, and an Artsy listing.',
     commentFrom:'2026-12-08', images:{imgCover:'art/flower-portrait.jpg', imgTheme:'art/ref-palms.jpg'},
+  },
+  'Woman Artist Award 2026': {
+    style:'editorial', series:'Arts to Hearts', edition:'7th', editionLabel:'7th Edition', name:'Woman Artist Award', keyword:'AWARD', deadline:'2026-11-30', selected:'[X]',
+    headline:'Calling all women artists', coverLine:'Selected artists are featured in Women Artists on the Rise, Edition 5.', colour:'#5B2A6E',
+    editions:'35+', seriesNoun:'books', published:'10,000+',
+    quote:'Your work deserves to be seen, recognized, and celebrated.',
+    submit:'Open theme: all subjects, styles and mediums. Women artists 18+, emerging and mid-career. Original work only, no AI.',
+    theme:'Open', themeWork:'best work', themeLine:'Open. All subjects, styles and mediums are welcome.',
+    juryLooks:'The strength of the work and a distinct artistic voice, in any subject or medium.',
+    kinds:'Painting | Oil, acrylic, watercolour: on any surface.\nPhotography | Fine art, documentary, experimental.\nSculpture and ceramics | Three-dimensional work in any material.\nTextiles and fibre | Weaving, embroidery, fibre and installation.\nMixed media and digital | Collage, illustration, mixed media and digital art.',
+    pastEds:'Women Artists on the Rise (Edition 4)',
+    who:'women artists', levels:'Emerging and mid-career women artists.', elig:'Women artists aged 18 and above, worldwide. Emerging and mid-career.',
+    distribution:'Arts to Hearts platforms and our 200,000+ Instagram community', bookName:'Women Artists on the Rise',
+    jury:'', bookText:'Selected artists are featured in Women Artists on the Rise, Edition 5: a professionally produced hardcover coffee table book.',
+    benefits:'Featured in the book | Women Artists on the Rise, Edition 5\nInterviews and features | Dedicated artist interviews\nSeen by 200,000+ | Our Instagram community\nWomen in Arts Network | A portfolio feature\nMentorship | For selected winners\nMagazines | A one-year Arts to Hearts subscription',
+    prize:'$500', prizeExtra:'an engraved glass trophy and certificate', runners:'An engraved glass trophy and certificate.',
+    commentFrom:'2026-12-08', images:{imgCover:'art/flower-portrait.jpg', imgTheme:'art/ref-dahlias.jpg'},
   },
   'New call (blank)': { series:'', edition:'', editionLabel:'', name:'', keyword:'', selected:'', coverLine:'', quote:'', submit:'', theme:'', themeWork:'work', themeLine:'', juryLooks:'', kinds:'', pastEds:'', jury:'', images:{} },
 };
@@ -374,7 +400,7 @@ function launch(){
   // 9 who can apply
   S.push({bg:CREAM, html:`${corners(INK, BURG, 'Who can apply')}
     <p class="a R c" style="left:80px;right:80px;top:330px;font-size:100px;color:${INK}">Your work deserves the <span style="display:inline-block;background:${INK};color:${WHITE};border-radius:999px;padding:0 .3em .07em;line-height:1">spotlight.</span></p>
-    <p class="a c sub" style="left:150px;right:150px;top:720px;font-size:40px;color:${INK}">Emerging, mid-career or established.</p>
+    <p class="a c sub" style="left:150px;right:150px;top:720px;font-size:40px;color:${INK}">${esc(state.levels || '')}</p>
     <p class="a c sub" style="left:170px;right:170px;top:830px;opacity:.65;font-size:30px;color:${INK}">${esc(state.elig)}</p>`});
 
   // 10 published artists
