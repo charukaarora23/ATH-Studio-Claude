@@ -4,181 +4,105 @@
 @font-face{font-family:HG;src:url(fonts/ath/HankenGrotesk.woff2) format("woff2");font-weight:100 900}
 @font-face{font-family:NR;src:url(fonts/ath/Newsreader-Italic.woff2) format("woff2");font-style:italic;font-weight:200 800}
 @font-face{font-family:NR;src:url(fonts/ath/Newsreader.woff2) format("woff2");font-weight:200 800}
-:root{--ink:#1E080E;--petrol:#025054;--pet2:#013A3D;--pist:#D0D996;--cream:#F9ECE5;--burg:#6A0620}
+:root{--ink:#1E080E;--petrol:#025054;--pist:#D0D996;--paper:#F7F3EC;--burg:#6A0620}
 body{margin:0;background:#C9D3CF;display:flex;flex-wrap:wrap;gap:40px;padding:40px}
-.s{position:relative;width:1080px;height:1350px;overflow:hidden;font-family:HG,sans-serif;-webkit-font-smoothing:antialiased}
+.s{position:relative;width:1080px;height:1350px;overflow:hidden;font-family:HG,sans-serif;-webkit-font-smoothing:antialiased;background:var(--paper);color:var(--ink)}
 .s *{margin:0;box-sizing:border-box}
 .a{position:absolute}
-/* Colour jobs: photo = feeling · petrol = the book and the facts · cream = the artist */
-.pet{background:var(--petrol);color:var(--cream)} .cr{background:var(--cream);color:var(--ink)}
-/* Type: serif carries feeling, grotesk carries facts. Italic only on slides 1, 5, 9. Nothing under 24px. */
-.q{font-family:NR,serif;font-weight:400;letter-spacing:-.022em;line-height:1.04}
-.q i{font-style:italic}
-.h{font-weight:500;letter-spacing:-.03em;line-height:1.06}
-.n{font-weight:400;letter-spacing:-.055em;line-height:.85;white-space:nowrap}
-.b{font-size:36px;line-height:1.4;font-weight:400;letter-spacing:-.01em}
-.l{font-size:25px;font-weight:500;line-height:1.2}
+.d{font-family:NR,serif;font-weight:400;letter-spacing:-.025em;line-height:1.02}
+.d i{font-style:italic}
+.c{font-size:24px;font-weight:500;line-height:1.4;letter-spacing:0}
 .img{background-size:cover;background-repeat:no-repeat}
-.pill{display:inline-flex;align-items:center;border-radius:999px;white-space:nowrap}
-.chip{left:72px;top:68px;height:58px;padding:0 26px;font-size:25px;font-weight:600}
-.logo{right:72px;top:62px;height:68px}
-.swipe{right:72px;bottom:44px;display:inline-flex;align-items:center;justify-content:center;width:112px;height:60px;border:2.5px solid currentColor;border-radius:999px}
-.foot{left:72px;bottom:60px;font-size:24px;font-weight:500;opacity:.75}
-/* book mockups (stand-ins until real photos) */
-.cover{position:absolute;border-radius:4px 12px 12px 4px;overflow:hidden;box-shadow:0 50px 70px -20px rgba(0,0,0,.55),0 10px 20px rgba(0,0,0,.25)}
-.cover:before{content:"";position:absolute;left:0;top:0;bottom:0;width:34px;background:linear-gradient(90deg,rgba(0,0,0,.45),rgba(255,255,255,.12) 60%,rgba(0,0,0,.15));z-index:2}
-.page{position:absolute;background:#FBF8F2}
+.run{left:80px;right:80px;top:64px;display:flex;justify-content:space-between;align-items:center}
+.run img{height:44px}
+.rule{height:0;border-top:1.5px solid currentColor;opacity:.3}
 </style></head><body>
-<template id="arrow"><svg width="56" height="26" viewBox="0 0 64 30"><path d="M3 15h54M44 3l14 12-14 12" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/></svg></template>
 
-<!-- 1 · HOOK: who it's for, what you get, when -->
+<!-- 1 · Cover -->
 <div class="s" id="s1" style="color:#fff">
-  <div class="a img" style="inset:0;background-image:url(art/flower-portrait.jpg);background-position:center 12%"></div>
-  <div class="a" style="inset:0;background:linear-gradient(180deg,rgba(1,40,42,.5) 0%,rgba(1,40,42,0) 18%,rgba(1,40,42,0) 30%,rgba(1,40,42,.85) 52%,var(--pet2) 74%)"></div>
-  <span class="a pill chip" style="background:var(--pist);color:var(--petrol)">Open call · 30 days left</span>
-  <img class="a logo" src="art/logo-no-project_peony.svg">
-  <h1 class="a q" style="left:68px;right:80px;top:600px;font-size:116px">Calling all artists inspired by <i>nature.</i></h1>
-  <p class="a h" style="left:72px;right:72px;top:960px;font-size:50px">Get published in a juried hardcover book. Win $500.</p>
-  <div class="a" style="left:72px;top:1120px;display:flex;gap:14px">
-    <span class="pill" style="height:66px;padding:0 30px;background:var(--cream);color:var(--burg);font-size:28px;font-weight:600">Closes 13 December</span>
-    <span class="pill" style="height:66px;padding:0 30px;border:2px solid rgba(255,255,255,.65);font-size:28px;font-weight:500">DM “GARDEN” for the brief</span></div>
-  <p class="a foot">Art: [Artist name]</p>
-  <span class="a swipe" data-arrow></span>
+  <div class="a img" style="inset:0;background-image:url(art/flower-portrait.jpg);background-position:center 18%"></div>
+  <div class="a" style="inset:0;background:linear-gradient(180deg,rgba(10,20,20,.45),rgba(10,20,20,0) 22%,rgba(10,20,20,0) 55%,rgba(10,20,20,.7) 100%)"></div>
+  <div class="a run"><img src="art/logo-no-project_peony.svg"><span class="c">Open call</span></div>
+  <p class="a c" style="left:80px;bottom:500px;font-size:30px">Open call for artists</p>
+  <h1 class="a d" style="left:70px;right:60px;bottom:250px;font-size:250px;letter-spacing:-.04em;line-height:.9"><i>Garden</i></h1>
+  <div class="a rule" style="left:80px;right:80px;bottom:200px;opacity:.6"></div>
+  <p class="a c" style="left:80px;bottom:130px">101 Art Book, Volume 16</p>
+  <p class="a c" style="right:80px;bottom:130px;text-align:right">Submissions close 13 December</p>
+  <p class="a c" style="left:80px;bottom:64px;opacity:.7;font-size:20px">Art: [Artist name]</p>
 </div>
 
-<!-- 2 · THE BOOK: proof it's real -->
-<div class="s pet" id="s2">
-  <span class="a pill chip" style="background:var(--pist);color:var(--petrol)">30 days left</span>
-  <img class="a logo" src="art/logo-no-project_peony.svg">
-  <div class="a" style="left:0;right:0;top:150px;height:650px;background:radial-gradient(60% 70% at 50% 60%,rgba(208,217,150,.22),rgba(2,80,84,0) 70%)"></div>
-  <!-- lying book (spine) -->
-  <div class="a" style="left:250px;top:700px;width:600px;height:64px;border-radius:6px;background:linear-gradient(180deg,#2A0A12,#1A050B);box-shadow:0 30px 40px -12px rgba(0,0,0,.6);display:flex;align-items:center;justify-content:space-between;padding:0 30px;color:var(--pist);font-size:22px;font-weight:600;letter-spacing:.08em">101 ART BOOK<span style="font-family:NR,serif;font-style:italic;font-weight:400;letter-spacing:0;font-size:28px;color:var(--cream)">Garden Edition</span>VOL. 16</div>
-  <!-- standing cover -->
-  <div class="cover" style="left:350px;top:170px;width:400px;height:530px;transform:rotate(-3deg)">
-    <div class="a img" style="inset:0;background-image:url(art/night-bloom.jpg);background-position:center 35%"></div>
-    <div class="a" style="left:0;right:0;top:0;height:170px;background:linear-gradient(180deg,rgba(20,6,10,.85),rgba(20,6,10,0))"></div>
-    <p class="a" style="left:56px;top:34px;color:var(--pist);font-size:18px;font-weight:600;letter-spacing:.12em">101 ART BOOK · VOL. 16</p>
-    <p class="a q" style="left:56px;top:66px;color:#fff;font-size:48px"><i>Garden Edition</i></p>
-  </div>
-  <p class="a l" style="left:72px;top:850px;color:var(--pist)">The book</p>
-  <h2 class="a q" style="left:68px;right:72px;top:900px;font-size:92px">101 artists. One hardcover book.</h2>
-  <p class="a b" style="left:72px;right:110px;top:1110px">Volume 16 of a juried series, sold on Amazon, Barnes &amp; Noble and in bookstores.</p>
-  <span class="a swipe" data-arrow></span>
+<!-- 2 · The statement -->
+<div class="s" id="s2">
+  <div class="a run"><img src="art/logo-no-project_burgundy.svg"><span class="c">Open call · 30 days remaining</span></div>
+  <h2 class="a d" style="left:80px;right:100px;top:300px;font-size:104px">A juried hardcover edition of 101 artists, inspired by the <i>garden.</i></h2>
+  <div class="a rule" style="left:80px;width:300px;top:860px"></div>
+  <p class="a c" style="left:80px;top:890px;width:560px;font-size:28px;font-weight:400">Published by Arts to Hearts. Sold on Amazon, Barnes &amp; Noble and in bookstores.</p>
+  <div class="a img" style="right:80px;bottom:80px;width:300px;height:380px;background-image:url(art/call-garden.jpg);background-position:42% 30%"></div>
 </div>
 
-<!-- 3 · WHAT YOU GET: picture yourself in it -->
-<div class="s cr" id="s3">
-  <span class="a pill chip" style="background:var(--petrol);color:var(--cream)">30 days left</span>
-  <img class="a logo" src="art/logo-no-project_burgundy.svg">
-  <!-- open spread -->
-  <div class="a" style="left:110px;top:170px;width:860px;height:420px;box-shadow:0 40px 60px -24px rgba(30,8,14,.4)">
-    <div class="page" style="left:0;top:0;width:430px;height:420px;border-radius:6px 0 0 6px;background:linear-gradient(90deg,#FBF8F2 80%,#E9E2D6)">
-      <p class="a" style="left:50px;bottom:110px;font-family:NR,serif;font-size:40px;color:var(--ink)">Your name</p>
-      <p class="a" style="left:50px;bottom:76px;font-size:19px;color:var(--ink);opacity:.6">Title of work · Oil on canvas · Country</p>
-      <p class="a" style="left:50px;bottom:28px;font-size:16px;color:var(--ink);opacity:.4">142</p></div>
-    <div class="page" style="left:430px;top:0;width:430px;height:420px;border-radius:0 6px 6px 0;background:linear-gradient(90deg,#E9E2D6,#FBF8F2 20%)">
-      <div class="a img" style="left:60px;top:44px;right:50px;bottom:44px;background-image:url(art/flower-portrait.jpg);background-position:center 20%"></div></div>
-  </div>
-  <p class="a l" style="left:72px;top:650px;color:var(--petrol)">If you’re selected</p>
-  <h2 class="a q" style="left:68px;right:72px;top:700px;font-size:84px">Imagine turning the page and finding your work.</h2>
-  <div class="a" style="left:72px;right:72px;top:910px">
-    <p class="b" style="padding:22px 0;border-top:2px solid rgba(30,8,14,.14)"><b style="font-weight:600">Your art in print,</b> sold on Amazon and Barnes &amp; Noble.</p>
-    <p class="b" style="padding:22px 0;border-top:2px solid rgba(30,8,14,.14)"><b style="font-weight:600">“Published artist”</b> on your CV and grant applications.</p>
-    <p class="b" style="padding:22px 0;border-top:2px solid rgba(30,8,14,.14);border-bottom:2px solid rgba(30,8,14,.14)"><b style="font-weight:600">Seen by collectors</b> and 190,000+ people across our platforms.</p>
-  </div>
-  <span class="a swipe" style="bottom:36px" data-arrow></span>
-</div>
-
-<!-- 4 · IS THIS FOR YOU -->
-<div class="s cr" id="s4">
-  <span class="a pill chip" style="background:var(--petrol);color:var(--cream)">30 days left</span>
-  <img class="a logo" src="art/logo-no-project_burgundy.svg">
-  <p class="a l" style="left:72px;top:190px;color:var(--petrol)">Who can apply</p>
-  <h2 class="a q" style="left:68px;right:72px;top:240px;font-size:96px">Is this for you?<br>Very likely.</h2>
-  <div class="a" style="left:72px;right:72px;top:500px;display:grid;grid-template-columns:1fr 1fr;gap:22px">
-    <div style="background:#fff;border-radius:32px;padding:40px;height:340px;display:flex;flex-direction:column;justify-content:space-between"><p class="l" style="color:var(--petrol)">Where</p><div><p class="h" style="font-size:54px">Any country.</p><p class="b" style="font-size:31px;opacity:.7;margin-top:8px">Open worldwide.</p></div></div>
-    <div style="background:var(--petrol);color:var(--cream);border-radius:32px;padding:40px;height:340px;display:flex;flex-direction:column;justify-content:space-between"><p class="l" style="color:var(--pist)">Age</p><div><p class="h" style="font-size:54px">18 and over.</p><p class="b" style="font-size:31px;opacity:.85;margin-top:8px">Emerging or established.</p></div></div>
-    <div style="background:var(--petrol);color:var(--cream);border-radius:32px;padding:40px;height:340px;display:flex;flex-direction:column;justify-content:space-between"><p class="l" style="color:var(--pist)">Medium</p><div><p class="h" style="font-size:54px">Any medium.</p><p class="b" style="font-size:31px;opacity:.85;margin-top:8px">Traditional or digital.</p></div></div>
-    <div style="background:#fff;border-radius:32px;padding:40px;height:340px;display:flex;flex-direction:column;justify-content:space-between"><p class="l" style="color:var(--petrol)">Background</p><div><p class="h" style="font-size:54px">Self-taught welcome.</p><p class="b" style="font-size:31px;opacity:.7;margin-top:8px">The jury judges the work.</p></div></div>
-  </div>
-  <p class="a foot" style="opacity:.6">Closes 13 Dec · Link in bio</p>
-  <span class="a swipe" data-arrow></span>
-</div>
-
-<!-- 5 · THE THEME (the slide you liked) -->
-<div class="s" id="s5" style="color:#fff">
+<!-- 3 · The theme -->
+<div class="s" id="s3" style="color:#fff">
   <div class="a img" style="inset:0;background-image:url(art/night-bloom.jpg);background-position:center 40%"></div>
-  <div class="a" style="inset:0;background:linear-gradient(180deg,rgba(20,6,10,.86) 0%,rgba(20,6,10,.55) 36%,rgba(20,6,10,0) 55%,rgba(20,6,10,0) 64%,rgba(20,6,10,.9) 100%)"></div>
-  <span class="a pill chip" style="background:var(--pist);color:var(--petrol)">30 days left</span>
-  <img class="a logo" src="art/logo-no-project_peony.svg">
-  <p class="a l" style="left:72px;top:190px;color:var(--pist)">The theme</p>
-  <p class="a q" style="left:68px;right:90px;top:240px;font-size:96px">“A garden is more than a place where things <i>grow.</i>”</p>
-  <p class="a b" style="left:72px;right:130px;top:1020px">A single flower, an overgrown landscape, a world that exists only in memory. Show us what a garden means to you.</p>
-  <p class="a foot">Art: [Artist name]</p>
-  <span class="a swipe" data-arrow></span>
+  <div class="a" style="inset:0;background:linear-gradient(180deg,rgba(20,6,10,.8),rgba(20,6,10,.25) 34%,rgba(20,6,10,0) 50%,rgba(20,6,10,0) 75%,rgba(20,6,10,.6))"></div>
+  <div class="a run"><img src="art/logo-no-project_peony.svg"><span class="c">The theme</span></div>
+  <p class="a d" style="left:80px;right:120px;top:190px;font-size:84px">“A garden is more than a place where things <i>grow.</i>”</p>
+  <p class="a c" style="left:80px;bottom:64px;opacity:.75;font-size:20px">Art: [Artist name]</p>
 </div>
 
-<!-- 6 · RECOGNITION -->
-<div class="s pet" id="s6">
-  <span class="a pill chip" style="background:var(--pist);color:var(--petrol)">30 days left</span>
-  <img class="a logo" src="art/logo-no-project_peony.svg">
-  <p class="a l" style="left:72px;top:190px;color:var(--pist)">Recognition</p>
-  <h2 class="a q" style="left:68px;right:72px;top:240px;font-size:92px">And for three artists,<br>a little more.</h2>
-  <div class="a" style="left:72px;right:72px;top:520px;background:var(--cream);color:var(--ink);border-radius:36px;padding:52px 56px">
-    <p class="l" style="color:var(--petrol)">Winner</p>
-    <p class="n" style="font-size:220px;margin-top:20px;color:var(--petrol)">$500</p>
-    <p class="b" style="margin-top:22px">plus a 4-page feature, a glass trophy and an Artsy listing.</p>
+<!-- 4 · The book -->
+<div class="s" id="s4">
+  <div class="a run"><img src="art/logo-no-project_burgundy.svg"><span class="c">The edition</span></div>
+  <div class="a" style="left:330px;top:230px;width:420px;height:560px;border-radius:3px 8px 8px 3px;overflow:hidden;box-shadow:0 60px 80px -30px rgba(30,8,14,.45),0 8px 18px rgba(30,8,14,.15)">
+    <div class="a img" style="inset:0;background-image:url(art/night-bloom.jpg);background-position:center 35%"></div>
+    <div class="a" style="left:0;top:0;bottom:0;width:26px;background:linear-gradient(90deg,rgba(0,0,0,.4),rgba(255,255,255,.12) 60%,rgba(0,0,0,.12))"></div>
+    <div class="a" style="left:0;right:0;top:0;height:150px;background:linear-gradient(180deg,rgba(20,6,10,.8),rgba(20,6,10,0))"></div>
+    <p class="a" style="left:54px;top:36px;color:#fff;font-size:15px;font-weight:600;letter-spacing:.16em">101 ART BOOK · VOL. 16</p>
+    <p class="a d" style="left:54px;top:62px;color:#fff;font-size:46px"><i>Garden</i></p>
   </div>
-  <div class="a" style="left:72px;right:72px;top:1040px;border:2px solid rgba(249,236,229,.4);border-radius:30px;padding:30px 40px;display:flex;justify-content:space-between;align-items:center">
-    <p class="l" style="color:var(--pist)">Two runners-up</p><p class="b" style="font-size:32px">2-page feature · glass trophy · Artsy</p></div>
-  <span class="a swipe" data-arrow></span>
+  <h2 class="a d" style="left:80px;right:80px;top:930px;font-size:72px;text-align:center">One hundred and one artists.<br>One book.</h2>
+  <p class="a c" style="left:0;right:0;top:1130px;text-align:center;font-weight:400;opacity:.7">Hardcover · Juried · Volume 16 of the series</p>
 </div>
 
-<!-- 7 · ARTIST VOICES (needs a real quote) -->
-<div class="s cr" id="s7">
-  <span class="a pill chip" style="background:var(--petrol);color:var(--cream)">30 days left</span>
-  <img class="a logo" src="art/logo-no-project_burgundy.svg">
-  <p class="a l" style="left:72px;top:190px;color:var(--petrol)">From past editions</p>
-  <p class="a q" style="left:68px;right:72px;top:250px;font-size:80px">“[A real line from a past selected artist about what being in the book meant.]”</p>
-  <div class="a" style="left:72px;top:800px;display:flex;align-items:center;gap:30px">
-    <div style="width:220px;height:270px;border-radius:20px;background:repeating-linear-gradient(135deg,#EADBD2 0 16px,#F2E5DD 16px 32px);display:flex;align-items:center;justify-content:center;font-size:22px;color:#9b8a82;text-align:center;padding:20px">Their<br>artwork</div>
-    <div><p class="h" style="font-size:48px">[Artist name]</p><p class="b" style="font-size:31px;opacity:.7;margin-top:8px">Selected in [Edition] · [Country]</p></div>
+<!-- 5 · Selection -->
+<div class="s" id="s5">
+  <div class="a run"><img src="art/logo-no-project_burgundy.svg"><span class="c">Selected artists receive</span></div>
+  <div class="a" style="left:80px;right:80px;top:260px">
+    <div class="rule"></div>
+    <p class="d" style="font-size:66px;padding:40px 0">Publication in the book</p><div class="rule"></div>
+    <p class="d" style="font-size:66px;padding:40px 0">A Certificate of Recognition</p><div class="rule"></div>
+    <p class="d" style="font-size:66px;padding:40px 0">Introductions to collectors and galleries</p><div class="rule"></div>
+    <p class="d" style="font-size:66px;padding:40px 0">Promotion to 190,000+ followers</p><div class="rule"></div>
   </div>
-  <p class="a foot" style="opacity:.6">Closes 13 Dec · Link in bio</p>
-  <span class="a swipe" data-arrow></span>
+  <p class="a c" style="left:80px;bottom:72px;font-weight:400;opacity:.65">Selected artists may purchase copies at a subsidised rate.</p>
 </div>
 
-<!-- 8 · HOW TO APPLY + good to know -->
-<div class="s pet" id="s8">
-  <span class="a pill chip" style="background:var(--pist);color:var(--petrol)">30 days left</span>
-  <img class="a logo" src="art/logo-no-project_peony.svg">
-  <p class="a l" style="left:72px;top:190px;color:var(--pist)">How to apply</p>
-  <h2 class="a q" style="left:68px;right:72px;top:240px;font-size:96px">About ten minutes.</h2>
-  <div class="a" style="left:72px;right:72px;top:420px">
-    <div style="display:grid;grid-template-columns:130px 1fr;padding:30px 0;border-top:2px solid rgba(249,236,229,.25)"><p class="n" style="font-size:110px;color:var(--pist)">1</p><div><p class="h" style="font-size:46px">Choose one artwork</p><p class="b" style="font-size:31px;opacity:.8;margin-top:6px">The piece that shows how you see the theme.</p></div></div>
-    <div style="display:grid;grid-template-columns:130px 1fr;padding:30px 0;border-top:2px solid rgba(249,236,229,.25)"><p class="n" style="font-size:110px;color:var(--pist)">2</p><div><p class="h" style="font-size:46px">Photograph it well</p><p class="b" style="font-size:31px;opacity:.8;margin-top:6px">Daylight, straight on, no filters.</p></div></div>
-    <div style="display:grid;grid-template-columns:130px 1fr;padding:30px 0;border-top:2px solid rgba(249,236,229,.25);border-bottom:2px solid rgba(249,236,229,.25)"><p class="n" style="font-size:110px;color:var(--pist)">3</p><div><p class="h" style="font-size:46px">Submit via the link in bio</p><p class="b" style="font-size:31px;opacity:.8;margin-top:6px">Every entry is reviewed by the jury.</p></div></div>
-  </div>
-  <div class="a" style="left:72px;right:72px;top:1010px;background:rgba(249,236,229,.1);border-radius:26px;padding:28px 34px">
-    <p class="l" style="color:var(--pist)">Good to know</p>
-    <p class="b" style="font-size:30px;margin-top:8px">An application fee applies. Selected artists can buy the book at a subsidised rate.</p></div>
-  <span class="a swipe" style="bottom:36px" data-arrow></span>
+<!-- 6 · The award -->
+<div class="s" id="s6" style="background:var(--petrol);color:#F7F3EC">
+  <div class="a run"><img src="art/logo-no-project_peony.svg"><span class="c">The award</span></div>
+  <p class="a d" style="left:64px;top:300px;font-size:380px;letter-spacing:-.05em;line-height:.85;color:var(--pist)">$500</p>
+  <div class="a rule" style="left:80px;right:80px;top:720px;opacity:.4"></div>
+  <p class="a d" style="left:80px;right:200px;top:760px;font-size:60px">and a four-page feature for the winner, selected by the jury.</p>
+  <p class="a c" style="left:80px;bottom:72px;font-weight:400;opacity:.75">Two runners-up receive a two-page feature.</p>
 </div>
 
-<!-- 9 · THE INVITATION -->
-<div class="s cr" id="s9">
-  <span class="a pill chip" style="background:var(--petrol);color:var(--cream)">30 days left</span>
-  <img class="a logo" src="art/logo-no-project_burgundy.svg">
-  <div class="a img" style="left:72px;right:72px;top:170px;height:420px;border-radius:30px;background-image:url(art/call-garden.jpg);background-position:center 35%"></div>
-  <h2 class="a q" style="left:68px;right:72px;top:640px;font-size:108px">101 places. Will one be <i>yours?</i></h2>
-  <span class="a pill" style="left:72px;top:900px;height:104px;padding:0 50px;background:var(--burg);color:var(--cream);font-size:36px;font-weight:500">Apply · link in bio&nbsp;&nbsp;→</span>
-  <p class="a b" style="left:72px;right:72px;top:1036px;font-size:32px">Submissions close 13 December. Or DM us <b style="font-weight:600">“GARDEN”</b> for the full brief.</p>
-  <p class="a b" style="left:72px;right:72px;top:1170px;font-size:30px;color:var(--petrol)">Know an artist who paints gardens? Send this to them.</p>
-  <p class="a foot" style="opacity:.6;bottom:52px;left:auto;right:72px">Art: [Artist name]</p>
+<!-- 7 · Eligibility -->
+<div class="s" id="s7">
+  <div class="a img" style="right:0;top:0;bottom:0;width:440px;background-image:url(art/flower-portrait.jpg);background-position:58% 70%;background-size:auto 118%"></div>
+  <div class="a run" style="right:520px"><img src="art/logo-no-project_burgundy.svg"></div>
+  <p class="a c" style="left:80px;top:300px">Eligibility</p>
+  <h2 class="a d" style="left:80px;width:500px;top:350px;font-size:68px">Open to artists aged 18 and over, in every country and every medium.</h2>
+  <p class="a c" style="left:80px;width:460px;top:820px;font-size:28px;font-weight:400;opacity:.75">Emerging and established artists are reviewed alike.</p>
+  <p class="a c" style="right:470px;bottom:64px;font-size:20px;opacity:.7;text-align:right">Art: [Artist name]</p>
 </div>
 
-<script>
-const a = document.getElementById('arrow').innerHTML;
-document.querySelectorAll('[data-arrow]').forEach(e => e.innerHTML = a);
-</script>
+<!-- 8 · Close -->
+<div class="s" id="s8" style="background:var(--petrol);color:#F7F3EC">
+  <div class="a run"><img src="art/logo-no-project_peony.svg"><span class="c">30 days remaining</span></div>
+  <p class="a c" style="left:80px;top:360px;color:var(--pist)">Submissions close</p>
+  <h2 class="a d" style="left:72px;right:80px;top:410px;font-size:170px;letter-spacing:-.04em;line-height:.92">13 <i>December</i></h2>
+  <div class="a rule" style="left:80px;right:80px;top:760px;opacity:.4"></div>
+  <p class="a d" style="left:80px;right:80px;top:800px;font-size:52px">Apply through the link in bio.</p>
+  <p class="a d" style="left:80px;right:80px;top:880px;font-size:52px;opacity:.85">For the full brief, DM us <i>Garden.</i></p>
+  <p class="a c" style="left:80px;bottom:72px;font-weight:400;opacity:.6">Application fee applicable.</p>
+</div>
 </body></html>
