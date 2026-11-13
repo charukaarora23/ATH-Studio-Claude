@@ -105,15 +105,15 @@ const T = {
       : tone === 'chilli' ? 'linear-gradient(180deg,rgba(120,0,2,.6) 0%,rgba(120,0,2,.3) 30%,rgba(150,0,3,.92) 60%,#AA0003 100%)'
       : 'linear-gradient(180deg,rgba(20,9,12,.6) 0%,rgba(20,9,12,.3) 30%,rgba(20,9,12,.88) 58%,rgba(20,9,12,.97) 100%)';
     const acc = tone === 'ink' ? tint(state.colour) : CREAM;
-    const big = String(o.big), size = big.length <= 2 ? 480 : big.length <= 8 ? 220 : 170;
+    const big = String(o.big), size = big.length <= 2 ? 300 : big.length <= 8 ? 150 : 120;
     return {bg:INK, html:`${imgDiv(o.img || ART[0], 'inset:0', o.pos || 'center 25%')}
       <div class="a" style="inset:0;background:${shade}"></div>
       ${corners(WHITE, PEONY, o.tr || leftLabel())}
       <div class="a" style="left:0;right:0;top:150px">${OPENCALL(acc, true)}</div>
       <p class="a c scr" style="left:0;right:0;top:205px;font-size:58px;color:${WHITE}">${esc(state.name)}</p>
-      <p class="a c" style="left:0;right:0;top:${big.length <= 2 ? 300 : 380}px;font-size:${size}px;font-weight:700;letter-spacing:-.06em;line-height:.85;color:${WHITE}">${big}</p>
-      <p class="a c" style="left:0;right:0;top:${big.length <= 2 ? 720 : 640}px;font-size:56px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:${acc}">${esc(o.unit)}</p>
-      <p class="a c" style="left:120px;right:120px;top:${big.length <= 2 ? 820 : 760}px;font-size:40px;font-weight:500;letter-spacing:-.015em;color:${WHITE}">${o.info || `to get your work into a juried hardcover book of ${esc(state.selected)} artists.`}</p>
+      <p class="a c" style="left:0;right:0;top:${big.length <= 2 ? 350 : 400}px;font-size:${size}px;font-weight:700;letter-spacing:-.06em;line-height:.85;color:${WHITE}">${big}</p>
+      <p class="a c" style="left:0;right:0;top:620px;font-size:48px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:${acc}">${esc(o.unit)}</p>
+      <p class="a c" style="left:120px;right:120px;top:760px;font-size:38px;font-weight:500;letter-spacing:-.015em;color:${WHITE}">${o.info || `to get your work into a juried hardcover book of ${esc(state.selected)} artists.`}</p>
       ${actionBtn(1110, tone === 'chilli')}`};
   },
   // the whole open call on one page
@@ -294,16 +294,16 @@ const AW = {
       ${actionBtn(1110)}`};
   },
   count(o){ const c = gold(); const chilli = o.tone === 'chilli'; const bg = chilli ? '#5A0A0A' : AWARD_BG;
-    const big = String(o.big), size = big.length <= 2 ? 460 : big.length <= 8 ? 200 : 150;
+    const big = String(o.big), size = big.length <= 2 ? 300 : big.length <= 8 ? 150 : 120;
     return {bg, html:`${imgDiv(o.img || ART[0], 'left:40px;right:40px;top:40px;bottom:40px', o.pos || 'center 30%')}
       <div class="a" style="left:40px;right:40px;top:40px;bottom:40px;background:${chilli ? 'rgba(90,10,10,.9)' : 'rgba(28,19,11,.86)'}"></div>
       ${frame(c)}${corners(CREAM, PEONY, o.tr || leftLabel())}
       <div class="a" style="left:0;right:0;top:150px">${OPENCALL(c, true)}</div>
       <p class="a c scr" style="left:0;right:0;top:205px;font-size:58px;color:${CREAM}">${esc(state.name)}</p>
-      <p class="a c" style="left:0;right:0;top:${big.length <= 2 ? 300 : 380}px;font-size:${size}px;font-weight:700;letter-spacing:-.05em;line-height:.85;color:${CREAM}">${big}</p>
-      <p class="a c" style="left:0;right:0;top:${big.length <= 2 ? 710 : 630}px;font-size:56px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:${c}">${esc(o.unit)}</p>
-      <div class="a" style="left:300px;right:300px;top:${big.length <= 2 ? 800 : 730}px;border-top:2px solid ${c}"></div>
-      <p class="a c" style="left:120px;right:120px;top:${big.length <= 2 ? 840 : 770}px;font-size:40px;font-weight:500;letter-spacing:-.015em;color:${CREAM}">${o.info || `to get your work into a juried hardcover book of ${esc(state.selected)} artists.`}</p>
+      <p class="a c" style="left:0;right:0;top:${big.length <= 2 ? 350 : 400}px;font-size:${size}px;font-weight:700;letter-spacing:-.05em;line-height:.85;color:${CREAM}">${big}</p>
+      <p class="a c" style="left:0;right:0;top:620px;font-size:48px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:${c}">${esc(o.unit)}</p>
+      <div class="a" style="left:380px;right:380px;top:710px;border-top:2px solid ${c}"></div>
+      <p class="a c" style="left:120px;right:120px;top:760px;font-size:38px;font-weight:500;letter-spacing:-.015em;color:${CREAM}">${o.info || `to get your work into a juried hardcover book of ${esc(state.selected)} artists.`}</p>
       ${actionBtn(1110, chilli)}`};
   },
 };
@@ -312,7 +312,7 @@ T.urgent = (o) => { const award = isAward(); const bg = o.chilli ? '#AA0003' : (
   const btn = actionBtn(1060, o.chilli);
   return {bg, html:`${award ? frame(gold()) : ''}${corners(CREAM, PEONY, o.tr || 'Final day')}
     <div class="a" style="left:0;right:0;top:200px">${OPENCALL(acc, true)}</div><p class="a c scr" style="left:0;right:0;top:255px;font-size:56px;color:${CREAM}">${esc(state.name)}</p>
-    <p class="a c" style="left:40px;right:40px;top:330px;font-size:${o.size||230}px;font-weight:700;letter-spacing:-.055em;line-height:.88;color:${CREAM}">${o.head}</p>
+    <p class="a c" style="left:40px;right:40px;top:380px;font-size:${o.size||190}px;font-weight:700;letter-spacing:-.055em;line-height:.88;color:${CREAM}">${o.head}</p>
     <p class="a c" style="left:120px;right:120px;top:${o.subTop||800}px;font-size:40px;font-weight:500;letter-spacing:-.015em;color:${CREAM}">${o.sub}</p>
     ${btn}`};
 };
