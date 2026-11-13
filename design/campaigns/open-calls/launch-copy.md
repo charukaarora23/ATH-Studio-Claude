@@ -1,7 +1,9 @@
 # Garden Edition launch: copy around the carousel
 
 ## Caption
-Calling all artists inspired by nature.
+What happens when 101 artists from around the world come together around a single idea?
+
+The 101 Art Book: Garden Edition is open. Edition 16 of the series that has published 1,300+ artists since 2023.
 
 The 101 Art Book: Garden Edition is open for submissions. We're selecting 101 artists to be published in a juried hardcover book, sold on Amazon, Barnes & Noble and in bookstores. The winner receives $500 and a 4-page feature.
 
