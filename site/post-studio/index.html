@@ -41,7 +41,7 @@ body{margin:0;background:var(--bg);color:var(--ink);font:400 14px/1.45 var(--san
 .segbar button[aria-current=page]{color:#F9ECE5;border-bottom-color:#FAD2E1}.segbar button:hover{color:#F9ECE5}
 body[data-seg=interviews] aside:not(#ivside),body[data-seg=interviews] #tabs,body[data-seg=interviews] #go,body[data-seg=interviews] #ptype,body:not([data-seg=interviews]) #ivside{display:none}
 #ivside .thumbs{display:flex;gap:6px;flex-wrap:wrap;margin:6px 0}#ivside .thumbs span{width:54px;height:54px;border-radius:6px;background:#eee center/cover;position:relative}#ivside .thumbs b{position:absolute;left:3px;top:2px;font:700 10px var(--sans,sans-serif);color:#fff;text-shadow:0 0 3px #000}
-#ivside .ivmsg{font-size:13px;margin:8px 0 0;line-height:1.45}#ivside .ivmsg.err{color:#AA0003}#ivside .demo{background:#FAD2E1;border-radius:10px;padding:10px 12px;font-size:13px;line-height:1.45;margin:0 0 12px}
+#ivside .ivmsg{font-size:13px;margin:10px 0 0;line-height:1.45}#ivside .ivmsg:not(:empty){background:#F9EEE5;color:#1C1310;border-radius:8px;padding:10px 12px}#ivside .ivmsg.err{color:#AA0003}#ivside .demo{background:#FAD2E1;border-radius:10px;padding:10px 12px;font-size:13px;line-height:1.45;margin:0 0 12px}
 body[data-seg=interviews] .top .f{display:none!important}
 .iv-list{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0}.iv-list button{border:1px solid var(--line);background:#fff;border-radius:999px;padding:8px 14px;font:600 13px var(--sans,sans-serif);cursor:pointer}.iv-list button[aria-current=true]{background:#14090C;color:#F9ECE5;border-color:#14090C}
 aside{background:var(--panel);border-right:1px solid var(--line);padding-block:20px;padding-left:max(18px,env(safe-area-inset-left,0px));padding-right:18px;overflow:auto;max-height:100vh;position:sticky;top:0}
@@ -753,10 +753,11 @@ function renderIvSide(){ const el = $('ivside'); if (!el) return; const p = ivCu
   el.innerHTML = `<h1>ATH Post Studio</h1><p class="sub">Artist interviews. Give it the article as a link or a PDF: the carousel, quote cards, stories and captions are written from it, in the Arts to Hearts look.</p>
     <div class="f"><label for="ivPick">Interview</label><div class="row2"><select id="ivPick"><option value="demo"${demo ? ' selected' : ''}>Example · PQHAÜS</option>${list.map(x => `<option value="${x.id}"${x.id === IVSEL ? ' selected' : ''}>${esc(x.f.name || 'Untitled')}${x.date ? ' · ' + esc(x.date) : ''}</option>`).join('')}</select><button class="btn ghost" type="button" data-ivnew>New</button></div>
     <p class="hint" style="margin:6px 0 0;display:flex;justify-content:space-between;gap:8px"><span>${DMODE === 'shared' ? 'Saved for the whole team.' : 'Saved in this browser.'}</span>${demo ? '' : '<button type="button" class="linkbtn" data-ivdel>Delete this interview</button>'}</p></div>
-    ${sec('Start from the article', `<div class="f"><label for="ivUrl">Article link</label><input id="ivUrl" type="url" placeholder="https://artstoheartsproject.com/…" value="${esc(demo ? '' : (p.f || {}).src || '')}"></div>
-      <button class="btn" type="button" data-ivimport style="width:100%">Build from link</button><p class="ivmsg" id="ivMsg"></p>
-      <div class="f" style="margin-top:12px"><label for="ivPdf">Or upload the article as a PDF (on the article page: Print, then Save as PDF)</label><input id="ivPdf" type="file" accept="application/pdf,.pdf"></div>
-      <details style="margin-top:10px"><summary style="font-size:13px">No link or PDF? Paste the article text</summary><textarea id="ivPaste" rows="4" placeholder="Copy everything on the article page and paste it here"></textarea><button class="btn ghost" type="button" data-ivpaste>Build from text</button></details>`)}
+    ${sec('Start from the article', `<p class="hint" style="margin:0 0 8px">Open the article and <b>scroll slowly to the bottom</b> so every picture loads. Then press Print, choose <b>Save as PDF</b>, and upload the file here. Text, pictures and credits come out of it.</p>
+      <label class="btn" style="display:block;text-align:center;width:100%;cursor:pointer">Upload the article PDF<input id="ivPdf" type="file" accept="application/pdf,.pdf" style="display:none"></label>
+      <p class="ivmsg" id="ivMsg" role="status"></p>
+      <details style="margin-top:12px"><summary style="font-size:13px">Use the article link instead</summary><div class="f" style="margin-top:8px"><input id="ivUrl" type="url" placeholder="https://artstoheartsproject.com/…" value="${esc(demo ? '' : (p.f || {}).src || '')}"></div><button class="btn ghost" type="button" data-ivimport style="width:100%">Build from link</button><p class="hint" style="margin:6px 0 0">If the site blocks it, use the PDF.</p></details>
+      <details style="margin-top:8px"><summary style="font-size:13px">Or paste the article text</summary><textarea id="ivPaste" rows="4" placeholder="Copy everything on the article page and paste it here"></textarea><button class="btn ghost" type="button" data-ivpaste>Build from text</button></details>`)}
     ${demo ? `<div class="demo">This is the example, so its fields are locked. Paste a link above to build a new interview, or <button type="button" class="linkbtn" data-ivcopy>edit a copy of this one</button>.</div>` : ''}
     ${DCAT.interview.groups.map(([title, fields]) => sec(title, fields.map(fd => ivField(p, fd, demo)).join(''))).join('')}`;
   el.querySelectorAll('details[data-sec]').forEach(d => d.ontoggle = () => { d.open ? IV_OPEN.add(d.dataset.sec) : IV_OPEN.delete(d.dataset.sec); });
@@ -773,8 +774,8 @@ function renderIvSide(){ const el = $('ivside'); if (!el) return; const p = ivCu
 // Read a PDF of the article in the browser: text in reading order, images with the caption printed under each.
 async function readArticlePdf(file, onStep){
   const pdfjs = await import('./vendor/pdfjs/pdf.min.js'); pdfjs.GlobalWorkerOptions.workerSrc = 'vendor/pdfjs/pdf.worker.min.js';
-  const doc = await pdfjs.getDocument({data: new Uint8Array(await file.arrayBuffer())}).promise;
-  const lines = [], images = [], seenImg = new Set(); let title = '', ended = false; const firstItems = [];
+  const doc = await pdfjs.getDocument({data: new Uint8Array(await file.arrayBuffer()), isImageDecoderSupported: false, isOffscreenCanvasSupported: false}).promise;   // the browser's own JPEG decoder path garbles some article images
+  let empty = 0; const lines = [], images = [], seenImg = new Set(); let title = '', ended = false; const firstItems = [];
   const END = /^(Leave a Reply|The Latest|Related (posts|articles)|You may also like|More from|Recent posts|\d*\s*Shares\b)/i;
   for (let n = 1; n <= doc.numPages; n++) { onStep && onStep(`Reading page ${n} of ${doc.numPages}…`);
     const page = await doc.getPage(n); const tc = await page.getTextContent();
@@ -790,25 +791,33 @@ async function readArticlePdf(file, onStep){
     if (wasEnded) break;
     lines.push('');
     // images: follow the drawing matrix so each image knows where it sits, then read the caption just below it
-    const ops = await page.getOperatorList(); const O = pdfjs.OPS; let ctm = [1, 0, 0, 1, 0, 0]; const stack = [];
+    const ops = await page.getOperatorList(); const O = pdfjs.OPS; let ctm = [1, 0, 0, 1, 0, 0]; const stack = []; const rects = [];
     const mul = (m, t) => [m[0] * t[0] + m[2] * t[1], m[1] * t[0] + m[3] * t[1], m[0] * t[2] + m[2] * t[3], m[1] * t[2] + m[3] * t[3], m[0] * t[4] + m[2] * t[5] + m[4], m[1] * t[4] + m[3] * t[5] + m[5]];
     for (let i = 0; i < ops.fnArray.length; i++) { const fn = ops.fnArray[i], a = ops.argsArray[i];
       if (fn === O.save) stack.push(ctm.slice()); else if (fn === O.restore) ctm = stack.pop() || [1, 0, 0, 1, 0, 0]; else if (fn === O.transform) ctm = mul(ctm, a);
-      else if (fn === O.paintImageXObject) { const id = a[0]; const store = id.startsWith('g_') ? page.commonObjs : page.objs;
-        const img = await new Promise(res => { try { store.get(id, res); } catch { res(null); } }); if (!img) continue;
-        const w = img.width, h = img.height; if (!w || !h || Math.min(w, h) < 500 || seenImg.has(id)) continue; seenImg.add(id);
-        if (Math.max(ctm[5], ctm[5] + ctm[3]) < endY) continue;
-        const cv = document.createElement('canvas'); cv.width = w; cv.height = h; const cx = cv.getContext('2d');
-        if (img.bitmap) cx.drawImage(img.bitmap, 0, 0); else if (img.data) { const out = cx.createImageData(w, h), d = img.data, o = out.data;
-          if (d.length === w * h * 4) o.set(d); else if (d.length === w * h * 3) { for (let p = 0, q = 0; p < d.length; p += 3, q += 4) { o[q] = d[p]; o[q + 1] = d[p + 1]; o[q + 2] = d[p + 2]; o[q + 3] = 255; } } else continue; cx.putImageData(out, 0, 0); } else continue;
-        const bottom = Math.min(ctm[5], ctm[5] + ctm[3]); const capRow = pageRows.find(r => r.y < bottom && bottom - r.y < 140 && / \/ (19|20)\d{2} \/ /.test(r.t)) || pageRows.find(r => r.y < bottom && bottom - r.y < 70); const cap = (capRow || {}).t || '';
-        const blob = await new Promise(r => cv.toBlob(r, 'image/jpeg', .9)); images.push({w, h, file: new File([blob], `pdf-img-${images.length + 1}.jpg`, {type: 'image/jpeg'}), alt: '', cap: / \/ (19|20)\d{2} \/ /.test(cap) ? cap : ''}); } } }
-  return {title: title.replace(/\s+/g, ' ').trim(), text: lines.join('\n').replace(/\n{3,}/g, '\n\n'), images};
+      else if (fn === O.paintImageXObject || fn === O.paintInlineImageXObject || fn === O.paintImageMaskXObject) { const id = String(a[0]);
+        const xs = [ctm[4], ctm[4] + ctm[0], ctm[4] + ctm[2], ctm[4] + ctm[0] + ctm[2]], ys = [ctm[5], ctm[5] + ctm[1], ctm[5] + ctm[3], ctm[5] + ctm[1] + ctm[3]];
+        const r = {x0: Math.min(...xs), x1: Math.max(...xs), y0: Math.min(...ys), y1: Math.max(...ys), id};
+        if (r.x1 - r.x0 < 150 || r.y1 - r.y0 < 150 || r.y1 < endY || rects.some(q => Math.abs(q.x0 - r.x0) < 2 && Math.abs(q.y0 - r.y0) < 2)) continue;
+        const ci = pageRows.findIndex(row => row.y < r.y0 && r.y0 - row.y < 160 && (window.isCaption(row.t) || window.isCaption((row.t + ' ' + ((pageRows[pageRows.indexOf(row) + 1] || {}).t || '')).trim())));
+        r.cap = ci < 0 ? '' : (window.isCaption(pageRows[ci].t) ? pageRows[ci].t : (pageRows[ci].t + ' ' + ((pageRows[ci + 1] || {}).t || '')).trim()); rects.push(r); } }
+    // cut each image out of the rendered page: works whatever way the PDF stores its pictures
+    if (rects.length) { const vp = page.getViewport({scale: 3}); const pc = document.createElement('canvas'); pc.width = Math.ceil(vp.width); pc.height = Math.ceil(vp.height);
+      await page.render({canvasContext: pc.getContext('2d'), viewport: vp}).promise;
+      for (const r of rects) { const [ax, ay] = vp.convertToViewportPoint(r.x0, r.y1), [bx, by] = vp.convertToViewportPoint(r.x1, r.y0);
+        const sx = Math.max(0, Math.round(Math.min(ax, bx))), sy = Math.max(0, Math.round(Math.min(ay, by))), w = Math.min(pc.width - sx, Math.round(Math.abs(bx - ax))), h = Math.min(pc.height - sy, Math.round(Math.abs(by - ay)));
+        if (w < 300 || h < 300) continue; const cv = document.createElement('canvas'); cv.width = w; cv.height = h; cv.getContext('2d').drawImage(pc, sx, sy, w, h, 0, 0, w, h);
+        // a picture the website had not loaded yet prints as flat grey or a striped placeholder: skip it and say so
+        const t = document.createElement('canvas'); t.width = t.height = 48; const tx = t.getContext('2d'); tx.drawImage(cv, 0, 0, 48, 48); const px = tx.getImageData(0, 0, 48, 48).data;
+        let sum = 0, sq = 0, neon = 0; for (let q = 0; q < px.length; q += 4) { const l = (px[q] + px[q + 1] + px[q + 2]) / 3; sum += l; sq += l * l; if ((px[q + 1] > 200 && px[q] < 80 && px[q + 2] < 80) || (px[q] > 200 && px[q + 2] > 200 && px[q + 1] < 80)) neon++; }
+        const n = px.length / 4, sd = Math.sqrt(sq / n - (sum / n) ** 2); if (sd < 7 || neon / n > .15) { empty++; continue; }
+        const blob = await new Promise(res => cv.toBlob(res, 'image/jpeg', .92)); images.push({w, h, file: new File([blob], `pdf-img-${images.length + 1}.jpg`, {type: 'image/jpeg'}), alt: '', cap: r.cap}); } } }
+  return {empty, title: title.replace(/\s+/g, ' ').trim(), text: lines.join('\n').replace(/\n{3,}/g, '\n\n'), images};
 }
 async function ivImport({url, text, file}){ const msg = (t, err) => { const m = $('ivMsg'); if (m) { m.textContent = t; m.className = 'ivmsg' + (err ? ' err' : ''); } status(t); };
   let page = {title: '', text: text || '', images: [], ai: null};
   if (file) { try { const pdf = await readArticlePdf(file, t => msg(t)); msg(`Saving ${pdf.images.length} images…`);
-      for (const im of pdf.images) im.url = await dUpload(im.file); page = {title: pdf.title, text: pdf.text, images: pdf.images.map(({file, ...x}) => x), ai: null}; }
+      for (const im of pdf.images) im.url = await dUpload(im.file); page = {title: pdf.title, text: pdf.text, images: pdf.images.map(({file, ...x}) => x), ai: null, empty: pdf.empty}; }
     catch (e) { msg('Could not read that PDF (' + (e.message || e) + '). Try printing the article page to PDF again, or paste the text.', true); return; }
     if (page.text.length > 500) { msg('Writing the carousel copy…'); try { const r = await fetch('api/article', {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({text: page.text, images: page.images.map(i => ({alt: i.alt, cap: i.cap}))})}); const j = await r.json().catch(() => ({})); if (r.ok) { page.ai = j.ai; page.aiError = j.aiError; } } catch {} } }
   else if (url) { msg('Reading the article and saving its images… this takes up to a minute.');
@@ -824,7 +833,7 @@ async function ivImport({url, text, file}){ const msg = (t, err) => { const m = 
     pick: (c.picks || []).join(', '), kicks: (c.kicks || []).join('\n'), inside: (c.inside || []).join('\n'), ctahead: c.ctahead || '', hook: c.hook || '', key: 'INTERVIEW', url: url ? url.replace(/^https?:\/\//, '').replace(/\/$/, '') : '', src: url || ''};
   p.imgs = {arts: sorted.arts, studio: sorted.studio}; saveDaily(p.id); IV_OPEN.add('Cover'); ivSelect(p.id);
   const need = [!sorted.arts.length && 'artworks', !sorted.studio.length && 'a portrait'].filter(Boolean);
-  msg(`Built from the article: ${r.qa.length} questions, ${sorted.arts.length} artworks, ${sorted.studio.length} photo${sorted.studio.length === 1 ? "" : "s"}. ${ai ? 'Copy written by Claude. Read it through and adjust anything.' : page.aiError ? 'Claude could not write the copy (' + page.aiError + '), so it was picked by rules. Check the headline and labels.' : 'Copy picked from the article by rules. Check the headline and labels.'}${need.length ? ' Please add ' + need.join(' and ') + ' in the sidebar.' : ''}`); }
+  msg(`Built from the article: ${r.qa.length} questions, ${sorted.arts.length} artworks, ${sorted.studio.length} photo${sorted.studio.length === 1 ? "" : "s"}. ${ai ? 'Copy written by Claude. Read it through and adjust anything.' : page.aiError ? 'Claude could not write the copy (' + page.aiError + '), so it was picked by rules. Check the headline and labels.' : 'Copy picked from the article by rules. Check the headline and labels.'}${page.empty ? ` ${page.empty} picture${page.empty > 1 ? 's were' : ' was'} blank in the PDF, because the website had not loaded ${page.empty > 1 ? 'them' : 'it'} when the page was printed. Scroll slowly to the bottom of the article so every picture appears, then Print and Save as PDF again, or add the artworks under The work.` : need.length ? ' Please add ' + need.join(' and ') + ' in the sidebar.' : ''}`); }
 function setSeg(seg){ document.body.dataset.seg = seg; document.querySelectorAll('#seg [data-seg]').forEach(b => b.setAttribute('aria-current', b.dataset.seg === seg ? 'page' : 'false'));
   try { localStorage.setItem('athSeg', seg); } catch {}
   if (seg === 'interviews') { $('ptype').value = 'interview'; renderIvSide(); }

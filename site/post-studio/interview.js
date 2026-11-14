@@ -5,15 +5,24 @@
    Look: Arts to Hearts social guide (Night and Rose, Inter Tight + Libre Baskerville, four corners). Artworks are never cropped. */
 
 // ---------- article parser: paste the article text, fields fill themselves ----------
+// Artwork credit lines, in the two styles our articles use:
+//   Title / 2025 / 24×30 / Acrylic on canvas      and      “Title”, 2025, 16×20″, oil on canvas
+const CAP_SLASH = /^\s*(.+?)\s+\/\s+((?:19|20)\d{2})\s+\/\s+([^/]+?)\s+\/\s+(.+?)\s*$/;
+const CAP_COMMA = /^\s*[“"‘']\s*(.+?)\s*[”"’'],?\s+((?:19|20)\d{2})\s*,\s*([\d.,]+\s*[×xX]\s*[\d.,]+\s*(?:″|"|”|in\.?|inch(?:es)?|cm)?)\s*,\s*(.+?)\s*$/;
+const parseCap = l => { const m = String(l).match(CAP_SLASH) || String(l).match(CAP_COMMA); return m ? [m[1].trim(), m[2], m[3].trim().replace(/[″”"]$/, ' in'), m[4].trim()] : null; };
+window.isCaption = l => !!parseCap(l);
 function parseInterview(raw){
   const junk = l => /^\d{1,2}\/\d{1,2}\/\d{4}|^https?:\/\/|^\d+\/\d+$|minute read$|^(WEBSITE|INSTAGRAM|Leave a Reply|You must be logged in|Shares?|SHARE|PIN IT)/i.test(l.trim());
-  const all = String(raw || '').replace(/\r/g, '').split('\n'); const seen = {}; all.forEach(l => { const k = l.trim(); if (k) seen[k] = (seen[k] || 0) + 1; });
-  const lines = all.filter(l => !junk(l) && !(l.trim() && seen[l.trim()] >= 3));   // page headers repeat on every page
+  const all = String(raw || '').replace(/\r/g, '').replace(/(\p{L})-\n(\p{Ll})/gu, '$1-$2').split('\n');
+  const seen = {}; all.forEach(l => { const k = l.trim(); if (k) seen[k] = (seen[k] || 0) + 1; });
+  const kept = all.filter(l => !junk(l) && !(l.trim() && seen[l.trim()] >= 3));   // page headers repeat on every page
+  const lines = []; kept.forEach(l => { const prev = lines[lines.length - 1];   // a credit that wrapped onto a second line
+    if (prev !== undefined && /^\s*[“"‘']/.test(prev) && /(19|20)\d{2}\s*,/.test(prev) && /,\s*$|\band$|\bon$|\b(and|of|with)\s*$/.test(prev.trim()) && /^\s*[a-z]/.test(l)) lines[lines.length - 1] = prev.trim() + ' ' + l.trim(); else lines.push(l); });
   const text = lines.join('\n');
-  const capRe = /^\s*(.+?)\s+\/\s+((?:19|20)\d{2})\s+\/\s+([^/]+?)\s+\/\s+(.+?)\s*$/;
-  const caps = lines.map(l => l.match(capRe)).filter(Boolean).map(m => `${m[1].trim()} | ${m[2]} | ${m[3].trim()} | ${m[4].trim()}`);
-  const qa = []; const parts = text.split(/\n(?=\s*Q\d+\.)/);
-  parts.slice(1).forEach(b => { const flat = b.replace(/^\s*Q\d+\.\s*/, '').split('\n').filter(l => !capRe.test(l)).join('\n');
+  const caps = [...new Set(lines.map(parseCap).filter(Boolean).map(c => c.join(' | ')))];
+  const capRe = { test: l => !!parseCap(l) };
+  const qa = []; const parts = text.split(/\n(?=\s*Q\d+[.,:)])/);
+  parts.slice(1).forEach(b => { const flat = b.replace(/^\s*Q\d+[.,:)]\s*/, '').split('\n').filter(l => !capRe.test(l)).join('\n');
     const qi = flat.indexOf('?'); if (qi < 0) return;
     const q = flat.slice(0, qi + 1).replace(/\s+/g, ' ').trim();
     const a = flat.slice(qi + 1).split(/\n\s*\n/).map(p => p.replace(/\s+/g, ' ').trim()).filter(p => p && !/^(As our conversation|Follow )/.test(p));
@@ -82,9 +91,10 @@ const IV = {
   // Cover A, full image: the work fills the slide, evenly darkened a little so white type reads. Cover B, framed: the work whole, on white.
   cover(o){ const h = o.head, sz = h.length > 56 ? 76 : h.length > 40 ? 88 : 100;
     if (o.full) return {bg:B.ink, html:`${ivArt(o.img, 'inset:0', o.slot, 'cover')}<div class="a" style="inset:0;background:rgba(20,9,12,.3)"></div>${ivCorners(o, '#FFFFFF', B.burg)}
-      <p class="a cn" style="left:72px;bottom:${(h.length > 40 ? 250 : 210) + Math.ceil(h.length / Math.floor(936 / (sz * .5))) * sz * .96 + 26}px;color:#FFFFFF">Artist Interview</p>
-      <p class="a" style="left:72px;right:72px;bottom:${h.length > 40 ? 250 : 210}px;${T_MED};font-size:${sz}px;line-height:.96;letter-spacing:-.035em;color:#FFFFFF">${esc(h)}</p>
-      <p class="a" style="left:72px;right:72px;bottom:150px;${T_REG};font-size:30px;color:#FFFFFF">An interview with ${esc(o.name)}${o.meta ? ' · ' + esc(o.meta) : ''}</p>`};
+      <div class="a" style="left:72px;right:72px;bottom:140px;display:flex;flex-direction:column;gap:22px">
+        <p class="cn" style="color:#FFFFFF">Artist Interview</p>
+        <p style="${T_MED};font-size:${sz}px;line-height:.96;letter-spacing:-.035em;color:#FFFFFF">${esc(h)}</p>
+        <p style="${T_REG};font-size:30px;color:#FFFFFF;margin-top:8px">An interview with ${esc(o.name)}${o.meta ? ' · ' + esc(o.meta) : ''}</p></div>`};
     return {bg:B.ground, html:`${ivCorners(o)}${ivArt(o.img, 'left:72px;right:72px;top:130px;height:640px', o.slot)}
     <p class="a cn" style="left:72px;top:800px;color:${B.burg}">Artist Interview</p>
     <p class="a" style="left:72px;right:72px;top:846px;${T_MED};font-size:${sz}px;line-height:.96;letter-spacing:-.035em;color:${B.ink}">${esc(h)}</p>
@@ -97,7 +107,7 @@ const IV = {
     <p class="a" style="left:72px;right:72px;${top || !q ? 'top:1120px' : 'top:1150px'};${T_REG};font-size:24px;line-height:1.35;color:${B.soft}">${ivCredit(o.name, o.cap)}</p>`}; },
   tease(o){ return {bg:B.ground, html:`${ivCorners(o)}
     <p class="a" style="left:72px;right:72px;top:170px;${T_MED};font-size:26px;letter-spacing:.12em;text-transform:uppercase;line-height:1.4;color:${B.burg}">${esc(o.kick)}</p>
-    <p class="a" style="left:72px;right:72px;top:${o.kick.length > 40 ? 270 : 230}px;${BASK};font-size:${o.text.length > 210 ? 52 : 58}px;line-height:1.24;color:${B.ink}">&ldquo;${esc(o.text)}&rdquo;</p>
+    <p class="a" style="left:72px;right:72px;top:${170 + Math.ceil(o.kick.length / 44) * 37 + 34}px;${BASK};font-size:${o.text.length > 210 ? 52 : 58}px;line-height:1.24;color:${B.ink}">&ldquo;${esc(o.text)}&rdquo;</p>
     <p class="a" style="left:72px;right:72px;top:1110px;${T_MED};font-size:36px;letter-spacing:-.02em;color:${B.burg}">Continued in the interview &rarr;</p>`}; },
   // Page 6: three more questions we asked, word for word, so it is clear what is waiting in the article.
   list(o){ return {bg:B.ground, html:`${ivCorners(o)}
@@ -122,7 +132,7 @@ const IV = {
     ${o.mono ? ivMono(o.full ? 'white' : dark ? 'peony' : 'burgundy', 'right:64px;top:238px;width:112px;height:63px') : `<p class="a cn" style="left:64px;top:250px;color:${dark ? '#FAD2E1' : B.ink}">Arts to Hearts Project</p>`}
     ${art ? ivArt(o.img, 'left:72px;right:72px;top:340px;height:740px', o.slot) : ''}
     <p class="a" style="left:72px;right:72px;top:${top}px;${T_MED};font-size:28px;letter-spacing:.12em;text-transform:uppercase;line-height:1.4;color:${acc}">${esc(o.label)}</p>
-    <p class="a" style="left:72px;right:72px;top:${top + 60}px;${o.serif ? BASK + `;font-size:${o.size || 64}px;line-height:1.22` : T_MED + `;font-size:${o.size || 96}px;line-height:.96;letter-spacing:-.035em`};color:${fg}">${o.text}</p>
+    <p class="a" style="left:72px;right:72px;top:${top + Math.ceil(String(o.label).length / 42) * 40 + 22}px;${o.serif ? BASK + `;font-size:${o.size || 64}px;line-height:1.22` : T_MED + `;font-size:${o.size || 96}px;line-height:.96;letter-spacing:-.035em`};color:${fg}">${o.text}</p>
     ${o.sub ? `<p class="a" style="left:72px;right:72px;top:${o.subTop}px;${T_REG};font-size:36px;line-height:1.35;color:${fg}">${o.sub}</p>` : ''}
     ${o.zone ? `<div class="a" style="left:150px;right:150px;top:1470px;height:100px;border:2px dashed ${fg};border-radius:24px;opacity:.5;display:flex;align-items:center;justify-content:center;${T_MED};font-size:24px;color:${fg}">${o.zone}</div>` : ''}`}; },
 };
@@ -130,8 +140,12 @@ const IV = {
 // ---------- copy helpers: work from the article when no one has written the copy ----------
 const sentences = t => (String(t).replace(/\s+/g, ' ').match(/[^.!?]+[.!?]+["”’]?/g) || []).map(s => s.trim());
 const openLoop = a => { const t = String(a).replace(/\s+/g, ' ').trim(); let o = ''; for (const x of sentences(t)) { if ((o + ' ' + x).length > 230 && o) break; o = (o + ' ' + x).trim(); } return o.length < t.length ? o.replace(/[.,;:]$/, '') + '…' : o; };
-const kickOf = q => { const m = q.match(/^In (.+?), you/); if (m) return `On “${m[1]}”`; const st = sentences(q).filter(s => !s.endsWith('?'))[0]; if (st && st.length <= 70) return st.replace(/\.$/, ''); let core = q.split('?')[0]; const c = core.lastIndexOf(', '); if (c > 0 && core.length - c > 25 && /^(how|what|why|has|have|does|do|is|are|can|would|where|when|who|which)\b/i.test(core.slice(c + 2))) core = core.slice(c + 2); core = core.charAt(0).toUpperCase() + core.slice(1); return core.length <= 72 ? core + '?' : excerpt(core, 66); };
-function nameFromTitle(t){ t = String(t || '').replace(/[’']s\b/, ''); const m = t.match(/^(.+?)\s+(?:Uses|Explores|Talks|on|Discusses|Shares|Reflects|Paints|Creates|Turns|Finds|Brings|Captures|Invites|Examines|and|is|:|—|–|-)\s/); return (m ? m[1] : t.split(/[:—–]/)[0]).trim().slice(0, 40); }
+const kickOf = q => { const m = q.match(/^In (.+?), you/); if (m) return `On “${m[1]}”`; const st = sentences(q).filter(s => !s.endsWith('?'))[0]; if (st && st.length <= 70) return st.replace(/\.$/, ''); let core = q.split('?')[0]; const c = core.lastIndexOf(', '); if (c > 0 && core.length - c > 25 && /^(how|what|why|has|have|does|do|is|are|can|would|where|when|who|which)\b/i.test(core.slice(c + 2))) core = core.slice(c + 2); core = core.charAt(0).toUpperCase() + core.slice(1); return core.length <= 64 ? core + '?' : ''; };
+function nameFromTitle(t, body){ if (body) { const words = String(t || '').replace(/[’']s\b/g, '').split(/[\s,:—–-]+/); const runs = [];
+    for (let i = 0; i < words.length; i++) for (let k = 1; k <= 3 && i + k <= words.length; k++) { const run = words.slice(i, i + k); if (!run.every(w => /^[A-ZÀ-Þ][\p{L}'’.]+$/u.test(w)) || (i === 0 && k === 1 && /^(In|The|A|An|How|Why|When|What|Meet)$/.test(run[0]))) continue; const ph = run.join(' '); const n = body.split(ph).length - 1; runs.push({ph, n, k}); }
+    const two = runs.filter(r => r.k >= 2 && r.n >= 2).sort((a, b) => b.n - a.n)[0]; if (two) return two.ph; const one = runs.filter(r => r.n >= 5 && r.ph.length >= 3 && !/^(In|The|His|Her|Their|Our|We|You|Your|They|She|He|It|This|That|What|When|Why|How|Who|And|But|For|With|From|Art|Arts|Hearts|Project|Oil|Paintings?|Stories|Story|Work|Artist|Interview)$/i.test(r.ph)).sort((a, b) => b.n - a.n)[0]; if (one) return one.ph; }
+  return nameFromTitleOld(t); }
+function nameFromTitleOld(t){ t = String(t || '').replace(/[’']s\b/, ''); const m = t.match(/^(.+?)\s+(?:Uses|Explores|Talks|on|Discusses|Shares|Reflects|Paints|Creates|Turns|Finds|Brings|Captures|Invites|Examines|and|is|:|—|–|-)\s/); return (m ? m[1] : t.split(/[:—–]/)[0]).trim().slice(0, 40); }
 // Pick copy from the article by rules (used when Claude is not connected).
 function autoStructure(r, title){
   const qa = r.qa || [];
@@ -142,13 +156,15 @@ function autoStructure(r, title){
   const story = qa.map((x, i) => { const head = sentences(x.a).slice(0, 2).join(' '); let sc = 0; (head.match(/\b(began|started|grew up|growing up|when I was|in high school|friend|remember|years ago|first time|once|my (mother|father|family|grandmother))\b/gi) || []).forEach(() => sc += 2); (head.match(/\bI [a-z]+ed\b/g) || []).forEach(() => sc += 1); return {n: i + 1, sc}; }).sort((a, b) => b.sc - a.sc);
   const picks = story.slice(0, 2).map(x => x.n).sort((a, b) => a - b);
   const rest = qa.map((x, i) => ({x, i})).filter(o => !picks.includes(o.i + 1)).sort((a, b) => b.x.a.length - a.x.a.length).slice(0, 3).sort((a, b) => a.i - b.i);
-  const name = nameFromTitle(title || r.title);
+  const name = nameFromTitle(title || r.title, (r.pre || []).join(' ') + ' ' + (r.qa || []).map(x => x.q).join(' '));
   const pre = (r.pre || []).filter(p => p.length > 120); const flat = pre.join(' ');
   const based = ((flat.match(/\bbased in (?:the )?([A-Z][^,.;]+?)(?= and | where | with | who |[,.;])/) || [])[1] || '').trim();
   const medium = ((flat.match(/\bworks? (?:primarily )?in ([a-z ]+? on [a-z]+|oils?|watercolou?r|acrylics?|charcoal|ceramics|photography|textiles?)\b/i) || [])[1] || '').trim();
-  const about = pre.find(p => /\bbased in\b|\bthe artist behind\b/i.test(p)) || pre.find(p => name && p.includes(name)) || pre[0] || r.intro || '';
+  const about = pre.find(p => name && p.includes(name) && /\b(is an?|based in|works? (?:in|across)|paints?)\b/.test(p) && !/^(At|Our) Arts to Hearts/i.test(p)) || pre.find(p => /\bbased in\b|\bthe artist behind\b/i.test(p)) || pre.find(p => name && p.includes(name)) || pre.find(p => !/Arts to Hearts/i.test(p)) || r.intro || '';
   const head = quotes.slice().sort((a, b) => a.length - b.length)[0] || '';
-  return {name, based, medium: medium ? medium.charAt(0).toUpperCase() + medium.slice(1) : '', headline: head ? `“${head.replace(/\.$/, '')}”` : '', standfirst: excerpt(sentences(about).slice(0, 2).join(' '), 250), quotes, picks, kicks: picks.map(n => kickOf(qa[n - 1].q)), inside: rest.map(o => kickOf(o.x.q)), ctahead: 'The full interview is on our website.', hook: '', handle: ''};
+  const first = (name || '').split(' ')[0];
+  const kk = picks.map(n => kickOf(qa[n - 1].q) || `In ${first}’s words`);
+  return {kicks: kk, name, based, medium: medium ? medium.charAt(0).toUpperCase() + medium.slice(1) : '', headline: head ? `“${head.replace(/\.$/, '')}”` : '', standfirst: excerpt(sentences(about).slice(0, 2).join(' '), 250), quotes, picks, inside: rest.map(o => { const c = sentences(o.x.q).filter(x => x.endsWith('?')).pop() || o.x.q; return c.length > 110 ? excerpt(c, 104) : c; }), ctahead: 'The full interview is on our website.', hook: '', handle: ''};
 }
 // Sort imported images into artworks (in credit order) and portraits.
 function assignImages(images, caps, roles){
@@ -157,7 +173,7 @@ function assignImages(images, caps, roles){
   images.forEach((im, i) => { const role = roles && roles[i]; if (role === 'skip') return;
     const hay = ((im.cap || '') + ' ' + (im.alt || '')).toLowerCase(); const ti = titles.findIndex(t => t.length > 2 && hay.includes(t));
     if (ti >= 0 && byTitle[ti] === undefined) { byTitle[ti] = im.url; return; }
-    if (role === 'art' || (!role && / \/ (19|20)\d{2} \/ /.test(im.cap || ''))) arts.push(im.url); else if (im.alt !== 'cover' || role === 'portrait') studio.push(im); });
+    if (role === 'art' || (!role && parseCap(im.cap || ''))) arts.push(im.url); else if (im.alt !== 'cover' || role === 'portrait') studio.push(im); });
   // an artwork whose caption could not be tied to it: match the size in its credit (20×24) to the image's shape
   titles.forEach((t, i) => { if (byTitle[i] !== undefined) return; const m = String((caps[i] || [])[2] || '').match(/(\d+(?:\.\d+)?)\s*[×x]\s*(\d+(?:\.\d+)?)/); if (!m) return;
     const r = (+m[1]) / (+m[2]); const k = studio.findIndex(im => im.w && im.h && (Math.abs(im.w / im.h - r) < .04 || Math.abs(im.h / im.w - r) < .04));
@@ -176,7 +192,7 @@ DPACK.interview = p => {
   const picks = String(f.pick || '').split(/[,\s]+/).map(Number).filter(n => n >= 1 && n <= qa.length);
   const chosen = (picks.length ? picks : qa.map((x, i) => i + 1).filter(i => qa[i - 1].a.length > 180).slice(0, 1)).slice(0, 2);
   const kicks = dLines(f.kicks).map(x => x.join(' | '));
-  const teases = chosen.map((n, i) => ({kick: kicks[i] || kickOf(qa[n - 1].q), text: openLoop(qa[n - 1].a)}));
+  const teases = chosen.map((n, i) => ({kick: kicks[i] || kickOf(qa[n - 1].q) || `In ${name.split(' ')[0]}’s words`, text: openLoop(qa[n - 1].a)}));
   const inside = dLines(f.inside).map(x => x.join(' | ')).filter(Boolean);
   const shortQ = q => { const c = sentences(q).filter(x => x.endsWith('?')).pop() || q; return c.length > 110 ? excerpt(c, 104) : c; };
   const items = inside.length ? inside : qa.map((x, i) => ({x, i})).filter(o => !chosen.includes(o.i + 1)).sort((a, b) => b.x.a.length - a.x.a.length).slice(0, 3).sort((a, b) => a.i - b.i).map(o => shortQ(o.x.q));
