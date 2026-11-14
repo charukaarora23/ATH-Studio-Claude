@@ -64,7 +64,7 @@ summary{font:600 12px/1 var(--mono);letter-spacing:.1em;text-transform:uppercase
 .group{margin-bottom:34px}
 .canva{display:flex;gap:10px;align-items:center;margin-top:12px}.canva .btn{padding:9px 14px;font-size:13px;text-decoration:none}.cmiss{font-size:13px;color:var(--muted)}
 .pool{display:grid;grid-template-columns:repeat(auto-fill,minmax(64px,1fr));gap:8px;margin:4px 0 10px}.pc{position:relative;font-size:10px;line-height:1.2;color:var(--muted)}.pc span{display:block;margin-top:3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.pt{width:100%;aspect-ratio:4/5;border:1.5px dashed var(--line);border-radius:8px;background:var(--panel) center/cover;font:700 14px var(--sans);color:var(--muted);cursor:pointer}.pc.on .pt{border:0}.px{position:absolute;top:3px;right:3px;width:20px;height:20px;border-radius:50%;border:0;background:rgba(0,0,0,.6);color:#fff;font-size:14px;line-height:20px;cursor:pointer;padding:0}
-.frame.pointing{cursor:pointer}.post .slot-on{outline:14px solid #2f7cf6!important;outline-offset:-14px;filter:brightness(1.06)}.frame{position:relative}.frame.texting{cursor:text}.post .tx-on{outline:6px dashed #2f7cf6;outline-offset:6px;border-radius:4px}.txed{position:absolute;z-index:50;width:340px;background:var(--panel,#fff);border:1px solid var(--line);border-radius:12px;box-shadow:0 12px 32px rgba(0,0,0,.18);padding:12px}.txed label{display:block;font-size:12px;color:var(--muted);margin-bottom:6px}.txed textarea{width:100%;box-sizing:border-box;font:15px/1.4 var(--sans,sans-serif);padding:8px;border:1px solid var(--line);border-radius:8px;resize:vertical}.txb{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap}.txb .btn{padding:7px 12px;font-size:13px}.frame.pointing::after{content:attr(data-hint);position:absolute;left:50%;bottom:12px;transform:translateX(-50%);background:#2f7cf6;color:#fff;font:600 12px/1.2 var(--sans,sans-serif);padding:7px 12px;border-radius:999px;white-space:nowrap;z-index:20;pointer-events:none;box-shadow:0 2px 8px rgba(0,0,0,.25)}
+.frame.pointing{cursor:pointer}.post .slot-on{outline:14px solid #2f7cf6!important;outline-offset:-14px;filter:brightness(1.06)}.frame{position:relative}.frame.grab{cursor:grab}body.dragging-img,body.dragging-img *{cursor:grabbing!important}.imgbar{position:absolute;top:8px;left:50%;transform:translateX(-50%);z-index:22;display:none;gap:2px;background:rgba(20,9,12,.88)!important;border-radius:999px;padding:3px;box-shadow:0 2px 10px rgba(0,0,0,.35)}.imgbar.on{display:flex}.imgbar button{border:0;background:none;color:#fff;font:600 12px/1 var(--sans,sans-serif);padding:6px 9px;border-radius:999px;cursor:pointer}.imgbar button:hover{background:rgba(255,255,255,.18)}.frame.texting{cursor:text}.post .tx-on{outline:6px dashed #2f7cf6;outline-offset:6px;border-radius:4px}.txed{position:absolute;z-index:50;width:340px;background:var(--panel,#fff);border:1px solid var(--line);border-radius:12px;box-shadow:0 12px 32px rgba(0,0,0,.18);padding:12px}.txed label{display:block;font-size:12px;color:var(--muted);margin-bottom:6px}.txed textarea{width:100%;box-sizing:border-box;font:15px/1.4 var(--sans,sans-serif);padding:8px;border:1px solid var(--line);border-radius:8px;resize:vertical}.txb{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap}.txb .btn{padding:7px 12px;font-size:13px}.frame.pointing::after{content:attr(data-hint);position:absolute;left:50%;bottom:12px;transform:translateX(-50%);background:#2f7cf6;color:#fff;font:600 12px/1.2 var(--sans,sans-serif);padding:7px 12px;border-radius:999px;white-space:nowrap;z-index:20;pointer-events:none;box-shadow:0 2px 8px rgba(0,0,0,.25)}
 .sp-rules p{margin:0}.sp-rules{display:grid;gap:10px;margin:10px 0 18px;font-size:14px;line-height:1.5;max-width:900px}.sp-wrap{overflow-x:auto}.sp-t{border-collapse:collapse;font-size:13px;min-width:720px;width:100%}.sp-t th,.sp-t td{border:1px solid var(--line);padding:8px 10px;vertical-align:top;text-align:left}.sp-t thead th{position:sticky;top:0;background:var(--panel,#fff)}.sp-t tbody th{white-space:nowrap;font-weight:600}.sp-hot{background:#fbe3e3}.sp-off{color:var(--muted);text-align:center!important}.sp-n{text-align:center!important;font-weight:600}.sp-dot{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:6px}.sp-lib p{margin:4px 0;font-size:13px}
 .acts{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}.hint{font-size:13px;color:var(--muted);margin:0 0 10px;line-height:1.45}
 .capbox{max-width:720px;margin-top:10px;border-top:1px solid var(--line)}
@@ -367,6 +367,47 @@ function slotName(k){ k = String(k || ''); let m;
   return {imgCover:'cover artwork', imgTheme:'theme artwork', imgBooks:'the books together', imgSpread:'open spread', phSpread2:'a second spread', phShelf:'book on a shelf', phHolding:'artist holding their copy', phStoryWork:'the artwork they sent', phStoryPage:'their page in the book', phPast1:'past edition 1', phPast2:'past edition 2'}[k] || 'this slide'; }
 function slotsUnder(frame, x, y){ return document.elementsFromPoint(x, y).filter(el => frame.contains(el) && el.matches('.post [data-slot], .post .img, .post .ph')); }
 function putImage(key, file){ if (!key || !file || !/^image\//.test(file.type)) return; shrink(file).then(url => { state.images[key] = url; render(); status('Image placed. Press "Save call" to keep it.'); }); }
+// ---------- move and zoom images inside their frame ----------
+const POS = () => (state.pos = state.pos || {});
+const imgEls = root => [...root.querySelectorAll('[style*="background-image"]')].filter(e => /url\(/.test(e.getAttribute('style') || '') && !/linear-gradient/.test(e.getAttribute('style') || ''));
+const imgId = (el, list) => el.dataset.slot || ('i' + list.indexOf(el));
+function applyPos(s, base){
+  if (!s.html || !Object.keys(POS()).some(k => k.startsWith(base + '|'))) return s;
+  const t = document.createElement('template'); t.innerHTML = s.html; const list = imgEls(t.content);
+  list.forEach(el => { const v = POS()[base + '|' + imgId(el, list)]; if (!v) return; el.style.backgroundPosition = v.x + '% ' + v.y + '%'; if (v.size) { el.style.backgroundSize = v.size; el.style.backgroundRepeat = 'no-repeat'; } });
+  return {...s, html: t.innerHTML};
+}
+const NATV = {};
+function natSize(url){ if (NATV[url] !== undefined) return; NATV[url] = null; const im = new Image(); im.onload = () => { NATV[url] = {w: im.naturalWidth, h: im.naturalHeight}; }; im.src = url; }
+const urlOf = el => { const m = (el.style.backgroundImage || '').match(/url\(["']?(.*?)["']?\)$/); return m ? m[1] : ''; };
+function parsePos(str){ const kw = {left:0, top:0, center:50, right:100, bottom:100}; const p = String(str || '').trim().split(/\s+/).filter(Boolean).map(t => t in kw ? kw[t] : parseFloat(t));
+  return {x: isNaN(p[0]) ? 50 : p[0], y: p.length > 1 && !isNaN(p[1]) ? p[1] : 50}; }
+function imgGeom(el, z){ const n = NATV[urlOf(el)]; const W = el.offsetWidth, H = el.offsetHeight; if (!n) return null;
+  const sz = el.style.backgroundSize; const fit = sz === 'contain'; const base = fit ? Math.min(W / n.w, H / n.h) : Math.max(W / n.w, H / n.h);
+  let iw = n.w * base, ih = n.h * base; const m = /^([\d.]+)px/.exec(sz || ''); if (m && !fit) { const k = parseFloat(m[1]) / iw; iw *= k; ih *= k; }
+  return {W, H, iw, ih, n, cover: Math.max(W / n.w, H / n.h)}; }
+let DRAG = null;
+document.addEventListener('mousemove', e => { if (!DRAG) return; const d = DRAG; const dx = (e.clientX - d.x0) / d.sc, dy = (e.clientY - d.y0) / d.sc;
+  if (Math.abs(dx) + Math.abs(dy) > 4) d.moved = true; if (!d.g) d.g = imgGeom(d.el); if (d.moved) document.body.classList.add('dragging-img'); if (!d.moved || !d.g) return;
+  const nx = d.g.iw - d.g.W > 1 ? Math.max(0, Math.min(100, d.p0.x - dx / (d.g.iw - d.g.W) * 100)) : d.p0.x;
+  const ny = d.g.ih - d.g.H > 1 ? Math.max(0, Math.min(100, d.p0.y - dy / (d.g.ih - d.g.H) * 100)) : d.p0.y;
+  d.el.style.backgroundPosition = nx + '% ' + ny + '%'; d.now = {x: +nx.toFixed(2), y: +ny.toFixed(2)}; e.preventDefault(); });
+document.addEventListener('mouseup', () => { if (!DRAG) return; const d = DRAG; DRAG = null; document.body.classList.remove('dragging-img');
+  if (d.moved) { d.frame._dragged = true; if (d.now) { const old = POS()[d.key] || {}; POS()[d.key] = {...old, x: d.now.x, y: d.now.y}; render(); status('Image moved. It saves automatically.'); } } });
+function imgBar(frame){
+  let bar = frame.querySelector('.imgbar'); if (bar) return bar;
+  bar = document.createElement('div'); bar.className = 'imgbar';
+  bar.innerHTML = '<button type="button" data-z="out" title="Zoom out">&minus;</button><button type="button" data-z="in" title="Zoom in">+</button><button type="button" data-z="fit" title="Show the whole image">Fit</button><button type="button" data-z="fill" title="Fill the frame">Fill</button><button type="button" data-z="reset" title="Back to the original position">Reset</button>';
+  bar.addEventListener('mousedown', e => e.stopPropagation()); bar.addEventListener('click', e => { e.stopPropagation(); const b = e.target.closest('button'); const t = bar._t; if (!b || !t) return;
+    const g = imgGeom(t.el); const cur = POS()[t.key] || {}; const p = parsePos(t.el.style.backgroundPosition); const a = b.dataset.z;
+    if (a === 'reset') delete POS()[t.key];
+    else if (a === 'fit') POS()[t.key] = {...p, x:50, y:50, size:'contain', z:0};
+    else if (a === 'fill') POS()[t.key] = {...p, size:'', z:1};
+    else { if (!g) { status('One moment, the image is still loading.'); return; } const z = Math.max(1, Math.min(5, (cur.z || 1) * (a === 'in' ? 1.2 : 1 / 1.2)));
+      POS()[t.key] = {...p, z, size: Math.round(g.n.w * g.cover * z) + 'px ' + Math.round(g.n.h * g.cover * z) + 'px'}; }
+    render(); });
+  frame.appendChild(bar); return bar;
+}
 function wireSlots(){
   $('out').querySelectorAll('.frame').forEach(frame => {
     const pick = e => { const el = slotsUnder(frame, e.clientX, e.clientY)[0]; return el ? {el, key: slotKeyFor(el, frame)} : null; };
@@ -374,9 +415,15 @@ function wireSlots(){
     const hover = (el, key) => { frame.querySelectorAll('.slot-on').forEach(x => x !== el && x.classList.remove('slot-on')); if (el) { el.classList.add('slot-on'); frame.dataset.hint = 'Click or drop an image: ' + slotName(key); } frame.classList.toggle('pointing', !!el); };
     frame.addEventListener('mousemove', e => { const t = textAt(frame, e.clientX, e.clientY); clearTx();
       if (t) { hover(null); t.node.parentElement.classList.add('tx-on'); frame.dataset.hint = 'Click to edit this text'; frame.classList.add('pointing', 'texting'); return; }
-      frame.classList.remove('texting'); const p = pick(e); hover(p && p.el, p && p.key); });
-    frame.addEventListener('mouseleave', () => { hover(null); clearTx(); frame.classList.remove('texting'); });
-    frame.addEventListener('click', e => { const t = textAt(frame, e.clientX, e.clientY); if (t && t.idx >= 0) { editText(frame, t, e.clientX, e.clientY); return; } const p = pick(e); if (!p) return; const inp = document.createElement('input'); inp.type = 'file'; inp.accept = 'image/*'; inp.onchange = () => putImage(p.key, inp.files[0]); inp.click(); });
+      frame.classList.remove('texting'); const p = pick(e); hover(p && p.el, p && p.key);
+      const bar = imgBar(frame); if (p && urlOf(p.el)) { natSize(urlOf(p.el)); const list = imgEls(frame.querySelector('.post')); bar._t = {el: p.el, key: frame.dataset.tkey.slice(3) + '|' + imgId(p.el, list)}; bar.classList.add('on'); frame.classList.add('grab'); frame.dataset.hint = 'Drag to move · click to replace: ' + slotName(p.key); }
+      else frame.classList.remove('grab'); });
+    frame.addEventListener('mouseleave', () => { hover(null); clearTx(); frame.classList.remove('texting', 'grabbing'); const b = frame.querySelector('.imgbar'); if (b) b.classList.remove('on'); });
+    frame.addEventListener('mousedown', e => { if (e.button !== 0 || textAt(frame, e.clientX, e.clientY)) return; const p = pick(e); if (!p || !urlOf(p.el)) return;
+      const post = frame.querySelector('.post'); const list = imgEls(post); natSize(urlOf(p.el));
+      DRAG = {frame, el: p.el, key: frame.dataset.tkey.slice(3) + '|' + imgId(p.el, list), x0: e.clientX, y0: e.clientY, sc: p.el.getBoundingClientRect().width / p.el.offsetWidth, p0: parsePos(p.el.style.backgroundPosition), g: imgGeom(p.el), moved: false};
+      e.preventDefault(); });
+    frame.addEventListener('click', e => { if (frame._dragged) { frame._dragged = false; return; } const t = textAt(frame, e.clientX, e.clientY); if (t && t.idx >= 0) { editText(frame, t, e.clientX, e.clientY); return; } const p = pick(e); if (!p) return; const inp = document.createElement('input'); inp.type = 'file'; inp.accept = 'image/*'; inp.onchange = () => putImage(p.key, inp.files[0]); inp.click(); });
     frame.addEventListener('dragover', e => { const p = pick(e); if (p) { e.preventDefault(); hover(p.el, p.key); } });
     frame.addEventListener('dragleave', () => hover(null));
     frame.addEventListener('drop', e => { const p = pick(e); hover(null); if (!p) return; e.preventDefault(); putImage(p.key, e.dataTransfer.files[0]); });
@@ -652,7 +699,7 @@ function render(){
   }
   groups.forEach(g => { const t = g.title.replace(/^[^·]*·\s*/, ''); g.slides = g.slides.map((s, j) => { const o = state.images['ov|' + t + '|' + j];
     const s2 = o && s.html ? {...s, html: s.html.replace(/background-image:url\([^)]*\)/, 'background-image:url(' + o + ')')} : s;
-    return applyTexts(s2, 'tx|' + t + '|' + j); }); });
+    return applyPos(applyTexts(s2, 'tx|' + t + '|' + j), t + '|' + j); }); });
   renderPool();
   RENDERED = [];
   $('out').innerHTML = groups.map((g,gi) => {
