@@ -32,6 +32,13 @@ if (!window.JSZip) document.write('<script src="https://cdnjs.cloudflare.com/aja
 html,body{height:100%}
 body{margin:0;background:var(--bg);color:var(--ink);font:400 14px/1.45 var(--sans)}
 .app{display:grid;grid-template-columns:390px minmax(0,1fr);min-height:100%}
+.segbar{position:sticky;top:0;z-index:50;display:flex;align-items:center;gap:28px;padding:0 24px;height:56px;background:#14090C;color:#F9ECE5}
+.segbar b{font:700 13px var(--sans,sans-serif);letter-spacing:.22em;text-transform:uppercase;white-space:nowrap}
+.segbar nav{display:flex;gap:4px;height:100%;overflow-x:auto}.segbar button{border:0;background:none;color:rgba(249,236,229,.6);font:600 14px var(--sans,sans-serif);padding:0 14px;height:100%;border-bottom:3px solid transparent;cursor:pointer;white-space:nowrap}
+.segbar button[aria-current=page]{color:#F9ECE5;border-bottom-color:#FAD2E1}.segbar button:hover{color:#F9ECE5}
+body[data-seg=interviews] .app{grid-template-columns:minmax(0,1fr)}body[data-seg=interviews] aside,body[data-seg=interviews] #tabs,body[data-seg=interviews] #go,body[data-seg=interviews] #ptype{display:none}
+body[data-seg=interviews] .top .f{display:none!important}
+.iv-list{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0}.iv-list button{border:1px solid var(--line);background:#fff;border-radius:999px;padding:8px 14px;font:600 13px var(--sans,sans-serif);cursor:pointer}.iv-list button[aria-current=true]{background:#14090C;color:#F9ECE5;border-color:#14090C}
 aside{background:var(--panel);border-right:1px solid var(--line);padding-block:20px;padding-left:max(18px,env(safe-area-inset-left,0px));padding-right:18px;overflow:auto;max-height:100vh;position:sticky;top:0}
 main{padding-block:20px;padding-left:24px;padding-right:max(20px,env(safe-area-inset-right,0px));min-width:0}
 h1{font:700 20px/1.1 var(--sans);letter-spacing:-.02em;margin:0 0 4px}
@@ -102,6 +109,7 @@ summary{font:600 12px/1 var(--mono);letter-spacing:.1em;text-transform:uppercase
 </style>
 </head><body>
 
+<header class="segbar"><b>ATH Studio</b><nav id="seg" aria-label="Sections"><button type="button" data-seg="calls">Open calls</button><button type="button" data-seg="interviews">Artist interviews</button></nav></header>
 <div class="app">
 <aside>
   <h1>ATH Post Studio</h1>
@@ -221,7 +229,6 @@ summary{font:600 12px/1 var(--mono);letter-spacing:.1em;text-transform:uppercase
 <main>
   <nav class="tabs" id="tabs" aria-label="Views">
     <button type="button" data-view="calendar">Calendar</button>
-    <button type="button" data-view="daily">Daily posts</button>
     <button type="button" data-view="feed">Feed posts</button>
     <button type="button" data-view="storyplan">Stories plan</button>
     <button type="button" data-view="storydays">Stories by day</button>
@@ -467,12 +474,12 @@ function wireSlots(){
 }
 // ---------- view tabs ----------
 let lastFeed = 'month';
-function viewOf(v){ return ['calendar', 'daily', 'storyplan', 'storydays', 'stories', 'reels'].includes(v) ? v : 'feed'; }
+function viewOf(v){ return ['calendar', 'daily', 'interview', 'storyplan', 'storydays', 'stories', 'reels'].includes(v) ? v : 'feed'; }
 function updateTabs(){ const v = viewOf($('ptype').value); if (v === 'feed') lastFeed = $('ptype').value || 'month';
   document.querySelectorAll('#tabs [data-view]').forEach(b => b.setAttribute('aria-current', b.dataset.view === v ? 'page' : 'false'));
   $('ptype').closest('.f').style.display = v === 'feed' ? '' : 'none';
   const noExport = v === 'calendar' || v === 'storyplan'; $('go').style.display = noExport ? 'none' : ''; $('zip').style.display = noExport ? 'none' : ''; }
-function setView(v){ $('ptype').value = v === 'feed' ? lastFeed : v; try { localStorage.setItem('athLastPtype', $('ptype').value); } catch {} render(); window.scrollTo({top:0}); }
+function setView(v){ $('ptype').value = v === 'feed' ? lastFeed : v; try { if (v !== 'interview') localStorage.setItem('athLastPtype', $('ptype').value); } catch {} render(); window.scrollTo({top:0}); }
 document.querySelectorAll('#tabs [data-view]').forEach(b => b.onclick = () => setView(b.dataset.view));
 document.addEventListener('click', e => { const g = e.target.closest('[data-goto]'); if (g) setView(g.dataset.goto); });
 const HID = () => (state.hidden = state.hidden || {});
@@ -653,7 +660,7 @@ function wireCal(){
   $('out').querySelectorAll('[data-mon]').forEach(b => b.onclick = () => { const k = +b.dataset.mon; const t = new Date(); if (!k) { calMonth = new Date(t.getFullYear(), t.getMonth(), 1); calDay = isoD(t); } else calMonth = new Date(calMonth.getFullYear(), calMonth.getMonth() + k, 1); $('out').innerHTML = calHTML(); wireCal(); });
   $('out').querySelectorAll('[data-post]').forEach(c => c.onchange = () => setPosted(c.dataset.post, c.checked));
   $('out').querySelectorAll('[data-open]').forEach(b => b.onclick = async () => { const o = JSON.parse(b.dataset.open);
-    if (o.daily) { if (DPOSTS[o.daily]) DSEL = o.daily; else { const [d, s, c] = o.daily.split('|'); dNew(d, s, c); } dWeek = dWeekStart(new Date(calDay + 'T00:00:00')); $('ptype').value = 'daily'; render(); window.scrollTo({top: 0}); return; }
+    if (o.daily) { if (DPOSTS[o.daily]) DSEL = o.daily; else { const [d, s, c] = o.daily.split('|'); dNew(d, s, c); } if ((DPOSTS[DSEL] || {}).cat === 'interview') { IVTAB = 'list'; setSeg('interviews'); return; } dWeek = dWeekStart(new Date(calDay + 'T00:00:00')); $('ptype').value = 'daily'; render(); window.scrollTo({top: 0}); return; }
     if ($('preset').value !== o.preset) { $('preset').value = o.preset; await $('preset').onchange(); }
     $('ptype').value = o.ptype; try { localStorage.setItem('athLastPtype', o.ptype); } catch {} render();
     const hit = o.find && [...document.querySelectorAll('.group h2')].find(x => x.textContent.trim() === o.find); if (hit) { hit.scrollIntoView({block: 'start'}); hit.closest('.group').classList.add('flash'); } else window.scrollTo({top: 0}); });
@@ -664,7 +671,7 @@ let DPOSTS = {}, DMODE = 'local', dLoaded = false, DSEL = null, dWeek = null, dS
 const slotLabel = id => { const s = SLOTS.find(x => x.id === id); return s ? `${s.ist} IST (${s.pt})` : ''; };
 async function loadDaily(){ try { const r = await fetch('api/posts', {cache: 'no-store'}); if (!r.ok) throw 0; DPOSTS = await r.json(); DMODE = 'shared'; }
   catch { try { DPOSTS = JSON.parse(localStorage.getItem('athDailyPosts') || '{}'); } catch { DPOSTS = {}; } DMODE = 'local'; }
-  dLoaded = true; if (['daily', 'calendar'].includes($('ptype').value)) render(); }
+  dLoaded = true; if (['daily', 'calendar', 'interview'].includes($('ptype').value)) render(); }
 function saveDaily(id){ clearTimeout(dSaveT); dSaveT = setTimeout(async () => { const p = DPOSTS[id] || null;
   if (DMODE === 'shared') { try { const r = await fetch('api/posts', {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({id, post: p})}); if (!r.ok) throw 0; const all = await r.json(); DPOSTS = {...all, ...(p ? {[id]: DPOSTS[id]} : {})}; status('Saved for the team.'); return; }
     catch { DMODE = 'local'; status('Could not reach the shared queue. Saved in this browser for now.'); } }
@@ -673,12 +680,7 @@ async function dUpload(file){ const url = await shrink(file); if (DMODE !== 'sha
   try { const r = await fetch('api/upload', {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({data: url})}); if (!r.ok) throw 0; return (await r.json()).url; } catch { return url; } }
 function dNew(date, slot, cat){ const id = 'p' + Date.now().toString(36) + Math.random().toString(36).slice(2, 5); DPOSTS[id] = {id, date, slot, cat, f: {}, imgs: {}}; DSEL = id; saveDaily(id); return id; }
 const dWeekStart = d => { const x = new Date(d); x.setHours(0, 0, 0, 0); x.setDate(x.getDate() - ((x.getDay() + 6) % 7)); return x; };
-function dailyPanel(){
-  if (!dWeek) dWeek = dWeekStart(new Date()); const days = Array.from({length: 7}, (_, i) => new Date(+dWeek + i * DAYMS)); const todayIso = isoD(new Date());
-  const cell = (d, s) => { const iso = isoD(d), planned = (WEEK_PLAN[d.getDay()] || {})[s.id]; const post = Object.values(DPOSTS).find(p => p.date === iso && p.slot === s.id);
-    if (post) { const st = STATUS['ath|' + iso + '|' + s.id]; return `<button type="button" class="dp-c has${post.id === DSEL ? ' sel' : ''}${st ? ' done' : ''}" data-dsel="${post.id}"><b>${esc((DCAT[post.cat] || {}).name || post.cat)}</b><span>${esc(post.f.name || post.f.title || post.f.book || post.f.quote || 'Draft')}</span>${st ? '<i>Posted</i>' : ''}</button>`; }
-    return planned ? `<button type="button" class="dp-c plan" data-dnew="${iso}|${s.id}|${planned}"><b>${esc(DCAT[planned].name)}</b><span>+ Create</span></button>` : `<button type="button" class="dp-c empty" data-dnew="${iso}|${s.id}|quote"><span>+</span></button>`; };
-  const p = DPOSTS[DSEL]; const cat = p && DCAT[p.cat];
+function dEditor(p, lock){ const cat = p && DCAT[p.cat];
   const field = fd => { const v = (p.f || {})[fd.k] || ''; const im = (p.imgs || {})[fd.k];
     if (fd.type === 'img') return `<div class="f"><label>${esc(fd.label)}</label><div class="img-in"><span class="th" style="${im ? `background-image:url(${im})` : ''}"></span><input type="file" accept="image/*" data-dimg="${fd.k}">${im ? `<button type="button" class="linkbtn" data-dimgx="${fd.k}">Remove</button>` : ''}</div></div>`;
     if (fd.type === 'imgs') return `<div class="f"><label>${esc(fd.label)}</label><div class="img-in" style="flex-wrap:wrap">${[].concat(im || []).map((u, i) => `<span class="th" style="background-image:url(${u})" title="${i + 1}"></span>`).join('')}<input type="file" accept="image/*" multiple data-dimgs="${fd.k}">${[].concat(im || []).length ? `<button type="button" class="linkbtn" data-dimgx="${fd.k}">Clear</button>` : ''}</div></div>`;
@@ -687,12 +689,19 @@ function dailyPanel(){
     if (fd.type === 'qa') { const n = (String(v).match(/(^|\n)Q:/g) || []).length; return `<div class="f dp-wide"><label>${esc(fd.label)} · ${n} found</label><textarea data-df="${fd.k}" rows="6">${esc(v)}</textarea></div>`; }
     const tag = fd.type === 'text' ? `<input data-df="${fd.k}" value="${esc(v)}" placeholder="${esc(fd.ph || '')}">` : `<textarea data-df="${fd.k}" rows="${fd.type === 'lines' ? 5 : 3}" placeholder="${esc(fd.ph || (fd.type === 'lines' ? 'One per line' : ''))}">${esc(v)}</textarea>`;
     return `<div class="f"><label>${esc(fd.label)}</label>${tag}</div>`; };
-  const editor = p && cat ? `<div class="dp-ed"><div class="dp-edh"><b>Editing</b><select data-dcat>${Object.entries(DCAT).map(([k, c]) => `<option value="${k}" ${k === p.cat ? 'selected' : ''}>${esc(c.name)}</option>`).join('')}</select>
+  return p && cat ? `<div class="dp-ed"><div class="dp-edh"><b>Editing</b>${lock ? '' : `<select data-dcat>${Object.entries(DCAT).map(([k, c]) => `<option value="${k}" ${k === p.cat ? 'selected' : ''}>${esc(c.name)}</option>`).join('')}</select>`}
       <input type="date" data-ddate value="${p.date}"><select data-dslot>${SLOTS.map(s => `<option value="${s.id}" ${s.id === p.slot ? 'selected' : ''}>${s.ist} IST</option>`).join('')}</select>
       <button type="button" class="linkbtn" data-ddel>Delete post</button></div>
     ${cat.link ? `<p class="hint">This slot is made in the ${cat.link === 'feed' ? 'Feed posts' : 'Reels'} section of the open call studio.</p><button type="button" class="btn" data-goto="${cat.link === 'feed' ? 'feed' : 'reels'}">Open ${cat.link === 'feed' ? 'Feed posts' : 'Reels'}</button>`
       : `<div class="dp-fields">${cat.fields.map(field).join('')}${cat.key && !cat.fields.some(x => x.k === 'key') ? `<div class="f"><label>Comment keyword</label><input data-df="key" value="${esc((p.f || {}).key || '')}" placeholder="${esc(cat.key)}"></div>` : ''}</div><p class="hint">Slides and caption update below when you leave a field. Changes save automatically${DMODE === 'shared' ? ' for the whole team' : ' in this browser'}.</p>`}</div>`
     : `<p class="hint" style="margin-top:12px">Click a planned slot to create that post, or an existing post to edit it.</p>`;
+}
+function dailyPanel(){
+  if (!dWeek) dWeek = dWeekStart(new Date()); const days = Array.from({length: 7}, (_, i) => new Date(+dWeek + i * DAYMS)); const todayIso = isoD(new Date());
+  const cell = (d, s) => { const iso = isoD(d), planned = (WEEK_PLAN[d.getDay()] || {})[s.id]; const post = Object.values(DPOSTS).find(p => p.date === iso && p.slot === s.id);
+    if (post) { const st = STATUS['ath|' + iso + '|' + s.id]; return `<button type="button" class="dp-c has${post.id === DSEL ? ' sel' : ''}${st ? ' done' : ''}" data-dsel="${post.id}"><b>${esc((DCAT[post.cat] || {}).name || post.cat)}</b><span>${esc(post.f.name || post.f.title || post.f.book || post.f.quote || 'Draft')}</span>${st ? '<i>Posted</i>' : ''}</button>`; }
+    return planned ? `<button type="button" class="dp-c plan" data-dnew="${iso}|${s.id}|${planned}"><b>${esc(DCAT[planned].name)}</b><span>+ Create</span></button>` : `<button type="button" class="dp-c empty" data-dnew="${iso}|${s.id}|quote"><span>+</span></button>`; };
+  const editor = dEditor(DPOSTS[DSEL]);
   return `<section class="group dp"><div class="ghead"><h2>Daily posts · @artstoheartsproject</h2><span class="ghr"><span class="cal-mode ${DMODE}">${DMODE === 'shared' ? 'Shared with the team' : 'Saved in this browser only'}</span></span></div>
     <p class="meta">Built from 61 days of your posts: 13 formats, about 4 to 5 posts a day · times in IST (PT in brackets)</p>
     <div class="cal-nav" style="max-width:560px"><button type="button" class="btn ghost" data-dwk="-1">&larr;</button><b>Week of ${days[0].getDate()} ${MONTHS[days[0].getMonth()]}</b><button type="button" class="btn ghost" data-dwk="1">&rarr;</button><button type="button" class="btn ghost" data-dwk="0">This week</button></div>
@@ -720,6 +729,30 @@ function wireDaily(){
   const ex = $('out').querySelector('[data-dexample]'); if (ex) ex.onclick = () => { p.f = {...IV_EXAMPLE.f}; p.imgs = JSON.parse(JSON.stringify(IV_EXAMPLE.imgs)); saveDaily(p.id); re(); status('PQHAÜS example loaded.'); };
   $('out').querySelectorAll('[data-dimgx]').forEach(b => b.onclick = () => { delete p.imgs[b.dataset.dimgx]; saveDaily(p.id); re(); });
 }
+// ---------- ARTIST INTERVIEWS: its own section ----------
+let IVTAB = 'template';
+const IV_DEMO = () => ({id: 'demo', cat: 'interview', date: 'Template', f: IV_EXAMPLE.f, imgs: IV_EXAMPLE.imgs});
+const ivPosts = () => Object.values(DPOSTS).filter(p => p.cat === 'interview').sort((a, b) => (b.date || '').localeCompare(a.date || ''));
+function ivCurrent(){ if (IVTAB === 'template') return IV_DEMO(); if (!DPOSTS[DSEL] || DPOSTS[DSEL].cat !== 'interview') DSEL = (ivPosts()[0] || {}).id || null; return DPOSTS[DSEL] || null; }
+function ivPanel(){ const list = ivPosts(), p = IVTAB === 'list' ? DPOSTS[DSEL] : null;
+  const empty = p && !Object.values(p.f || {}).some(Boolean) && !Object.keys(p.imgs || {}).length;
+  return `<section class="group dp"><div class="ghead"><h2>Artist interviews</h2><span class="ghr"><span class="cal-mode ${DMODE}">${DMODE === 'shared' ? 'Shared with the team' : 'Saved in this browser only'}</span></span></div>
+    <nav class="tabs" style="margin-top:6px"><button type="button" data-ivtab="template" aria-current="${IVTAB === 'template' ? 'page' : 'false'}">Template · PQHAÜS example</button><button type="button" data-ivtab="list" aria-current="${IVTAB === 'list' ? 'page' : 'false'}">Our interviews (${list.length})</button></nav>
+    ${IVTAB === 'template' ? `<p class="hint" style="font-size:14px">This is how every interview goes out: a 6-page carousel, quote cards for later weeks, 3 stories for the same day and a frame the artist reshares. Shown with the PQHAÜS interview.</p><div style="display:flex;gap:8px;margin-top:10px"><button type="button" class="btn" data-ivnew>Start a new interview</button></div>`
+    : `<div class="iv-list">${list.map(x => `<button type="button" data-ivsel="${x.id}" aria-current="${x.id === DSEL}">${esc(x.f.name || 'Untitled')}${x.date ? ' · ' + esc(x.date) : ''}</button>`).join('')}<button type="button" data-ivnew>+ New interview</button></div>
+      ${p ? `${empty ? '<p class="hint"><b>Start here:</b> paste the article text below and press “Fill from article”. Then add the artwork and portrait images. The pages below fill in as you go.</p>' : ''}${dEditor(p, true)}` : '<p class="hint">No interviews yet. Start one, or look at the Template tab to see how it comes out.</p>'}`}</section>`; }
+function wireIv(){
+  $('out').querySelectorAll('[data-ivtab]').forEach(b => b.onclick = () => { IVTAB = b.dataset.ivtab; render(); });
+  $('out').querySelectorAll('[data-ivsel]').forEach(b => b.onclick = () => { DSEL = b.dataset.ivsel; render(); });
+  $('out').querySelectorAll('[data-ivnew]').forEach(b => b.onclick = () => { IVTAB = 'list'; dNew(isoD(new Date()), 's1', 'interview'); render(); window.scrollTo({top: 0}); });
+  if (IVTAB === 'list') wireDaily();
+}
+function setSeg(seg){ document.body.dataset.seg = seg; document.querySelectorAll('#seg [data-seg]').forEach(b => b.setAttribute('aria-current', b.dataset.seg === seg ? 'page' : 'false'));
+  try { localStorage.setItem('athSeg', seg); } catch {}
+  if (seg === 'interviews') $('ptype').value = 'interview';
+  else if ($('ptype').value === 'interview') { let pt = null; try { pt = localStorage.getItem('athLastPtype'); } catch {} $('ptype').value = pt && pt !== 'interview' && [...$('ptype').options].some(o => o.value === pt) ? pt : 'calendar'; }
+  render(); window.scrollTo({top: 0}); }
+document.querySelectorAll('#seg [data-seg]').forEach(b => b.onclick = () => setSeg(b.dataset.seg));
 function storyPlanHTML(){
   const cur = state.name; const calls = Object.entries(PRESETS).filter(([n]) => !/blank/i.test(n)).map(([n, p]) => { const s = n === $('preset').value || (p.name || DEFAULTS.name) === cur ? state : {...DEFAULTS, ...p}; return {name: s.name, kw: (s.keyword || '').toUpperCase(), colour: s.colour, dl: new Date(s.deadline + 'T00:00:00')}; });
   const posts = new Set(monthPosts().map(p => p.left)); const day = 864e5;
@@ -964,7 +997,7 @@ const slideNode = s => `<div class="post" style="background:${s.bg};height:${s.h
 function verbFor(left){ if ((state.ctaMode || 'comment') === 'comment') return 'COMMENT'; const d = new Date(dl()); d.setDate(d.getDate() - left); const [y,m,dd] = String(state.commentFrom||'').split('-').map(Number); return (y && d >= new Date(y, m-1, dd)) ? 'COMMENT' : 'DM'; }
 function postDate(left){ const d = new Date(dl()); d.setDate(d.getDate() - left); return d.getDate() + ' ' + MONTHS[d.getMonth()]; }
 function buildPtype(){ const sel = $('ptype'), cur = sel.value;
-  sel.innerHTML = `<option value="month">Whole month (${monthPosts().length} feed posts)</option>` + monthPosts().map((p,i) => `<option value="${i}">${postDate(p.left)} · ${esc(p.title)} (${p.kind.split(' ·')[0]})</option>`).join('') + '<optgroup label="Stories"><option value="storyplan">Stories plan: all calls, day by day</option><option value="storydays">Stories: this call, every day ready to post</option><option value="stories">Stories: template library</option></optgroup><option value="reels">Reels</option><option value="calendar">Calendar</option><option value="daily">Daily posts</option>';
+  sel.innerHTML = `<option value="month">Whole month (${monthPosts().length} feed posts)</option>` + monthPosts().map((p,i) => `<option value="${i}">${postDate(p.left)} · ${esc(p.title)} (${p.kind.split(' ·')[0]})</option>`).join('') + '<optgroup label="Stories"><option value="storyplan">Stories plan: all calls, day by day</option><option value="storydays">Stories: this call, every day ready to post</option><option value="stories">Stories: template library</option></optgroup><option value="reels">Reels</option><option value="calendar">Calendar</option><option value="daily">Daily posts</option><option value="interview">Artist interviews</option>';
   sel.value = cur || '0'; if (!sel.value) sel.value = '0'; }
 function render(){
   readForm(); scheduleDraft(); updateTabs();
@@ -975,9 +1008,10 @@ function render(){
     if (p && cat && window.DPACK && DPACK[p.cat]) { DPACK[p.cat](p).forEach(g => groups.push({...g, daily: true})); }
     else if (p && cat && DSLIDES[p.cat]) { const slides = DSLIDES[p.cat](p).map((s, j) => ({...s, title: p.cat + '-' + (j + 1)}));
       groups.push({title: `${p.date} · ${cat.name}`, meta: `${cat.marker || cat.name} · ${slides.length} slide${slides.length > 1 ? 's' : ''} · ${slotLabel(p.slot)}${cat.key || p.f.key ? ' · keyword “' + (p.f.key || cat.key) + '”' : ''}`, slides, cap: DCAPTION[p.cat](p), pin: (p.f.key || cat.key) ? `Comment '${p.f.key || cat.key}' and we'll send you the link.` : '', daily: true}); }
+  } else if (pick === 'interview') { if (!dLoaded) loadDaily(); const p = ivCurrent(); if (p) DPACK.interview(p).forEach(g => groups.push({...g, daily: true}));
   } else if (pick === 'calendar') { renderPool(); RENDERED = []; $('out').innerHTML = calHTML(); wireCal(); if (!calLoaded) loadStatus(); if (!dLoaded) loadDaily(); return; }
   if (pick === 'storyplan') { renderPool(); RENDERED = []; $('out').innerHTML = storyPlanHTML(); status('Stories plan for every call. Pick "Stories: this call, every day" to get the frames.'); return; }
-  if (pick === 'daily') {
+  if (pick === 'daily' || pick === 'interview') {
     /* daily slides were built above */
   } else if (pick === 'stories') {
     const phases = {}; Object.keys(STORY_T).forEach(id => { const t = STORY_T[id]; VERB = verbFor(id[0] === 'F' ? 3 : 20); (phases[t.phase] = phases[t.phase] || []).push({id, t, f: storyMake(id, 21)}); });
@@ -1051,6 +1085,7 @@ function render(){
     inp.onchange = () => { const file = inp.files[0]; if (!file) return; shrink(file).then(url => { state.images[b.dataset.ph] = url; render(); status('Photo changed. Press "Save call" to keep it.'); }); }; inp.click(); });
   wireSlots();
   if (pick === 'daily') { $('out').insertAdjacentHTML('afterbegin', dailyPanel()); wireDaily(); }
+  if (pick === 'interview') { $('out').insertAdjacentHTML('afterbegin', ivPanel()); wireIv(); }
   $('out').querySelectorAll('[data-phx]').forEach(b => b.onclick = () => { delete state.images[b.dataset.phx]; render(); });
   $('out').querySelectorAll('[data-cap]').forEach(b => b.onclick = async () => { const t = $(b.dataset.cap); try { await navigator.clipboard.writeText(t.value); status('Caption copied.'); } catch { t.select(); status('Selected: press copy.'); } });
   $('out').querySelectorAll('[data-cedit]').forEach(b => b.onclick = () => { const k = b.parentElement.dataset.ckey;
@@ -1120,7 +1155,8 @@ $('ptype').onchange = () => { try { localStorage.setItem('athLastPtype', $('ptyp
   restoring = true; const had = await loadCall($('preset').value); restoring = false;
   fillForm(); buildPtype(); let pt = null; try { pt = localStorage.getItem('athLastPtype'); } catch {}
   $('ptype').value = pt && [...$('ptype').options].some(o => o.value === pt) ? pt : '0';
-  sizePreviews(); await document.fonts.ready; render(); if (had) status('Welcome back. Your edits are restored.'); })();
+  if (pt === 'interview') $('ptype').value = 'calendar';
+  sizePreviews(); await document.fonts.ready; let seg = 'calls'; try { seg = localStorage.getItem('athSeg') || 'calls'; } catch {} setSeg(seg); if (had) status('Welcome back. Your edits are restored.'); })();
 </script>
 <script src="daily.js"></script>
 <script src="interview.js"></script>
