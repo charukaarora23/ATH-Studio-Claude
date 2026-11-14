@@ -331,7 +331,7 @@ G.ink   = () => isEd() ? ({bg:mix(state.colour, '#000000', .55), fg:CREAM, acc:t
 const ED = {
   // magazine cover: full-bleed portrait, masthead across the top, cover lines at the bottom
   mast(){ const acc = tint(state.colour);
-    return `<p class="a c cn" style="left:0;right:0;top:70px;color:${CREAM};font-size:19px;letter-spacing:.32em;opacity:.85">Arts to Hearts · ${esc(state.editionLabel || '')}</p>
+    return `<p class="a c cn" style="left:0;right:0;top:70px;color:${CREAM};font-size:19px;letter-spacing:.32em;opacity:.85">Arts to Hearts Project · ${esc(state.editionLabel || '')}</p>
       <p class="a c scr" style="left:40px;right:40px;top:104px;font-size:${String(state.name).length > 18 ? 96 : 112}px;line-height:1;white-space:nowrap;color:${CREAM};text-shadow:0 4px 30px rgba(0,0,0,.35)">${esc(state.name)}</p>
       <div class="a" style="left:80px;right:80px;top:244px;border-top:2px solid ${acc}"></div>`; },
   shade(){ return `<div class="a" style="inset:0;background:linear-gradient(180deg,${rgba(mix(state.colour,'#000000',.5),.75)} 0%,rgba(0,0,0,.05) 30%,rgba(0,0,0,0) 45%,${rgba(mix(state.colour,'#000000',.5),.9)} 72%,${mix(state.colour,'#000000',.55)} 100%)"></div>`; },
@@ -784,7 +784,7 @@ function storyFrame(o){
   const zone = o.zone ? `<div class="a" style="left:140px;right:140px;top:${o.zoneTop||1260}px;height:${o.zoneH||200}px;border:3px dashed ${g.fg};border-radius:28px;opacity:.55;display:flex;align-items:center;justify-content:center;text-align:center;font-size:26px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:${g.fg}">${o.zone}</div>` : '';
   return {h:1920, bg:g.bg, html:`
     ${o.img ? imgDiv(o.img,'inset:0',o.pos||'center 30%') + `<div class="a" style="inset:0;background:linear-gradient(180deg,rgba(20,9,12,.55) 0%,rgba(20,9,12,0) 22%,rgba(20,9,12,0) 45%,rgba(20,9,12,.85) 72%,rgba(20,9,12,.95) 100%)"></div>` : ''}
-    <p class="a cn" style="left:64px;top:250px;color:${g.fg}">Arts to Hearts</p><p class="a cn" style="right:64px;top:250px;color:${g.fg}">${esc(o.tr||state.name)}</p>
+    <p class="a cn" style="left:64px;top:250px;color:${g.fg}">Arts to Hearts Project</p><p class="a cn" style="right:64px;top:250px;color:${g.fg}">${esc(o.tr||state.name)}</p>
     ${o.kicker ? `<p class="a lab" style="left:80px;top:${o.top||820}px;color:${g.acc}">${esc(o.kicker)}</p>` : ''}
     <p class="a H" style="left:76px;right:80px;top:${(o.top||820)+50}px;font-size:${o.size||110}px;color:${g.fg}">${o.head}</p>
     ${o.sub ? `<p class="a sub" style="left:80px;right:120px;top:${o.subTop||((o.top||820)+330)}px;color:${g.fg};opacity:.9">${o.sub}</p>` : ''}

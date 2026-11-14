@@ -5,8 +5,12 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Hanken+Grotesk:wght@400;500;600;700&display=swap">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<script src="vendor/html2canvas.min.js"></script>
+<script src="vendor/jszip.min.js"></script>
+<script>
+if (!window.html2canvas) document.write('<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"><\/script>');
+if (!window.JSZip) document.write('<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"><\/script>');
+</script>
 <style>
 /* Post fonts ship with the page so previews and exported PNGs match exactly */
 @font-face{font-family:"ATH Grotesk";src:url(fonts/ath/HankenGrotesk.woff2) format("woff2");font-weight:100 900}
@@ -312,7 +316,7 @@ const KW = () => esc((state.keyword || 'KEYWORD').toUpperCase());
 
 // four corner labels: the one header system on every slide
 const corners = (col, dmCol, tr) => `
-  <p class="a cn" style="left:52px;top:48px;color:${col}">Arts to Hearts</p><p class="a cn" style="right:52px;top:48px;color:${col}">${esc(tr)}</p>
+  <p class="a cn" style="left:52px;top:48px;color:${col}">Arts to Hearts Project</p><p class="a cn" style="right:52px;top:48px;color:${col}">${esc(tr)}</p>
   <p class="a cn" style="left:52px;bottom:48px;color:${dmCol}">${VERB} “${KW()}”</p><p class="a cn" style="right:52px;bottom:48px;color:${col}">Closes ${short()}</p>`;
 const spineLab = (n,f,fs) => `<span style="position:absolute;left:50%;bottom:18px;transform:translateX(-50%) rotate(-90deg);white-space:nowrap;font-family:'ATH Serif',serif;font-style:italic;font-size:${fs}px;width:0;color:${f}">${esc(n)}</span>`;
 const SPINES = [['#14090C','#F9ECE5'],['#AA0003','#FFD6DE'],['#FAD2E1','#6A0620'],['#2E4A2A','#E3E8DE'],['#E3E8DE','#14090C'],['#6A0620','#FAD2E1'],['#C9D3BE','#14090C'],['#FFD6DE','#AA0003'],['#4C4240','#F9ECE5'],['#B7D9FF','#6A0620'],['#FFF3B2','#AA0003']];
@@ -483,7 +487,7 @@ function render(){
   }
   RENDERED = [];
   $('out').innerHTML = groups.map((g,gi) => {
-    const cells = g.slides.map((s,j) => { const i = RENDERED.push({ s, name: `${base}-${g.left !== undefined ? String(g.idx+1).padStart(2,'0')+'-' : 'story-'}${s.title}.png` }) - 1;
+    const cells = g.slides.map((s,j) => { const i = RENDERED.push({ s, name: `${base}-${g.left !== undefined ? String(g.idx+1).padStart(2,'0')+'-' : 'story-'}${String(j+1).padStart(2,'0')}-${s.title}.png` }) - 1;
       return `<div class="cell"><div class="frame${s.h ? ' tall' : ''}">${slideNode(s)}</div><div class="act"><span>${g.slides.length>1 ? 'Slide ' + (j+1) : 'Single'}</span><button type="button" data-i="${i}">Save PNG</button></div></div>`; }).join('');
     const capBox = g.cap ? `<details class="capbox"><summary>Caption and pinned comment</summary><div class="f"><textarea id="cap${gi}" style="min-height:220px">${esc(g.cap)}</textarea></div><div class="f"><label>Pinned comment</label><input value="${esc(g.pin)}"></div><button class="btn ghost" type="button" data-cap="cap${gi}" style="margin-top:8px">Copy caption</button></details>` : '';
     const ckey = (state.name || '') + ' | ' + g.title.replace(/^[^·]*·\s*/, '');
@@ -524,9 +528,15 @@ function preflight(){
   if (!issues.length) return true;
   return confirm('Before you save: ' + issues.join(' and ') + '. Save anyway?');
 }
-async function saveOne(i){ if (!preflight()) return; status('Rendering…'); await offer(RENDERED[i].name, await toBlob(RENDERED[i].s)); }
-$('zip').onclick = async () => { if (!RENDERED.length) render(); if (!preflight()) return; const zip = new JSZip(); for (let i = 0; i < RENDERED.length; i++){ status(`Rendering ${i+1} of ${RENDERED.length}…`); zip.file(RENDERED[i].name, await toBlob(RENDERED[i].s)); }
-  status('Packing…'); await offer((state.name || 'ath-call').toLowerCase().replace(/[^a-z0-9]+/g,'-') + '-posts.zip', await zip.generateAsync({ type:'blob' })); };
+function libsOk(){ if (window.html2canvas && window.JSZip) return true; status('Export tools did not load. Refresh the page and try again.'); alert('The export tools did not load. Refresh the page and try again.'); return false; }
+async function saveOne(i){ if (!libsOk() || !preflight()) return; try { status('Rendering…'); await offer(RENDERED[i].name, await toBlob(RENDERED[i].s)); } catch (e) { console.error(e); status('Could not render this image: ' + (e && e.message || e)); } }
+let zipping = false;
+$('zip').onclick = async () => { if (zipping) return; if (!RENDERED.length) render(); if (!libsOk() || !preflight()) return;
+  zipping = true; const btn = $('zip'); btn.disabled = true;
+  try { const zip = new JSZip(); for (let i = 0; i < RENDERED.length; i++){ status(`Rendering ${i+1} of ${RENDERED.length}…`); zip.file(RENDERED[i].name, await toBlob(RENDERED[i].s)); }
+    status('Packing…'); await offer((state.name || 'ath-call').toLowerCase().replace(/[^a-z0-9]+/g,'-') + '-posts.zip', await zip.generateAsync({ type:'blob' })); }
+  catch (e) { console.error(e); status('ZIP failed: ' + (e && e.message || e)); }
+  finally { zipping = false; btn.disabled = false; } };
 $('go').onclick = render;
 document.querySelector('aside').addEventListener('change', e => { if (e.target.type !== 'file') { readForm(); buildPtype(); render(); } });
 
