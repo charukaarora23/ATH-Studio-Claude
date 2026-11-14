@@ -13,8 +13,9 @@ const edSize = (t, big, mid, small) => t.length > 64 ? small : t.length > 38 ? m
 // Look: bold, conversational, editorial. Five devices, alternated so no two slides in a row look the same:
 // big Rose type on Night · a Burgundy card over an artwork · marker highlights in a serif paragraph ·
 // the ticket card · highlight boxes on a Chilli ground. Brand palette and the two brand typefaces only.
-const EP = {night: '#52051A', burg: '#6A0620', rose: '#FFA1C2', peony: '#FAD2E1', cream: '#F9EEE5', ink: '#1C1310', chilli: '#AA0003', ballet: '#FFD6DE', lemon: '#FFF3B2'};
-const mark = (t, bg = EP.lemon) => `<span style="background:${bg};-webkit-box-decoration-break:clone;box-decoration-break:clone;padding:0 .12em;border-radius:4px">${t}</span>`;
+// Three colours only: White, Maroon (Burgundy) and Pink. Pink is the highlight. Full Maroon only on the cover and the end card.
+const EP = {white: '#FFFFFF', burg: '#6A0620', rose: '#FFA1C2', pink: '#FAD2E1'};
+const mark = (t, bg = EP.pink) => `<span style="background:${bg};-webkit-box-decoration-break:clone;box-decoration-break:clone;padding:0 .12em;border-radius:4px">${t}</span>`;
 const hl = (text, phrase, bg) => { const t = esc(text); const p = esc(phrase || ''); return p && t.includes(p) ? t.replace(p, mark(p, bg)) : t; };
 const edCorner = (fg) => `<p class="a cn" style="left:52px;top:48px;color:${fg}">Arts to Hearts Project</p>`;
 const edHandle = (fg, op = .8) => `<p class="a" style="left:72px;bottom:60px;${T_REG};font-size:24px;color:${fg};opacity:${op}">@artstoheartsproject</p>`;
@@ -24,48 +25,47 @@ const splitHalf = t => { const w = String(t).split(' '); const k = Math.ceil(w.l
 const EDT = {
   // Cover A: the question, huge, Rose on Night, opened by the round arrow
   coverHook(o){ const q = o.q; const sz = q.length > 44 ? 112 : q.length > 30 ? 132 : 150;
-    return {bg: EP.night, html: `${ivMono('peony', 'right:52px;top:36px;width:112px;height:63px')}
-      <p class="a" style="left:96px;right:80px;top:150px;${T_MED};font-size:${sz}px;line-height:1.02;letter-spacing:-.035em;color:${EP.rose}">${arrowDot(EP.rose, EP.night, Math.round(sz * 1.05))}${esc(q)}</p>
-      ${swipePill(EP.rose, EP.night)}`}; },
+    return {bg: EP.burg, html: `${ivMono('peony', 'right:52px;top:36px;width:112px;height:63px')}
+      <p class="a" style="left:72px;right:72px;top:210px;${T_MED};font-size:${sz}px;line-height:1.02;letter-spacing:-.035em;color:${EP.rose}">${arrowDot(EP.rose, EP.burg, Math.round(sz * 1.05))}${esc(q)}</p>
+      ${swipePill(EP.rose, EP.burg)}`}; },
   // Cover B: a Burgundy card over the artwork, the question split above and below a small line
   coverCard(o){ const [a, b] = splitHalf(o.q); const sz = o.q.length > 40 ? 70 : 84;
-    return {bg: EP.ink, html: `${ivArt(o.img, 'inset:0', o.slot, 'cover')}${ivMono('white', 'right:52px;top:36px;width:112px;height:63px')}
+    return {bg: EP.burg, html: `${ivArt(o.img, 'inset:0', o.slot, 'cover')}${ivMono('white', 'right:52px;top:36px;width:112px;height:63px')}
       <div class="a" style="left:130px;right:130px;top:170px;bottom:190px;border-radius:34px;background:${EP.burg};display:flex;flex-direction:column;justify-content:space-between;align-items:center;text-align:center;padding:64px 48px">
-        <p style="${T_MED};font-size:${sz}px;line-height:.98;letter-spacing:-.02em;text-transform:uppercase;color:${EP.rose}">${esc(a)}</p>
-        <p style="${T_REG};font-size:36px;line-height:1.4;color:${EP.peony};max-width:640px">${esc(o.sub)}</p>
-        <p style="${T_MED};font-size:${sz}px;line-height:.98;letter-spacing:-.02em;text-transform:uppercase;color:${EP.rose}">${esc(b)}</p></div>`}; },
+        <p style="${T_MED};font-size:${sz}px;line-height:.98;letter-spacing:-.02em;text-transform:uppercase;color:${EP.pink}">${esc(a)}</p>
+        <p style="${T_REG};font-size:36px;line-height:1.4;color:${EP.pink};max-width:640px">${esc(o.sub)}</p>
+        <p style="${T_MED};font-size:${sz}px;line-height:.98;letter-spacing:-.02em;text-transform:uppercase;color:${EP.pink}">${esc(b)}</p></div>`}; },
   // The problem, as a serif paragraph with the sharpest phrase marked
-  open(o){ return {bg: EP.cream, html: `${edCorner(EP.ink)}
-    <p class="a" style="left:72px;right:72px;top:210px;${BASK};font-size:${o.text.length > 200 ? 60 : 68}px;line-height:1.28;color:${EP.ink}">${hl(o.text, o.mark)}</p>${edHandle(EP.ink)}`}; },
+  open(o){ return {bg: EP.white, html: `${edCorner(EP.burg)}
+    <p class="a" style="left:72px;right:72px;top:210px;${BASK};font-size:${o.text.length > 200 ? 60 : 68}px;line-height:1.28;color:${EP.burg}">${hl(o.text, o.mark)}</p>${edHandle(EP.burg)}`}; },
   // Advice as a marked paragraph: the advice itself is highlighted inside the sentence that explains it
-  adviceMark(o){ const text = `${o.title}. ${o.how || ''}`.trim(); return {bg: EP.cream, html: `${edCorner(EP.ink)}
-    <p class="a" style="left:72px;right:72px;top:210px;${BASK};font-size:${text.length > 170 ? 60 : 70}px;line-height:1.26;color:${EP.ink}">${hl(text, o.title + '.')}</p>
-    ${o.credit ? `<p class="a" style="left:72px;right:72px;bottom:120px;${T_REG};font-size:22px;color:${EP.ink};opacity:.6">${edLabelCredit(o.credit)}</p>` : ''}${edHandle(EP.ink)}`}; },
+  adviceMark(o){ const text = `${o.title}. ${o.how || ''}`.trim(); return {bg: EP.white, html: `${edCorner(EP.burg)}
+    <p class="a" style="left:72px;right:72px;top:210px;${BASK};font-size:${text.length > 170 ? 60 : 70}px;line-height:1.26;color:${EP.burg}">${hl(text, o.title + '.')}</p>${edHandle(EP.burg)}`}; },
   // Advice on a Burgundy card over an artwork, the advice split above and below the how
   adviceCard(o){ if (!o.img) return EDT.adviceMark(o); const [a, b] = splitHalf(o.title); const sz = o.title.length > 34 ? 62 : 74;
-    return {bg: EP.ink, html: `${ivArt(o.img, 'inset:0', o.slot, 'cover')}
+    return {bg: EP.burg, html: `${ivArt(o.img, 'inset:0', o.slot, 'cover')}
       <div class="a" style="left:130px;right:130px;top:170px;bottom:210px;border-radius:34px;background:${EP.burg};display:flex;flex-direction:column;justify-content:space-between;align-items:center;text-align:center;padding:60px 48px">
-        <p style="${T_MED};font-size:${sz}px;line-height:.98;letter-spacing:-.02em;text-transform:uppercase;color:${EP.rose}">${esc(a)}</p>
-        <p style="${T_REG};font-size:36px;line-height:1.4;color:${EP.peony};max-width:640px">${esc(o.how || '')}</p>
-        <p style="${T_MED};font-size:${sz}px;line-height:.98;letter-spacing:-.02em;text-transform:uppercase;color:${EP.rose}">${esc(b)}</p></div>
+        <p style="${T_MED};font-size:${sz}px;line-height:.98;letter-spacing:-.02em;text-transform:uppercase;color:${EP.pink}">${esc(a)}</p>
+        <p style="${T_REG};font-size:36px;line-height:1.4;color:${EP.pink};max-width:640px">${esc(o.how || '')}</p>
+        <p style="${T_MED};font-size:${sz}px;line-height:.98;letter-spacing:-.02em;text-transform:uppercase;color:${EP.pink}">${esc(b)}</p></div>
       ${o.credit ? `<p class="a" style="left:130px;right:130px;bottom:120px;${T_REG};font-size:22px;color:#FFFFFF;text-shadow:0 1px 6px rgba(0,0,0,.6)">${edLabelCredit(o.credit)}</p>` : ''}`}; },
   // The habit to drop: highlight boxes on Chilli, the habit struck through
-  instead(o){ const box = t => `<span style="background:${EP.ballet};-webkit-box-decoration-break:clone;box-decoration-break:clone;padding:2px 10px">${t}</span>`;
-    return {bg: EP.chilli, html: `${edCorner(EP.ballet)}
-      <p class="a" style="left:40px;right:60px;top:170px;${T_MED};font-size:${o.bad.length > 50 ? 70 : 84}px;line-height:1.18;letter-spacing:-.03em;color:${EP.ink}">${box(`<s style="text-decoration-thickness:6px;text-decoration-color:${EP.chilli}">&ldquo;${esc(o.bad)}&rdquo;</s>`)}</p>
-      <p class="a" style="left:40px;right:60px;bottom:170px;${T_MED};font-size:${o.good.length > 80 ? 64 : 76}px;line-height:1.18;letter-spacing:-.03em;color:${EP.ink}">${box(esc(o.good))}</p>`}; },
+  instead(o){ const box = t => `<span style="background:${EP.pink};-webkit-box-decoration-break:clone;box-decoration-break:clone;padding:2px 12px">${t}</span>`;
+    return {bg: EP.white, html: `${edCorner(EP.burg)}
+      <p class="a" style="left:72px;right:72px;top:210px;${BASK};font-style:italic;font-size:${o.bad.length > 50 ? 58 : 66}px;line-height:1.3;color:${EP.burg};opacity:.55"><s style="text-decoration-thickness:4px">&ldquo;${esc(o.bad)}&rdquo;</s></p>
+      <p class="a" style="left:72px;right:72px;top:620px;${T_MED};font-size:${o.good.length > 80 ? 62 : 72}px;line-height:1.2;letter-spacing:-.03em;color:${EP.burg}">${box(esc(o.good))}</p>${edHandle(EP.burg)}`}; },
   // The short version on a ticket: notches, corner labels, one phrase picked out in white
-  short(o){ return {bg: EP.cream, html: `<div class="a" style="left:60px;right:60px;top:70px;bottom:70px;border-radius:40px;background:${EP.rose}"></div>
-      <div class="a" style="left:470px;width:140px;top:0;height:140px;border-radius:50%;background:${EP.cream}"></div><div class="a" style="left:470px;width:140px;bottom:0;height:140px;border-radius:50%;background:${EP.cream}"></div>
-      <p class="a cn" style="left:120px;top:130px;font-size:18px;color:${EP.night}">The short version</p><p class="a" style="right:120px;top:128px;${T_MED};font-size:22px;color:${EP.night};text-decoration:underline">artstoheartsproject.com</p>
-      <p class="a" style="left:120px;right:120px;top:230px;${BASK};font-size:${o.text.length > 200 ? 56 : 64}px;line-height:1.22;color:${EP.night}">${o.pick && o.text.includes(o.pick) ? esc(o.text).replace(esc(o.pick), `<span style="color:#FFFFFF">${esc(o.pick)}</span>`) : esc(o.text)}</p>
-      <p class="a" style="left:120px;bottom:130px;${T_MED};font-size:22px;color:${EP.night};text-decoration:underline">@artstoheartsproject</p><p class="a cn" style="right:120px;bottom:132px;font-size:18px;color:${EP.night}">Save this</p>`}; },
+  short(o){ return {bg: EP.white, html: `<div class="a" style="left:52px;right:52px;top:110px;bottom:110px;border-radius:40px;background:${EP.pink}"></div>
+      <div class="a" style="left:470px;width:140px;top:40px;height:140px;border-radius:50%;background:${EP.white}"></div><div class="a" style="left:470px;width:140px;bottom:40px;height:140px;border-radius:50%;background:${EP.white}"></div>
+      <p class="a cn" style="left:112px;top:170px;color:${EP.burg}">The short version</p><p class="a cn" style="right:112px;top:170px;color:${EP.burg}">Save this</p>
+      <p class="a" style="left:112px;right:112px;top:260px;${BASK};font-size:${o.text.length > 200 ? 54 : 62}px;line-height:1.26;color:${EP.burg}">${hl(o.text, o.pick, EP.white)}</p>
+      <p class="a" style="left:112px;bottom:170px;${T_REG};font-size:24px;color:${EP.burg}">@artstoheartsproject</p><p class="a" style="right:112px;bottom:170px;${T_REG};font-size:24px;color:${EP.burg}">artstoheartsproject.com</p>`}; },
   // The ask: the keyword is the headline
-  cta(o){ return {bg: EP.night, html: `${edCorner(EP.peony)}
-    <p class="a" style="left:96px;right:80px;top:200px;${T_MED};font-size:60px;line-height:1.1;letter-spacing:-.02em;color:${EP.peony}">${esc(o.head)}</p>
-    <p class="a" style="left:96px;right:80px;top:470px;${T_MED};font-size:${o.key.length > 8 ? 150 : 180}px;line-height:1;letter-spacing:-.04em;color:${EP.rose}">${arrowDot(EP.rose, EP.night, 150)}${esc(o.key)}</p>
-    <p class="a" style="left:96px;right:120px;top:720px;${T_REG};font-size:40px;line-height:1.35;color:${EP.peony}">Comment the word and we’ll send it to you.</p>
-    <p class="a" style="left:96px;right:120px;bottom:150px;${T_REG};font-size:28px;line-height:1.4;color:${EP.peony};opacity:.85">${esc(o.offer)}</p>${edHandle(EP.peony)}`}; },
+  cta(o){ return {bg: EP.white, html: `${edCorner(EP.burg)}
+    <p class="a" style="left:72px;right:72px;top:210px;${BASK};font-size:60px;line-height:1.24;color:${EP.burg}">${hl(o.head, o.head)}</p>
+    <p class="a" style="left:72px;right:72px;top:520px;${T_MED};font-size:${o.key.length > 8 ? 150 : 180}px;line-height:1;letter-spacing:-.04em;color:${EP.burg}">${arrowDot(EP.burg, EP.white, 150)}${esc(o.key)}</p>
+    <p class="a" style="left:72px;right:72px;top:780px;${T_REG};font-size:38px;line-height:1.35;color:${EP.burg}">Comment the word and we’ll send it to you.</p>
+    <p class="a" style="left:72px;right:72px;bottom:130px;${T_REG};font-size:28px;line-height:1.4;color:${EP.burg};opacity:.8">${esc(o.offer)}</p>${edHandle(EP.burg)}`}; },
   end(o){ return {bg: EP.burg, html: `${ivMono('peony', 'left:390px;width:300px;top:250px;height:170px')}
     <p class="a c" style="left:110px;right:110px;top:520px;${BASK};font-size:44px;line-height:1.3;color:#F9EEE5">${esc(o.line)}</p>
     ${o.invite ? `<div class="a" style="left:300px;right:300px;top:860px;border-top:1px solid rgba(250,210,225,.35)"></div><p class="a c" style="left:120px;right:120px;top:900px;${T_REG};font-size:32px;line-height:1.4;color:#FAD2E1">${esc(o.invite)}</p>` : ''}
@@ -165,10 +165,10 @@ DPACK.editorial = p => {
   const cap = `${f.hook || q}\n\n${f.why || ''}\n\n${steps.map(s => `${s.title}.${s.how ? ' ' + s.how : ''}`).join('\n\n')}\n\n${f.short ? 'The short version: ' + f.short + '\n\n' : ''}Comment ${key} and we'll send you the whole guide.${who ? `\n\nWorks shown: ${who}.` : ''}\n\n${tags}`.replace(/\n{3,}/g, '\n\n');
   const SINGLES = steps.slice(0, 6).map((s, i) => ({...advice(s, i), label: 'Single ' + (i + 1)}));
   const ST = [
-    {...IV.story({full: !!imgs[0], cream: !imgs[0], img: imgs[0], slot: 'imgs0', mono: true, label: 'ATH Editorial', text: `&ldquo;${esc(q)}&rdquo;`, serif: true, size: 72, sub: esc(sub), zone: 'Link sticker: read the guide'}), label: 'Story 1'},
-    ...(f.good ? [{...IV.story({cream: true, label: 'Which one sounds like you?', text: `<span style="text-decoration:line-through;text-decoration-color:#6A0620;opacity:.5">&ldquo;${esc(f.bad || 'I’ll work it out later.')}&rdquo;</span><br><br>${esc(f.good)}`, serif: true, size: 56, zone: 'Poll sticker: Guilty / Not me'}), label: 'Story 2 · poll'}] : []),
+    {...IV.story({full: !!imgs[0], img: imgs[0], slot: 'imgs0', mono: true, label: 'ATH Editorial', text: `&ldquo;${esc(q)}&rdquo;`, serif: true, size: 72, sub: esc(sub), zone: 'Link sticker: read the guide'}), label: 'Story 1'},
+    ...(f.good ? [{...IV.story({label: 'Which one sounds like you?', text: `<span style="text-decoration:line-through;opacity:.5">&ldquo;${esc(f.bad || 'I’ll work it out later.')}&rdquo;</span><br><br>${esc(f.good)}`, serif: true, size: 56, zone: 'Poll sticker: Guilty / Not me'}), label: 'Story 2 · poll'}] : []),
     ...(steps.length ? [{...IV.story({dark: true, label: 'From the guide', text: esc(steps[0].title), sub: esc(steps[0].how || ''), zone: 'Link sticker: the whole guide'}), label: 'Story 3'}] : []),
-    {...IV.story({cream: true, label: 'Your turn', text: esc(f.ask || 'What do you want to ask us about this?'), serif: true, size: 64, zone: 'Question sticker'}), label: 'Story 4 · question box'},
+    {...IV.story({label: 'Your turn', text: esc(f.ask || 'What do you want to ask us about this?'), serif: true, size: 64, zone: 'Question sticker'}), label: 'Story 4 · question box'},
   ];
   return [
     {title: `${p.date} · Editorial carousel`, meta: `${S.length - 1} slides plus a second cover to choose from · keyword ${key}`, slides: S.map((s, j) => ({...s, title: 'editorial-' + (j + 1)})), cap, pin: `Comment ${key} and we'll send you the whole guide.`},
