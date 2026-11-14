@@ -16,12 +16,12 @@ const HLT = {
   cover(o){ const solid = o.solid || !o.img, big = String(o.big || '').toUpperCase().trim();
     const words = big.length > 11 && big.includes(' ') ? splitHalf(big) : [big];
     const bs = Math.min(150, Math.floor(900 / (Math.max(...words.map(w => w.length), 1) * .64)));
-    const ss = Math.min(76, Math.floor(900 / (Math.max(String(o.serif || '').length, 1) * .72)));   // the serif line always sits on one line
+    const ss = Math.min(96, Math.floor(900 / (Math.max(String(o.serif || '').length, 1) * .5)));   // the serif line always sits on one line
     const fg = solid ? HL.rose : HL.white;
     return {bg: solid ? HL.burg : HL.ink, html: `${solid ? '' : `${ivArt(o.img, 'inset:0', 'arts0', 'cover')}<div class="a" style="inset:0;background:rgba(20,9,12,.38)"></div>`}
       <p class="a cn" style="left:52px;top:48px;color:${HL.white}">Arts to Hearts Project</p>${ivMono('white', 'right:52px;top:40px;width:96px;height:54px')}
       <div class="a" style="left:60px;right:60px;top:120px;bottom:120px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center">
-        <p style="${BASK};font-size:${ss}px;line-height:1.05;letter-spacing:.01em;text-transform:uppercase;white-space:nowrap;color:${fg}">${esc(o.serif || '')}</p>
+        <p style="${BASK};font-style:italic;font-size:${ss}px;line-height:1.1;letter-spacing:-.01em;white-space:nowrap;color:${fg}">${esc(o.serif || '')}</p>
         <p style="${T_MED};font-size:${bs}px;line-height:.9;letter-spacing:-.03em;color:${fg};margin-top:14px">${words.map(esc).join('<br>')}</p>
         ${o.under ? `<p style="${T_REG};font-size:34px;line-height:1.4;letter-spacing:.08em;text-transform:uppercase;color:${fg};margin-top:36px">${esc(o.under)}</p>` : ''}</div>`}; },
   // The artwork, as big as the slide allows (never cropped), with the artist named first
