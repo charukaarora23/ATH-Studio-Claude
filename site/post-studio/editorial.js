@@ -77,29 +77,33 @@ const EDT = {
 };
 const edLabelCredit = c => { const [who, t, y] = (c || []).map(x => String(x || '').trim()); return who ? `${esc(who)}${t ? `, <i style="${BASK};font-style:italic">${esc(t)}</i>` : ''}${y ? ', ' + esc(y) : ''}` : ''; };
 
+
+// The one layout: a small label (the reader's question), the line large, one short line under it.
+EDT.plainSlide = o => { const dark = o.dark, bg = dark ? EP.burg : EP.white, fg = dark ? EP.pink : EP.burg, big = dark ? '#F9EEE5' : EP.burg;
+  const sz = o.title.length > 60 ? 76 : o.title.length > 38 ? 90 : 104;
+  return {bg, html: `${o.first ? ivMono(dark ? 'peony' : 'burgundy', 'right:52px;top:36px;width:112px;height:63px') : edCorner(fg)}
+    <div class="a" style="left:72px;right:72px;top:250px;display:flex;flex-direction:column;gap:34px">
+      <p style="${T_MED};font-size:28px;letter-spacing:.12em;text-transform:uppercase;line-height:1.4;color:${fg}">${esc(o.label)}</p>
+      ${o.struck ? `<p style="${BASK};font-style:italic;font-size:46px;line-height:1.3;color:${big};opacity:.5"><s>&ldquo;${esc(o.struck)}&rdquo;</s></p>` : ''}
+      <p style="${T_MED};font-size:${sz}px;line-height:.98;letter-spacing:-.035em;color:${big}">${esc(o.title)}</p>
+      ${o.how ? `<p style="${T_REG};font-size:38px;line-height:1.4;color:${fg}">${esc(o.how)}</p>` : ''}</div>
+    ${o.last ? '' : edHandle(fg)}`}; };
+
 // ---------- the form ----------
 DCAT.editorial = {name: 'ATH Editorial', marker: '//EDITORIAL', key: 'GUIDE', pack: true, groups: [
-  ['Cover', [
-    {k: 'cover', label: 'Cover in use (both are shown, hide the one you skip)', type: 'select', options: [['hook', 'A: the question, huge, Rose on Night'], ['card', 'A: a Burgundy card over the artwork']]},
-    {k: 'question', label: 'The question, in an artist’s own words', type: 'text', ph: 'How should I price my art?'},
-    {k: 'sub', label: 'Line under it', type: 'text', ph: 'What we tell artists who ask us this'}]],
+  ['The question', [
+    {k: 'question', label: 'The question, in an artist’s own words (the small label on every slide)', type: 'text', ph: 'How should I price my art?'}]],
   ['The advice', [
-    {k: 'why', label: 'Under the question on the cover: the problem, said plainly', type: 'area'},
     {k: 'steps', label: 'Advice, one per line: the advice as a sentence | one line on how', type: 'lines'},
-    {k: 'imgs', label: 'Artworks from ATH artists: 1 behind the card cover, then behind every other piece of advice', type: 'imgs'},
-    {k: 'credits', label: 'Their credits, same order: Artist | Title | Year', type: 'lines'}]],
-  ['Instead of', [
+    {k: 'why', label: 'The problem, said plainly (used in the caption)', type: 'area'}]],
+  ['Instead of (the last slide before the end card)', [
     {k: 'bad', label: 'The habit artists should drop, in their words (struck through)', type: 'text', ph: 'I’ll price it lower so it sells.'},
-    {k: 'good', label: 'What to do instead', type: 'text', ph: 'Price it so the next one can sell for more.'},
-    {k: 'short', label: 'The short version, for a single ticket post: the whole guide in one sentence', type: 'area'},
-    {k: 'pick', label: 'Words on the ticket to pick out in white (copy them exactly)', type: 'text'}]],
+    {k: 'good', label: 'What to do instead', type: 'text', ph: 'Price it so the next one can sell for more.'}]],
   ['The action', [
     {k: 'key', label: 'Comment keyword (its DM must send the guide, not a submission pitch)', type: 'text', ph: 'GUIDE'},
     {k: 'ctahead', label: 'End card: line above the keyword', type: 'text', ph: 'Want the whole guide?'},
-    {k: 'offer', label: 'End card: line under the keyword', type: 'text', ph: 'Comment the word and we’ll send it to you.'},
-    ]],
-  ['Stories and caption', [
-    {k: 'ask', label: 'Story question box', type: 'text', ph: 'What do you find hardest about pricing?'},
+    {k: 'offer', label: 'End card: line under the keyword', type: 'text', ph: 'Comment the word and we’ll send it to you.'}]],
+  ['Caption', [
     {k: 'hook', label: 'Caption first line', type: 'text'},
     {k: 'url', label: 'Article link', type: 'text'},
     {k: 'tags', label: 'Hashtags (up to 5 in total)', type: 'text', ph: '#artbusiness #artistadvice'}]],
@@ -154,26 +158,20 @@ DPACK.editorial = p => {
   const A = EDT.coverHook({q, sub}), Bc = EDT.coverCard({q, sub, img: imgs[0] || '', slot: 'imgs0'});
   const advice = (s, i) => (i % 2 ? EDT.adviceMark : EDT.adviceCard)({title: s.title, how: s.how, img: imgs[i + 1] || '', slot: 'imgs' + (i + 1), credit: credits[i + 1]});
   const head = f.ctahead || 'Want the whole guide?', offer = f.offer || 'Comment the word and we’ll send it to you.';
-  const A2 = EDT.coverHook({q, why: f.why}), B2 = EDT.coverCard({q, sub: f.why ? (f.why.match(/[^.!?]+[.!?]/) || [f.why])[0].trim() : sub, img: imgs[0] || '', slot: 'imgs0'});
+  const label = q;
   const S = [
-    {...(artCover ? A2 : B2), label: 'Cover A (in use)'}, {...(artCover ? B2 : A2), label: 'Cover B: hide the one you skip'},
-    ...steps.slice(0, 6).map(advice),
-    ...(f.good ? [EDT.instead({bad: f.bad || 'I’ll work it out later.', good: f.good})] : []),
+    ...steps.slice(0, 6).map((st, i) => EDT.plainSlide({label, title: st.title, how: st.how, dark: i % 2 === 0, first: i === 0})),
+    ...(f.good ? [EDT.plainSlide({label: 'Instead of', struck: f.bad || 'I’ll work it out later.', title: f.good, dark: steps.slice(0, 6).length % 2 === 0})] : []),
     EDT.end({head, key, offer}),
   ];
   const tags = ['#artstoheartsproject', '#artbusiness', ...String(f.tags || '').split(/\s+/).filter(x => x.startsWith('#'))].slice(0, 5).join(' ');
   const who = [...new Set(credits.map(c => c[0]).filter(Boolean))].join(', ');
   const cap = `${f.hook || q}\n\n${f.why || ''}\n\n${steps.map(s => `${s.title}.${s.how ? ' ' + s.how : ''}`).join('\n\n')}\n\n${f.short ? 'The short version: ' + f.short + '\n\n' : ''}Comment ${key} and we'll send you the whole guide.${who ? `\n\nWorks shown: ${who}.` : ''}\n\n${tags}`.replace(/\n{3,}/g, '\n\n');
-  const SINGLES = [...(f.short ? [{...EDT.short({text: f.short, pick: f.pick || f.short.split(/,\s*/)[0]}), label: 'The short version'}] : []), ...steps.slice(0, 6).map((s, i) => ({...advice(s, i), label: 'Single ' + (i + 1)}))];
-  const ST = [
-    {...IV.story({full: !!imgs[0], img: imgs[0], slot: 'imgs0', mono: true, label: 'ATH Editorial', text: `&ldquo;${esc(q)}&rdquo;`, serif: true, size: 72, sub: esc(sub), zone: 'Link sticker: read the guide'}), label: 'Story 1'},
-    ...(f.good ? [{...IV.story({label: 'Which one sounds like you?', text: `<span style="text-decoration:line-through;opacity:.5">&ldquo;${esc(f.bad || 'I’ll work it out later.')}&rdquo;</span><br><br>${esc(f.good)}`, serif: true, size: 56, zone: 'Poll sticker: Guilty / Not me'}), label: 'Story 2 · poll'}] : []),
-    ...(steps.length ? [{...IV.story({dark: true, label: 'From the guide', text: esc(steps[0].title), sub: esc(steps[0].how || ''), zone: 'Link sticker: the whole guide'}), label: 'Story 3'}] : []),
-    {...IV.story({label: 'Your turn', text: esc(f.ask || 'What do you want to ask us about this?'), serif: true, size: 64, zone: 'Question sticker'}), label: 'Story 4 · question box'},
-  ];
+  const SINGLES = steps.slice(0, 6).map((st, i) => ({...EDT.plainSlide({label, title: st.title, how: st.how, dark: i % 2 === 0, first: true}), label: 'Single ' + (i + 1)}));
+  const ST = steps.slice(0, 3).map((st, i) => ({...IV.story({dark: i % 2 === 0, mono: i === 0, label: q, text: esc(st.title), sub: esc(st.how || ''), zone: i === 2 ? 'Question sticker' : 'Link sticker: the whole guide'}), label: 'Story ' + (i + 1)}));
   return [
-    {title: `${p.date} · Editorial carousel`, meta: `${S.length - 1} slides plus a second cover to choose from · keyword ${key}`, slides: S.map((s, j) => ({...s, title: 'editorial-' + (j + 1)})), cap, pin: `Comment ${key} and we'll send you the whole guide.`},
-    ...(SINGLES.length ? [{title: `${p.date} · Editorial singles`, meta: `${SINGLES.length} single posts for later weeks: the short version on a ticket, then one piece of advice each, all sending people back to the guide`, slides: SINGLES.map((s, j) => ({...s, title: 'single-' + (j + 1)})), cap: steps[0] ? `${steps[0].title}.\n\n${steps[0].how}\n\nFrom our guide "${q}". Comment ${key} and we'll send you the whole thing.\n\n${tags}` : '', pin: ''}] : []),
+    {title: `${p.date} · Editorial carousel`, meta: `${S.length} slides · keyword ${key}`, slides: S.map((s, j) => ({...s, title: 'editorial-' + (j + 1)})), cap, pin: `Comment ${key} and we'll send you the whole guide.`},
+    ...(SINGLES.length ? [{title: `${p.date} · Editorial singles`, meta: `${SINGLES.length} single posts for later weeks, one piece of advice each, all sending people back to the guide`, slides: SINGLES.map((s, j) => ({...s, title: 'single-' + (j + 1)})), cap: steps[0] ? `${steps[0].title}.\n\n${steps[0].how}\n\nFrom our guide "${q}". Comment ${key} and we'll send you the whole thing.\n\n${tags}` : '', pin: ''}] : []),
     {title: `${p.date} · Editorial stories`, meta: 'Same day as the carousel · add the stickers in Instagram', slides: ST.map((s, j) => ({...s, title: 'editorial-story-' + (j + 1)})), story: true},
   ];
 };
