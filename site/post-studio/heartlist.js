@@ -83,7 +83,11 @@ DCAT.heartlist.fields = DCAT.heartlist.groups.flatMap(g => g[1]);
 
 // ---------- read a Heart List article ----------
 // Headings look like "1. Peace Offering by Denis D’Alesio @denisdalesio". Each section ends with a line like "Follow him. His paintings feel like bedtime stories for grown-ups."
-const HL_HEAD = /^\s*(\d{1,2})\s*[.)]\s*(.+?)\s+by\s+(.+?)(?:\s+(@[\w.]+))?\s*$/i;
+// Headings come as "1. Peace Offering by Denis D’Alesio @denisdalesio" or "01. Summerland — Aaron Nagel @aaronnagel"
+const HL_BY = /^\s*(\d{1,2})\s*[.)]\s*(.+?)\s+by\s+(.+?)(?:\s+(@[\w.]+))?\s*$/i;
+const HL_DASH = /^\s*(\d{1,2})\s*[.)]\s*(.+)\s+[—–-]\s+(.+?)(?:\s+(@[\w.]+))?\s*$/;
+const HL_HEAD = {test: l => HL_BY.test(l) || HL_DASH.test(l)};
+const hlHead = l => l.match(HL_BY) || l.match(HL_DASH);
 const HL_GO = /^(Follow (him|her|them)|Give (him|her|them) a follow|Go (find|follow|see|spend|look)\b|Find (him|her|them)\b|Stay a while|Check out)/i;
 function parseHeartList(raw, images, title){
   const lines = String(raw || '').replace(/\r/g, '').split('\n').map(l => l.replace(/\s+/g, ' ').trim());
@@ -93,19 +97,22 @@ function parseHeartList(raw, images, title){
   const flush = () => { if (buf.length) paras.push(buf.join(' ').trim()); buf = []; };
   lines.forEach(l => { if (!l) return flush(); if (HL_HEAD.test(l) && l.length < 160) { flush(); paras.push(l); flush(); } else buf.push(l); }); flush();
   const works = []; const intro = []; let cur = null; const outro = [];
-  for (const p of paras) { const m = p.match(HL_HEAD);
+  for (const p of paras) { const m = hlHead(p);
     if (m && p.length < 160) { cur = {n: +m[1], title: m[2].replace(/^[“"']|[”"']$/g, '').trim(), artist: m[3].trim(), handle: m[4] || '', body: [], close: ''}; works.push(cur); continue; }
     if (!cur) { intro.push(p); continue; }
     if (cur.close) { outro.push(p); continue; }
     const isCap = p.length < 160 && cur.handle && p.includes(cur.handle) && / by /.test(p); if (isCap) continue;
-    if (HL_GO.test(p) || /^(His|Her|Their) (page|whole page|work|paintings?)\b/.test(p) && cur.body.length) { cur.close = p; continue; }
+    if (cur.body.length && (HL_GO.test(p) || /^(His|Her|Their) (page|whole page|work|paintings?)\b/.test(p) || /\bLink below\.?$/i.test(p))) { cur.close = p; continue; }
     cur.body.push(p); }
   const sent = t => (String(t).match(/[^.!?]+[.!?]+["”’]?/g) || [String(t)]).map(s => s.trim()).filter(Boolean);
   works.forEach(w => {
-    const rest = sent(w.close).filter(s => !HL_GO.test(s)).join(' ');
+    const rest = sent(w.close).filter(s => !HL_GO.test(s) && !/^Link below\.?$/i.test(s)).join(' ').replace(/\s+go (give|follow|explore|see|find)\b.*$/i, '.').replace(/\.\.$/, '.');
     let line = rest;
     if (!line && w.body[0]) { const first = sent(w.body[0])[0] || ''; const m = first.match(/,\s*and\s+(it\s+.+)$/i); line = m ? m[1].charAt(0).toUpperCase() + m[1].slice(1) : ''; }
-    w.line = line.replace(/,?\s+so (go|do) .+$/i, '.').replace(/\s+/g, ' ').trim();
+    line = line.replace(/,?\s+so (go|do) .+$/i, '.').replace(/\s+/g, ' ').trim();
+    // a cut that leaves a dangling end ("…but we’d rather you just.") falls back to the clause before "but"
+    if (/\b(you|just|to|and|but|we|rather|the|a)\.$/i.test(line)) line = /\s+but\s+/.test(line) ? line.replace(/,?\s+but\s+.*$/, '.') : '';
+    w.line = line;
     if (!w.handle) { const h = w.body.join(' ').match(/@[\w.]{3,}/); if (h) w.handle = h[0]; }
     // what the work does: "…, and it feels like a fairytale" → "Peace Offering feels like a fairytale"
     const ss = sent(w.body[0] || ''); let hook = '';
@@ -118,10 +125,13 @@ function parseHeartList(raw, images, title){
     w.about = ab.replace(/\s+/g, ' ').trim(); });
   // the open call the article plugs at the end
   const all = paras.join('\n');
-  const cp = paras.find(p => /(award|open call|prize|residency)/i.test(p) && /(open|until|deadline|closes|apply)/i.test(p) && p.length < 900) || '';
+  const cp = paras.find(p => /(award|open call|prize|residency)/i.test(p) && /(open|until|deadline|closes|apply|submit|days left)/i.test(p) && p.length < 900) || '';
   const callName = (cp.match(/((?:The\s+)?[A-Z][\w’'&]*(?:\s+(?:of|the|for|and|in|[A-Z0-9][\w’'&]*)){0,7}\s+(?:Award|Prize|Open Call|Residency)(?:\s+\d{4})?)/) || [])[1] || '';
   const until = (cp.match(/(?:until|by|before|deadline:?|closes(?: on)?)\s+((?:January|February|March|April|May|June|July|August|September|October|November|December)\s+\d{1,2})/i) || [])[1] || '';
-  const call = callName ? `${/^The /.test(callName) ? '' : 'The '}${callName.trim()} is open${until ? ' until ' + until : ' now'}.` : '';
+  const lower = !callName && (cp.match(/((?:[A-Z0-9][\w’'&]*)(?:\s+(?:of|the|for|and|in|[A-Z0-9][\w’'&]*)){0,7})\s+open call/) || [])[1];
+  const left = (cp.match(/(\d{1,3})\s+days?\s+left/i) || [])[1];
+  const name = callName || (lower ? lower + ' open call' : '');
+  const call = name ? `${/^The /.test(name) ? '' : 'The '}${name.trim()} is open${until ? ' until ' + until : left ? `, with ${left} days left to submit` : ' now'}.` : '';
   // pictures: each work gets the image whose caption names it; otherwise the next unused one in order
   const used = new Set(); const fold = s => String(s || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[^a-z0-9@]/g, '');
   const imgs = (images || []).filter(im => im && im.url && !(im.w && im.h && im.w / im.h > 2.4));
@@ -158,7 +168,7 @@ DPACK.heartlist = p => {
   const cap = `${f.hook || `The Heart List: ${sub.charAt(0).toLowerCase() + sub.slice(1)}`}\n\n${works.map(w => `${w.title} by ${w.artist}${w.handle ? ' ' + w.handle : ''}${w.hook ? '\n' + w.hook : w.line ? '\n' + w.line : ''}`).join('\n\n')}\n\nWho should be on next week's list? Tag your favourite artist in the comments, so we can feature them. And give these ${n > 1 ? HL_NUM[n] ? HL_NUM[n].toLowerCase() : n : 'one'} a follow: thirty seconds from you can carry an artist through a week of doubt.\n\nComment ${key} and we'll send you the full Heart List, with more about every artist and their work. Or read it through the link in bio.\n\nWant your work on next week's list? ${f.call || 'Apply through the link in bio.'}\n\n${tags}`.replace(/\n{3,}/g, '\n\n');
   const SINGLES = works.map((w, i) => ({...HLT.single({w, img: arts[i] || '', slot: 'arts' + i}), label: 'Single ' + (i + 1)}));
   const ST = [
-    {...IV.story({dark: true, mono: true, label: 'The Heart List', text: `Top ${n} artists on our Heart List this week`, sub: '', zone: 'Link sticker: the carousel'}), label: 'Story 1'},
+    {...IV.story({dark: true, mono: true, label: 'The Heart List', text: `Top ${n || 5} artists on our Heart List this week`, sub: '', zone: 'Link sticker: the carousel'}), label: 'Story 1'},
     ...works.map((w, i) => ({...IV.story({img: arts[i] || '', slot: 'arts' + i, label: 'The Heart List', text: esc(w.artist), sub: esc(`${w.handle ? w.handle + ' · ' : ''}${w.title}`), zone: 'Mention sticker: tag the artist'}), label: 'Story ' + (i + 2)})),
     {...IV.story({dark: true, label: 'Your turn', text: 'Tag your favourite artist, so we can feature them', sub: `Comment ${esc(key)} on the post for the full Heart List.`, zone: 'Question sticker: “Who should we feature next?”'}), label: 'Story ' + (n + 2)},
   ];

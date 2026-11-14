@@ -891,7 +891,7 @@ async function ivSavePics(id, pics){
   const worker = async () => { while (todo.length) { const u = todo.shift(); const g = await grabImage(u); done++; if (g.saved) { kept++; swap(u, g.url); saveDaily(id); if (IVSEL === id) render(); } note(); } };
   await Promise.all([worker(), worker(), worker(), worker()]);
 }
-async function ivImportRun({url, text, file, rebuild, html, files, pics}){ const msg = (t, err) => { const m = $('ivMsg'); if (m) { m.textContent = t; m.className = 'ivmsg' + (err ? ' err' : ''); } status(t); };
+async function ivImportRun({url, text, file, rebuild, html, files, pics}){ const o_pics = pics || []; const msg = (t, err) => { const m = $('ivMsg'); if (m) { m.textContent = t; m.className = 'ivmsg' + (err ? ' err' : ''); } status(t); };
   let page = {title: '', text: text || '', images: [], ai: null};
   if (rebuild) { page = {title: rebuild.f.srcTitle || '', text: rebuild.f.srcText || '', images: [], ai: null}; try { const r = await fetch('api/article', {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({text: page.text, kind: IVK})}); const j = await r.json().catch(() => ({})); if (r.ok) { page.ai = j.ai; page.aiError = j.aiError; } } catch {} }
   if (html || (files && files.length)) { const art = html ? htmlToArticle(html) : {title: '', text: '', headings: [], images: []};
@@ -915,10 +915,11 @@ async function ivImportRun({url, text, file, rebuild, html, files, pics}){ const
   if (!page.text || page.text.length < 500) { msg('That did not have the article text. Open the article, press Ctrl+A then Ctrl+C, and paste it in the box.', true); return; }
   const remoteNote = page.remote ? ` ${page.remote} picture${page.remote > 1 ? 's' : ''} could not be saved to the studio and load${page.remote > 1 ? '' : 's'} from the website. If a download comes out blank, add ${page.remote > 1 ? 'them' : 'it'} again from your computer.` : '';
   if (IVK === 'heartlist') { const h = parseHeartList(page.text, page.images || [], page.title);
-    if (!h.works.length) { msg('Could not find the works. Each one needs a heading like “1. Title by Artist @handle”. You can type them under The list.', true); }
+
     const cur = DPOSTS[IVSEL]; const p = IVSEL !== 'demo' && cur && cur.cat === 'heartlist' && (html || !Object.values(cur.f || {}).some(Boolean)) ? cur : DPOSTS[dNew(isoD(new Date()), 's1', 'heartlist')]; IV_LAST = p.id;
     p.f = {...heartlistFields(h), srcText: page.text, srcTitle: page.title || '', url: url ? url.replace(/^https?:\/\//, '').replace(/\/$/, '') : '', src: url || ''};
     p.imgs = {arts: h.works.map(w => w.img || '')}; saveDaily(p.id); IV_OPEN.add('The list'); ivSelect(p.id);
+    if (!h.works.length) { o_pics.length = 0; msg('Could not find the works in what you pasted. Each one needs a heading like “1. Title by Artist @handle” or “01. Title — Artist @handle”. You can type them under The list.', true); return; }
     const got = h.works.filter(w => w.img).length, miss = h.works.length - got;
     if (h.works.length) msg(`Built the Heart List: ${h.works.length} works, ${got} with their picture${h.call ? ', and the open call from the end of the article' : ''}. Read each “one line” aloud: it is the line that makes people follow.${miss ? ` ${miss} picture${miss > 1 ? 's are' : ' is'} missing: add ${miss > 1 ? 'them' : 'it'} under The list, in the same order.` : ''}${remoteNote}`);
     return; }
