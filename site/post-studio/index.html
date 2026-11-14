@@ -63,6 +63,7 @@ summary{font:600 12px/1 var(--mono);letter-spacing:.1em;text-transform:uppercase
 .frame.tall{height:calc(var(--pw) * 1.7778)}
 .group{margin-bottom:34px}
 .canva{display:flex;gap:10px;align-items:center;margin-top:12px}.canva .btn{padding:9px 14px;font-size:13px;text-decoration:none}.cmiss{font-size:13px;color:var(--muted)}
+.acts{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}.hint{font-size:13px;color:var(--muted);margin:0 0 10px;line-height:1.45}
 .capbox{max-width:720px;margin-top:10px;border-top:1px solid var(--line)}
 .cell .act{display:flex;justify-content:space-between;align-items:center;font-size:12px;color:var(--muted);width:var(--pw)}
 .cell .act button{font:600 12px/1 var(--sans);border:1px solid var(--line);background:var(--panel);color:var(--ink);border-radius:8px;padding:6px 9px;cursor:pointer}
@@ -174,7 +175,16 @@ summary{font:600 12px/1 var(--mono);letter-spacing:.1em;text-transform:uppercase
     </div>
   </details>
 
-  <details><summary>Images and past artists</summary>
+  <details open><summary>Images and past artists</summary>
+    <p class="hint">Month artworks: these five images run through the whole 30 days. Upload one and every post using it updates. To change a single slide, use "Change photo" under that slide.</p>
+    <div class="row2">
+      <div class="f"><label for="imgArt1">Month artwork 1</label><div class="img-in"><span class="th" id="th-imgArt1"></span><input id="imgArt1" type="file" accept="image/*"></div></div>
+      <div class="f"><label for="imgArt2">Month artwork 2</label><div class="img-in"><span class="th" id="th-imgArt2"></span><input id="imgArt2" type="file" accept="image/*"></div></div>
+      <div class="f"><label for="imgArt3">Month artwork 3</label><div class="img-in"><span class="th" id="th-imgArt3"></span><input id="imgArt3" type="file" accept="image/*"></div></div>
+      <div class="f"><label for="imgArt4">Month artwork 4</label><div class="img-in"><span class="th" id="th-imgArt4"></span><input id="imgArt4" type="file" accept="image/*"></div></div>
+      <div class="f"><label for="imgArt5">Month artwork 5</label><div class="img-in"><span class="th" id="th-imgArt5"></span><input id="imgArt5" type="file" accept="image/*"></div></div>
+    </div>
+    <p class="hint" style="margin-top:14px">Launch carousel and page photos:</p>
     <div class="f"><label for="imgCover">Cover artwork</label><div class="img-in"><span class="th" id="th-imgCover"></span><input id="imgCover" type="file" accept="image/*"></div></div>
     <div class="f"><label for="credit">Cover credit</label><input id="credit" placeholder="Artist name, Title"></div>
     <div class="f"><label for="imgTheme">Theme artwork</label><div class="img-in"><span class="th" id="th-imgTheme"></span><input id="imgTheme" type="file" accept="image/*"></div></div>
@@ -265,13 +275,14 @@ const PRESETS = {
   },
   'New call (blank)': { series:'', edition:'', editionLabel:'', name:'', keyword:'', selected:'', coverLine:'', quote:'', submit:'', theme:'', themeWork:'work', themeLine:'', juryLooks:'', kinds:'', pastEds:'', jury:'', images:{} },
 };
-const IMGKEYS = ['imgCover','imgTheme','imgBooks','imgSpread','imgA1','imgA2'];
+const IMGKEYS = ['imgCover','imgTheme','imgBooks','imgSpread','imgA1','imgA2','imgArt1','imgArt2','imgArt3','imgArt4','imgArt5'];
+const thumbOf = k => state.images[k] || (/^imgArt\d$/.test(k) ? ART_DEFAULT[+k.slice(6) - 1] : '');
 const FIELDS = Object.keys(DEFAULTS).filter(k => k !== 'colour');
 const DEFAULT_IMAGES = { imgCover:'art/flower-portrait.jpg', imgTheme:'art/night-bloom.jpg' };
 let state = {...DEFAULTS, images:{...DEFAULT_IMAGES}};
 
 // ---------- form ----------
-function fillForm(){ FIELDS.forEach(k => { if ($(k)) $(k).value = state[k] ?? ''; }); renderColours(); IMGKEYS.forEach(k => { $('th-'+k).style.backgroundImage = state.images[k] ? `url(${state.images[k]})` : ''; }); }
+function fillForm(){ FIELDS.forEach(k => { if ($(k)) $(k).value = state[k] ?? ''; }); renderColours(); IMGKEYS.forEach(k => { const t = thumbOf(k); $('th-'+k).style.backgroundImage = t ? `url(${t})` : ''; }); }
 function readForm(){ FIELDS.forEach(k => { if ($(k)) state[k] = $(k).value; }); }
 function renderColours(){
   $('colours').innerHTML = Object.entries(COLOURS).map(([n,c]) => `<button type="button" title="${n}" aria-label="${n}" aria-pressed="${state.colour.toLowerCase()===c.toLowerCase()}" data-c="${c}"><span style="background:${c}"></span><span style="background:${tint(c)}"></span></button>`).join('')
@@ -282,14 +293,27 @@ function renderColours(){
 }
 IMGKEYS.forEach(k => $(k).addEventListener('change', e => {
   const file = e.target.files[0]; if (!file) return;
-  const r = new FileReader(); r.onload = () => { state.images[k] = r.result; $('th-'+k).style.backgroundImage = `url(${r.result})`; render(); }; r.readAsDataURL(file);
+  shrink(file).then(url => { state.images[k] = url; $('th-'+k).style.backgroundImage = `url(${url})`; render(); status('Image added. Press "Save call" to keep it.'); });
 }));
+// keep uploads light: longest side 1600px, JPEG
+function shrink(file){ return new Promise(res => { const r = new FileReader(); r.onload = () => { const im = new Image(); im.onload = () => {
+  const s = Math.min(1, 1600 / Math.max(im.width, im.height)); const c = document.createElement('canvas'); c.width = Math.round(im.width * s); c.height = Math.round(im.height * s);
+  c.getContext('2d').drawImage(im, 0, 0, c.width, c.height); res(c.toDataURL('image/jpeg', .88)); }; im.onerror = () => res(r.result); im.src = r.result; }; r.readAsDataURL(file); }); }
+// images are kept in IndexedDB (browser storage is too small for photos)
+const IDB = () => new Promise((res, rej) => { const q = indexedDB.open('athStudio', 1); q.onupgradeneeded = () => q.result.createObjectStore('images'); q.onsuccess = () => res(q.result); q.onerror = () => rej(q.error); });
+async function idbSet(key, val){ const db = await IDB(); return new Promise((res, rej) => { const t = db.transaction('images', 'readwrite'); t.objectStore('images').put(val, key); t.oncomplete = res; t.onerror = () => rej(t.error); }); }
+async function idbGet(key){ const db = await IDB(); return new Promise(res => { const q = db.transaction('images').objectStore('images').get(key); q.onsuccess = () => res(q.result); q.onerror = () => res(undefined); }); }
 function loadSaved(){ try { return JSON.parse(localStorage.getItem('athStudioCalls2') || '{}'); } catch { return {}; } }
 function refreshSaved(){ const s = loadSaved(); $('saved').innerHTML = '<option value="">Choose a saved call</option>' + Object.keys(s).map(n => `<option>${esc(n)}</option>`).join(''); }
-$('saved').onchange = () => { const s = loadSaved(); const v = $('saved').value; state = v && s[v] ? {...DEFAULTS, ...s[v], images: s[v].images || {}} : {...DEFAULTS, images:{...DEFAULT_IMAGES}}; fillForm(); render(); };
-$('saveCall').onclick = () => { readForm(); const s = loadSaved(); const key = state.name || 'Call'; s[key] = state;
-  try { localStorage.setItem('athStudioCalls2', JSON.stringify(s)); status('Saved "' + key + '" in this browser.'); }
-  catch { s[key] = {...state, images:{}}; try { localStorage.setItem('athStudioCalls2', JSON.stringify(s)); status('Saved without images (too large for browser storage).'); } catch { status('Could not save in this browser.'); } }
+$('saved').onchange = async () => { const s = loadSaved(); const v = $('saved').value; let imgs = {};
+  if (v && s[v]) { try { imgs = await idbGet('call:' + v) || {}; } catch {} }
+  state = v && s[v] ? {...DEFAULTS, ...s[v], images: {...(s[v].images || {}), ...imgs}} : {...DEFAULTS, images:{...DEFAULT_IMAGES}}; fillForm(); render(); };
+$('saveCall').onclick = async () => { readForm(); const s = loadSaved(); const key = state.name || 'Call';
+  const files = {}, paths = {}; Object.entries(state.images).forEach(([k, v]) => (String(v).startsWith('data:') ? files : paths)[k] = v);
+  s[key] = {...state, images: paths}; let imgOk = true;
+  try { await idbSet('call:' + key, files); } catch { imgOk = false; }
+  try { localStorage.setItem('athStudioCalls2', JSON.stringify(s)); status(imgOk ? 'Saved "' + key + '" with its images in this browser.' : 'Saved "' + key + '" but the images could not be stored in this browser.'); }
+  catch { status('Could not save in this browser.'); }
   refreshSaved(); $('saved').value = key; };
 
 // ---------- helpers ----------
@@ -485,10 +509,14 @@ function render(){
       groups.push({title: `${postDate(p.left)} · ${p.title}`, meta: `${p.kind} · ${slides.length} slide${slides.length>1?'s':''} · ${p.left === 0 ? 'deadline day' : p.left + ' days left'} · ${VERB} “${KW()}”`, slides: slides.map((s,j) => ({...s, title: s.title || (p.title.toLowerCase().replace(/[^a-z0-9]+/g,'-') + (slides.length>1 ? '-'+(j+1) : ''))})), cap, pin, left:p.left, idx:pi});
       VERB = 'DM'; });
   }
+  groups.forEach(g => { const t = g.title.replace(/^[^·]*·\s*/, ''); g.slides = g.slides.map((s, j) => { const o = state.images['ov|' + t + '|' + j];
+    return o && s.html ? {...s, html: s.html.replace(/background-image:url\([^)]*\)/, 'background-image:url(' + o + ')')} : s; }); });
   RENDERED = [];
   $('out').innerHTML = groups.map((g,gi) => {
     const cells = g.slides.map((s,j) => { const i = RENDERED.push({ s, name: `${base}-${g.left !== undefined ? String(g.idx+1).padStart(2,'0')+'-' : 'story-'}${String(j+1).padStart(2,'0')}-${s.title}.png` }) - 1;
-      return `<div class="cell"><div class="frame${s.h ? ' tall' : ''}">${slideNode(s)}</div><div class="act"><span>${g.slides.length>1 ? 'Slide ' + (j+1) : 'Single'}</span><button type="button" data-i="${i}">Save PNG</button></div></div>`; }).join('');
+      const hasImg = /background-image:url\(/.test(s.html || ''); const okey = 'ov|' + g.title.replace(/^[^·]*·\s*/, '') + '|' + j; const has = !!state.images[okey];
+      const photoBtns = hasImg ? `<button type="button" data-ph="${esc(okey)}">${has ? 'Change photo' : 'Change photo'}</button>${has ? `<button type="button" data-phx="${esc(okey)}">Reset</button>` : ''}` : '';
+      return `<div class="cell"><div class="frame${s.h ? ' tall' : ''}">${slideNode(s)}</div><div class="act"><span>${g.slides.length>1 ? 'Slide ' + (j+1) : 'Single'}</span><span class="acts">${photoBtns}<button type="button" data-i="${i}">Save PNG</button></span></div></div>`; }).join('');
     const capBox = g.cap ? `<details class="capbox"><summary>Caption and pinned comment</summary><div class="f"><textarea id="cap${gi}" style="min-height:220px">${esc(g.cap)}</textarea></div><div class="f"><label>Pinned comment</label><input value="${esc(g.pin)}"></div><button class="btn ghost" type="button" data-cap="cap${gi}" style="margin-top:8px">Copy caption</button></details>` : '';
     const ckey = (state.name || '') + ' | ' + g.title.replace(/^[^·]*·\s*/, '');
     const clink = canvaLink(ckey);
@@ -497,6 +525,9 @@ function render(){
       : `<span class="cmiss">Canva source file: not linked yet</span><button class="btn ghost" type="button" data-cedit>Add Canva link</button>`}</div>` : '';
     return `<section class="group"><h2>${esc(g.title)}</h2><p class="meta">${esc(g.meta)}</p><div class="slides">${cells}</div>${canvaRow}${capBox}</section>`; }).join('');
   $('out').querySelectorAll('[data-i]').forEach(b => b.onclick = () => saveOne(Number(b.dataset.i)));
+  $('out').querySelectorAll('[data-ph]').forEach(b => b.onclick = () => { const inp = document.createElement('input'); inp.type = 'file'; inp.accept = 'image/*';
+    inp.onchange = () => { const file = inp.files[0]; if (!file) return; shrink(file).then(url => { state.images[b.dataset.ph] = url; render(); status('Photo changed. Press "Save call" to keep it.'); }); }; inp.click(); });
+  $('out').querySelectorAll('[data-phx]').forEach(b => b.onclick = () => { delete state.images[b.dataset.phx]; render(); });
   $('out').querySelectorAll('[data-cap]').forEach(b => b.onclick = async () => { const t = $(b.dataset.cap); try { await navigator.clipboard.writeText(t.value); status('Caption copied.'); } catch { t.select(); status('Selected: press copy.'); } });
   $('out').querySelectorAll('[data-cedit]').forEach(b => b.onclick = () => { const k = b.parentElement.dataset.ckey;
     const v = prompt('Paste the Canva edit link for:\n' + k, canvaLink(k) || ''); if (v === null) return;

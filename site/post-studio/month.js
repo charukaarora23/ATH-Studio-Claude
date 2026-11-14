@@ -25,7 +25,9 @@ const isAwardStyle = () => state.style === 'award';
 const callBtn = () => `<span style="display:inline-flex;align-items:center;gap:16px;height:64px;padding:0 10px 0 28px;border-radius:999px;background:${state.colour};color:${WHITE}">
   <span class="cn" style="font-size:19px">Open call · ${esc(state.name)}</span>
   <span style="width:46px;height:46px;border-radius:50%;background:${WHITE};color:${state.colour};display:inline-flex;align-items:center;justify-content:center"><svg width="22" height="10" viewBox="0 0 46 20"><path d="M2 10h40M33 2l9 8-9 8" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/></svg></span></span>`;
-const ART = ['art/flower-portrait.jpg','art/night-bloom.jpg','art/call-garden.jpg','art/ref-reid.jpg','art/ref-dahlias.jpg'];
+const ART_DEFAULT = ['art/flower-portrait.jpg','art/night-bloom.jpg','art/call-garden.jpg','art/ref-reid.jpg','art/ref-dahlias.jpg'];
+// the five month artworks: an uploaded "Month artwork N" replaces the sample everywhere it is used
+const ART = new Proxy(ART_DEFAULT, { get(t, k){ if (typeof k === 'string' && /^\d+$/.test(k)) { const u = (typeof state !== 'undefined' && state.images && state.images['imgArt' + (+k + 1)]); return u || t[k]; } return t[k]; } });
 // simple line icons for teaching slides
 const ICON = {
   sun:'<circle cx="60" cy="60" r="22"/><path d="M60 14v14M60 92v14M14 60h14M92 60h14M27 27l10 10M83 83l10 10M27 93l10-10M83 37l10-10"/>',
