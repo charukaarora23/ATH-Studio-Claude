@@ -10,77 +10,86 @@ const edFoot = (last) => `<p class="a" style="left:72px;bottom:60px;${T_REG};fon
   ${last ? '' : `<div class="a" style="right:72px;bottom:46px;width:56px;height:56px;border-radius:50%;background:${EDC.burg};display:flex;align-items:center;justify-content:center;${T_MED};font-size:28px;color:#FFFFFF">&rarr;</div>`}`;
 const edSize = (t, big, mid, small) => t.length > 64 ? small : t.length > 38 ? mid : big;
 
-// Concept: advice hung like a show. Every piece of advice is set as the wall label of a real artwork by an ATH artist,
-// so the post stops people with the work, gives them one thing to do, and credits the artist (who reshares it).
-const edLabelCredit = c => { const [who, t, y] = (c || []).map(x => String(x || '').trim()); return who ? `${esc(who)}${t ? `, <i style="${BASK};font-style:italic">${esc(t)}</i>` : ''}${y ? ', ' + esc(y) : ''}` : ''; };
+// Look: bold, conversational, editorial. Five devices, alternated so no two slides in a row look the same:
+// big Rose type on Night · a Burgundy card over an artwork · marker highlights in a serif paragraph ·
+// the ticket card · highlight boxes on a Chilli ground. Brand palette and the two brand typefaces only.
+const EP = {night: '#52051A', burg: '#6A0620', rose: '#FFA1C2', peony: '#FAD2E1', cream: '#F9EEE5', ink: '#1C1310', chilli: '#AA0003', ballet: '#FFD6DE', lemon: '#FFF3B2'};
+const mark = (t, bg = EP.lemon) => `<span style="background:${bg};-webkit-box-decoration-break:clone;box-decoration-break:clone;padding:0 .12em;border-radius:4px">${t}</span>`;
+const hl = (text, phrase, bg) => { const t = esc(text); const p = esc(phrase || ''); return p && t.includes(p) ? t.replace(p, mark(p, bg)) : t; };
+const edCorner = (fg) => `<p class="a cn" style="left:52px;top:48px;color:${fg}">Arts to Hearts Project</p>`;
+const edHandle = (fg, op = .8) => `<p class="a" style="left:72px;bottom:60px;${T_REG};font-size:24px;color:${fg};opacity:${op}">@artstoheartsproject</p>`;
+const arrowDot = (bg, fg, size = 150) => `<span style="display:inline-flex;vertical-align:.08em;align-items:center;justify-content:center;width:${size}px;height:${size}px;border-radius:50%;background:${bg};margin-right:.18em"><svg width="${size * .34}" height="${size * .34}" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7" fill="none" stroke="${fg}" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span>`;
+const swipePill = (bg, fg) => `<div class="a" style="left:0;right:0;bottom:120px;display:flex;justify-content:center"><div style="display:flex;align-items:center"><span style="width:84px;height:84px;border-radius:50%;border:2px solid ${bg};display:flex;align-items:center;justify-content:center;margin-right:-10px"><svg width="30" height="30" viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7" fill="none" stroke="${bg}" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span style="height:84px;padding:0 44px;border-radius:999px;background:${bg};color:${fg};display:flex;align-items:center;${T_MED};font-size:36px">Swipe to find out</span></div></div>`;
+const splitHalf = t => { const w = String(t).split(' '); const k = Math.ceil(w.length / 2); return [w.slice(0, k).join(' '), w.slice(k).join(' ')]; };
 const EDT = {
-  // Cover A: the artwork fills the slide, the question in the artist's own voice
-  coverArt(o){ return {bg: EDC.ink, html: `${ivArt(o.img, 'inset:0', o.slot, 'cover')}<div class="a" style="inset:0;background:rgba(20,9,12,.34)"></div>${ivMono('white', 'right:52px;top:36px;width:112px;height:63px')}
-    <div class="a" style="left:72px;right:72px;bottom:150px;display:flex;flex-direction:column;gap:24px">
-      <p class="cn" style="color:#FFFFFF">ATH Editorial</p>
-      <p style="${BASK};font-size:${o.q.length > 46 ? 70 : 84}px;line-height:1.12;color:#FFFFFF">&ldquo;${esc(o.q)}&rdquo;</p>
-      <p style="${T_REG};font-size:32px;line-height:1.35;color:#FFFFFF">${esc(o.sub)}</p></div>
-    <p class="a" style="left:72px;bottom:60px;${T_REG};font-size:24px;color:#FFFFFF;opacity:.85">@artstoheartsproject</p>`}; },
-  // Cover B: the question set large on Cream, the work small beside it
-  coverType(o){ return {bg: EDC.cream, html: `${ivMono('burgundy', 'right:52px;top:36px;width:112px;height:63px')}
-    <div class="a" style="left:72px;right:72px;top:230px;display:flex;flex-direction:column;gap:30px">
-      <p class="cn" style="color:${EDC.burg}">ATH Editorial</p>
-      <p style="${BASK};font-size:${o.q.length > 46 ? 86 : 104}px;line-height:1.08;color:${EDC.ink}">&ldquo;${esc(o.q)}&rdquo;</p>
-      <p style="${T_REG};font-size:32px;line-height:1.35;color:${EDC.ink}">${esc(o.sub)}</p></div>
-    ${o.img ? ivArt(o.img, 'right:72px;bottom:130px;width:300px;height:300px', o.slot) : ''}
-    <p class="a" style="left:72px;bottom:60px;${T_REG};font-size:24px;color:${EDC.ink};opacity:.8">@artstoheartsproject</p>`}; },
-  // The opening: the problem in plain words, no label
-  open(o){ return {bg: EDC.cream, html: `${edBrand()}
-    <p class="a" style="left:72px;right:72px;top:230px;${BASK};font-size:${o.text.length > 200 ? 54 : 62}px;line-height:1.28;color:${EDC.ink}">${esc(o.text)}</p>
-    <p class="a" style="left:72px;right:72px;bottom:150px;${T_MED};font-size:32px;color:${EDC.burg}">Here is what we tell them &rarr;</p>${edFoot()}`}; },
-  // A piece of advice as the label of a work: the work whole on Cream, the label set under it
-  label(o){ if (!o.img) return EDT.plain(o); return {bg: EDC.cream, html: `${edBrand()}${ivArt(o.img, 'left:72px;right:72px;top:120px;height:700px', o.slot)}
-    <div class="a" style="left:72px;right:72px;top:860px;display:flex;flex-direction:column;gap:16px">
-      <p style="${T_MED};font-size:${o.title.length > 34 ? 52 : 60}px;line-height:1.02;letter-spacing:-.025em;color:${EDC.ink}">${esc(o.title)}</p>
-      ${o.how ? `<p style="${BASK};font-size:${o.how.length > 130 ? 30 : 34}px;line-height:1.38;color:${EDC.ink}">${esc(o.how)}</p>` : ''}
-      ${o.credit ? `<p style="${T_REG};font-size:22px;line-height:1.35;color:${EDC.soft};margin-top:4px">Shown: ${edLabelCredit(o.credit)}</p>` : ''}</div>${edFoot()}`}; },
-  // When there is no artwork for a piece of advice: the advice alone, set like a pull quote
-  plain(o){ return {bg: EDC.cream, html: `${edBrand()}
-    <div class="a" style="left:72px;right:72px;top:250px;display:flex;flex-direction:column;gap:34px">
-      <p style="${T_MED};font-size:${o.title.length > 34 ? 82 : 96}px;line-height:.98;letter-spacing:-.035em;color:${EDC.ink}">${esc(o.title)}</p>
-      ${o.how ? `<p style="${BASK};font-size:44px;line-height:1.34;color:${EDC.ink}">${esc(o.how)}</p>` : ''}</div>${edFoot()}`}; },
-  // The habit to drop, struck through, and what to do instead
-  instead(o){ return {bg: EDC.cream, html: `${edBrand()}
-    <div class="a" style="left:72px;right:72px;top:220px;display:flex;flex-direction:column;gap:44px">
-      <p style="${BASK};font-style:italic;font-size:${o.bad.length > 90 ? 50 : 60}px;line-height:1.25;color:rgba(28,19,16,.45);text-decoration:line-through;text-decoration-color:${EDC.burg};text-decoration-thickness:4px">&ldquo;${esc(o.bad)}&rdquo;</p>
-      <p style="${T_MED};font-size:${o.good.length > 90 ? 52 : 62}px;line-height:1.06;letter-spacing:-.025em;color:${EDC.ink}">${esc(o.good)}</p></div>${edFoot()}`}; },
-  // The whole guide in one sentence you could say to a friend
-  short(o){ return {bg: EDC.cream, html: `${edBrand()}
-    <p class="a" style="left:72px;top:200px;${T_MED};font-size:26px;letter-spacing:.12em;text-transform:uppercase;color:${EDC.burg}">The short version</p>
-    <p class="a" style="left:72px;right:72px;top:270px;${BASK};font-size:${o.text.length > 220 ? 50 : 58}px;line-height:1.3;color:${EDC.ink}">${esc(o.text)}</p>
-    <p class="a" style="left:72px;right:72px;bottom:150px;${T_REG};font-size:30px;color:${EDC.ink}">Save this for the next time someone asks.</p>${edFoot()}`}; },
-  cta(o){ return {bg: EDC.cream, html: `${edBrand()}
-    <div class="a" style="left:72px;right:72px;top:240px;display:flex;flex-direction:column;gap:16px">
-      <p style="${BASK};font-size:58px;line-height:1.24;color:${EDC.ink}">${esc(o.head)}</p>
-      <p style="${BASK};font-style:italic;font-size:54px;color:${EDC.ink};margin-top:70px">Comment</p>
-      <p style="${T_MED};font-size:${o.key.length > 8 ? 150 : 190}px;line-height:.9;letter-spacing:-.05em;color:${EDC.burg}">${esc(o.key)}</p>
-      <p style="${T_REG};font-size:32px;line-height:1.4;color:${EDC.ink};margin-top:30px">${esc(o.offer)}</p></div>${edFoot()}`}; },
-  end(o){ return {bg: EDC.burg, html: `${ivMono('peony', 'left:390px;width:300px;top:250px;height:170px')}
+  // Cover A: the question, huge, Rose on Night, opened by the round arrow
+  coverHook(o){ const q = o.q; const sz = q.length > 44 ? 112 : q.length > 30 ? 132 : 150;
+    return {bg: EP.night, html: `${ivMono('peony', 'right:52px;top:36px;width:112px;height:63px')}
+      <p class="a" style="left:96px;right:80px;top:150px;${T_MED};font-size:${sz}px;line-height:1.02;letter-spacing:-.035em;color:${EP.rose}">${arrowDot(EP.rose, EP.night, Math.round(sz * 1.05))}${esc(q)}</p>
+      ${swipePill(EP.rose, EP.night)}`}; },
+  // Cover B: a Burgundy card over the artwork, the question split above and below a small line
+  coverCard(o){ const [a, b] = splitHalf(o.q); const sz = o.q.length > 40 ? 70 : 84;
+    return {bg: EP.ink, html: `${ivArt(o.img, 'inset:0', o.slot, 'cover')}${ivMono('white', 'right:52px;top:36px;width:112px;height:63px')}
+      <div class="a" style="left:130px;right:130px;top:170px;bottom:190px;border-radius:34px;background:${EP.burg};display:flex;flex-direction:column;justify-content:space-between;align-items:center;text-align:center;padding:64px 48px">
+        <p style="${T_MED};font-size:${sz}px;line-height:.98;letter-spacing:-.02em;text-transform:uppercase;color:${EP.rose}">${esc(a)}</p>
+        <p style="${T_REG};font-size:36px;line-height:1.4;color:${EP.peony};max-width:640px">${esc(o.sub)}</p>
+        <p style="${T_MED};font-size:${sz}px;line-height:.98;letter-spacing:-.02em;text-transform:uppercase;color:${EP.rose}">${esc(b)}</p></div>`}; },
+  // The problem, as a serif paragraph with the sharpest phrase marked
+  open(o){ return {bg: EP.cream, html: `${edCorner(EP.ink)}
+    <p class="a" style="left:72px;right:72px;top:210px;${BASK};font-size:${o.text.length > 200 ? 60 : 68}px;line-height:1.28;color:${EP.ink}">${hl(o.text, o.mark)}</p>${edHandle(EP.ink)}`}; },
+  // Advice as a marked paragraph: the advice itself is highlighted inside the sentence that explains it
+  adviceMark(o){ const text = `${o.title}. ${o.how || ''}`.trim(); return {bg: EP.cream, html: `${edCorner(EP.ink)}
+    <p class="a" style="left:72px;right:72px;top:210px;${BASK};font-size:${text.length > 170 ? 60 : 70}px;line-height:1.26;color:${EP.ink}">${hl(text, o.title + '.')}</p>
+    ${o.credit ? `<p class="a" style="left:72px;right:72px;bottom:120px;${T_REG};font-size:22px;color:${EP.ink};opacity:.6">${edLabelCredit(o.credit)}</p>` : ''}${edHandle(EP.ink)}`}; },
+  // Advice on a Burgundy card over an artwork, the advice split above and below the how
+  adviceCard(o){ if (!o.img) return EDT.adviceMark(o); const [a, b] = splitHalf(o.title); const sz = o.title.length > 34 ? 62 : 74;
+    return {bg: EP.ink, html: `${ivArt(o.img, 'inset:0', o.slot, 'cover')}
+      <div class="a" style="left:130px;right:130px;top:170px;bottom:210px;border-radius:34px;background:${EP.burg};display:flex;flex-direction:column;justify-content:space-between;align-items:center;text-align:center;padding:60px 48px">
+        <p style="${T_MED};font-size:${sz}px;line-height:.98;letter-spacing:-.02em;text-transform:uppercase;color:${EP.rose}">${esc(a)}</p>
+        <p style="${T_REG};font-size:36px;line-height:1.4;color:${EP.peony};max-width:640px">${esc(o.how || '')}</p>
+        <p style="${T_MED};font-size:${sz}px;line-height:.98;letter-spacing:-.02em;text-transform:uppercase;color:${EP.rose}">${esc(b)}</p></div>
+      ${o.credit ? `<p class="a" style="left:130px;right:130px;bottom:120px;${T_REG};font-size:22px;color:#FFFFFF;text-shadow:0 1px 6px rgba(0,0,0,.6)">${edLabelCredit(o.credit)}</p>` : ''}`}; },
+  // The habit to drop: highlight boxes on Chilli, the habit struck through
+  instead(o){ const box = t => `<span style="background:${EP.ballet};-webkit-box-decoration-break:clone;box-decoration-break:clone;padding:2px 10px">${t}</span>`;
+    return {bg: EP.chilli, html: `${edCorner(EP.ballet)}
+      <p class="a" style="left:40px;right:60px;top:170px;${T_MED};font-size:${o.bad.length > 50 ? 70 : 84}px;line-height:1.18;letter-spacing:-.03em;color:${EP.ink}">${box(`<s style="text-decoration-thickness:6px;text-decoration-color:${EP.chilli}">&ldquo;${esc(o.bad)}&rdquo;</s>`)}</p>
+      <p class="a" style="left:40px;right:60px;bottom:170px;${T_MED};font-size:${o.good.length > 80 ? 64 : 76}px;line-height:1.18;letter-spacing:-.03em;color:${EP.ink}">${box(esc(o.good))}</p>`}; },
+  // The short version on a ticket: notches, corner labels, one phrase picked out in white
+  short(o){ return {bg: EP.cream, html: `<div class="a" style="left:60px;right:60px;top:70px;bottom:70px;border-radius:40px;background:${EP.rose}"></div>
+      <div class="a" style="left:470px;width:140px;top:0;height:140px;border-radius:50%;background:${EP.cream}"></div><div class="a" style="left:470px;width:140px;bottom:0;height:140px;border-radius:50%;background:${EP.cream}"></div>
+      <p class="a cn" style="left:120px;top:130px;font-size:18px;color:${EP.night}">The short version</p><p class="a" style="right:120px;top:128px;${T_MED};font-size:22px;color:${EP.night};text-decoration:underline">artstoheartsproject.com</p>
+      <p class="a" style="left:120px;right:120px;top:230px;${BASK};font-size:${o.text.length > 200 ? 56 : 64}px;line-height:1.22;color:${EP.night}">${o.pick && o.text.includes(o.pick) ? esc(o.text).replace(esc(o.pick), `<span style="color:#FFFFFF">${esc(o.pick)}</span>`) : esc(o.text)}</p>
+      <p class="a" style="left:120px;bottom:130px;${T_MED};font-size:22px;color:${EP.night};text-decoration:underline">@artstoheartsproject</p><p class="a cn" style="right:120px;bottom:132px;font-size:18px;color:${EP.night}">Save this</p>`}; },
+  // The ask: the keyword is the headline
+  cta(o){ return {bg: EP.night, html: `${edCorner(EP.peony)}
+    <p class="a" style="left:96px;right:80px;top:200px;${T_MED};font-size:60px;line-height:1.1;letter-spacing:-.02em;color:${EP.peony}">${esc(o.head)}</p>
+    <p class="a" style="left:96px;right:80px;top:470px;${T_MED};font-size:${o.key.length > 8 ? 150 : 180}px;line-height:1;letter-spacing:-.04em;color:${EP.rose}">${arrowDot(EP.rose, EP.night, 150)}${esc(o.key)}</p>
+    <p class="a" style="left:96px;right:120px;top:720px;${T_REG};font-size:40px;line-height:1.35;color:${EP.peony}">Comment the word and we’ll send it to you.</p>
+    <p class="a" style="left:96px;right:120px;bottom:150px;${T_REG};font-size:28px;line-height:1.4;color:${EP.peony};opacity:.85">${esc(o.offer)}</p>${edHandle(EP.peony)}`}; },
+  end(o){ return {bg: EP.burg, html: `${ivMono('peony', 'left:390px;width:300px;top:250px;height:170px')}
     <p class="a c" style="left:110px;right:110px;top:520px;${BASK};font-size:44px;line-height:1.3;color:#F9EEE5">${esc(o.line)}</p>
     ${o.invite ? `<div class="a" style="left:300px;right:300px;top:860px;border-top:1px solid rgba(250,210,225,.35)"></div><p class="a c" style="left:120px;right:120px;top:900px;${T_REG};font-size:32px;line-height:1.4;color:#FAD2E1">${esc(o.invite)}</p>` : ''}
     <p class="a c" style="left:0;right:0;bottom:96px;${T_REG};font-size:28px;color:#FAD2E1">artstoheartsproject.com</p>`}; },
 };
+const edLabelCredit = c => { const [who, t, y] = (c || []).map(x => String(x || '').trim()); return who ? `${esc(who)}${t ? `, <i style="${BASK};font-style:italic">${esc(t)}</i>` : ''}${y ? ', ' + esc(y) : ''}` : ''; };
 
 // ---------- the form ----------
 DCAT.editorial = {name: 'ATH Editorial', marker: '//EDITORIAL', key: 'GUIDE', pack: true, groups: [
   ['Cover', [
-    {k: 'cover', label: 'Cover in use (both are shown, hide the one you skip)', type: 'select', options: [['art', 'A: the artwork fills the slide'], ['type', 'A: the question on Cream']]},
+    {k: 'cover', label: 'Cover in use (both are shown, hide the one you skip)', type: 'select', options: [['hook', 'A: the question, huge, Rose on Night'], ['card', 'A: a Burgundy card over the artwork']]},
     {k: 'question', label: 'The question, in an artist’s own words', type: 'text', ph: 'How should I price my art?'},
     {k: 'sub', label: 'Line under it', type: 'text', ph: 'What we tell artists who ask us this'}]],
   ['The advice', [
-    {k: 'why', label: 'Opening: the problem, said plainly (no label on the slide)', type: 'area'},
+    {k: 'why', label: 'Opening: the problem, said plainly', type: 'area'},
+    {k: 'whymark', label: 'Phrase to highlight in the opening (copy it exactly)', type: 'text'},
     {k: 'steps', label: 'Advice, one per line: the advice as a sentence | one line on how', type: 'lines'},
-    {k: 'imgs', label: 'Artworks to hang the advice on: 1 the cover, then one per piece of advice (from ATH artists)', type: 'imgs'},
+    {k: 'imgs', label: 'Artworks from ATH artists: 1 behind the card cover, then behind every other piece of advice', type: 'imgs'},
     {k: 'credits', label: 'Their credits, same order: Artist | Title | Year', type: 'lines'}]],
   ['Instead of', [
     {k: 'bad', label: 'The habit artists should drop, in their words (struck through)', type: 'text', ph: 'I’ll price it lower so it sells.'},
     {k: 'good', label: 'What to do instead', type: 'text', ph: 'Price it so the next one can sell for more.'},
-    {k: 'short', label: 'The short version: the whole guide in one sentence', type: 'area'}]],
+    {k: 'short', label: 'The short version (the ticket): the whole guide in one sentence', type: 'area'},
+    {k: 'pick', label: 'Words on the ticket to pick out in white (copy them exactly)', type: 'text'}]],
   ['The action', [
     {k: 'key', label: 'Comment keyword (its DM must send the guide, not a submission pitch)', type: 'text', ph: 'GUIDE'},
     {k: 'ctahead', label: 'Line above the keyword', type: 'text', ph: 'Want the whole guide, with the examples?'},
@@ -127,7 +136,7 @@ function askOf(t){ t = String(t || '').trim().replace(/[.:]$/, ''); const w = t.
 function editorialFields(e, ai){
   const c = {...(ai || {})}; const steps = (c.steps && c.steps.length ? c.steps : e.steps);
   const short = c.short || (steps.length ? steps.map((s, i) => (i === 0 ? s.title : s.title.charAt(0).toLowerCase() + s.title.slice(1))).join(', ').replace(/, ([^,]*)$/, ', and $1') + '.' : '');
-  return {cover: 'art', question: c.question || askOf(e.title), sub: c.sub || 'What we tell artists who ask us this',
+  return {cover: 'hook', question: c.question || askOf(e.title), sub: c.sub || 'What we tell artists who ask us this',
     why: c.why || e.why, steps: steps.map(s => `${s.title} | ${s.how || ''}`).join('\n'), bad: c.bad || '', good: c.good || e.avoid || '', short,
     key: 'GUIDE', ctahead: 'Want the whole guide, with the examples?', offer: 'We’ll send it to you in your DMs. Or read it at artstoheartsproject.com, link in bio.',
     endline: 'New guides for artists every week.', invite: 'Follow @artstoheartsproject for the next one.', ask: c.ask || '', hook: c.hook || ''};
@@ -139,15 +148,15 @@ DPACK.editorial = p => {
   const steps = dLines(f.steps).map(x => ({title: x[0] || '', how: x.slice(1).join(' | ')})).filter(s => s.title);
   const key = (f.key || 'GUIDE').toUpperCase().replace(/[^A-Z0-9]/g, '') || 'GUIDE';
   const q = (f.question || f.headline || 'Add the question in the sidebar').replace(/^“|”$/g, ''), sub = f.sub || 'What we tell artists who ask us this';
-  const artCover = (f.cover || 'art') === 'art';
-  const A = EDT.coverArt({q, sub, img: imgs[0] || '', slot: 'imgs0'}), Bc = EDT.coverType({q, sub, img: imgs[0] || '', slot: 'imgs0'});
-  const advice = (s, i) => EDT.label({title: s.title, how: s.how, img: imgs[i + 1] || '', slot: 'imgs' + (i + 1), credit: credits[i + 1]});
+  const artCover = (f.cover || 'hook') === 'hook';
+  const A = EDT.coverHook({q, sub}), Bc = EDT.coverCard({q, sub, img: imgs[0] || '', slot: 'imgs0'});
+  const advice = (s, i) => (i % 2 ? EDT.adviceMark : EDT.adviceCard)({title: s.title, how: s.how, img: imgs[i + 1] || '', slot: 'imgs' + (i + 1), credit: credits[i + 1]});
   const S = [
     {...(artCover ? A : Bc), label: 'Cover A (in use)'}, {...(artCover ? Bc : A), label: 'Cover B: hide the one you skip'},
-    ...(f.why ? [EDT.open({text: f.why})] : []),
+    ...(f.why ? [EDT.open({text: f.why, mark: f.whymark || (f.why.match(/[^.!?]+[.!?]/g) || [''])[1]?.trim()})] : []),
     ...steps.slice(0, 6).map(advice),
     ...(f.good ? [EDT.instead({bad: f.bad || 'I’ll work it out later.', good: f.good})] : []),
-    ...(f.short ? [EDT.short({text: f.short})] : []),
+    ...(f.short ? [EDT.short({text: f.short, pick: f.pick || f.short.split(/,\s*/)[0]})] : []),
     EDT.cta({head: f.ctahead || 'Want the whole guide, with the examples?', key, offer: f.offer || 'We’ll send it to you in your DMs. Or read it at artstoheartsproject.com, link in bio.'}),
     EDT.end({line: f.endline || 'New guides for artists every week.', invite: f.invite === undefined ? 'Follow @artstoheartsproject for the next one.' : f.invite}),
   ];
@@ -170,11 +179,11 @@ DPACK.editorial = p => {
 
 // ---------- example: advice hung on works by PQHAÜS, an artist we featured ----------
 const ED_EXAMPLE = {cat: 'editorial', f: {
-  cover: 'art', question: 'How should I price my art?', sub: 'What we tell artists who ask us this',
+  cover: 'hook', question: 'How should I price my art?', sub: 'What we tell artists who ask us this',
   why: 'Most artists price by gut feeling, then second-guess every sale. Buyers trust a price you can explain, and you sleep better when you can explain it.',
   steps: 'Know what a piece really costs you | Add up materials, framing and your hours before you think about any number.\nPick one way of pricing and keep it | Price by size, so every work in a series makes sense next to the others.\nCompare yourself with artists like you | Look at artists at your stage, size and medium, not at famous names or hobby sellers.\nShow one price everywhere | Your studio, your website and a gallery should all say the same thing, or buyers stop trusting it.\nRaise your prices when you sell out | A waiting list is your sign to move up 10 to 20 percent.',
   credits: 'PQHAÜS | No help is coming | 2026\nPQHAÜS | I was the elephant in the room | 2025\nPQHAÜS | I am not a bad person | 2026\nPQHAÜS | 2903 miles | 2025\nPQHAÜS | 31 years old | 2024\nPQHAÜS | No help is coming | 2026',
-  bad: 'I’ll drop the price a little so it sells.', good: 'Hold the price. The buyers who paid it are watching, and it is hard to go back up.',
+  whymark: 'Buyers trust a price you can explain', pick: 'show one price everywhere', bad: 'I’ll drop the price a little so it sells.', good: 'Hold the price. The buyers who paid it are watching, and it is hard to go back up.',
   short: 'Know your costs, pick one way of pricing and keep it, compare yourself with artists like you, show one price everywhere, and raise it when you sell out.',
   key: 'GUIDE', ctahead: 'Want the whole guide, with the examples?', offer: 'We’ll send it to you in your DMs. Or read it at artstoheartsproject.com, link in bio.',
   endline: 'New guides for artists every week.', invite: 'Follow @artstoheartsproject for the next one.', ask: 'What do you find hardest about pricing?', hook: 'How should I price my art? The question we get most, answered.', tags: '#pricingart #artistadvice'},
