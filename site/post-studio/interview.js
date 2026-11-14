@@ -126,15 +126,19 @@ const IV = {
   quoteCard(o){ return {bg:B.burg, html:`<p class="a cn" style="left:52px;top:48px;color:#FAD2E1">Arts to Hearts Project</p>
     <p class="a" style="left:72px;right:72px;top:250px;${BASK};font-size:${o.text.length > 140 ? 58 : o.text.length > 90 ? 66 : 76}px;line-height:1.2;color:#F9EEE5">&ldquo;${esc(o.text)}&rdquo;</p>
     <p class="a" style="left:72px;bottom:60px;${T_MED};font-size:30px;color:#FAD2E1"><span style="${T_REG}">From our interview with </span>${esc(o.name)}${o.handle ? ` <span style="${T_REG}">${esc(o.handle)}</span>` : ''}</p>`}; },
+  // Stories: label, text and line below stack in one column and shrink to fit, so long names or titles never collide.
   story(o){ const dark = o.dark || o.full, bg = o.full ? B.ink : o.dark ? B.burg : B.ground, fg = dark ? '#F9EEE5' : B.ink, acc = o.full ? '#FFFFFF' : o.dark ? '#FAD2E1' : B.burg;
-    const art = o.img && !o.full; const top = art ? 1130 : o.full ? 1060 : 380;
+    const art = o.img && !o.full; const plain = String(o.text).replace(/<[^>]+>|&[a-z]+;/g, '');
+    const size = o.serif ? (plain.length > 230 ? 50 : plain.length > 150 ? 56 : o.size || 64) : (plain.length > 60 ? 70 : plain.length > 36 ? 84 : o.size || 96);
+    const box = art ? 'top:1050px' : o.full ? 'bottom:520px' : 'top:380px';
     return {h:1920, bg, html:`${o.full ? `${ivArt(o.img, 'inset:0', o.slot, 'cover')}<div class="a" style="inset:0;background:rgba(20,9,12,.32)"></div>` : ''}
     ${o.mono ? ivMono(o.full ? 'white' : dark ? 'peony' : 'burgundy', 'right:64px;top:238px;width:112px;height:63px') : `<p class="a cn" style="left:64px;top:250px;color:${dark ? '#FAD2E1' : B.ink}">Arts to Hearts Project</p>`}
-    ${art ? ivArt(o.img, 'left:72px;right:72px;top:340px;height:740px', o.slot) : ''}
-    <p class="a" style="left:72px;right:72px;top:${top}px;${T_MED};font-size:28px;letter-spacing:.12em;text-transform:uppercase;line-height:1.4;color:${acc}">${esc(o.label)}</p>
-    <p class="a" style="left:72px;right:72px;top:${top + Math.ceil(String(o.label).length / 42) * 40 + 22}px;${o.serif ? BASK + `;font-size:${o.size || 64}px;line-height:1.22` : T_MED + `;font-size:${o.size || 96}px;line-height:.96;letter-spacing:-.035em`};color:${fg}">${o.text}</p>
-    ${o.sub ? `<p class="a" style="left:72px;right:72px;top:${o.subTop}px;${T_REG};font-size:36px;line-height:1.35;color:${fg}">${o.sub}</p>` : ''}
-    ${o.zone ? `<div class="a" style="left:150px;right:150px;top:1470px;height:100px;border:2px dashed ${fg};border-radius:24px;opacity:.5;display:flex;align-items:center;justify-content:center;${T_MED};font-size:24px;color:${fg}">${o.zone}</div>` : ''}`}; },
+    ${art ? ivArt(o.img, 'left:72px;right:72px;top:340px;height:670px', o.slot) : ''}
+    <div class="a" style="left:72px;right:72px;${box};display:flex;flex-direction:column;gap:20px">
+      <p style="${T_MED};font-size:28px;letter-spacing:.12em;text-transform:uppercase;line-height:1.4;color:${acc}">${esc(o.label)}</p>
+      <p style="${o.serif ? BASK + `;font-size:${size}px;line-height:1.22` : T_MED + `;font-size:${size}px;line-height:.98;letter-spacing:-.035em`};color:${fg}">${o.text}</p>
+      ${o.sub ? `<p style="${T_REG};font-size:36px;line-height:1.35;color:${fg};margin-top:6px">${o.sub}</p>` : ''}</div>
+    ${o.zone ? `<div class="a" style="left:150px;right:150px;top:1490px;height:86px;border:2px dashed ${fg};border-radius:24px;opacity:.5;display:flex;align-items:center;justify-content:center;${T_MED};font-size:24px;color:${fg}">${o.zone}</div>` : ''}`}; },
 };
 
 // ---------- copy helpers: work from the article when no one has written the copy ----------
@@ -188,9 +192,12 @@ function assignImages(images, caps, roles){
 // ---------- the package ----------
 DPACK = window.DPACK || {};
 DPACK.interview = p => {
-  const f = p.f || {}, I = p.imgs || {}; const arts = [].concat(I.arts || []), studio = [].concat(I.studio || []);
+  let f = p.f || {}; const I = p.imgs || {}; const arts = [].concat(I.arts || []), studio = [].concat(I.studio || []);
   const caps = dLines(f.caps), quotes = dLines(f.quotes).map(x => x.join(' | ')), qa = qaParse(f.qa);
-  const name = f.name || 'Artist name', handle = f.handle || '', key = (f.key || 'INTERVIEW').toUpperCase();
+  const badName = n => !n || n.split(/\s+/).length > 4 || /[,:]/.test(n) || /^(In|The|How|Why|When|Meet)\b/.test(n);
+  const name = badName(f.name) ? 'Artist name' : f.name, handle = f.handle || '', key = (f.key || 'INTERVIEW').toUpperCase();
+  const BOILER = /^(At|Our) (Arts to Hearts|Best of the Art World)|our mission is|Best of the Art World editorial/i;
+  if (BOILER.test(f.intro || '')) f = {...f, intro: ''};
   const head = f.headline || 'Add a headline in the sidebar';
   const meta = [f.based].filter(Boolean).join('');
   const picks = String(f.pick || '').split(/[,\s]+/).map(Number).filter(n => n >= 1 && n <= qa.length);
@@ -207,7 +214,7 @@ DPACK.interview = p => {
   const T = 7, S = [
     {...IV.cover({...at(0), head, name, meta, full: coverFull, mono: true}), label: 'Cover A (in use)'},
     {...IV.cover({...at(0), head, name, meta, full: !coverFull, mono: true}), label: 'Cover B: hide the one you skip'},
-    IV.standfirst({img: studio[0], slot: 'studio0', text: excerpt(f.intro, 250), n: 2, t: T}),
+    IV.standfirst({img: studio[0], slot: 'studio0', text: f.intro ? excerpt(f.intro, 250) : 'Add a two-sentence intro about the artist in the sidebar, under The artist.', n: 2, t: T}),
     IV.work({...at(1), cap: caps[1], line: quotes[0], name, n: 3, t: T}),
     IV.tease({...(teases[0] || {kick: 'From the interview', text: 'Pick an answer to cut off in the sidebar.'}), n: 4, t: T}),
     IV.work({...at(2), cap: caps[2], line: quotes[1], name, flip: true, n: 5, t: T}),

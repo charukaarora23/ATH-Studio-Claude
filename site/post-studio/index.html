@@ -758,6 +758,12 @@ function renderIvSide(){ const el = $('ivside'); if (!el) return; const p = ivCu
       <p class="ivmsg" id="ivMsg" role="status"></p>
       <details style="margin-top:12px"><summary style="font-size:13px">Use the article link instead</summary><div class="f" style="margin-top:8px"><input id="ivUrl" type="url" placeholder="https://artstoheartsproject.com/…" value="${esc(demo ? '' : (p.f || {}).src || '')}"></div><button class="btn ghost" type="button" data-ivimport style="width:100%">Build from link</button><p class="hint" style="margin:6px 0 0">If the site blocks it, use the PDF.</p></details>
       <details style="margin-top:8px"><summary style="font-size:13px">Or paste the article text</summary><textarea id="ivPaste" rows="4" placeholder="Copy everything on the article page and paste it here"></textarea><button class="btn ghost" type="button" data-ivpaste>Build from text</button></details>`)}
+    ${!demo ? (() => { const f = p.f || {}, I = p.imgs || {}; const bad = [];
+        if (!f.name || f.name.split(/\s+/).length > 4 || /[,:]/.test(f.name) || /^(In|The|How|Why|When|Meet)\b/.test(f.name)) bad.push('The artist name looks wrong. Check Cover → Artist name.');
+        if (/^(At|Our) (Arts to Hearts|Best of the Art World)|our mission is/i.test(f.intro || '') || !f.intro) bad.push('The intro is missing or is our own magazine text. Write two sentences about the artist under The artist.');
+        if (!(I.arts || []).length) bad.push('No artworks yet. Add them under The work.');
+        if (!f.headline) bad.push('No headline yet. Add one under Cover.');
+        return (bad.length ? `<div class="demo"><b>Needs a look</b><br>${bad.map(esc).join('<br>')}</div>` : '') + (f.srcText ? `<button type="button" class="btn ghost" data-ivrebuild style="width:100%;margin:0 0 12px">Rebuild the copy from the article</button>` : ''); })() : ''}
     ${demo ? `<div class="demo">This is the example, so its fields are locked. Paste a link above to build a new interview, or <button type="button" class="linkbtn" data-ivcopy>edit a copy of this one</button>.</div>` : ''}
     ${DCAT.interview.groups.map(([title, fields]) => sec(title, fields.map(fd => ivField(p, fd, demo)).join(''))).join('')}`;
   el.querySelectorAll('details[data-sec]').forEach(d => d.ontoggle = () => { d.open ? IV_OPEN.add(d.dataset.sec) : IV_OPEN.delete(d.dataset.sec); });
@@ -767,6 +773,7 @@ function renderIvSide(){ const el = $('ivside'); if (!el) return; const p = ivCu
   const cp = el.querySelector('[data-ivcopy]'); if (cp) cp.onclick = () => { const id = dNew(isoD(new Date()), 's1', 'interview'); DPOSTS[id].f = {...IV_EXAMPLE.f}; DPOSTS[id].imgs = JSON.parse(JSON.stringify(IV_EXAMPLE.imgs)); saveDaily(id); ivSelect(id); };
   el.querySelector('[data-ivimport]').onclick = () => ivImport({url: $('ivUrl').value.trim()});
   el.querySelector('[data-ivpaste]').onclick = () => ivImport({text: $('ivPaste').value});
+  const rb = el.querySelector('[data-ivrebuild]'); if (rb) rb.onclick = () => { if (confirm('Rewrite the headline, intro, quotes and labels from the article? Your images stay. Text you typed by hand in those fields will be replaced.')) ivImport({rebuild: p}); };
   $('ivPdf').onchange = e => { const fl = e.target.files[0]; if (fl) ivImport({file: fl}); };
   if (!demo) { wireDaily(el, p); el.querySelectorAll('[data-dimgs],[data-dimgx]').forEach(x => { const prev = x.onchange || x.onclick; const after = () => setTimeout(renderIvSide, 50);
     if (x.matches('[data-dimgs]')) x.onchange = async () => { await prev.call(x); after(); }; else x.onclick = () => { prev.call(x); after(); }; }); }
@@ -810,12 +817,14 @@ async function readArticlePdf(file, onStep){
         // a picture the website had not loaded yet prints as flat grey or a striped placeholder: skip it and say so
         const t = document.createElement('canvas'); t.width = t.height = 48; const tx = t.getContext('2d'); tx.drawImage(cv, 0, 0, 48, 48); const px = tx.getImageData(0, 0, 48, 48).data;
         let sum = 0, sq = 0, neon = 0; for (let q = 0; q < px.length; q += 4) { const l = (px[q] + px[q + 1] + px[q + 2]) / 3; sum += l; sq += l * l; if ((px[q + 1] > 200 && px[q] < 80 && px[q + 2] < 80) || (px[q] > 200 && px[q + 2] > 200 && px[q + 1] < 80)) neon++; }
-        const n = px.length / 4, sd = Math.sqrt(sq / n - (sum / n) ** 2); if (sd < 7 || neon / n > .15) { empty++; continue; }
+        const n = px.length / 4, sd = Math.sqrt(sq / n - (sum / n) ** 2); const L = []; for (let q = 0; q < px.length; q += 4) L.push((px[q] + px[q + 1] + px[q + 2]) / 3); L.sort((x, y) => x - y); const med = L[L.length >> 1]; const flat = L.filter(v => Math.abs(v - med) < 6).length / n;
+        if (sd < 7 || (flat > .7 && med > 90 && med < 200) || neon / n > .15) { empty++; continue; }
         const blob = await new Promise(res => cv.toBlob(res, 'image/jpeg', .92)); images.push({w, h, file: new File([blob], `pdf-img-${images.length + 1}.jpg`, {type: 'image/jpeg'}), alt: '', cap: r.cap}); } } }
   return {empty, title: title.replace(/\s+/g, ' ').trim(), text: lines.join('\n').replace(/\n{3,}/g, '\n\n'), images};
 }
-async function ivImport({url, text, file}){ const msg = (t, err) => { const m = $('ivMsg'); if (m) { m.textContent = t; m.className = 'ivmsg' + (err ? ' err' : ''); } status(t); };
+async function ivImport({url, text, file, rebuild}){ const msg = (t, err) => { const m = $('ivMsg'); if (m) { m.textContent = t; m.className = 'ivmsg' + (err ? ' err' : ''); } status(t); };
   let page = {title: '', text: text || '', images: [], ai: null};
+  if (rebuild) { page = {title: rebuild.f.srcTitle || '', text: rebuild.f.srcText || '', images: [], ai: null}; try { const r = await fetch('api/article', {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({text: page.text})}); const j = await r.json().catch(() => ({})); if (r.ok) { page.ai = j.ai; page.aiError = j.aiError; } } catch {} }
   if (file) { try { const pdf = await readArticlePdf(file, t => msg(t)); msg(`Saving ${pdf.images.length} images…`);
       for (const im of pdf.images) im.url = await dUpload(im.file); page = {title: pdf.title, text: pdf.text, images: pdf.images.map(({file, ...x}) => x), ai: null, empty: pdf.empty}; }
     catch (e) { msg('Could not read that PDF (' + (e.message || e) + '). Try printing the article page to PDF again, or paste the text.', true); return; }
@@ -828,10 +837,12 @@ async function ivImport({url, text, file}){ const msg = (t, err) => { const m = 
   const r = parseInterview(page.text); const ai = page.ai, auto = autoStructure(r, page.title), c = {...auto, ...(ai || {})};
   const capsArr = r.caps.map(x => x.split('|').map(y => y.trim()));
   const sorted = assignImages(page.images || [], capsArr, ai && ai.roles && ai.roles.length === (page.images || []).length ? ai.roles : null);
-  let p = IVSEL !== 'demo' && DPOSTS[IVSEL] && !Object.values(DPOSTS[IVSEL].f || {}).some(Boolean) ? DPOSTS[IVSEL] : DPOSTS[dNew(isoD(new Date()), 's1', 'interview')];
+  let p = rebuild ? rebuild : IVSEL !== 'demo' && DPOSTS[IVSEL] && !Object.values(DPOSTS[IVSEL].f || {}).some(Boolean) ? DPOSTS[IVSEL] : DPOSTS[dNew(isoD(new Date()), 's1', 'interview')];
+  const keepImgs = rebuild ? p.imgs : null, keepUrl = rebuild ? p.f.src : '';
   p.f = {headline: c.headline, name: c.name, handle: c.handle || '', based: c.based || '', medium: c.medium || '', intro: c.standfirst, caps: r.caps.join('\n'), quotes: (c.quotes || []).join('\n'), qa: qaText(r.qa),
-    pick: (c.picks || []).join(', '), kicks: (c.kicks || []).join('\n'), inside: (c.inside || []).join('\n'), ctahead: c.ctahead || '', hook: c.hook || '', key: 'INTERVIEW', url: url ? url.replace(/^https?:\/\//, '').replace(/\/$/, '') : '', src: url || ''};
-  p.imgs = {arts: sorted.arts, studio: sorted.studio}; saveDaily(p.id); IV_OPEN.add('Cover'); ivSelect(p.id);
+    srcText: page.text, srcTitle: page.title || '', pick: (c.picks || []).join(', '), kicks: (c.kicks || []).join('\n'), inside: (c.inside || []).join('\n'), ctahead: c.ctahead || '', hook: c.hook || '', key: 'INTERVIEW', url: url ? url.replace(/^https?:\/\//, '').replace(/\/$/, '') : '', src: url || ''};
+  p.imgs = keepImgs || {arts: sorted.arts, studio: sorted.studio}; if (rebuild) p.f.src = keepUrl; saveDaily(p.id); IV_OPEN.add('Cover'); ivSelect(p.id);
+  if (rebuild) { msg(`Copy rebuilt from the article: ${r.qa.length} questions. ${ai ? 'Written by Claude.' : 'Picked by rules.'} Your images are unchanged.`); return; }
   const need = [!sorted.arts.length && 'artworks', !sorted.studio.length && 'a portrait'].filter(Boolean);
   msg(`Built from the article: ${r.qa.length} questions, ${sorted.arts.length} artworks, ${sorted.studio.length} photo${sorted.studio.length === 1 ? "" : "s"}. ${ai ? 'Copy written by Claude. Read it through and adjust anything.' : page.aiError ? 'Claude could not write the copy (' + page.aiError + '), so it was picked by rules. Check the headline and labels.' : 'Copy picked from the article by rules. Check the headline and labels.'}${page.empty ? ` ${page.empty} picture${page.empty > 1 ? 's were' : ' was'} blank in the PDF, because the website had not loaded ${page.empty > 1 ? 'them' : 'it'} when the page was printed. Scroll slowly to the bottom of the article so every picture appears, then Print and Save as PDF again, or add the artworks under The work.` : need.length ? ' Please add ' + need.join(' and ') + ' in the sidebar.' : ''}`); }
 function setSeg(seg){ document.body.dataset.seg = seg; document.querySelectorAll('#seg [data-seg]').forEach(b => b.setAttribute('aria-current', b.dataset.seg === seg ? 'page' : 'false'));
