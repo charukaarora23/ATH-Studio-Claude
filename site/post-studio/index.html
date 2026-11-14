@@ -70,6 +70,8 @@ summary{font:600 12px/1 var(--mono);letter-spacing:.1em;text-transform:uppercase
 .ghr{display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:flex-end}.vers{display:inline-flex;align-items:center;gap:3px;font-size:12px;color:var(--muted)}.vers button{border:1px solid var(--line);background:var(--panel,#fff);border-radius:6px;font:600 12px var(--sans,sans-serif);padding:3px 8px;cursor:pointer;color:var(--ink)}.vers button[aria-pressed=true]{background:var(--ink);color:var(--panel,#fff);border-color:var(--ink)}.ghead{display:flex;align-items:baseline;gap:12px;justify-content:space-between}.hidebtn{border:0;background:none;color:var(--muted);font-size:12px;text-decoration:underline;cursor:pointer;padding:0}.hidebtn:hover{color:var(--ink)}.hiddenpost{opacity:.65}.hiddenpost h2{text-decoration:line-through}.hiddencell .frame>.post{opacity:.25}.hidmask{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font:700 14px var(--sans,sans-serif);color:var(--ink);background:repeating-linear-gradient(45deg,transparent 0 10px,rgba(0,0,0,.04) 10px 20px);letter-spacing:.08em;text-transform:uppercase}.post [data-removed]{outline:2px dashed rgba(47,124,246,.0)}
 .rlctl{display:flex;flex-wrap:wrap;gap:6px 10px;align-items:center;font-size:12px;color:var(--muted);width:var(--pw);margin-top:6px}.rlctl select{font:12px var(--sans,sans-serif);padding:2px;border:1px solid var(--line);border-radius:6px}.rlctl input{width:54px;font:12px var(--sans,sans-serif);padding:3px 4px;border:1px solid var(--line);border-radius:6px}.rlctl button{border:0;background:none;color:var(--muted);text-decoration:underline;cursor:pointer;font-size:12px;padding:0}.vtag{background:#2f7cf6;color:#fff;border-radius:999px;padding:2px 8px;font-weight:600}.rlopt{font-size:12px;color:var(--muted);display:inline-flex;gap:4px;align-items:center;white-space:nowrap}
 .rmodal{position:fixed;inset:0;z-index:100;background:rgba(20,9,12,.72);display:flex;align-items:center;justify-content:center;padding:16px}.rbox{background:var(--panel,#fff);border-radius:16px;padding:16px;max-width:96vw;box-shadow:0 20px 60px rgba(0,0,0,.4)}.rcv{display:block;height:min(72vh,640px);width:auto;aspect-ratio:9/16;border-radius:10px;background:#000;margin:0 auto}.rbar{display:flex;align-items:center;gap:10px;margin-top:10px}.rprog{flex:1;height:6px;background:var(--line);border-radius:3px;overflow:hidden}.rprog span{display:block;height:100%;width:0;background:var(--ink)}.rtime{font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums}.rbtns{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:10px}.tbox{width:min(560px,96vw)}.tvid{display:block;height:min(52vh,460px);width:auto;aspect-ratio:9/16;object-fit:cover;border-radius:10px;background:#000;margin:0 auto}.tl{position:relative;height:60px;margin-top:12px;border-radius:8px;overflow:hidden;background:#222;cursor:pointer}.strip{position:absolute;inset:0;display:flex}.strip div{flex:1;background:center/cover}.win{position:absolute;top:0;bottom:0;border:3px solid #ffd23f;border-radius:6px;box-shadow:0 0 0 999px rgba(0,0,0,.55);cursor:grab}.grip{position:absolute;right:-3px;top:0;bottom:0;width:14px;background:#ffd23f;cursor:ew-resize}.tinfo{font-size:13px;margin:8px 0 0;font-variant-numeric:tabular-nums}.trimbtn{border:0;background:#2f7cf6!important;color:#fff!important;text-decoration:none!important;border-radius:999px;padding:3px 10px!important;font-weight:600}
+.cal-wrap{display:grid;grid-template-columns:minmax(300px,1fr) minmax(320px,1.1fr);gap:24px;align-items:start}@media(max-width:1100px){.cal-wrap{grid-template-columns:1fr}}.cal-nav{display:flex;align-items:center;gap:8px;margin-bottom:10px}.cal-nav b{flex:1;text-align:center}.cal-nav .btn{padding:6px 10px}.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}.cal-h{font-size:11px;color:var(--muted);text-align:center;padding:4px 0}.cal-c{min-height:68px;border:1px solid var(--line);background:var(--panel,#fff);border-radius:8px;padding:5px;display:flex;flex-direction:column;align-items:flex-start;gap:3px;cursor:pointer;font:inherit;text-align:left}.cal-c.off{border:0;background:none;cursor:default}.cal-c.sel{outline:2px solid var(--ink)}.cal-c.today .cal-n{background:var(--ink);color:var(--panel,#fff);border-radius:999px;padding:0 6px}.cal-c.alldone{background:#e6f4ea}.cal-c.late{background:#fdecec}.cal-n{font-size:12px;font-weight:700}.cal-dots{display:flex;gap:2px;flex-wrap:wrap}.cal-dot{display:inline-flex;min-width:14px;height:14px;border-radius:999px;color:#fff;font-size:9px;font-weight:700;align-items:center;justify-content:center;padding:0 3px;vertical-align:middle;margin-right:4px}.cal-p{font-size:10px;color:var(--muted);margin-top:auto}.cal-dh{margin:0}.cal-g h3{font-size:15px;margin:16px 0 8px;display:flex;align-items:center;gap:4px}.cal-g h3 small{color:var(--muted);font-weight:400;margin-left:6px}.cal-i{display:flex;align-items:center;gap:12px;padding:10px 12px;border:1px solid var(--line);border-radius:10px;margin-bottom:6px;background:var(--panel,#fff)}.cal-i.done{background:#e6f4ea;border-color:#b7dfc3}.cal-i.done .cal-t{opacity:.75}.cal-t{flex:1;font-size:14px;line-height:1.35}.cal-t small{color:var(--muted)}.cal-ck{display:flex;flex-direction:column;align-items:center;font-size:10px;color:var(--muted);gap:2px;min-width:44px}.cal-ck input{width:20px;height:20px}.cal-mode{font-size:12px;padding:3px 10px;border-radius:999px}.cal-mode.shared{background:#e6f4ea;color:#1e6b3a}.cal-mode.local{background:#fff4d6;color:#7a5a00}
+.group.flash{animation:flash 1.6s ease}@keyframes flash{0%{box-shadow:0 0 0 4px #2f7cf6}100%{box-shadow:0 0 0 0 transparent}}
 .acts{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}.hint{font-size:13px;color:var(--muted);margin:0 0 10px;line-height:1.45}
 .capbox{max-width:720px;margin-top:10px;border-top:1px solid var(--line)}
 .cell .act{display:flex;justify-content:space-between;align-items:center;font-size:12px;color:var(--muted);width:var(--pw)}
@@ -213,6 +215,7 @@ summary{font:600 12px/1 var(--mono);letter-spacing:.1em;text-transform:uppercase
 
 <main>
   <nav class="tabs" id="tabs" aria-label="Views">
+    <button type="button" data-view="calendar">Calendar</button>
     <button type="button" data-view="feed">Feed posts</button>
     <button type="button" data-view="storyplan">Stories plan</button>
     <button type="button" data-view="storydays">Stories by day</button>
@@ -458,10 +461,11 @@ function wireSlots(){
 }
 // ---------- view tabs ----------
 let lastFeed = 'month';
-function viewOf(v){ return ['storyplan', 'storydays', 'stories', 'reels'].includes(v) ? v : 'feed'; }
+function viewOf(v){ return ['calendar', 'storyplan', 'storydays', 'stories', 'reels'].includes(v) ? v : 'feed'; }
 function updateTabs(){ const v = viewOf($('ptype').value); if (v === 'feed') lastFeed = $('ptype').value || 'month';
   document.querySelectorAll('#tabs [data-view]').forEach(b => b.setAttribute('aria-current', b.dataset.view === v ? 'page' : 'false'));
-  $('ptype').closest('.f').style.display = v === 'feed' ? '' : 'none'; }
+  $('ptype').closest('.f').style.display = v === 'feed' ? '' : 'none';
+  const noExport = v === 'calendar' || v === 'storyplan'; $('go').style.display = noExport ? 'none' : ''; $('zip').style.display = noExport ? 'none' : ''; }
 function setView(v){ $('ptype').value = v === 'feed' ? lastFeed : v; try { localStorage.setItem('athLastPtype', $('ptype').value); } catch {} render(); window.scrollTo({top:0}); }
 document.querySelectorAll('#tabs [data-view]').forEach(b => b.onclick = () => setView(b.dataset.view));
 document.addEventListener('click', e => { const g = e.target.closest('[data-goto]'); if (g) setView(g.dataset.goto); });
@@ -585,6 +589,65 @@ async function openTrimmer(key){
   const close = () => { v.pause(); document.removeEventListener('mousemove', mm); document.removeEventListener('mouseup', mu); m.remove(); };
   m.querySelector('[data-a=close]').onclick = close;
   m.querySelector('[data-a=use]').onclick = async () => { meta.start = +start.toFixed(2); meta.speed = speed; state.durs = state.durs || {}; state.durs[key] = +dur.toFixed(2); close(); await makePoster(key); render(); status('Clip trimmed.'); };
+}
+// ---------- CALENDAR: what goes out on the ATH account each day, for every call; the team ticks it off ----------
+const REEL_DAYS = {27:'R1', 23:'R5', 19:'R2', 15:'R6', 11:'R7', 7:'R3', 4:'R8', 2:'R4'};
+let STATUS = {}, STATUS_MODE = 'local', calLoaded = false, calMonth = null, calDay = null, calTimer = null;
+const isoD = d => d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+const DAYMS = 864e5;
+function callStates(){ return Object.keys(PRESETS).filter(n => !/blank/i.test(n)).map(n => { let d = null; try { d = JSON.parse(localStorage.getItem(DKEY(n)) || 'null'); } catch {}
+  const s = n === $('preset').value ? state : {...DEFAULTS, ...PRESETS[n], ...(d || {})};
+  return {preset: n, name: s.name, kw: (s.keyword || '').toUpperCase(), colour: s.colour, dl: new Date(s.deadline + 'T00:00:00'), hidden: s.hidden || {}}; }); }
+function dayItems(date, calls){ const posts = monthPosts(), postDays = new Set(posts.map(p => p.left)), iso = isoD(date), out = [];
+  calls.forEach(c => { const left = Math.round((c.dl - date) / DAYMS); if (left < -1 || left > 30) return;
+    posts.forEach((p, i) => { if (p.left !== left || c.hidden['g|' + p.title]) return;
+      out.push({c, type: 'Feed post', title: p.title, detail: p.kind, id: `${c.preset}|${iso}|feed|${p.title}`, open: {preset: c.preset, ptype: String(i)}}); });
+    const ids = storyDay(left, postDays);
+    if (ids.length && !c.hidden['g|' + `${postDate(left)} · Stories`]) out.push({c, type: 'Stories', title: `${ids.length} frame${ids.length > 1 ? 's' : ''}`, detail: ids.map(x => STORY_T[x].name).join(' · '), id: `${c.preset}|${iso}|stories`, open: {preset: c.preset, ptype: 'storydays', find: `${postDate(left)} · Stories`}});
+    const r = REEL_DAYS[left] && REELS.find(x => x.id === REEL_DAYS[left]);
+    if (r) out.push({c, type: 'Reel', title: r.name, detail: `${r.len} · ${r.goal}`, id: `${c.preset}|${iso}|reel|${r.id}`, open: {preset: c.preset, ptype: 'reels', find: `Reel ${r.id.slice(1)} · ${r.name}`}}); });
+  return out; }
+async function loadStatus(){ try { const r = await fetch('api/status', {cache: 'no-store'}); if (!r.ok) throw 0; STATUS = await r.json(); STATUS_MODE = 'shared'; }
+  catch { try { STATUS = JSON.parse(localStorage.getItem('athCalStatus') || '{}'); } catch { STATUS = {}; } STATUS_MODE = 'local'; }
+  calLoaded = true; if ($('ptype').value === 'calendar') { $('out').innerHTML = calHTML(); wireCal(); } }
+async function setPosted(id, val){ let who = ''; try { who = localStorage.getItem('athWho') || ''; } catch {}
+  if (val && !who) { who = (prompt('Your name (shown next to what you post):') || '').trim(); try { localStorage.setItem('athWho', who); } catch {} }
+  if (val) STATUS[id] = {posted: true, by: who, at: new Date().toISOString()}; else delete STATUS[id];
+  if (STATUS_MODE === 'shared') { try { const r = await fetch('api/status', {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({id, posted: val, by: who})}); if (r.ok) STATUS = await r.json(); else throw 0; }
+    catch { status('Could not reach the shared list. Your tick is saved in this browser for now.'); STATUS_MODE = 'local'; } }
+  if (STATUS_MODE === 'local') { try { localStorage.setItem('athCalStatus', JSON.stringify(STATUS)); } catch {} }
+  $('out').innerHTML = calHTML(); wireCal(); }
+function calHTML(){
+  const today = new Date(); today.setHours(0, 0, 0, 0); if (!calMonth) calMonth = new Date(today.getFullYear(), today.getMonth(), 1); if (!calDay) calDay = isoD(today);
+  const calls = callStates(); const first = new Date(calMonth); const startDow = (first.getDay() + 6) % 7; const days = new Date(first.getFullYear(), first.getMonth() + 1, 0).getDate();
+  const cells = []; for (let i = 0; i < startDow; i++) cells.push('<div class="cal-c off"></div>');
+  for (let d = 1; d <= days; d++) { const dt = new Date(first.getFullYear(), first.getMonth(), d); const its = dayItems(dt, calls); const done = its.filter(x => STATUS[x.id]).length; const iso = isoD(dt);
+    const dots = calls.map(c => { const n = its.filter(x => x.c.preset === c.preset).length; return n ? `<span class="cal-dot" style="background:${c.colour}" title="${esc(c.name)}: ${n}">${n}</span>` : ''; }).join('');
+    const cls = ['cal-c', iso === calDay ? 'sel' : '', iso === isoD(today) ? 'today' : '', its.length && done === its.length ? 'alldone' : '', dt < today && done < its.length ? 'late' : ''].join(' ');
+    cells.push(`<button type="button" class="${cls}" data-day="${iso}"><span class="cal-n">${d}</span><span class="cal-dots">${dots}</span>${its.length ? `<span class="cal-p">${done}/${its.length}</span>` : ''}</button>`); }
+  const sel = new Date(calDay + 'T00:00:00'); const its = dayItems(sel, calls); const done = its.filter(x => STATUS[x.id]).length;
+  const tIts = dayItems(today, calls); const tDone = tIts.filter(x => STATUS[x.id]).length;
+  const groups = calls.map(c => { const list = its.filter(x => x.c.preset === c.preset); if (!list.length) return '';
+    return `<div class="cal-g"><h3><span class="cal-dot" style="background:${c.colour}"></span>${esc(c.name)} <small>“${esc(c.kw)}” · closes ${c.dl.getDate()} ${MONTHS[c.dl.getMonth()]}</small></h3>${list.map(x => { const st = STATUS[x.id];
+      return `<div class="cal-i${st ? ' done' : ''}"><label class="cal-ck"><input type="checkbox" data-post="${esc(x.id)}" ${st ? 'checked' : ''}><span>${st ? 'Posted' : 'To post'}</span></label>
+        <div class="cal-t"><b>${esc(x.type)}</b> · ${esc(x.title)}<br><small>${esc(x.detail)}${st ? ` · posted${st.by ? ' by ' + esc(st.by) : ''} ${new Date(st.at).toLocaleString([], {day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit'})}` : ''}</small></div>
+        <button type="button" class="btn ghost" data-open='${esc(JSON.stringify(x.open))}'>Open</button></div>`; }).join('')}</div>`; }).join('');
+  return `<section class="group cal"><div class="ghead"><h2>Content calendar · every call</h2><span class="ghr"><span class="cal-mode ${STATUS_MODE}">${STATUS_MODE === 'shared' ? 'Shared with the team' : 'Saved in this browser only'}</span></span></div>
+    <p class="meta">Today: ${tIts.length ? `${tDone} of ${tIts.length} posted` : 'nothing scheduled'} · click a day to see what goes out · tick when it is live</p>
+    <div class="cal-wrap"><div class="cal-m"><div class="cal-nav"><button type="button" class="btn ghost" data-mon="-1">&larr;</button><b>${['January','February','March','April','May','June','July','August','September','October','November','December'][first.getMonth()]} ${first.getFullYear()}</b><button type="button" class="btn ghost" data-mon="1">&rarr;</button><button type="button" class="btn ghost" data-mon="0">Today</button></div>
+      <div class="cal-grid">${['Mon','Tue','Wed','Thu','Fri','Sat','Sun'].map(d => `<div class="cal-h">${d}</div>`).join('')}${cells.join('')}</div>
+      <p class="hint" style="margin-top:8px">${calls.map(c => `<span class="cal-dot" style="background:${c.colour}"></span>${esc(c.name)}`).join(' &nbsp; ')}</p></div>
+    <div class="cal-d"><h3 class="cal-dh">${sel.toLocaleDateString([], {weekday: 'long', day: 'numeric', month: 'long'})}</h3><p class="meta">${its.length ? `${done} of ${its.length} posted` : 'Nothing scheduled this day.'}</p>${groups}</div></div></section>`;
+}
+function wireCal(){
+  $('out').querySelectorAll('[data-day]').forEach(b => b.onclick = () => { calDay = b.dataset.day; $('out').innerHTML = calHTML(); wireCal(); });
+  $('out').querySelectorAll('[data-mon]').forEach(b => b.onclick = () => { const k = +b.dataset.mon; const t = new Date(); if (!k) { calMonth = new Date(t.getFullYear(), t.getMonth(), 1); calDay = isoD(t); } else calMonth = new Date(calMonth.getFullYear(), calMonth.getMonth() + k, 1); $('out').innerHTML = calHTML(); wireCal(); });
+  $('out').querySelectorAll('[data-post]').forEach(c => c.onchange = () => setPosted(c.dataset.post, c.checked));
+  $('out').querySelectorAll('[data-open]').forEach(b => b.onclick = async () => { const o = JSON.parse(b.dataset.open);
+    if ($('preset').value !== o.preset) { $('preset').value = o.preset; await $('preset').onchange(); }
+    $('ptype').value = o.ptype; try { localStorage.setItem('athLastPtype', o.ptype); } catch {} render();
+    const hit = o.find && [...document.querySelectorAll('.group h2')].find(x => x.textContent.trim() === o.find); if (hit) { hit.scrollIntoView({block: 'start'}); hit.closest('.group').classList.add('flash'); } else window.scrollTo({top: 0}); });
+  clearInterval(calTimer); calTimer = setInterval(() => { if ($('ptype').value === 'calendar' && STATUS_MODE === 'shared' && !document.hidden) loadStatus(); else if ($('ptype').value !== 'calendar') clearInterval(calTimer); }, 30000);
 }
 function storyPlanHTML(){
   const cur = state.name; const calls = Object.entries(PRESETS).filter(([n]) => !/blank/i.test(n)).map(([n, p]) => { const s = n === $('preset').value || (p.name || DEFAULTS.name) === cur ? state : {...DEFAULTS, ...p}; return {name: s.name, kw: (s.keyword || '').toUpperCase(), colour: s.colour, dl: new Date(s.deadline + 'T00:00:00')}; });
@@ -830,13 +893,14 @@ const slideNode = s => `<div class="post" style="background:${s.bg};height:${s.h
 function verbFor(left){ if ((state.ctaMode || 'comment') === 'comment') return 'COMMENT'; const d = new Date(dl()); d.setDate(d.getDate() - left); const [y,m,dd] = String(state.commentFrom||'').split('-').map(Number); return (y && d >= new Date(y, m-1, dd)) ? 'COMMENT' : 'DM'; }
 function postDate(left){ const d = new Date(dl()); d.setDate(d.getDate() - left); return d.getDate() + ' ' + MONTHS[d.getMonth()]; }
 function buildPtype(){ const sel = $('ptype'), cur = sel.value;
-  sel.innerHTML = `<option value="month">Whole month (${monthPosts().length} feed posts)</option>` + monthPosts().map((p,i) => `<option value="${i}">${postDate(p.left)} · ${esc(p.title)} (${p.kind.split(' ·')[0]})</option>`).join('') + '<optgroup label="Stories"><option value="storyplan">Stories plan: all calls, day by day</option><option value="storydays">Stories: this call, every day ready to post</option><option value="stories">Stories: template library</option></optgroup><option value="reels">Reels</option>';
+  sel.innerHTML = `<option value="month">Whole month (${monthPosts().length} feed posts)</option>` + monthPosts().map((p,i) => `<option value="${i}">${postDate(p.left)} · ${esc(p.title)} (${p.kind.split(' ·')[0]})</option>`).join('') + '<optgroup label="Stories"><option value="storyplan">Stories plan: all calls, day by day</option><option value="storydays">Stories: this call, every day ready to post</option><option value="stories">Stories: template library</option></optgroup><option value="reels">Reels</option><option value="calendar">Calendar</option>';
   sel.value = cur || '0'; if (!sel.value) sel.value = '0'; }
 function render(){
   readForm(); scheduleDraft(); updateTabs();
   const base = (state.name || 'call').toLowerCase().replace(/[^a-z0-9]+/g,'-');
   const pick = $('ptype').value || '0';
   const groups = [];
+  if (pick === 'calendar') { renderPool(); RENDERED = []; $('out').innerHTML = calHTML(); wireCal(); if (!calLoaded) loadStatus(); return; }
   if (pick === 'storyplan') { renderPool(); RENDERED = []; $('out').innerHTML = storyPlanHTML(); status('Stories plan for every call. Pick "Stories: this call, every day" to get the frames.'); return; }
   if (pick === 'stories') {
     const phases = {}; Object.keys(STORY_T).forEach(id => { const t = STORY_T[id]; VERB = verbFor(id[0] === 'F' ? 3 : 20); (phases[t.phase] = phases[t.phase] || []).push({id, t, f: storyMake(id, 21)}); });
