@@ -64,7 +64,7 @@ summary{font:600 12px/1 var(--mono);letter-spacing:.1em;text-transform:uppercase
 .group{margin-bottom:34px}
 .canva{display:flex;gap:10px;align-items:center;margin-top:12px}.canva .btn{padding:9px 14px;font-size:13px;text-decoration:none}.cmiss{font-size:13px;color:var(--muted)}
 .pool{display:grid;grid-template-columns:repeat(auto-fill,minmax(64px,1fr));gap:8px;margin:4px 0 10px}.pc{position:relative;font-size:10px;line-height:1.2;color:var(--muted)}.pc span{display:block;margin-top:3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.pt{width:100%;aspect-ratio:4/5;border:1.5px dashed var(--line);border-radius:8px;background:var(--panel) center/cover;font:700 14px var(--sans);color:var(--muted);cursor:pointer}.pc.on .pt{border:0}.px{position:absolute;top:3px;right:3px;width:20px;height:20px;border-radius:50%;border:0;background:rgba(0,0,0,.6);color:#fff;font-size:14px;line-height:20px;cursor:pointer;padding:0}
-.frame.pointing{cursor:pointer}.post .slot-on{outline:14px solid #2f7cf6!important;outline-offset:-14px;filter:brightness(1.06)}.frame{position:relative}.frame.pointing::after{content:attr(data-hint);position:absolute;left:50%;bottom:12px;transform:translateX(-50%);background:#2f7cf6;color:#fff;font:600 12px/1.2 var(--sans,sans-serif);padding:7px 12px;border-radius:999px;white-space:nowrap;z-index:20;pointer-events:none;box-shadow:0 2px 8px rgba(0,0,0,.25)}
+.frame.pointing{cursor:pointer}.post .slot-on{outline:14px solid #2f7cf6!important;outline-offset:-14px;filter:brightness(1.06)}.frame{position:relative}.frame.texting{cursor:text}.post .tx-on{outline:6px dashed #2f7cf6;outline-offset:6px;border-radius:4px}.txed{position:absolute;z-index:50;width:340px;background:var(--panel,#fff);border:1px solid var(--line);border-radius:12px;box-shadow:0 12px 32px rgba(0,0,0,.18);padding:12px}.txed label{display:block;font-size:12px;color:var(--muted);margin-bottom:6px}.txed textarea{width:100%;box-sizing:border-box;font:15px/1.4 var(--sans,sans-serif);padding:8px;border:1px solid var(--line);border-radius:8px;resize:vertical}.txb{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap}.txb .btn{padding:7px 12px;font-size:13px}.frame.pointing::after{content:attr(data-hint);position:absolute;left:50%;bottom:12px;transform:translateX(-50%);background:#2f7cf6;color:#fff;font:600 12px/1.2 var(--sans,sans-serif);padding:7px 12px;border-radius:999px;white-space:nowrap;z-index:20;pointer-events:none;box-shadow:0 2px 8px rgba(0,0,0,.25)}
 .acts{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}.hint{font-size:13px;color:var(--muted);margin:0 0 10px;line-height:1.45}
 .capbox{max-width:720px;margin-top:10px;border-top:1px solid var(--line)}
 .cell .act{display:flex;justify-content:space-between;align-items:center;font-size:12px;color:var(--muted);width:var(--pw)}
@@ -185,7 +185,7 @@ summary{font:600 12px/1 var(--mono);letter-spacing:.1em;text-transform:uppercase
   </details>
 
   <details open><summary>Images and past artists</summary>
-    <p class="hint" style="background:#eef4ff;border-radius:8px;padding:10px 12px;color:#1d3d7a"><b>Tip:</b> click any photo on a slide, or drag an image onto it, to put an image exactly there.</p>
+    <p class="hint" style="background:#eef4ff;border-radius:8px;padding:10px 12px;color:#1d3d7a"><b>Tip:</b> click any photo on a slide, or drag an image onto it, to put an image exactly there. Click any text on a slide to rewrite it.</p>
     <p class="hint"><b>Month artworks</b>: every photo in the 30 days gets its own artwork, none is used twice. <span id="artNeed"></span></p>
     <div class="f"><label for="poolUp">Add artworks (select several at once; they fill the empty slots in posting order)</label><input id="poolUp" type="file" accept="image/*" multiple></div>
     <div class="pool" id="poolGrid"></div>
@@ -328,6 +328,36 @@ function slotKeyFor(el, frame){
   if (u) { for (const [k, v] of Object.entries(state.images)) if (v === u && !k.startsWith('ov|')) return k; }
   return frame.dataset.okey;   // fallback: replace this slide's photo
 }
+// ---------- edit any text on a slide: click the words in the preview ----------
+const TXT = () => (state.texts = state.texts || {});
+const textNodes = root => { const w = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, {acceptNode: n => /\S/.test(n.nodeValue) && !n.parentElement.closest('svg,style') ? 1 : 2}); const out = []; while (w.nextNode()) out.push(w.currentNode); return out; };
+function applyTexts(s, base){
+  const keys = Object.keys(TXT()).filter(k => k.startsWith(base + '|')); if (!keys.length || !s.html) return s;
+  const t = document.createElement('template'); t.innerHTML = s.html; const nodes = textNodes(t.content);
+  keys.forEach(k => { const n = nodes[+k.slice(base.length + 1)]; if (n) n.nodeValue = TXT()[k]; });
+  return {...s, html: t.innerHTML};
+}
+function textAt(frame, x, y){
+  const r = document.caretRangeFromPoint ? document.caretRangeFromPoint(x, y) : null; const n = r && r.startContainer;
+  if (!n || n.nodeType !== 3 || !/\S/.test(n.nodeValue) || !frame.contains(n)) return null;
+  const rg = document.createRange(); rg.selectNodeContents(n); if (![...rg.getClientRects()].some(b => x >= b.left - 2 && x <= b.right + 2 && y >= b.top - 2 && y <= b.bottom + 2)) return null;
+  const post = frame.querySelector('.post'); return {node: n, idx: textNodes(post).indexOf(n)};
+}
+function editText(frame, hit, x, y){
+  document.querySelectorAll('.txed').forEach(e => e.remove());
+  const key = frame.dataset.tkey + '|' + hit.idx; const orig = hit.node.nodeValue;
+  const box = document.createElement('div'); box.className = 'txed';
+  box.innerHTML = `<label>Edit text</label><textarea rows="3"></textarea><div class="txb"><button type="button" class="btn" data-a="save">Save</button>${TXT()[key] !== undefined ? '<button type="button" class="btn ghost" data-a="reset">Back to original</button>' : ''}<button type="button" class="btn ghost" data-a="cancel">Cancel</button></div>`;
+  document.body.appendChild(box); const ta = box.querySelector('textarea'); ta.value = orig.replace(/\s+/g, ' ').trim();
+  const W = 340; box.style.left = Math.max(8, Math.min(innerWidth - W - 8, x - W / 2)) + scrollX + 'px'; box.style.top = (y + 14 + scrollY) + 'px';
+  const close = () => box.remove();
+  const save = () => { const v = ta.value.replace(/\s*\n\s*/g, ' '); if (v.trim() === orig.replace(/\s+/g, ' ').trim()) { close(); return; }
+    const lead = /^\s/.test(orig) ? ' ' : '', trail = /\s$/.test(orig) ? ' ' : ''; TXT()[key] = lead + v.trim() + trail; close(); render(); status('Text changed. Press "Save call" to keep it.'); };
+  box.querySelector('[data-a=save]').onclick = save; box.querySelector('[data-a=cancel]').onclick = close;
+  const rs = box.querySelector('[data-a=reset]'); if (rs) rs.onclick = () => { delete TXT()[key]; close(); render(); };
+  ta.onkeydown = e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); save(); } if (e.key === 'Escape') close(); };
+  ta.focus(); ta.select();
+}
 function slotName(k){ k = String(k || ''); let m;
   if ((m = k.match(/^pool(\d+)$/))) return 'month artwork ' + m[1];
   if ((m = k.match(/^pa(\d+)$/))) return 'past artist ' + m[1];
@@ -338,10 +368,13 @@ function putImage(key, file){ if (!key || !file || !/^image\//.test(file.type)) 
 function wireSlots(){
   $('out').querySelectorAll('.frame').forEach(frame => {
     const pick = e => { const el = slotsUnder(frame, e.clientX, e.clientY)[0]; return el ? {el, key: slotKeyFor(el, frame)} : null; };
+    const clearTx = () => frame.querySelectorAll('.tx-on').forEach(x => x.classList.remove('tx-on'));
     const hover = (el, key) => { frame.querySelectorAll('.slot-on').forEach(x => x !== el && x.classList.remove('slot-on')); if (el) { el.classList.add('slot-on'); frame.dataset.hint = 'Click or drop an image: ' + slotName(key); } frame.classList.toggle('pointing', !!el); };
-    frame.addEventListener('mousemove', e => { const p = pick(e); hover(p && p.el, p && p.key); });
-    frame.addEventListener('mouseleave', () => hover(null));
-    frame.addEventListener('click', e => { const p = pick(e); if (!p) return; const inp = document.createElement('input'); inp.type = 'file'; inp.accept = 'image/*'; inp.onchange = () => putImage(p.key, inp.files[0]); inp.click(); });
+    frame.addEventListener('mousemove', e => { const t = textAt(frame, e.clientX, e.clientY); clearTx();
+      if (t) { hover(null); t.node.parentElement.classList.add('tx-on'); frame.dataset.hint = 'Click to edit this text'; frame.classList.add('pointing', 'texting'); return; }
+      frame.classList.remove('texting'); const p = pick(e); hover(p && p.el, p && p.key); });
+    frame.addEventListener('mouseleave', () => { hover(null); clearTx(); frame.classList.remove('texting'); });
+    frame.addEventListener('click', e => { const t = textAt(frame, e.clientX, e.clientY); if (t && t.idx >= 0) { editText(frame, t, e.clientX, e.clientY); return; } const p = pick(e); if (!p) return; const inp = document.createElement('input'); inp.type = 'file'; inp.accept = 'image/*'; inp.onchange = () => putImage(p.key, inp.files[0]); inp.click(); });
     frame.addEventListener('dragover', e => { const p = pick(e); if (p) { e.preventDefault(); hover(p.el, p.key); } });
     frame.addEventListener('dragleave', () => hover(null));
     frame.addEventListener('drop', e => { const p = pick(e); hover(null); if (!p) return; e.preventDefault(); putImage(p.key, e.dataTransfer.files[0]); });
@@ -586,14 +619,15 @@ function render(){
       VERB = verbFor(99); });
   }
   groups.forEach(g => { const t = g.title.replace(/^[^·]*·\s*/, ''); g.slides = g.slides.map((s, j) => { const o = state.images['ov|' + t + '|' + j];
-    return o && s.html ? {...s, html: s.html.replace(/background-image:url\([^)]*\)/, 'background-image:url(' + o + ')')} : s; }); });
+    const s2 = o && s.html ? {...s, html: s.html.replace(/background-image:url\([^)]*\)/, 'background-image:url(' + o + ')')} : s;
+    return applyTexts(s2, 'tx|' + t + '|' + j); }); });
   renderPool();
   RENDERED = [];
   $('out').innerHTML = groups.map((g,gi) => {
     const cells = g.slides.map((s,j) => { const i = RENDERED.push({ s, name: `${base}-${g.left !== undefined ? String(g.idx+1).padStart(2,'0')+'-' : 'story-'}${String(j+1).padStart(2,'0')}-${s.title}.png` }) - 1;
        const okey = 'ov|' + g.title.replace(/^[^·]*·\s*/, '') + '|' + j; const has = !!state.images[okey];
       const photoBtns = has ? `<button type="button" data-phx="${esc(okey)}">Reset photo</button>` : '';
-      return `<div class="cell"><div class="frame${s.h ? ' tall' : ''}" data-okey="${esc(okey)}">${slideNode(s)}</div><div class="act"><span>${g.slides.length>1 ? 'Slide ' + (j+1) : 'Single'}</span><span class="acts">${photoBtns}<button type="button" data-i="${i}">Save PNG</button></span></div></div>`; }).join('');
+      return `<div class="cell"><div class="frame${s.h ? ' tall' : ''}" data-okey="${esc(okey)}" data-tkey="${esc('tx|' + g.title.replace(/^[^·]*·\s*/, '') + '|' + j)}">${slideNode(s)}</div><div class="act"><span>${g.slides.length>1 ? 'Slide ' + (j+1) : 'Single'}</span><span class="acts">${photoBtns}<button type="button" data-i="${i}">Save PNG</button></span></div></div>`; }).join('');
     const capBox = g.cap ? `<details class="capbox"><summary>Caption and pinned comment</summary><div class="f"><textarea id="cap${gi}" style="min-height:220px">${esc(g.cap)}</textarea></div><div class="f"><label>Pinned comment</label><input value="${esc(g.pin)}"></div><button class="btn ghost" type="button" data-cap="cap${gi}" style="margin-top:8px">Copy caption</button></details>` : '';
     const ckey = (state.name || '') + ' | ' + g.title.replace(/^[^·]*·\s*/, '');
     const clink = canvaLink(ckey);
