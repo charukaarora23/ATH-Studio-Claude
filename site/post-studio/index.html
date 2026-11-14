@@ -64,6 +64,7 @@ summary{font:600 12px/1 var(--mono);letter-spacing:.1em;text-transform:uppercase
 .group{margin-bottom:34px}
 .canva{display:flex;gap:10px;align-items:center;margin-top:12px}.canva .btn{padding:9px 14px;font-size:13px;text-decoration:none}.cmiss{font-size:13px;color:var(--muted)}
 .pool{display:grid;grid-template-columns:repeat(auto-fill,minmax(64px,1fr));gap:8px;margin:4px 0 10px}.pc{position:relative;font-size:10px;line-height:1.2;color:var(--muted)}.pc span{display:block;margin-top:3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.pt{width:100%;aspect-ratio:4/5;border:1.5px dashed var(--line);border-radius:8px;background:var(--panel) center/cover;font:700 14px var(--sans);color:var(--muted);cursor:pointer}.pc.on .pt{border:0}.px{position:absolute;top:3px;right:3px;width:20px;height:20px;border-radius:50%;border:0;background:rgba(0,0,0,.6);color:#fff;font-size:14px;line-height:20px;cursor:pointer;padding:0}
+.frame.pointing{cursor:pointer}.post .slot-on{outline:14px solid #2f7cf6!important;outline-offset:-14px;filter:brightness(1.06)}.frame{position:relative}.frame.pointing::after{content:attr(data-hint);position:absolute;left:50%;bottom:12px;transform:translateX(-50%);background:#2f7cf6;color:#fff;font:600 12px/1.2 var(--sans,sans-serif);padding:7px 12px;border-radius:999px;white-space:nowrap;z-index:20;pointer-events:none;box-shadow:0 2px 8px rgba(0,0,0,.25)}
 .acts{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}.hint{font-size:13px;color:var(--muted);margin:0 0 10px;line-height:1.45}
 .capbox{max-width:720px;margin-top:10px;border-top:1px solid var(--line)}
 .cell .act{display:flex;justify-content:space-between;align-items:center;font-size:12px;color:var(--muted);width:var(--pw)}
@@ -184,6 +185,7 @@ summary{font:600 12px/1 var(--mono);letter-spacing:.1em;text-transform:uppercase
   </details>
 
   <details open><summary>Images and past artists</summary>
+    <p class="hint" style="background:#eef4ff;border-radius:8px;padding:10px 12px;color:#1d3d7a"><b>Tip:</b> click any photo on a slide, or drag an image onto it, to put an image exactly there.</p>
     <p class="hint"><b>Month artworks</b>: every photo in the 30 days gets its own artwork, none is used twice. <span id="artNeed"></span></p>
     <div class="f"><label for="poolUp">Add artworks (select several at once; they fill the empty slots in posting order)</label><input id="poolUp" type="file" accept="image/*" multiple></div>
     <div class="pool" id="poolGrid"></div>
@@ -319,6 +321,32 @@ function multiFill(prefix, max){ return async e => { const files = [...e.target.
   e.target.value = ''; render(); status(added + ' image' + (added === 1 ? '' : 's') + ' added. Press "Save call" to keep them.'); }; }
 $('paUp').addEventListener('change', multiFill('pa', 40));
 $('cvUp').addEventListener('change', multiFill('cv', 12));
+// ---------- put an image exactly where you want it: click or drop on the photo in the preview ----------
+function slotKeyFor(el, frame){
+  if (el.dataset.slot) return el.dataset.slot;
+  const m = (el.style.backgroundImage || '').match(/url\(["']?(.*?)["']?\)$/); const u = m && m[1];
+  if (u) { for (const [k, v] of Object.entries(state.images)) if (v === u && !k.startsWith('ov|')) return k; }
+  return frame.dataset.okey;   // fallback: replace this slide's photo
+}
+function slotName(k){ k = String(k || ''); let m;
+  if ((m = k.match(/^pool(\d+)$/))) return 'month artwork ' + m[1];
+  if ((m = k.match(/^pa(\d+)$/))) return 'past artist ' + m[1];
+  if ((m = k.match(/^cv(\d+)$/))) return 'book cover ' + m[1];
+  return {imgCover:'cover artwork', imgTheme:'theme artwork', imgBooks:'the books together', imgSpread:'open spread', phSpread2:'a second spread', phShelf:'book on a shelf', phHolding:'artist holding their copy', phStoryWork:'the artwork they sent', phStoryPage:'their page in the book', phPast1:'past edition 1', phPast2:'past edition 2'}[k] || 'this slide'; }
+function slotsUnder(frame, x, y){ return document.elementsFromPoint(x, y).filter(el => frame.contains(el) && el.matches('.post [data-slot], .post .img, .post .ph')); }
+function putImage(key, file){ if (!key || !file || !/^image\//.test(file.type)) return; shrink(file).then(url => { state.images[key] = url; render(); status('Image placed. Press "Save call" to keep it.'); }); }
+function wireSlots(){
+  $('out').querySelectorAll('.frame').forEach(frame => {
+    const pick = e => { const el = slotsUnder(frame, e.clientX, e.clientY)[0]; return el ? {el, key: slotKeyFor(el, frame)} : null; };
+    const hover = (el, key) => { frame.querySelectorAll('.slot-on').forEach(x => x !== el && x.classList.remove('slot-on')); if (el) { el.classList.add('slot-on'); frame.dataset.hint = 'Click or drop an image: ' + slotName(key); } frame.classList.toggle('pointing', !!el); };
+    frame.addEventListener('mousemove', e => { const p = pick(e); hover(p && p.el, p && p.key); });
+    frame.addEventListener('mouseleave', () => hover(null));
+    frame.addEventListener('click', e => { const p = pick(e); if (!p) return; const inp = document.createElement('input'); inp.type = 'file'; inp.accept = 'image/*'; inp.onchange = () => putImage(p.key, inp.files[0]); inp.click(); });
+    frame.addEventListener('dragover', e => { const p = pick(e); if (p) { e.preventDefault(); hover(p.el, p.key); } });
+    frame.addEventListener('dragleave', () => hover(null));
+    frame.addEventListener('drop', e => { const p = pick(e); hover(null); if (!p) return; e.preventDefault(); putImage(p.key, e.dataTransfer.files[0]); });
+  });
+}
 function renderPool(){
   renderPeople('paGrid', 'pa', PAST_ARTISTS(), 6, paImg); renderPeople('cvGrid', 'cv', COVER_ARTISTS(), 3, cvImg);
   const keys = artPlan(); const g = $('poolGrid'); if (!g) return;
@@ -370,8 +398,8 @@ const tint = c => mix(c, '#FFFFFF', .72);         // light version of the call c
 const rgba = (hex, a) => { const h = hex.replace('#',''); return `rgba(${parseInt(h.substr(0,2),16)},${parseInt(h.substr(2,2),16)},${parseInt(h.substr(4,2),16)},${a})`; };
 const gap = (v, label) => v ? esc(v) : `<span class="gap">${esc(label)}</span>`;
 const photo = (k, label, style, col) => state.images[k]
-  ? `<div class="a img" style="${style};background-image:url(${state.images[k]});background-position:center;border-radius:18px"></div>`
-  : `<div class="a ph" style="${style};color:${col}">Real photo needed<br>${esc(label)}</div>`;
+  ? `<div data-slot="${k}" class="a img" style="${style};background-image:url(${state.images[k]});background-position:center;border-radius:18px"></div>`
+  : `<div data-slot="${k}" class="a ph" style="${style};color:${col}">Real photo needed<br>${esc(label)}</div>`;
 let VERB = 'DM';
 const KW = () => esc((state.keyword || 'KEYWORD').toUpperCase());
 
@@ -392,7 +420,7 @@ function launch(){
 
   // 1 cover
   S.push({bg:INK, html:`
-    <div class="a img" style="inset:0;background-image:url(${state.images.imgCover || ''});background-position:center 6%"></div>
+    <div data-slot="imgCover" class="a img" style="inset:0;background-image:url(${state.images.imgCover || ''});background-position:center 6%"></div>
     <div class="a" style="inset:0;background:linear-gradient(180deg,rgba(20,14,12,.38) 0%,rgba(20,14,12,0) 16%,rgba(20,14,12,0) 40%,rgba(20,14,12,.6) 62%,rgba(20,14,12,.82) 100%)"></div>
     ${corners(WHITE, WHITE, state.series)}
     <div class="a" style="left:0;right:0;top:650px;display:flex;justify-content:center"><span class="cn" style="display:inline-flex;align-items:center;height:46px;padding:0 26px;background:${Tn};color:${INK};border-radius:999px">Open call · ${esc(state.editionLabel || ('Edition ' + state.edition))}</span></div>
@@ -419,7 +447,7 @@ function launch(){
 
   // 4 the theme
   S.push({bg:INK, html:`
-    <div class="a img" style="inset:0;background-image:url(${state.images.imgTheme || ''});background-position:center 44%"></div>
+    <div data-slot="imgTheme" class="a img" style="inset:0;background-image:url(${state.images.imgTheme || ''});background-position:center 44%"></div>
     <div class="a" style="inset:0;background:linear-gradient(180deg,rgba(20,9,12,.9) 0%,rgba(20,9,12,.5) 26%,rgba(20,9,12,0) 42%,rgba(20,9,12,0) 62%,rgba(20,9,12,.85) 80%,rgba(20,9,12,.95) 100%)"></div>
     ${corners(WHITE, PEONY, 'The theme')}
     <p class="a c ser" style="left:100px;right:100px;top:160px;font-size:76px;line-height:1.08;letter-spacing:-.015em;color:${WHITE}">“${esc(state.quote)}”</p>
@@ -476,7 +504,7 @@ function launch(){
   // 10 published artists: six, three across
   const al = PAST_ARTISTS();
   const card = i => { const [n, e] = al[i] || []; const u = paImg(i);
-    return `<div>${u ? `<div class="img" style="height:330px;border-radius:12px;background-image:url(${u});background-position:center"></div>` : `<div class="ph" style="height:330px;font-size:18px;color:${WHITE}">Their work</div>`}
+    return `<div>${u ? `<div data-slot="pa${i + 1}" class="img" style="height:330px;border-radius:12px;background-image:url(${u});background-position:center"></div>` : `<div data-slot="pa${i + 1}" class="ph" style="height:330px;font-size:18px;color:${WHITE}">Their work</div>`}
       <p style="font-size:26px;font-weight:600;line-height:1.2;margin-top:16px">${gap(n, 'Artist name')}</p>
       <p style="font-size:20px;opacity:.7;line-height:1.3;margin-top:6px">${gap(e, 'Edition · Country')}</p></div>`; };
   S.push({bg:INK, html:`${corners(WHITE, PEONY, 'From past editions')}
@@ -488,7 +516,7 @@ function launch(){
   const ca = COVER_ARTISTS();
   const cover = i => { const [n, e] = ca[i] || []; const u = cvImg(i);
     return `<div style="display:flex;flex-direction:column;align-items:center;text-align:center">
-      ${u ? `<div class="img" style="width:310px;height:440px;border-radius:6px;background-image:url(${u});background-position:center"></div>` : `<div class="ph" style="width:310px;height:440px;font-size:18px;color:${INK}">Book cover</div>`}
+      ${u ? `<div data-slot="cv${i + 1}" class="img" style="width:310px;height:440px;border-radius:6px;background-image:url(${u});background-position:center"></div>` : `<div data-slot="cv${i + 1}" class="ph" style="width:310px;height:440px;font-size:18px;color:${INK}">Book cover</div>`}
       <p style="font-size:28px;font-weight:600;line-height:1.2;margin-top:30px">${gap(n, 'Artist name')}</p>
       <p style="font-family:'ATH Serif',serif;font-style:italic;font-size:24px;line-height:1.3;opacity:.75;margin-top:8px">${gap(e, 'Book or edition')}</p></div>`; };
   S.push({bg:CREAM, html:`${corners(INK, BURG, 'On the cover')}
@@ -563,9 +591,9 @@ function render(){
   RENDERED = [];
   $('out').innerHTML = groups.map((g,gi) => {
     const cells = g.slides.map((s,j) => { const i = RENDERED.push({ s, name: `${base}-${g.left !== undefined ? String(g.idx+1).padStart(2,'0')+'-' : 'story-'}${String(j+1).padStart(2,'0')}-${s.title}.png` }) - 1;
-      const hasImg = /background-image:url\(/.test(s.html || ''); const okey = 'ov|' + g.title.replace(/^[^·]*·\s*/, '') + '|' + j; const has = !!state.images[okey];
-      const photoBtns = hasImg ? `<button type="button" data-ph="${esc(okey)}">${has ? 'Change photo' : 'Change photo'}</button>${has ? `<button type="button" data-phx="${esc(okey)}">Reset</button>` : ''}` : '';
-      return `<div class="cell"><div class="frame${s.h ? ' tall' : ''}">${slideNode(s)}</div><div class="act"><span>${g.slides.length>1 ? 'Slide ' + (j+1) : 'Single'}</span><span class="acts">${photoBtns}<button type="button" data-i="${i}">Save PNG</button></span></div></div>`; }).join('');
+       const okey = 'ov|' + g.title.replace(/^[^·]*·\s*/, '') + '|' + j; const has = !!state.images[okey];
+      const photoBtns = has ? `<button type="button" data-phx="${esc(okey)}">Reset photo</button>` : '';
+      return `<div class="cell"><div class="frame${s.h ? ' tall' : ''}" data-okey="${esc(okey)}">${slideNode(s)}</div><div class="act"><span>${g.slides.length>1 ? 'Slide ' + (j+1) : 'Single'}</span><span class="acts">${photoBtns}<button type="button" data-i="${i}">Save PNG</button></span></div></div>`; }).join('');
     const capBox = g.cap ? `<details class="capbox"><summary>Caption and pinned comment</summary><div class="f"><textarea id="cap${gi}" style="min-height:220px">${esc(g.cap)}</textarea></div><div class="f"><label>Pinned comment</label><input value="${esc(g.pin)}"></div><button class="btn ghost" type="button" data-cap="cap${gi}" style="margin-top:8px">Copy caption</button></details>` : '';
     const ckey = (state.name || '') + ' | ' + g.title.replace(/^[^·]*·\s*/, '');
     const clink = canvaLink(ckey);
@@ -576,6 +604,7 @@ function render(){
   $('out').querySelectorAll('[data-i]').forEach(b => b.onclick = () => saveOne(Number(b.dataset.i)));
   $('out').querySelectorAll('[data-ph]').forEach(b => b.onclick = () => { const inp = document.createElement('input'); inp.type = 'file'; inp.accept = 'image/*';
     inp.onchange = () => { const file = inp.files[0]; if (!file) return; shrink(file).then(url => { state.images[b.dataset.ph] = url; render(); status('Photo changed. Press "Save call" to keep it.'); }); }; inp.click(); });
+  wireSlots();
   $('out').querySelectorAll('[data-phx]').forEach(b => b.onclick = () => { delete state.images[b.dataset.phx]; render(); });
   $('out').querySelectorAll('[data-cap]').forEach(b => b.onclick = async () => { const t = $(b.dataset.cap); try { await navigator.clipboard.writeText(t.value); status('Caption copied.'); } catch { t.select(); status('Selected: press copy.'); } });
   $('out').querySelectorAll('[data-cedit]').forEach(b => b.onclick = () => { const k = b.parentElement.dataset.ckey;

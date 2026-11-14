@@ -35,7 +35,9 @@ let ART_CTX = null, ART_ORDER = {}, ART_KEYS = [];
 function artNext(){ return ART_CTX ? 'ARTSLOT' + (ART_CTX.n++) + 'X' : SAMPLE_ART[0]; }
 function artBuild(p){ ART_CTX = {n:0}; let slides; try { slides = p.slides(); } finally { ART_CTX = null; } return slides; }
 function artKeys(p, slides){ const ks = []; slides.forEach(s => String(s.html || '').replace(/ARTSLOT(\d+)X/g, (m, n) => { const k = p.title + '#' + n; if (!ks.includes(k)) ks.push(k); return m; })); return ks; }
-function artFill(p, slides){ return slides.map(s => s.html ? {...s, html: s.html.replace(/ARTSLOT(\d+)X/g, (m, n) => artFor(ART_ORDER[p.title + '#' + n]))} : s); }
+function artFill(p, slides){ return slides.map(s => { if (!s.html) return s; const idx = n => ART_ORDER[p.title + '#' + n];
+  let h = s.html.replace(/style="([^"]*?)url\(ARTSLOT(\d+)X\)/g, (m, pre, n) => `data-slot="pool${idx(n) + 1}" style="${pre}url(${artFor(idx(n))})`);
+  h = h.replace(/ARTSLOT(\d+)X/g, (m, n) => artFor(idx(n))); return {...s, html: h}; }); }
 function artFor(i){
   if (i === undefined) return SAMPLE_ART[0];
   const up = state.images['pool' + (i + 1)]; if (up) return up;
@@ -221,7 +223,7 @@ const T = {
   photo(o){
     const g = G[o.ground||'cream']();
     return {bg:g.bg, html:`${corners(g.fg, g.dm, o.tr)}
-      ${slot(o.img, o.label, 'left:80px;right:80px;top:150px;height:700px', g.fg)}
+      ${slot(o.img || (o.key && state.images[o.key]), o.label, 'left:80px;right:80px;top:150px;height:700px', g.fg).replace('<div class="a', `<div data-slot="${o.key || ''}" class="a`)}
       <p class="a R" style="left:76px;right:80px;top:900px;font-size:${o.size||68}px;color:${g.fg}">${o.head}</p>
       ${o.sub ? `<p class="a sub" style="left:80px;right:140px;top:${o.subTop||1010}px;color:${g.fg};opacity:.8">${o.sub}</p>` : ''}`};
   },
@@ -230,7 +232,7 @@ const T = {
     const g = G[o.ground||'cream']();
     if (o.from !== undefined) o.items = o.items.map((_, i) => { const a = PAST_ARTISTS()[o.from + i] || []; return {name: a[0] ? esc(a[0]) : '', meta: a[1] ? esc(a[1]) : '', img: paImg(o.from + i)}; });
     const cell = (it,i) => { const x = i%2 ? 556 : 80, y = i<2 ? 260 : 760;
-      return `${slot(it.img, 'Artwork', `left:${x}px;top:${y}px;width:444px;height:380px`, g.fg)}
+      return `${slot(it.img, 'Artwork', `left:${x}px;top:${y}px;width:444px;height:380px`, g.fg).replace('<div class="a', `<div data-slot="${o.from !== undefined ? 'pa' + (o.from + i + 1) : ''}" class="a`)}
         <p class="a" style="left:${x}px;top:${y+398}px;font-size:26px;font-weight:600;color:${g.fg}">${gap(it.name,'Artist name')}</p>
         <p class="a" style="left:${x}px;top:${y+438}px;font-size:22px;opacity:.7;color:${g.fg}">${gap(it.meta,'Title · Country')}</p>`; };
     return {bg:g.bg, html:`${corners(g.fg, g.dm, o.tr)}
@@ -515,9 +517,9 @@ ${tags}`},
  {left:24, title:'Inside the book', kind:'Carousel · proof', slides:() => [
    T.hook({ground:'ink', img2: state.images.imgSpread || null, imgLabel:'Real photo needed<br>A spread from a past edition', size:72, tr:'Inside the book', head:'This is what being published with us looks like.', sub:`Selected artists appear in the ${name} exactly like this.`}),
    T.photo({img:state.images.imgSpread, label:'Real photo needed<br>A spread from a past edition', tr:'Inside the book', head:'Every artist, in print.', sub:'Name, artwork title, medium and country, on the page.'}),
-   T.photo({img:null, label:'Real photo needed<br>A second spread', tr:'Inside the book', head:'Juried and curated.', sub:'Each edition is selected by a jury and laid out as one collection.', ground:'ink'}),
-   T.photo({img:null, label:'Real photo needed<br>The book on a shelf or in a shop', tr:'Inside the book', head:'Seen worldwide.', sub:`Through ${esc(state.distribution || 'Amazon, Barnes & Noble and the ATH Shop')}.`}),
-   T.photo({img:null, label:'Real photo needed<br>An artist holding their copy', tr:'Inside the book', head:'Introduced beyond the feed.', sub:'Each book is shared with collectors, galleries and curators.', ground:'ink'}),
+   T.photo({key:'phSpread2', img:null, label:'Real photo needed<br>A second spread', tr:'Inside the book', head:'Juried and curated.', sub:'Each edition is selected by a jury and laid out as one collection.', ground:'ink'}),
+   T.photo({key:'phShelf', img:null, label:'Real photo needed<br>The book on a shelf or in a shop', tr:'Inside the book', head:'Seen worldwide.', sub:`Through ${esc(state.distribution || 'Amazon, Barnes & Noble and the ATH Shop')}.`}),
+   T.photo({key:'phHolding', img:null, label:'Real photo needed<br>An artist holding their copy', tr:'Inside the book', head:'Introduced beyond the feed.', sub:'Each book is shared with collectors, galleries and curators.', ground:'ink'}),
    T.cta({kicker:'Your page could be next'}),
  ], caption:() => `This is what being published with Arts to Hearts looks like.
 
@@ -621,8 +623,8 @@ ${tags}`},
  {left:13, title:'From submission to print', kind:'Carousel · artist story', slides:() => [
    T.hook({img:ART[4], pos:'center 40%', tr:'An artist’s story', head:`Submit to the ${name} and see your work in print.`, size:76, sub:'How one past artist went from submission to a published page.'}),
    T.quote({tr:'An artist’s story'}),
-   T.photo({img:null, label:'Real photo needed<br>The artwork they submitted', tr:'An artist’s story', head:'The work they sent.', sub:gap(state.storyWork,'Title, medium, and why they chose it')}),
-   T.photo({img:null, label:'Real photo needed<br>Their page in the book', tr:'An artist’s story', head:'The page it became.', sub:gap(state.storyAfter,'Edition and what happened next'), ground:'ink'}),
+   T.photo({key:'phStoryWork', img:null, label:'Real photo needed<br>The artwork they submitted', tr:'An artist’s story', head:'The work they sent.', sub:gap(state.storyWork,'Title, medium, and why they chose it')}),
+   T.photo({key:'phStoryPage', img:null, label:'Real photo needed<br>Their page in the book', tr:'An artist’s story', head:'The page it became.', sub:gap(state.storyAfter,'Edition and what happened next'), ground:'ink'}),
    T.howto(),
    T.cta({kicker:'Your page could be next'}),
  ], caption:() => `Submit to the ${N()} and see your work in print.
@@ -682,8 +684,8 @@ ${closeLn()}
 ${tags}`},
  {left:8, title:'Next on the shelf', kind:'Carousel · proof', slides:() => [
    T.hook({img:ART[3], tr:'The collection', head:`Get your work on our shelf: the ${name} is open.`, size:76, sub:`${sel} artists will join the next book in the series.`}),
-   T.photo({img:null, label:`Real photo needed<br>${esc(PAST()[0] || 'A past edition')}`, tr:'The collection', head:`${esc(PAST()[0] || 'A past edition')}: published.`, size:56, subTop:1060, sub:`Seen through ${esc(state.distribution || 'Amazon, Barnes & Noble and the ATH Shop')}.`}),
-   T.photo({img:null, label:`Real photo needed<br>${esc(PAST()[1] || PAST()[0] || 'Another past edition')}`, tr:'The collection', head:`${esc(PAST()[1] || PAST()[0] || 'Another past edition')}: published.`, size:56, subTop:1060, sub:'Shared with collectors, galleries and curators.', ground:'ink'}),
+   T.photo({key:'phPast1', img:null, label:`Real photo needed<br>${esc(PAST()[0] || 'A past edition')}`, tr:'The collection', head:`${esc(PAST()[0] || 'A past edition')}: published.`, size:56, subTop:1060, sub:`Seen through ${esc(state.distribution || 'Amazon, Barnes & Noble and the ATH Shop')}.`}),
+   T.photo({key:'phPast2', img:null, label:`Real photo needed<br>${esc(PAST()[1] || PAST()[0] || 'Another past edition')}`, tr:'The collection', head:`${esc(PAST()[1] || PAST()[0] || 'Another past edition')}: published.`, size:56, subTop:1060, sub:'Shared with collectors, galleries and curators.', ground:'ink'}),
    T.value({ground:'cream', art:ART[4]}),
    T.cta({kicker:'Be in the next one'}),
  ], caption:() => `Get your work on our shelf: the ${N()} is open.
