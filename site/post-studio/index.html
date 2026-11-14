@@ -58,6 +58,7 @@ summary{font:600 12px/1 var(--mono);letter-spacing:.1em;text-transform:uppercase
 .frame>.post{transform:scale(var(--sc));transform-origin:0 0}
 .frame.tall{height:calc(var(--pw) * 1.7778)}
 .group{margin-bottom:34px}
+.canva{display:flex;gap:10px;align-items:center;margin-top:12px}.canva .btn{padding:9px 14px;font-size:13px;text-decoration:none}.cmiss{font-size:13px;color:var(--muted)}
 .capbox{max-width:720px;margin-top:10px;border-top:1px solid var(--line)}
 .cell .act{display:flex;justify-content:space-between;align-items:center;font-size:12px;color:var(--muted);width:var(--pw)}
 .cell .act button{font:600 12px/1 var(--sans);border:1px solid var(--line);background:var(--panel);color:var(--ink);border-radius:8px;padding:6px 9px;cursor:pointer}
@@ -196,6 +197,7 @@ summary{font:600 12px/1 var(--mono);letter-spacing:.1em;text-transform:uppercase
 <div id="stage" aria-hidden="true"></div>
 
 <script src="month.js"></script>
+<script src="canva-links.js"></script>
 <script>
 const $ = id => document.getElementById(id);
 // ATH brand colours: fixed on every call
@@ -460,7 +462,7 @@ const slideNode = s => `<div class="post" style="background:${s.bg};height:${s.h
 function verbFor(left){ const d = new Date(dl()); d.setDate(d.getDate() - left); const [y,m,dd] = String(state.commentFrom||'').split('-').map(Number); return (y && d >= new Date(y, m-1, dd)) ? 'COMMENT' : 'DM'; }
 function postDate(left){ const d = new Date(dl()); d.setDate(d.getDate() - left); return d.getDate() + ' ' + MONTHS[d.getMonth()]; }
 function buildPtype(){ const sel = $('ptype'), cur = sel.value;
-  sel.innerHTML = '<option value="month">Whole month (${monthPosts().length} feed posts)</option>' + monthPosts().map((p,i) => `<option value="${i}">${postDate(p.left)} · ${esc(p.title)} (${p.kind.split(' ·')[0]})</option>`).join('') + '<option value="stories">Stories (10 frames)</option>';
+  sel.innerHTML = `<option value="month">Whole month (${monthPosts().length} feed posts)</option>` + monthPosts().map((p,i) => `<option value="${i}">${postDate(p.left)} · ${esc(p.title)} (${p.kind.split(' ·')[0]})</option>`).join('') + '<option value="stories">Stories (10 frames)</option>';
   sel.value = cur || '0'; if (!sel.value) sel.value = '0'; }
 function render(){
   readForm();
@@ -484,11 +486,21 @@ function render(){
     const cells = g.slides.map((s,j) => { const i = RENDERED.push({ s, name: `${base}-${g.left !== undefined ? String(g.idx+1).padStart(2,'0')+'-' : 'story-'}${s.title}.png` }) - 1;
       return `<div class="cell"><div class="frame${s.h ? ' tall' : ''}">${slideNode(s)}</div><div class="act"><span>${g.slides.length>1 ? 'Slide ' + (j+1) : 'Single'}</span><button type="button" data-i="${i}">Save PNG</button></div></div>`; }).join('');
     const capBox = g.cap ? `<details class="capbox"><summary>Caption and pinned comment</summary><div class="f"><textarea id="cap${gi}" style="min-height:220px">${esc(g.cap)}</textarea></div><div class="f"><label>Pinned comment</label><input value="${esc(g.pin)}"></div><button class="btn ghost" type="button" data-cap="cap${gi}" style="margin-top:8px">Copy caption</button></details>` : '';
-    return `<section class="group"><h2>${esc(g.title)}</h2><p class="meta">${esc(g.meta)}</p><div class="slides">${cells}</div>${capBox}</section>`; }).join('');
+    const ckey = (state.name || '') + ' | ' + g.title.replace(/^[^·]*·\s*/, '');
+    const clink = canvaLink(ckey);
+    const canvaRow = g.cap !== undefined ? `<div class="canva" data-ckey="${esc(ckey)}">${clink
+      ? `<a class="btn" href="${esc(clink)}" target="_blank" rel="noopener">Edit in Canva &rarr;</a><button class="btn ghost" type="button" data-cedit>Change link</button>`
+      : `<span class="cmiss">Canva source file: not linked yet</span><button class="btn ghost" type="button" data-cedit>Add Canva link</button>`}</div>` : '';
+    return `<section class="group"><h2>${esc(g.title)}</h2><p class="meta">${esc(g.meta)}</p><div class="slides">${cells}</div>${canvaRow}${capBox}</section>`; }).join('');
   $('out').querySelectorAll('[data-i]').forEach(b => b.onclick = () => saveOne(Number(b.dataset.i)));
   $('out').querySelectorAll('[data-cap]').forEach(b => b.onclick = async () => { const t = $(b.dataset.cap); try { await navigator.clipboard.writeText(t.value); status('Caption copied.'); } catch { t.select(); status('Selected: press copy.'); } });
+  $('out').querySelectorAll('[data-cedit]').forEach(b => b.onclick = () => { const k = b.parentElement.dataset.ckey;
+    const v = prompt('Paste the Canva edit link for:\n' + k, canvaLink(k) || ''); if (v === null) return;
+    const s = loadCanva(); if (v.trim()) s[k] = v.trim(); else delete s[k]; try { localStorage.setItem('athCanvaLinks', JSON.stringify(s)); } catch {} render(); });
   status(`${RENDERED.length} images ready.`);
 }
+function loadCanva(){ try { return JSON.parse(localStorage.getItem('athCanvaLinks') || '{}'); } catch { return {}; } }
+function canvaLink(k){ return loadCanva()[k] || (window.CANVA_LINKS || {})[k] || ''; }
 async function toBlob(s){
   await document.fonts.ready;
   const stage = $('stage'); stage.innerHTML = slideNode(s); const el = stage.firstElementChild;
