@@ -47,7 +47,7 @@ export function extract(html, base){
 async function rehost(images){
   const out = [];
   for (const im of images.slice(0, 16)) {
-    try { const r = await fetch(im.url, {headers: {'User-Agent': UA}}); if (!r.ok) continue;
+    try { const r = await fetch(im.url, {headers: {'User-Agent': UA}, signal: AbortSignal.timeout(8000)}); if (!r.ok) continue;
       const type = (r.headers.get('content-type') || '').split(';')[0]; if (!/^image\/(jpeg|png|webp|gif|avif)$/.test(type)) continue;
       const buf = Buffer.from(await r.arrayBuffer()); if (buf.length < 12000) continue;   // icons and spacers
       const ext = type.split('/')[1].replace('jpeg', 'jpg');

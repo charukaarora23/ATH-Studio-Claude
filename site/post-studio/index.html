@@ -41,7 +41,7 @@ body{margin:0;background:var(--bg);color:var(--ink);font:400 14px/1.45 var(--san
 .segbar button[aria-current=page]{color:#F9ECE5;border-bottom-color:#FAD2E1}.segbar button:hover{color:#F9ECE5}
 body:is([data-seg=interviews],[data-seg=editorial],[data-seg=heartlist]) :is(aside:not(#ivside),#tabs,#go,#ptype),body:not([data-seg=interviews]):not([data-seg=editorial]):not([data-seg=heartlist]) #ivside{display:none}
 #ivside .thumbs{display:flex;gap:6px;flex-wrap:wrap;margin:6px 0}#ivside .thumbs span{width:54px;height:54px;border-radius:6px;background:#eee center/cover;position:relative}#ivside .thumbs b{position:absolute;left:3px;top:2px;font:700 10px var(--sans,sans-serif);color:#fff;text-shadow:0 0 3px #000}
-#ivside .pastebox{min-height:96px;max-height:96px;overflow:hidden;border:2px dashed rgba(106,6,32,.45);border-radius:10px;padding:12px;font-size:14px;color:#1C1310;background:#FFF;cursor:text;outline:none}#ivside .pastebox:empty:before{content:attr(data-ph);color:rgba(28,19,16,.55)}#ivside .pastebox:focus,#ivside .pastebox.over{border-color:#6A0620;background:#FDF3F6}
+#ivside .pastebox{min-height:96px;max-height:96px;overflow:hidden;border:2px dashed rgba(106,6,32,.45);border-radius:10px;padding:12px;font-size:14px;color:#1C1310;background:#FFF;cursor:text;outline:none}#ivside .pastebox:empty:before{content:attr(data-ph);color:rgba(28,19,16,.55)}#ivside .pastebox:focus,#ivside .pastebox.over{border-color:#6A0620;background:#FDF3F6}#ivside .pastebox.done:empty:before{color:#1C1310;font-weight:500}
 #ivside .ivmsg{font-size:13px;margin:10px 0 0;line-height:1.45}#ivside .ivmsg:not(:empty){background:#F9EEE5;color:#1C1310;border-radius:8px;padding:10px 12px}#ivside .ivmsg.err{color:#AA0003}#ivside .demo{background:#FAD2E1;border-radius:10px;padding:10px 12px;font-size:13px;line-height:1.45;margin:0 0 12px}
 body:is([data-seg=interviews],[data-seg=editorial],[data-seg=heartlist]) .top .f{display:none!important}
 .iv-list{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0}.iv-list button{border:1px solid var(--line);background:#fff;border-radius:999px;padding:8px 14px;font:600 13px var(--sans,sans-serif);cursor:pointer}.iv-list button[aria-current=true]{background:#14090C;color:#F9ECE5;border-color:#14090C}
@@ -764,7 +764,7 @@ function renderIvSide(){ const el = $('ivside'); if (!el) return; const p = ivCu
     <div class="f"><label for="ivPick">${K.pick}</label><div class="row2"><select id="ivPick"><option value="demo"${demo ? ' selected' : ''}>${K.demo}</option>${list.map(x => `<option value="${x.id}"${x.id === IVSEL ? ' selected' : ''}>${esc((K.nameOf(x) || 'Untitled').slice(0, 40))}${x.date ? ' · ' + esc(x.date) : ''}</option>`).join('')}</select><button class="btn ghost" type="button" data-ivnew>New</button></div>
     <p class="hint" style="margin:6px 0 0;display:flex;justify-content:space-between;gap:8px"><span>${DMODE === 'shared' ? 'Saved for the whole team.' : 'Saved in this browser.'}</span>${demo ? '' : '<button type="button" class="linkbtn" data-ivdel>Delete this one</button>'}</p></div>
     ${sec('Start from the article', `<p class="hint" style="margin:0 0 8px"><b>Copy and paste the article.</b> It keeps the pictures. Open the article and scroll to the bottom so every picture loads. Press <b>Ctrl+A</b>, then <b>Ctrl+C</b> (on a Mac, ⌘A then ⌘C). Click the box below and press <b>Ctrl+V</b>.</p>
-      <div id="ivDrop" class="pastebox" contenteditable="true" role="textbox" aria-label="Paste the article here" data-ph="Click here, then paste the article"></div>
+      <div id="ivDrop" class="pastebox${IV_PASTED ? ' done' : ''}" contenteditable="true" role="textbox" aria-label="Paste the article here" data-ph="${esc(IV_PASTED || 'Click here, then paste the article')}"></div>
       <p class="ivmsg" id="ivMsg" role="status"></p>
       <details style="margin-top:12px"><summary style="font-size:13px">Upload a PDF instead</summary><p class="hint" style="margin:8px 0">Scroll to the bottom of the article so every picture loads, then Print and Save as PDF. You can also drop the PDF on the box above.</p><label class="btn ghost" style="display:block;text-align:center;width:100%;cursor:pointer">Upload the article PDF<input id="ivPdf" type="file" accept="application/pdf,.pdf" style="display:none"></label></details>
       <details style="margin-top:8px"><summary style="font-size:13px">Use the article link instead</summary><div class="f" style="margin-top:8px"><input id="ivUrl" type="url" placeholder="https://artstoheartsproject.com/…" value="${esc(demo ? '' : (p.f || {}).src || '')}"></div><button class="btn ghost" type="button" data-ivimport style="width:100%">Build from link</button><p class="hint" style="margin:6px 0 0">The website sometimes blocks this. Copy and paste always works.</p></details>`)}
@@ -785,7 +785,7 @@ function renderIvSide(){ const el = $('ivside'); if (!el) return; const p = ivCu
   el.querySelector('[data-ivimport]').onclick = () => ivImport({url: $('ivUrl').value.trim()});
   const drop = $('ivDrop');
   drop.onpaste = e => { e.preventDefault(); const cd = e.clipboardData; const html = cd.getData('text/html'), text = cd.getData('text/plain'); const files = [...cd.files].filter(f => /^image\//.test(f.type));
-    drop.textContent = ''; if (!html && !text && !files.length) return; ivImport({html, text, files}); };
+    drop.textContent = ''; if (!html && !text && !files.length) return; drop.dataset.ph = 'Reading the article…'; drop.classList.add('done'); ivImport({html, text, files}); };
   drop.oninput = () => { drop.textContent = ''; };
   drop.ondragover = e => { e.preventDefault(); drop.classList.add('over'); }; drop.ondragleave = () => drop.classList.remove('over');
   drop.ondrop = e => { e.preventDefault(); drop.classList.remove('over'); const fl = [...e.dataTransfer.files]; const pdf = fl.find(f => /pdf/.test(f.type) || /\.pdf$/i.test(f.name));
@@ -868,25 +868,46 @@ function htmlToArticle(html){
 }
 // Keep a picture from the article: saved to the studio when possible, so downloads never come out blank.
 async function grabImage(u){
-  try { const r = await fetch('api/article', {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({rehost: [u]})}); const j = await r.json().catch(() => ({})); if (r.ok && j.images && j.images[0]) return {url: j.images[0].url, saved: true}; } catch {}
-  for (const v of [u, 'https://i0.wp.com/' + u.replace(/^https?:\/\//, '')]) { try { const r = await fetch(v, {mode: 'cors'}); if (!r.ok) continue; const b = await r.blob(); if (!/^image\//.test(b.type) || b.size < 8000) continue; return {url: await dUpload(new File([b], 'article-img.jpg', {type: b.type})), saved: true}; } catch {} }
+  try { const r = await fetch('api/article', {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({rehost: [u]}), signal: AbortSignal.timeout(12000)}); const j = await r.json().catch(() => ({})); if (r.ok && j.images && j.images[0]) return {url: j.images[0].url, saved: true}; } catch {}
+  for (const v of [u, 'https://i0.wp.com/' + u.replace(/^https?:\/\//, '')]) { try { const r = await fetch(v, {mode: 'cors', signal: AbortSignal.timeout(10000)}); if (!r.ok) continue; const b = await r.blob(); if (!/^image\//.test(b.type) || b.size < 8000) continue; return {url: await dUpload(new File([b], 'article-img.jpg', {type: b.type})), saved: true}; } catch {} }
   return {url: u, saved: false};
 }
-async function ivImport({url, text, file, rebuild, html, files}){ const msg = (t, err) => { const m = $('ivMsg'); if (m) { m.textContent = t; m.className = 'ivmsg' + (err ? ' err' : ''); } status(t); };
+let IV_PASTED = '', IV_BUSY = false, IV_LAST = null;
+const ivMsg = (t, err) => { const m = $('ivMsg'); if (m) { m.textContent = t; m.className = 'ivmsg' + (err ? ' err' : ''); } status(t); };
+async function ivImport(o){
+  if (IV_BUSY) { ivMsg('Still building the last one. Give it a moment, then paste again.'); return; }
+  IV_BUSY = true; IV_LAST = null; o.pics = [];
+  try { await ivImportRun(o); }
+  catch (e) { ivMsg('Something went wrong while building (' + (e && e.message || e) + '). Paste again, or tell us what you pasted.', true); }
+  finally { IV_BUSY = false; }
+  if (IV_LAST && o.pics.length) ivSavePics(IV_LAST, o.pics);
+}
+// Swap the website's picture links for copies kept in the studio, four at a time, without holding up the build.
+async function ivSavePics(id, pics){
+  let done = 0, kept = 0; const todo = pics.slice(); const base = (($('ivMsg') || {}).textContent || '').trim(); const swap = (from, to) => { const p = DPOSTS[id]; if (!p) return; const I = p.imgs || {};
+    Object.keys(I).forEach(k => { I[k] = Array.isArray(I[k]) ? I[k].map(u => u === from ? to : u) : I[k] === from ? to : I[k]; }); };
+  const note = () => { const left = pics.length - done; if (IVSEL === id) ivMsg((base ? base + ' ' : '') + (left ? `Saving the pictures to the studio in the background: ${done} of ${pics.length}…` : kept === pics.length ? `All ${pics.length} pictures are saved to the studio.` : `${kept} of ${pics.length} pictures are saved to the studio; the rest load from the website. If one comes out blank in a download, add it again from your computer.`)); };
+  note();
+  const worker = async () => { while (todo.length) { const u = todo.shift(); const g = await grabImage(u); done++; if (g.saved) { kept++; swap(u, g.url); saveDaily(id); if (IVSEL === id) render(); } note(); } };
+  await Promise.all([worker(), worker(), worker(), worker()]);
+}
+async function ivImportRun({url, text, file, rebuild, html, files, pics}){ const msg = (t, err) => { const m = $('ivMsg'); if (m) { m.textContent = t; m.className = 'ivmsg' + (err ? ' err' : ''); } status(t); };
   let page = {title: '', text: text || '', images: [], ai: null};
   if (rebuild) { page = {title: rebuild.f.srcTitle || '', text: rebuild.f.srcText || '', images: [], ai: null}; try { const r = await fetch('api/article', {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({text: page.text, kind: IVK})}); const j = await r.json().catch(() => ({})); if (r.ok) { page.ai = j.ai; page.aiError = j.aiError; } } catch {} }
   if (html || (files && files.length)) { const art = html ? htmlToArticle(html) : {title: '', text: '', headings: [], images: []};
     if ((!art.text || art.text.length < 500) && text) art.text = text;
-    const list = art.images.slice(0, 30); let remote = 0;
-    for (let i = 0; i < list.length; i++) { msg(`Saving picture ${i + 1} of ${list.length}…`); const g = await grabImage(list[i].url); list[i].src = list[i].url; list[i].url = g.url; if (!g.saved) remote++; }
+    const list = art.images.slice(0, 30); let remote = 0; list.forEach(i => pics.push(i.url));
+    const words = (art.text.match(/\S+/g) || []).length;
+    IV_PASTED = words > 80 ? `Pasted${art.title ? ' “' + art.title.slice(0, 60) + '”' : ''} · ${words.toLocaleString()} words · ${list.length} picture${list.length === 1 ? '' : 's'}. Paste again to replace it.` : '';
+    const dp = $('ivDrop'); if (dp) dp.dataset.ph = IV_PASTED || 'Click here, then paste the article';
     for (const fl of files || []) { msg('Saving your picture…'); list.push({url: await dUpload(fl), alt: '', cap: ''}); }
-    if ((!art.text || art.text.length < 500) && list.length && (IVSEL !== 'demo') && DPOSTS[IVSEL]) { const p = DPOSTS[IVSEL]; const k = IVK === 'heartlist' || IVK === 'interview' ? 'arts' : 'imgs'; p.imgs = p.imgs || {}; p.imgs[k] = [].concat(p.imgs[k] || [], list.map(i => i.url)); saveDaily(p.id); renderIvSide(); render(); msg(`Added ${list.length} picture${list.length > 1 ? 's' : ''}.`); return; }
+    if ((!art.text || art.text.length < 500) && list.length && (IVSEL !== 'demo') && DPOSTS[IVSEL]) { const p = DPOSTS[IVSEL]; IV_LAST = p.id; const k = IVK === 'heartlist' || IVK === 'interview' ? 'arts' : 'imgs'; p.imgs = p.imgs || {}; p.imgs[k] = [].concat(p.imgs[k] || [], list.map(i => i.url)); saveDaily(p.id); renderIvSide(); render(); msg(`Added ${list.length} picture${list.length > 1 ? 's' : ''}.`); return; }
     page = {title: art.title, text: art.text, headings: art.headings, images: list, ai: null, remote};
-    if (page.text.length > 500 && IVK !== 'heartlist') { msg('Writing the carousel copy…'); try { const r = await fetch('api/article', {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({text: page.text, kind: IVK, images: list.map(i => ({alt: i.alt, cap: i.cap}))})}); const j = await r.json().catch(() => ({})); if (r.ok) { page.ai = j.ai; page.aiError = j.aiError; } } catch {} } }
+    if (page.text.length > 500 && IVK !== 'heartlist') { msg('Writing the carousel copy…'); try { const r = await fetch('api/article', {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({text: page.text, kind: IVK, images: list.map(i => ({alt: i.alt, cap: i.cap}))}), signal: AbortSignal.timeout(75000)}); const j = await r.json().catch(() => ({})); if (r.ok) { page.ai = j.ai; page.aiError = j.aiError; } } catch {} } }
   else if (file) { try { const pdf = await readArticlePdf(file, t => msg(t)); msg(`Saving ${pdf.images.length} images…`);
       for (const im of pdf.images) im.url = await dUpload(im.file); page = {title: pdf.title, text: pdf.text, headings: pdf.headings, images: pdf.images.map(({file, ...x}) => x), ai: null, empty: pdf.empty}; }
     catch (e) { msg('Could not read that PDF (' + (e.message || e) + '). Try printing the article page to PDF again, or paste the text.', true); return; }
-    if (page.text.length > 500 && IVK !== 'heartlist') { msg('Writing the carousel copy…'); try { const r = await fetch('api/article', {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({text: page.text, kind: IVK, images: page.images.map(i => ({alt: i.alt, cap: i.cap}))})}); const j = await r.json().catch(() => ({})); if (r.ok) { page.ai = j.ai; page.aiError = j.aiError; } } catch {} } }
+    if (page.text.length > 500 && IVK !== 'heartlist') { msg('Writing the carousel copy…'); try { const r = await fetch('api/article', {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({text: page.text, kind: IVK, images: page.images.map(i => ({alt: i.alt, cap: i.cap}))}), signal: AbortSignal.timeout(75000)}); const j = await r.json().catch(() => ({})); if (r.ok) { page.ai = j.ai; page.aiError = j.aiError; } } catch {} } }
   else if (url) { msg('Reading the article and saving its images… this takes up to a minute.');
     try { const r = await fetch('api/article', {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({url})}); const j = await r.json().catch(() => ({}));
       if (!r.ok) throw new Error(j.error || 'The importer did not answer (' + r.status + ').'); page = j; }
@@ -895,14 +916,14 @@ async function ivImport({url, text, file, rebuild, html, files}){ const msg = (t
   const remoteNote = page.remote ? ` ${page.remote} picture${page.remote > 1 ? 's' : ''} could not be saved to the studio and load${page.remote > 1 ? '' : 's'} from the website. If a download comes out blank, add ${page.remote > 1 ? 'them' : 'it'} again from your computer.` : '';
   if (IVK === 'heartlist') { const h = parseHeartList(page.text, page.images || [], page.title);
     if (!h.works.length) { msg('Could not find the works. Each one needs a heading like “1. Title by Artist @handle”. You can type them under The list.', true); }
-    const cur = DPOSTS[IVSEL]; const p = IVSEL !== 'demo' && cur && cur.cat === 'heartlist' && !Object.values(cur.f || {}).some(Boolean) ? cur : DPOSTS[dNew(isoD(new Date()), 's1', 'heartlist')];
+    const cur = DPOSTS[IVSEL]; const p = IVSEL !== 'demo' && cur && cur.cat === 'heartlist' && (html || !Object.values(cur.f || {}).some(Boolean)) ? cur : DPOSTS[dNew(isoD(new Date()), 's1', 'heartlist')]; IV_LAST = p.id;
     p.f = {...heartlistFields(h), srcText: page.text, srcTitle: page.title || '', url: url ? url.replace(/^https?:\/\//, '').replace(/\/$/, '') : '', src: url || ''};
     p.imgs = {arts: h.works.map(w => w.img || '')}; saveDaily(p.id); IV_OPEN.add('The list'); ivSelect(p.id);
     const got = h.works.filter(w => w.img).length, miss = h.works.length - got;
     if (h.works.length) msg(`Built the Heart List: ${h.works.length} works, ${got} with their picture${h.call ? ', and the open call from the end of the article' : ''}. Read each “one line” aloud: it is the line that makes people follow.${miss ? ` ${miss} picture${miss > 1 ? 's are' : ' is'} missing: add ${miss > 1 ? 'them' : 'it'} under The list, in the same order.` : ''}${remoteNote}`);
     return; }
   if (IVK === 'editorial') { const e = parseEditorial(page.text, page.headings || (rebuild && rebuild.f.srcHeads) || [], page.title || (rebuild && rebuild.f.srcTitle)); const fields = editorialFields(e, page.ai);
-    const cur = DPOSTS[IVSEL]; const p = rebuild ? rebuild : IVSEL !== 'demo' && cur && cur.cat === 'editorial' && !Object.values(cur.f || {}).some(Boolean) ? cur : DPOSTS[dNew(isoD(new Date()), 's1', 'editorial')];
+    const cur = DPOSTS[IVSEL]; const p = rebuild ? rebuild : IVSEL !== 'demo' && cur && cur.cat === 'editorial' && (html || !Object.values(cur.f || {}).some(Boolean)) ? cur : DPOSTS[dNew(isoD(new Date()), 's1', 'editorial')]; IV_LAST = p.id;
     const keep = rebuild ? {imgs: p.imgs, src: p.f.src, url: p.f.url, key: p.f.key, tags: p.f.tags} : null;
     p.f = {...fields, srcText: page.text, srcTitle: page.title || '', srcHeads: page.headings || (keep && rebuild.f.srcHeads) || [], url: keep ? keep.url : url ? url.replace(/^https?:\/\//, '').replace(/\/$/, '') : '', src: keep ? keep.src : url || '', ...(keep ? {key: keep.key || 'ARTICLE', tags: keep.tags || ''} : {})};
     p.imgs = keep ? keep.imgs : {imgs: (page.images || []).map(i => i.url)}; saveDaily(p.id); IV_OPEN.add('Cover'); IV_OPEN.add('The guide'); ivSelect(p.id);
@@ -912,7 +933,7 @@ async function ivImport({url, text, file, rebuild, html, files}){ const msg = (t
   const r = parseInterview(page.text); const ai = page.ai, auto = autoStructure(r, page.title), c = {...auto, ...(ai || {})};
   const capsArr = r.caps.map(x => x.split('|').map(y => y.trim()));
   const sorted = assignImages(page.images || [], capsArr, ai && ai.roles && ai.roles.length === (page.images || []).length ? ai.roles : null);
-  let p = rebuild ? rebuild : IVSEL !== 'demo' && DPOSTS[IVSEL] && !Object.values(DPOSTS[IVSEL].f || {}).some(Boolean) ? DPOSTS[IVSEL] : DPOSTS[dNew(isoD(new Date()), 's1', 'interview')];
+  let p = rebuild ? rebuild : IVSEL !== 'demo' && DPOSTS[IVSEL] && DPOSTS[IVSEL].cat === 'interview' && (html || !Object.values(DPOSTS[IVSEL].f || {}).some(Boolean)) ? DPOSTS[IVSEL] : DPOSTS[dNew(isoD(new Date()), 's1', 'interview')]; IV_LAST = p.id;
   const keepImgs = rebuild ? p.imgs : null, keepUrl = rebuild ? p.f.src : '';
   p.f = {headline: c.headline, name: c.name, handle: c.handle || '', based: c.based || '', medium: c.medium || '', intro: c.standfirst, caps: r.caps.join('\n'), quotes: (c.quotes || []).join('\n'), qa: qaText(r.qa),
     srcText: page.text, srcTitle: page.title || '', pick: (c.picks || []).join(', '), kicks: (c.kicks || []).join('\n'), inside: (c.inside || []).join('\n'), ctahead: c.ctahead || '', hook: c.hook || '', key: 'INTERVIEW', url: url ? url.replace(/^https?:\/\//, '').replace(/\/$/, '') : '', src: url || ''};
