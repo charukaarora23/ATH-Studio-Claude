@@ -921,7 +921,7 @@ async function ivImportRun({url, text, file, rebuild, html, files, pics}){ const
     p.imgs = {arts: h.works.map(w => w.img || '')}; saveDaily(p.id); IV_OPEN.add('The list'); ivSelect(p.id);
     if (!h.works.length) { o_pics.length = 0; msg('Could not find the works in what you pasted. Each one needs a heading like “1. Title by Artist @handle” or “01. Title — Artist @handle”. You can type them under The list.', true); return; }
     const got = h.works.filter(w => w.img).length, miss = h.works.length - got;
-    if (h.works.length) msg(`Built the Heart List: ${h.works.length} works, ${got} with their picture${h.call ? ', and the open call from the end of the article' : ''}. Read each “one line” aloud: it is the line that makes people follow.${miss ? ` ${miss} picture${miss > 1 ? 's are' : ' is'} missing: add ${miss > 1 ? 'them' : 'it'} under The list, in the same order.` : ''}${remoteNote}`);
+    if (h.works.length) msg(`Built the Heart List: ${h.works.length} works, ${got} with their picture. Read each “one line” aloud: it is the line that makes people follow.${miss ? ` ${miss} picture${miss > 1 ? 's are' : ' is'} missing: add ${miss > 1 ? 'them' : 'it'} under The list, in the same order.` : ''}${remoteNote}`);
     return; }
   if (IVK === 'editorial') { const e = parseEditorial(page.text, page.headings || (rebuild && rebuild.f.srcHeads) || [], page.title || (rebuild && rebuild.f.srcTitle)); const fields = editorialFields(e, page.ai);
     const cur = DPOSTS[IVSEL]; const p = rebuild ? rebuild : IVSEL !== 'demo' && cur && cur.cat === 'editorial' && (html || !Object.values(cur.f || {}).some(Boolean)) ? cur : DPOSTS[dNew(isoD(new Date()), 's1', 'editorial')]; IV_LAST = p.id;

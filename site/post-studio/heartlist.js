@@ -49,7 +49,7 @@ const HLT = {
       <p style="${T_MED};font-size:${o.key.length > 8 ? 120 : 150}px;line-height:1;letter-spacing:-.04em;color:${HL.rose};margin-top:48px;display:flex;align-items:center">${arrowDot(HL.rose, HL.burg, 112)}${esc(o.key)}</p>
       <p style="${T_REG};font-size:34px;line-height:1.38;color:${HL.pink};margin-top:40px">${esc(o.offer)}</p>
       <div style="width:240px;border-top:2px solid rgba(250,210,225,.35);margin:52px 0 38px"></div>
-      <p style="${T_REG};font-size:30px;line-height:1.4;color:${HL.pink}">Want your work on next week’s list?<br>${esc(o.call || 'Apply through the link in bio.')}</p></div>
+      <p style="${T_REG};font-size:30px;line-height:1.4;color:${HL.pink}">Check out our open calls. Link in bio.</p></div>
     <p class="a c" style="left:0;right:0;bottom:96px;${T_REG};font-size:28px;color:${HL.pink}">artstoheartsproject.com</p>`}; },
   // Single post for a later week: one work, whole, "on our Heart List"
   single(o){ const w = o.w; return {bg: HL.white, html: `${hlBrand()}${ivMono('burgundy', 'right:52px;top:40px;width:96px;height:54px')}
@@ -72,8 +72,7 @@ DCAT.heartlist = {name: 'The Heart List', marker: '//HEARTLIST', key: 'HEART', p
   ['The end card', [
     {k: 'key', label: 'Comment keyword (its DM sends the full Heart List article)', type: 'text', ph: 'HEART'},
     {k: 'ctahead', label: 'Line above the keyword', type: 'text', ph: 'Read more about every artist and their work on our website.'},
-    {k: 'offer', label: 'Line under the keyword', type: 'text', ph: 'Comment the word and we’ll send you the full Heart List.'},
-    {k: 'call', label: 'For artists: the open call line (from the article)', type: 'text', ph: 'The Artist of the Year Award 2026 is open until November 15.'}]],
+    {k: 'offer', label: 'Line under the keyword', type: 'text', ph: 'Comment the word and we’ll send you the full Heart List.'}]],
   ['Caption', [
     {k: 'hook', label: 'Caption first line', type: 'text'},
     {k: 'url', label: 'Article link', type: 'text'},
@@ -144,7 +143,7 @@ function parseHeartList(raw, images, title){
 function heartlistFields(h){
   return {cover: 'image', serif: 'Top 5 artists', big: 'On our Heart List', under: 'This week', layout: 'pair',
     works: h.works.map(w => [w.title, w.artist, w.handle, w.line, w.hook, w.about].join(' | ')).join('\n'),
-    key: 'HEART', ctahead: 'Read more about every artist and their work on our website.', offer: 'Comment the word and we’ll send you the full Heart List.', call: h.call, hook: '', tags: ''};
+    key: 'HEART', ctahead: 'Read more about every artist and their work on our website.', offer: 'Comment the word and we’ll send you the full Heart List.', hook: '', tags: ''};
 }
 
 // ---------- the package ----------
@@ -161,11 +160,11 @@ DPACK.heartlist = p => {
     HLT.cover({solid: f.cover === 'solid', img: arts[0] || '', serif: f.serif === undefined ? `Top ${n || 5} artists` : f.serif, big: f.big || 'On our Heart List', under: f.under === undefined ? 'This week' : f.under}),
     ...works.flatMap((w, i) => [HLT.work({w, img: arts[i] || '', slot: 'arts' + i, under}), ...(!under && (w.about || w.hook || w.line) ? [HLT.about({w, sz})] : [])]),
     HLT.pick({}),
-    HLT.end({head, key, offer, call: f.call || ''}),
+    HLT.end({head, key, offer}),
   ];
   const tags = ['#artstoheartsproject', '#heartlist', ...String(f.tags || '').split(/\s+/).filter(x => x.startsWith('#'))].slice(0, 5).join(' ');
   const handles = works.map(w => w.handle).filter(Boolean);
-  const cap = `${f.hook || `The Heart List: ${sub.charAt(0).toLowerCase() + sub.slice(1)}`}\n\n${works.map(w => `${w.title} by ${w.artist}${w.handle ? ' ' + w.handle : ''}${w.hook ? '\n' + w.hook : w.line ? '\n' + w.line : ''}`).join('\n\n')}\n\nWho should be on next week's list? Tag your favourite artist in the comments, so we can feature them. And give these ${n > 1 ? HL_NUM[n] ? HL_NUM[n].toLowerCase() : n : 'one'} a follow: thirty seconds from you can carry an artist through a week of doubt.\n\nComment ${key} and we'll send you the full Heart List, with more about every artist and their work. Or read it through the link in bio.\n\nWant your work on next week's list? ${f.call || 'Apply through the link in bio.'}\n\n${tags}`.replace(/\n{3,}/g, '\n\n');
+  const cap = `${f.hook || `The Heart List: ${sub.charAt(0).toLowerCase() + sub.slice(1)}`}\n\n${works.map(w => `${w.title} by ${w.artist}${w.handle ? ' ' + w.handle : ''}${w.hook ? '\n' + w.hook : w.line ? '\n' + w.line : ''}`).join('\n\n')}\n\nWho should be on next week's list? Tag your favourite artist in the comments, so we can feature them. And give these ${n > 1 ? HL_NUM[n] ? HL_NUM[n].toLowerCase() : n : 'one'} a follow: thirty seconds from you can carry an artist through a week of doubt.\n\nComment ${key} and we'll send you the full Heart List, with more about every artist and their work. Or read it through the link in bio.\n\nCheck out our open calls, link in bio.\n\n${tags}`.replace(/\n{3,}/g, '\n\n');
   const SINGLES = works.map((w, i) => ({...HLT.single({w, img: arts[i] || '', slot: 'arts' + i}), label: 'Single ' + (i + 1)}));
   const ST = [
     {...IV.story({dark: true, mono: true, label: 'The Heart List', text: `Top ${n || 5} artists on our Heart List this week`, sub: '', zone: 'Link sticker: the carousel'}), label: 'Story 1'},
@@ -189,5 +188,5 @@ const HL_EXAMPLE = {cat: 'heartlist', f: {
     'Nothing To Wear (The Chair) II | Austin Hayman | @austinhayman | His page is full of work this hushed and this carefully seen. | A woman kneels in front of a mirror with an empty chair beside her, and nothing dramatic happens at all. | Austin is a self-taught American painter from Santa Monica, now based in Los Angeles.',
     'Windy Portrait | Karolina Jabłońska | @karolina_jab | Every painting she makes is funny, tender and a little bit brave. | Windy Portrait turns being caught out in the wind into something raw, funny and strangely vulnerable. | Karolina is a Polish painter based in Kraków, who trained at the city’s Academy of Fine Arts.'].join('\n'),
   key: 'HEART', ctahead: 'Read more about every artist and their work on our website.', offer: 'Comment the word and we’ll send you the full Heart List.',
-  call: 'The Artist of the Year Award 2026 is open until November 15.', hook: '', url: 'artstoheartsproject.com/5-paintings-on-our-heart-list-this-week-6', tags: '#contemporarypainting #figurativepainting'},
+  hook: '', url: 'artstoheartsproject.com/5-paintings-on-our-heart-list-this-week-6', tags: '#contemporarypainting #figurativepainting'},
   imgs: {arts: ['art/examples/heartlist/peace.jpg', 'art/examples/heartlist/learning.jpg', 'art/examples/heartlist/weave.jpg']}};
