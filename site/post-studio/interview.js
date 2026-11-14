@@ -74,7 +74,7 @@ const ATH_MARK = 'brand/heart.svg';   // the heart: drop the file at this path a
 const MARK_OK = {v: false};   // the monogram now carries recall; the heart slot stays off
 const MONO = c => `brand/monogram-${c}.svg`;   // ATH / PROJECT monogram (logo suite, panel 06)
 const ivMono = (c, style) => `<div class="a" style="${style};background:url(${MONO(c)}) center/contain no-repeat"></div>`;
-const ivCorners = (o, fg = B.ink, acc = B.burg) => `${ivMono(fg === B.ink ? 'burgundy' : 'white', 'right:66px;top:40px;width:112px;height:63px')}
+const ivCorners = (o, fg = B.ink, acc = B.burg) => `${o.mono ? ivMono(fg === B.ink ? 'burgundy' : 'white', 'right:66px;top:40px;width:112px;height:63px') : `<p class="a cn" style="left:72px;top:58px;font-size:19px;color:${fg}">Arts to Hearts Project</p>`}
   <p class="a" style="left:72px;bottom:60px;${T_REG};font-size:24px;color:${fg};opacity:.8">@artstoheartsproject</p>
   ${o.last ? '' : `<div class="a" style="right:72px;bottom:46px;width:56px;height:56px;border-radius:50%;background:${acc};display:flex;align-items:center;justify-content:center;${T_MED};font-size:28px;color:#FFFFFF">&rarr;</div>`}`;
 const ivCredit = (name, c) => { const [t, y, sz, m] = (c || []).map(x => String(x || '').trim()); return t ? `${esc(name)}, <i style="${BASK};font-style:italic">${esc(t)}</i>${y ? ', ' + esc(y) : ''}${[m, sz].filter(Boolean).length ? ' · ' + [m, sz].filter(Boolean).map(x => esc(x.toLowerCase())).join(' · ') : ''}` : ''; };
@@ -113,13 +113,13 @@ const IV = {
     ${o.invite ? `<div class="a" style="left:300px;right:300px;top:860px;border-top:1px solid rgba(250,210,225,.35)"></div><p class="a c" style="left:120px;right:120px;top:900px;${T_REG};font-size:32px;line-height:1.4;color:#FAD2E1">${esc(o.invite)}</p>` : ''}
     <p class="a" style="left:72px;bottom:96px;${T_REG};font-size:28px;color:#FAD2E1">artstoheartsproject.com</p>`}; },
   // Quote cards are singles posted in later weeks: Burgundy ground so the feed remembers who they are from.
-  quoteCard(o){ return {bg:B.burg, html:`${ivMono('peony', 'right:66px;top:40px;width:112px;height:63px')}
+  quoteCard(o){ return {bg:B.burg, html:`<p class="a cn" style="left:72px;top:58px;font-size:19px;color:#FAD2E1">Arts to Hearts Project</p>
     <p class="a" style="left:72px;right:72px;top:250px;${BASK};font-size:${o.text.length > 140 ? 58 : o.text.length > 90 ? 66 : 76}px;line-height:1.2;color:#F9EEE5">&ldquo;${esc(o.text)}&rdquo;</p>
     <p class="a" style="left:72px;bottom:60px;${T_MED};font-size:30px;color:#FAD2E1"><span style="${T_REG}">From our interview with </span>${esc(o.name)}${o.handle ? ` <span style="${T_REG}">${esc(o.handle)}</span>` : ''}</p>`}; },
   story(o){ const dark = o.dark || o.full, bg = o.full ? B.ink : o.dark ? B.burg : B.ground, fg = dark ? '#F9EEE5' : B.ink, acc = o.full ? '#FFFFFF' : o.dark ? '#FAD2E1' : B.ink;
     const art = o.img && !o.full; const top = art ? 1130 : o.full ? 1060 : 380;
     return {h:1920, bg, html:`${o.full ? `${ivArt(o.img, 'inset:0', o.slot, 'cover')}<div class="a" style="inset:0;background:rgba(20,9,12,.32)"></div>` : ''}
-    ${ivMono(o.full ? 'white' : dark ? 'peony' : 'burgundy', 'right:66px;top:244px;width:112px;height:63px')}
+    ${o.mono ? ivMono(o.full ? 'white' : dark ? 'peony' : 'burgundy', 'right:66px;top:244px;width:112px;height:63px') : `<p class="a cn" style="left:72px;top:262px;font-size:20px;color:${dark ? '#FAD2E1' : B.ink}">Arts to Hearts Project</p>`}
     ${art ? ivArt(o.img, 'left:72px;right:72px;top:340px;height:740px', o.slot) : ''}
     <p class="a" style="left:72px;right:72px;top:${top}px;${T_MED};font-size:28px;letter-spacing:.12em;text-transform:uppercase;line-height:1.4;color:${acc}">${esc(o.label)}</p>
     <p class="a" style="left:72px;right:72px;top:${top + 60}px;${o.serif ? BASK + `;font-size:${o.size || 64}px;line-height:1.22` : T_MED + `;font-size:${o.size || 96}px;line-height:.96;letter-spacing:-.035em`};color:${fg}">${o.text}</p>
@@ -185,8 +185,8 @@ DPACK.interview = p => {
   const extraN = f.extra === 'all' ? 99 : f.extra === undefined || f.extra === '' ? 2 : +f.extra;
   const extras = arts.slice(3, 3 + extraN).map((u, i) => IV.plate({img: u, slot: 'arts' + (i + 3), cap: caps[i + 3], name}));
   const T = 7, S = [
-    {...IV.cover({...at(0), head, name, meta, full: coverFull}), label: 'Cover A (in use)'},
-    {...IV.cover({...at(0), head, name, meta, full: !coverFull}), label: 'Cover B: hide the one you skip'},
+    {...IV.cover({...at(0), head, name, meta, full: coverFull, mono: true}), label: 'Cover A (in use)'},
+    {...IV.cover({...at(0), head, name, meta, full: !coverFull, mono: true}), label: 'Cover B: hide the one you skip'},
     IV.standfirst({img: studio[0], slot: 'studio0', text: excerpt(f.intro, 250), n: 2, t: T}),
     IV.work({...at(1), cap: caps[1], line: quotes[0], name, n: 3, t: T}),
     IV.tease({...(teases[0] || {kick: 'From the interview', text: 'Pick an answer to cut off in the sidebar.'}), n: 4, t: T}),
@@ -203,12 +203,12 @@ DPACK.interview = p => {
   const t2 = teases[1] || teases[0];
   const hd = esc(head.replace(/^“|”$/g, ''));
   const ST = [
-    {...IV.story({...at(0), full: coverFull, label: 'New interview', text: hd, size: head.length > 50 ? 76 : 92, sub: `An interview with ${esc(name)}`, subTop: 1385, zone: 'Link sticker: the interview'}), label: 'Story 1 · A'},
-    {...IV.story({...at(0), full: !coverFull, label: 'New interview', text: hd, size: head.length > 50 ? 76 : 92, sub: `An interview with ${esc(name)}`, subTop: 1385, zone: 'Link sticker: the interview'}), label: 'Story 1 · B (hide one)'},
+    {...IV.story({...at(0), mono: true, full: coverFull, label: 'New interview', text: hd, size: head.length > 50 ? 76 : 92, sub: `An interview with ${esc(name)}`, subTop: 1385, zone: 'Link sticker: the interview'}), label: 'Story 1 · A'},
+    {...IV.story({...at(0), mono: true, full: !coverFull, label: 'New interview', text: hd, size: head.length > 50 ? 76 : 92, sub: `An interview with ${esc(name)}`, subTop: 1385, zone: 'Link sticker: the interview'}), label: 'Story 1 · B (hide one)'},
     {...IV.story({dark: true, label: t2 ? t2.kick : 'From the interview', text: `&ldquo;${esc(t2 ? t2.text : head)}&rdquo;`, serif: true, size: 62, zone: 'Link sticker: read the rest'}), label: 'Story 2'},
     {...IV.story({...at(3), label: 'In their words', text: `&ldquo;${esc(quotes[2] || quotes[0] || '')}&rdquo;`, serif: true, size: 50, zone: 'Question sticker: what do you see?'}), label: 'Story 3'},
   ];
-  const KIT = [IV.story({...at(0), full: true, label: 'Featured in Arts to Hearts Project', text: esc(name), size: 110, sub: 'Read the interview at artstoheartsproject.com', subTop: 1310, zone: 'Mention @artstoheartsproject'})];
+  const KIT = [IV.story({...at(0), mono: true, full: true, label: 'Featured in Arts to Hearts Project', text: esc(name), size: 110, sub: 'Read the interview at artstoheartsproject.com', subTop: 1310, zone: 'Mention @artstoheartsproject'})];
   const dm = `Hi ${name.split(' ')[0]}, your interview is live on Arts to Hearts Project and on our Instagram today. We made this story frame for you: share it and tag @artstoheartsproject and we'll reshare it to our community. Thank you for the conversation.`;
   return [
     {title: `${p.date} · Interview carousel`, meta: `${S.length - 1} slides plus a second cover to choose from · keyword ${key}`, slides: S.map((s, j) => ({...s, title: 'interview-' + (j + 1)})), cap: capMain, pin: `Comment ${key} and we'll send you the full interview.`},
