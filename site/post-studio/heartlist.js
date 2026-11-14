@@ -1,6 +1,6 @@
 /* ATH Post Studio · THE HEART LIST (the weekly artists we discovered, from the website).
    Job: make finding new artists on our page a weekly habit, and a little fun.
-   For the audience: five works worth stopping for, the artists tagged, a question to answer (which one would you take home?), five more next week.
+   For the audience: five works worth stopping for, the artists tagged, an ask (tag your favourite artist so we can feature them), more next week.
    For artists (the lead): "Want your work on next week's list?" The comment keyword sends them how to get featured and the open call.
    Same system as the interviews and editorial: white ground, ink type, Burgundy accents, brand line top left, monogram on the cover and the end card.
    Artworks are never cropped. */
@@ -8,45 +8,39 @@
 const HL = {white: '#FFFFFF', ink: '#1C1310', burg: '#6A0620', rose: '#FFA1C2', pink: '#FAD2E1', soft: 'rgba(28,19,16,.62)'};
 const HL_NUM = ['', 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine', 'Ten'];
 const hlBrand = (fg = HL.ink) => `<p class="a cn" style="left:52px;top:48px;color:${fg}">Arts to Hearts Project</p>`;
-const hlCredit = (w, big) => `<p style="${BASK};font-style:italic;font-size:${big ? 46 : 40}px;line-height:1.18;color:${HL.ink}">${esc(w.title || 'Untitled')}</p>
-  <p style="${T_MED};font-size:${big ? 32 : 28}px;line-height:1.3;color:${HL.ink}">${esc(w.artist || '')}${w.handle ? ` <span style="color:${HL.burg}">${esc(w.handle)}</span>` : ''}</p>`;
+const hlCredit = (w, big) => `<p style="${T_MED};font-size:${big ? 36 : 32}px;line-height:1.25;color:${HL.ink}">${esc(w.artist || '')}${w.handle ? ` <span style="color:${HL.burg}">${esc(w.handle)}</span>` : ''}</p>
+  <p style="${BASK};font-style:italic;font-size:${big ? 28 : 26}px;line-height:1.3;color:${HL.soft}">${esc(w.title || '')}</p>`;
 
 const HLT = {
-  // Cover, poster style: one line set like a film title (a serif line, then the big line), over the artwork or on solid Maroon.
+  // Cover, poster style: "Your favourite artist" in serif, "On our Heart List" large, "This week" under. Over the artwork or on solid Maroon.
   cover(o){ const solid = o.solid || !o.img, big = String(o.big || '').toUpperCase().trim();
     const words = big.length > 11 && big.includes(' ') ? splitHalf(big) : [big];
     const bs = Math.min(176, Math.floor(930 / (Math.max(...words.map(w => w.length), 1) * .64)));
     const fg = solid ? HL.rose : HL.white;
     return {bg: solid ? HL.burg : HL.ink, html: `${solid ? '' : `${ivArt(o.img, 'inset:0', 'arts0', 'cover')}<div class="a" style="inset:0;background:rgba(20,9,12,.38)"></div>`}
-      <p class="a cn" style="left:52px;top:48px;color:${HL.pink}">Arts to Hearts Project</p>${ivMono('peony', 'right:52px;top:40px;width:96px;height:54px')}
-      <div class="a" style="left:60px;right:60px;top:120px;bottom:130px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center">
-        <p style="${T_MED};font-size:26px;letter-spacing:.24em;text-transform:uppercase;color:${solid ? HL.pink : HL.white}">The Heart List</p>
-        <p style="${BASK};font-size:84px;line-height:1.05;letter-spacing:.01em;text-transform:uppercase;color:${fg};margin-top:34px">${esc(o.serif || '')}</p>
-        <p style="${T_MED};font-size:${bs}px;line-height:.9;letter-spacing:-.03em;color:${fg};margin-top:10px">${words.map(esc).join('<br>')}</p>
-        <p style="${T_REG};font-size:30px;line-height:1.4;letter-spacing:.06em;text-transform:uppercase;color:${solid ? HL.pink : HL.white};margin-top:40px">${esc(o.under || '')}</p></div>
-      <p class="a c" style="left:0;right:0;bottom:64px;${T_MED};font-size:28px;color:${HL.pink}">Swipe &rarr;</p>`}; },
-  // One work per slide: the artwork whole, the credit. In the "under" layout the line about it sits below, highlighted.
+      <p class="a cn" style="left:52px;top:48px;color:${HL.white}">Arts to Hearts Project</p>${ivMono('white', 'right:52px;top:40px;width:96px;height:54px')}
+      <div class="a" style="left:60px;right:60px;top:120px;bottom:120px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center">
+        <p style="${BASK};font-size:84px;line-height:1.05;letter-spacing:.01em;text-transform:uppercase;color:${fg}">${esc(o.serif || '')}</p>
+        <p style="${T_MED};font-size:${bs}px;line-height:.9;letter-spacing:-.03em;color:${fg};margin-top:14px">${words.map(esc).join('<br>')}</p>
+        ${o.under ? `<p style="${T_REG};font-size:34px;line-height:1.4;letter-spacing:.08em;text-transform:uppercase;color:${fg};margin-top:36px">${esc(o.under)}</p>` : ''}</div>`}; },
+  // The artwork, as big as the slide allows (never cropped), with the artist named first
   work(o){ const w = o.w; return {bg: HL.white, html: `${hlBrand()}
-    ${ivArt(o.img, `left:72px;right:72px;top:120px;height:${o.under ? 800 : 860}px`, o.slot)}
-    <div class="a" style="left:72px;right:72px;top:${o.under ? 950 : 1010}px;bottom:56px;display:flex;flex-direction:column;gap:10px">
-      ${hlCredit(w, !o.under)}
-      ${o.under && w.hook ? `<p style="${BASK};font-size:${w.hook.length > 90 ? 30 : 34}px;line-height:1.36;color:${HL.burg};margin-top:10px">${mark(esc(w.hook))}</p>` : ''}</div>`}; },
-  // The artist, on the next slide: the same highlighted paragraph as the editorial carousel
-  about(o){ const w = o.w; return {bg: HL.white, html: `${hlBrand(HL.burg)}
+    ${ivArt(o.img, `left:36px;right:36px;top:96px;height:${o.under ? 930 : 1060}px`, o.slot)}
+    <div class="a" style="left:72px;right:72px;top:${o.under ? 1046 : 1180}px;bottom:40px;display:flex;flex-direction:column;gap:6px">
+      <p style="${T_MED};font-size:36px;line-height:1.2;color:${HL.ink}">${esc(w.artist || '')}${w.handle ? ` <span style="color:${HL.burg}">${esc(w.handle)}</span>` : ''}</p>
+      <p style="${BASK};font-style:italic;font-size:26px;line-height:1.3;color:${HL.soft}">${esc(w.title || '')}</p>
+      ${o.under && (w.about || w.line) ? `<p style="${BASK};font-size:28px;line-height:1.36;color:${HL.burg};margin-top:8px">${mark(esc(w.about || w.line))}</p>` : ''}</div>`}; },
+  // The artist, on the next slide: who they are, highlighted, then what their work is like
+  about(o){ const w = o.w; const lead = w.about || w.hook || '';
+    return {bg: HL.white, html: `${hlBrand(HL.burg)}
     <div class="a" style="left:72px;right:72px;top:210px;bottom:300px">
-      <p style="${BASK};font-size:${o.sz}px;line-height:1.3;color:${HL.burg}">${w.hook ? mark(esc(w.hook)) + ' ' : ''}${esc(w.about || '')}${w.line ? ' ' + esc(w.line) : ''}</p></div>
+      <p style="${BASK};font-size:${o.sz}px;line-height:1.3;color:${HL.burg}">${lead ? mark(esc(lead)) : ''}${w.line ? ' ' + esc(w.line) : ''}</p></div>
     <p class="a" style="left:72px;right:72px;top:1130px;${T_MED};font-size:34px;letter-spacing:-.01em;color:${HL.burg}">${esc(w.artist)}${w.handle ? ` <span style="${T_REG}">${esc(w.handle)}</span>` : ''}</p>`}; },
-  // The question: all five side by side, so people answer in the comments and save the post
-  pick(o){ const n = o.works.length, top = o.works.slice(0, 3), bot = o.works.slice(3, 6);
-    const cell = (w, i) => `<div style="width:290px;display:flex;flex-direction:column;gap:10px;align-items:center">
-        <div style="width:290px;height:${bot.length ? 300 : 420}px;background:${o.imgs[i] ? `url(${o.imgs[i]}) center/contain no-repeat` : '#F4EEEA'}"></div>
-        <p style="${T_MED};font-size:22px;line-height:1.25;color:${HL.ink};text-align:center">${esc(w.handle || w.artist || '')}</p></div>`;
-    return {bg: HL.white, html: `${hlBrand()}
-      <p class="a" style="left:72px;right:72px;top:130px;${BASK};font-size:62px;line-height:1.24;color:${HL.ink}">Which one would you ${mark('take home?')}</p>
-      <div class="a" style="left:72px;right:72px;top:${bot.length ? 340 : 400}px;display:flex;flex-direction:column;gap:34px">
-        <div style="display:flex;justify-content:${top.length < 3 ? 'center' : 'space-between'};gap:33px">${top.map((w, i) => cell(w, i)).join('')}</div>
-        ${bot.length ? `<div style="display:flex;justify-content:center;gap:33px">${bot.map((w, i) => cell(w, i + 3)).join('')}</div>` : ''}</div>
-      <p class="a" style="left:72px;right:72px;top:1150px;${T_REG};font-size:32px;line-height:1.38;color:${HL.burg}">Tell us in the comments, then give ${n > 1 ? 'them' : 'the artist'} a follow. ${n > 1 ? HL_NUM[n] || n : 'One'} more ${n > 1 ? 'artists' : 'artist'} next week.</p>`}; },
+  // The ask: tag an artist we should feature next (finds us artists, and brings their friends to the page)
+  pick(o){ return {bg: HL.white, html: `${hlBrand(HL.burg)}
+      <div class="a" style="left:72px;right:72px;top:210px;bottom:300px">
+        <p style="${BASK};font-size:64px;line-height:1.28;color:${HL.burg}">Who should be on next week’s list? ${mark('Tag your favourite artist')} in the comments, so we can feature them.</p></div>
+      <p class="a" style="left:72px;right:72px;top:1130px;${T_MED};font-size:34px;letter-spacing:-.01em;color:${HL.burg}">Or tag yourself. We look at every one.</p>`}; },
   // End card: the invitation to artists (the lead), the open call if there is one
   end(o){ return {bg: HL.burg, html: `${ivMono('peony', 'left:430px;width:220px;top:150px;height:124px')}
     <div class="a" style="left:72px;right:72px;top:330px;bottom:200px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center">
@@ -67,9 +61,9 @@ const HLT = {
 DCAT.heartlist = {name: 'The Heart List', marker: '//HEARTLIST', key: 'HEART', pack: true, groups: [
   ['Cover', [
     {k: 'cover', label: 'Cover', type: 'select', options: [['image', 'The first artwork, full bleed'], ['solid', 'Solid Maroon']]},
-    {k: 'serif', label: 'Serif line (small, above)', type: 'text', ph: 'Your next'},
-    {k: 'big', label: 'Big line', type: 'text', ph: 'Favourite artist'},
-    {k: 'under', label: 'Line under it', type: 'text', ph: 'Is one swipe away'}]],
+    {k: 'serif', label: 'Serif line', type: 'text', ph: 'Your favourite artist'},
+    {k: 'big', label: 'Big line', type: 'text', ph: 'On our Heart List'},
+    {k: 'under', label: 'Line under it', type: 'text', ph: 'This week'}]],
   ['The list', [
     {k: 'layout', label: 'About each artist', type: 'select', options: [['pair', 'On its own slide after the artwork'], ['under', 'Under the artwork, smaller']]},
     {k: 'works', label: 'The works, one per line: title | artist | @handle | closing line | what the work does | one line about the artist', type: 'lines'},
@@ -137,7 +131,7 @@ function parseHeartList(raw, images, title){
   return {title: String(title || '').trim(), works, intro, outro, call, hasText: all.length > 0};
 }
 function heartlistFields(h){
-  return {cover: 'image', serif: 'Your next', big: 'Favourite artist', under: 'Is one swipe away', layout: 'pair',
+  return {cover: 'image', serif: 'Your favourite artist', big: 'On our Heart List', under: 'This week', layout: 'pair',
     works: h.works.map(w => [w.title, w.artist, w.handle, w.line, w.hook, w.about].join(' | ')).join('\n'),
     key: 'HEART', ctahead: 'Read more about every artist and their work on our website.', offer: 'Comment the word and we’ll send you the full Heart List.', call: h.call, hook: '', tags: ''};
 }
@@ -150,22 +144,22 @@ DPACK.heartlist = p => {
   const n = works.length, sub = `${HL_NUM[n] || n} ${n === 1 ? 'artist' : 'artists'} we couldn’t stop looking at this week.`;
   const head = f.ctahead || 'Read more about every artist and their work on our website.', offer = f.offer || 'Comment the word and we’ll send you the full Heart List.';
   const under = f.layout === 'under';
-  const longest = Math.max(0, ...works.map(w => (w.hook + ' ' + w.about + ' ' + w.line).length));
+  const longest = Math.max(0, ...works.map(w => ((w.about || w.hook) + ' ' + w.line).length));
   const sz = longest > 320 ? 46 : longest > 240 ? 52 : 58;
   const S = [
-    HLT.cover({solid: f.cover === 'solid', img: arts[0] || '', serif: f.serif === undefined ? 'Your next' : f.serif, big: f.big || 'Favourite artist', under: f.under === undefined ? 'Is one swipe away' : f.under}),
-    ...works.flatMap((w, i) => [HLT.work({w, img: arts[i] || '', slot: 'arts' + i, under}), ...(!under && (w.hook || w.about || w.line) ? [HLT.about({w, sz})] : [])]),
-    ...(n > 1 ? [HLT.pick({works, imgs: arts})] : []),
+    HLT.cover({solid: f.cover === 'solid', img: arts[0] || '', serif: f.serif === undefined ? 'Your favourite artist' : f.serif, big: f.big || 'On our Heart List', under: f.under === undefined ? 'This week' : f.under}),
+    ...works.flatMap((w, i) => [HLT.work({w, img: arts[i] || '', slot: 'arts' + i, under}), ...(!under && (w.about || w.hook || w.line) ? [HLT.about({w, sz})] : [])]),
+    HLT.pick({}),
     HLT.end({head, key, offer, call: f.call || ''}),
   ];
   const tags = ['#artstoheartsproject', '#heartlist', ...String(f.tags || '').split(/\s+/).filter(x => x.startsWith('#'))].slice(0, 5).join(' ');
   const handles = works.map(w => w.handle).filter(Boolean);
-  const cap = `${f.hook || `The Heart List: ${sub.charAt(0).toLowerCase() + sub.slice(1)}`}\n\n${works.map(w => `${w.title} by ${w.artist}${w.handle ? ' ' + w.handle : ''}${w.hook ? '\n' + w.hook : w.line ? '\n' + w.line : ''}`).join('\n\n')}\n\nWhich one would you take home? Tell us below, then go give ${n > 1 ? 'them' : 'the artist'} a follow. Thirty seconds from you can carry an artist through a week of doubt.\n\nComment ${key} and we'll send you the full Heart List, with more about every artist and their work. Or read it through the link in bio.\n\nWant your work on next week's list? ${f.call || 'Apply through the link in bio.'}\n\n${tags}`.replace(/\n{3,}/g, '\n\n');
+  const cap = `${f.hook || `The Heart List: ${sub.charAt(0).toLowerCase() + sub.slice(1)}`}\n\n${works.map(w => `${w.title} by ${w.artist}${w.handle ? ' ' + w.handle : ''}${w.hook ? '\n' + w.hook : w.line ? '\n' + w.line : ''}`).join('\n\n')}\n\nWho should be on next week's list? Tag your favourite artist in the comments, so we can feature them. And give these ${n > 1 ? HL_NUM[n] ? HL_NUM[n].toLowerCase() : n : 'one'} a follow: thirty seconds from you can carry an artist through a week of doubt.\n\nComment ${key} and we'll send you the full Heart List, with more about every artist and their work. Or read it through the link in bio.\n\nWant your work on next week's list? ${f.call || 'Apply through the link in bio.'}\n\n${tags}`.replace(/\n{3,}/g, '\n\n');
   const SINGLES = works.map((w, i) => ({...HLT.single({w, img: arts[i] || '', slot: 'arts' + i}), label: 'Single ' + (i + 1)}));
   const ST = [
-    {...IV.story({dark: true, mono: true, label: 'The Heart List', text: 'Five works we couldn’t stop looking at this week'.replace('Five', HL_NUM[n] || n), sub: 'Swipe through, then tell us your favourite.', zone: 'Link sticker: the carousel'}), label: 'Story 1'},
-    ...works.map((w, i) => ({...IV.story({img: arts[i] || '', slot: 'arts' + i, label: 'The Heart List', text: esc(w.title), sub: esc(`${w.artist}${w.handle ? ' ' + w.handle : ''}`), zone: 'Mention sticker: tag the artist'}), label: 'Story ' + (i + 2)})),
-    {...IV.story({dark: true, label: 'Your turn', text: 'Which one would you take home?', sub: `Comment ${esc(key)} on the post for the full Heart List.`, zone: 'Poll or quiz sticker with the artists’ names'}), label: 'Story ' + (n + 2)},
+    {...IV.story({dark: true, mono: true, label: 'The Heart List', text: 'Your favourite artist on our Heart List this week', sub: '', zone: 'Link sticker: the carousel'}), label: 'Story 1'},
+    ...works.map((w, i) => ({...IV.story({img: arts[i] || '', slot: 'arts' + i, label: 'The Heart List', text: esc(w.artist), sub: esc(`${w.handle ? w.handle + ' · ' : ''}${w.title}`), zone: 'Mention sticker: tag the artist'}), label: 'Story ' + (i + 2)})),
+    {...IV.story({dark: true, label: 'Your turn', text: 'Tag your favourite artist, so we can feature them', sub: `Comment ${esc(key)} on the post for the full Heart List.`, zone: 'Question sticker: “Who should we feature next?”'}), label: 'Story ' + (n + 2)},
   ];
   return [
     {title: `${p.date} · Heart List carousel`, meta: `${S.length} slides · tag ${handles.length} artist${handles.length === 1 ? '' : 's'} in the image · keyword ${key}`, slides: S.map((s, j) => ({...s, title: 'heartlist-' + (j + 1)})), cap, pin: `Comment ${key} and we'll send you the full Heart List, with more about every artist.`},
@@ -176,7 +170,7 @@ DPACK.heartlist = p => {
 
 // ---------- example: this week's list (5 Paintings on Our Heart List This Week) ----------
 const HL_EXAMPLE = {cat: 'heartlist', f: {
-  cover: 'image', serif: 'Your next', big: 'Favourite artist', under: 'Is one swipe away', layout: 'pair',
+  cover: 'image', serif: 'Your favourite artist', big: 'On our Heart List', under: 'This week', layout: 'pair',
   works: [
     'Peace Offering | Denis D’Alesio | @denisdalesio | His paintings feel like bedtime stories for grown-ups. | Peace Offering feels like a fairytale no one has told you yet. | Denis is a painter working in a soft, surreal figurative register, building quiet mythologies one canvas at a time.',
     'Learning | Ellen Akimoto | @ellenakimoto | Her whole page sits in this same quiet space between the real and the rendered. | Learning makes you question what you are actually looking at. | Ellen is an American painter, born in California in 1988 and based in Leipzig, who blends painterly gesture with digital collage.',
