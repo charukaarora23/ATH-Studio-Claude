@@ -69,6 +69,7 @@ summary{font:600 12px/1 var(--mono);letter-spacing:.1em;text-transform:uppercase
 .tabs{display:flex;gap:4px;flex-wrap:wrap;margin:0 0 14px;border-bottom:1px solid var(--line)}.tabs button{border:0;background:none;font:600 14px var(--sans,sans-serif);color:var(--muted);padding:10px 14px;border-bottom:3px solid transparent;margin-bottom:-1px;cursor:pointer}.tabs button[aria-current=page]{color:var(--ink);border-bottom-color:var(--ink)}.tabs button:hover{color:var(--ink)}
 .ghr{display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:flex-end}.vers{display:inline-flex;align-items:center;gap:3px;font-size:12px;color:var(--muted)}.vers button{border:1px solid var(--line);background:var(--panel,#fff);border-radius:6px;font:600 12px var(--sans,sans-serif);padding:3px 8px;cursor:pointer;color:var(--ink)}.vers button[aria-pressed=true]{background:var(--ink);color:var(--panel,#fff);border-color:var(--ink)}.ghead{display:flex;align-items:baseline;gap:12px;justify-content:space-between}.hidebtn{border:0;background:none;color:var(--muted);font-size:12px;text-decoration:underline;cursor:pointer;padding:0}.hidebtn:hover{color:var(--ink)}.hiddenpost{opacity:.65}.hiddenpost h2{text-decoration:line-through}.hiddencell .frame>.post{opacity:.25}.hidmask{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font:700 14px var(--sans,sans-serif);color:var(--ink);background:repeating-linear-gradient(45deg,transparent 0 10px,rgba(0,0,0,.04) 10px 20px);letter-spacing:.08em;text-transform:uppercase}.post [data-removed]{outline:2px dashed rgba(47,124,246,.0)}
 .rlctl{display:flex;flex-wrap:wrap;gap:6px 10px;align-items:center;font-size:12px;color:var(--muted);width:var(--pw);margin-top:6px}.rlctl input{width:54px;font:12px var(--sans,sans-serif);padding:3px 4px;border:1px solid var(--line);border-radius:6px}.rlctl button{border:0;background:none;color:var(--muted);text-decoration:underline;cursor:pointer;font-size:12px;padding:0}.vtag{background:#2f7cf6;color:#fff;border-radius:999px;padding:2px 8px;font-weight:600}.rlopt{font-size:12px;color:var(--muted);display:inline-flex;gap:4px;align-items:center;white-space:nowrap}
+.rmodal{position:fixed;inset:0;z-index:100;background:rgba(20,9,12,.72);display:flex;align-items:center;justify-content:center;padding:16px}.rbox{background:var(--panel,#fff);border-radius:16px;padding:16px;max-width:96vw;box-shadow:0 20px 60px rgba(0,0,0,.4)}.rcv{display:block;height:min(72vh,640px);width:auto;aspect-ratio:9/16;border-radius:10px;background:#000;margin:0 auto}.rbar{display:flex;align-items:center;gap:10px;margin-top:10px}.rprog{flex:1;height:6px;background:var(--line);border-radius:3px;overflow:hidden}.rprog span{display:block;height:100%;width:0;background:var(--ink)}.rtime{font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums}.rbtns{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:10px}.tbox{width:min(560px,96vw)}.tvid{display:block;height:min(52vh,460px);width:auto;aspect-ratio:9/16;object-fit:cover;border-radius:10px;background:#000;margin:0 auto}.tl{position:relative;height:60px;margin-top:12px;border-radius:8px;overflow:hidden;background:#222;cursor:pointer}.strip{position:absolute;inset:0;display:flex}.strip div{flex:1;background:center/cover}.win{position:absolute;top:0;bottom:0;border:3px solid #ffd23f;border-radius:6px;box-shadow:0 0 0 999px rgba(0,0,0,.55);cursor:grab}.grip{position:absolute;right:-3px;top:0;bottom:0;width:14px;background:#ffd23f;cursor:ew-resize}.tinfo{font-size:13px;margin:8px 0 0;font-variant-numeric:tabular-nums}.trimbtn{border:0;background:#2f7cf6!important;color:#fff!important;text-decoration:none!important;border-radius:999px;padding:3px 10px!important;font-weight:600}
 .acts{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}.hint{font-size:13px;color:var(--muted);margin:0 0 10px;line-height:1.45}
 .capbox{max-width:720px;margin-top:10px;border-top:1px solid var(--line)}
 .cell .act{display:flex;justify-content:space-between;align-items:center;font-size:12px;color:var(--muted);width:var(--pw)}
@@ -470,57 +471,118 @@ const gid = g => g.story ? g.title : g.title.replace(/^[^·]*·\s*/, '');
 function loadImg(src){ return new Promise(res => { if (!src) return res(null); const im = new Image(); im.onload = () => res(im); im.onerror = () => res(null); im.src = src; }); }
 async function slideCanvas(s, transparent){ await document.fonts.ready; const stage = $('stage'); stage.innerHTML = slideNode(transparent ? {...s, bg:'transparent'} : s); const el = stage.firstElementChild;
   const c = await html2canvas(el, {scale:1, width:1080, height:(s.h || 1350), backgroundColor:null, useCORS:true, logging:false}); stage.innerHTML = ''; return c; }
-async function makeReel(id, btn){
-  if (!window.html2canvas || !window.MediaRecorder || !HTMLCanvasElement.prototype.captureStream) { alert('This browser cannot make videos. Use Chrome on a computer.'); return; }
-  const items = RENDERED.filter(r => r.s.reel === id); if (!items.length) { status('Show the Reels tab first.'); return; }
-  const opt = (state.rlopt || {})[id] || {}; btn.disabled = true; const old = btn.textContent;
+// ---------- reel engine: prepare once, then play to a canvas (preview) or record it (export) ----------
+async function prepareReel(id, opt, progress, forRecord){
+  const items = RENDERED.filter(r => r.s.reel === id); if (!items.length) throw new Error('Show the Reels tab first.');
   const missing = items.filter(r => r.s.photoKey && (state.vids || {})[r.s.photoKey] && !VIDURL[r.s.photoKey]).length;
-  if (missing) { alert(missing + ' clip(s) are not in this browser any more. Add them again, then make the video.'); btn.disabled = false; return; }
-  let ac = null, dest = null;
-  try {
-    if (opt.sound) { ac = new (window.AudioContext || window.webkitAudioContext)(); dest = ac.createMediaStreamDestination(); }
-    const beats = [];
-    for (let i = 0; i < items.length; i++) { btn.textContent = `Preparing ${i + 1}/${items.length}…`; const s = items[i].s;
-      const t = document.createElement('template'); t.innerHTML = s.html; const ph = t.content.querySelector('[data-slot^="r"]'); let img = null, vid = null, fx = 50, fy = 50, start = 0;
-      if (ph) { const bp = parsePos(ph.style.backgroundPosition); fx = bp.x; fy = bp.y; const vm = (state.vids || {})[s.photoKey];
-        if (vm && VIDURL[s.photoKey]) { vid = document.createElement('video'); vid.src = VIDURL[s.photoKey]; vid.playsInline = true; vid.muted = !opt.sound; vid.preload = 'auto'; start = vm.start || 0;
-          await new Promise(r => { vid.onloadeddata = r; vid.onerror = r; }); vid.currentTime = start; await new Promise(r => { vid.onseeked = r; setTimeout(r, 1500); });
-          if (ac) { const src = ac.createMediaElementSource(vid); src.connect(dest); } }
-        else { const u = (ph.getAttribute('style').match(/url\(([^)]*)\)/) || [])[1]; img = await loadImg((u || '').replace(/^["']|["']$/g, '')); }
-        ph.remove(); }
-      const over = await slideCanvas({...s, html: t.innerHTML}, !!(img || vid)); beats.push({dur: s.dur || 2.6, img, vid, start, fx, fy, over}); }
-    const W = 1080, H = 1920, cv = document.createElement('canvas'); cv.width = W; cv.height = H; const ctx = cv.getContext('2d');
-    const ease = x => 1 - Math.pow(1 - Math.min(1, Math.max(0, x)), 3);
-    const cover = (src, sw, sh, z, fxp, fyp, dx) => { const sc = Math.max(W / sw, H / sh) * z; const iw = sw * sc, ih = sh * sc; ctx.drawImage(src, (W - iw) * (fxp / 100) + dx, (H - ih) * (fyp / 100), iw, ih); };
-    const draw = (b, lt, i, alpha) => { ctx.globalAlpha = alpha; const p = Math.min(1, lt / b.dur);
-      if (b.vid || b.img) { ctx.fillStyle = '#14090c'; ctx.fillRect(0, 0, W, H);
-        if (b.vid) cover(b.vid, b.vid.videoWidth || W, b.vid.videoHeight || H, 1.02 + .03 * p, b.fx, b.fy, 0);
-        else { const z = i % 2 ? 1.12 - .08 * p : 1.04 + .08 * p; cover(b.img, b.img.width, b.img.height, z, b.fx, b.fy, (i % 2 ? -1 : 1) * 12 * p); }
-        const e = ease(lt / .5); ctx.globalAlpha = alpha * e; ctx.drawImage(b.over, 0, (1 - e) * 46, W, H); }
-      else { const e = ease(lt / .4); ctx.drawImage(b.over, 0, 0, W, H); if (e < 1) { ctx.globalAlpha = alpha * (1 - e); ctx.fillStyle = '#14090c'; ctx.fillRect(0, 0, W, H); } }
-      ctx.globalAlpha = 1; };
-    const vtrack = cv.captureStream(30).getVideoTracks();
-    const stream = new MediaStream(dest ? vtrack.concat(dest.stream.getAudioTracks()) : vtrack);
-    const types = dest ? ['video/mp4;codecs=avc1.640028,mp4a.40.2', 'video/mp4;codecs=avc1,mp4a.40.2', 'video/mp4;codecs=avc1.640028,opus', 'video/mp4;codecs=avc1,opus', 'video/mp4', 'video/webm;codecs=vp9,opus', 'video/webm'] : ['video/mp4;codecs=avc1.640028', 'video/mp4;codecs=avc1', 'video/mp4', 'video/webm;codecs=vp9', 'video/webm'];
-    const mime = types.find(t => MediaRecorder.isTypeSupported(t)) || '';
-    const rec = new MediaRecorder(stream, mime ? {mimeType: mime, videoBitsPerSecond: 10e6} : {}); const chunks = []; rec.ondataavailable = e => e.data.size && chunks.push(e.data);
-    const total = beats.reduce((a, b) => a + b.dur, 0), XF = .35; const starts = []; beats.reduce((a, b, i) => (starts[i] = a, a + b.dur), 0);
-    const done = new Promise(r => rec.onstop = r); rec.start(200); const t0 = performance.now(); let cur = -1;
-    await new Promise(res => { const tick = () => { const t = (performance.now() - t0) / 1000; if (t >= total) return res();
+  if (missing) throw new Error(missing + ' clip(s) are not in this browser any more. Add them again.');
+  let ac = null, dest = null; if (forRecord && opt.sound) { ac = new (window.AudioContext || window.webkitAudioContext)(); dest = ac.createMediaStreamDestination(); }
+  const beats = [];
+  for (let i = 0; i < items.length; i++) { progress && progress(`Preparing ${i + 1}/${items.length}…`); const s = items[i].s;
+    const t = document.createElement('template'); t.innerHTML = s.html; const ph = t.content.querySelector('[data-slot^="r"]'); let img = null, vid = null, fx = 50, fy = 50, start = 0;
+    if (ph) { const bp = parsePos(ph.style.backgroundPosition); fx = bp.x; fy = bp.y; const vm = (state.vids || {})[s.photoKey];
+      if (vm && VIDURL[s.photoKey]) { vid = document.createElement('video'); vid.src = VIDURL[s.photoKey]; vid.playsInline = true; vid.muted = !opt.sound; vid.preload = 'auto'; start = vm.start || 0;
+        await new Promise(r => { vid.onloadeddata = r; vid.onerror = r; }); vid.currentTime = start; await new Promise(r => { vid.onseeked = r; setTimeout(r, 1500); });
+        if (ac) ac.createMediaElementSource(vid).connect(dest); }
+      else { const u = (ph.getAttribute('style').match(/url\(([^)]*)\)/) || [])[1]; img = await loadImg((u || '').replace(/^["']|["']$/g, '')); }
+      ph.remove(); }
+    const over = await slideCanvas({...s, html: t.innerHTML}, !!(img || vid)); beats.push({dur: s.dur || 2.6, img, vid, start, fx, fy, over}); }
+  return {beats, ac, dest, total: beats.reduce((a, b) => a + b.dur, 0)};
+}
+function playReel(prep, cv, opt, onProgress, stopFlag){
+  const W = 1080, H = 1920, ctx = cv.getContext('2d'), beats = prep.beats, total = prep.total, XF = .35;
+  const ease = x => 1 - Math.pow(1 - Math.min(1, Math.max(0, x)), 3);
+  const cover = (src, sw, sh, z, fxp, fyp, dx) => { const sc = Math.max(W / sw, H / sh) * z; const iw = sw * sc, ih = sh * sc; ctx.drawImage(src, (W - iw) * (fxp / 100) + dx, (H - ih) * (fyp / 100), iw, ih); };
+  const draw = (b, lt, i, alpha) => { ctx.globalAlpha = alpha; const p = Math.min(1, lt / b.dur);
+    if (b.vid || b.img) { ctx.fillStyle = '#14090c'; ctx.fillRect(0, 0, W, H);
+      if (b.vid) cover(b.vid, b.vid.videoWidth || W, b.vid.videoHeight || H, 1.02 + .03 * p, b.fx, b.fy, 0);
+      else { const z = i % 2 ? 1.12 - .08 * p : 1.04 + .08 * p; cover(b.img, b.img.width, b.img.height, z, b.fx, b.fy, (i % 2 ? -1 : 1) * 12 * p); }
+      const e = ease(lt / .5); ctx.globalAlpha = alpha * e; ctx.drawImage(b.over, 0, (1 - e) * 46, W, H); }
+    else { const e = ease(lt / .4); ctx.drawImage(b.over, 0, 0, W, H); if (e < 1) { ctx.globalAlpha = alpha * (1 - e); ctx.fillStyle = '#14090c'; ctx.fillRect(0, 0, W, H); } }
+    ctx.globalAlpha = 1; };
+  const starts = []; beats.reduce((a, b, i) => (starts[i] = a, a + b.dur), 0);
+  return new Promise(res => { const t0 = performance.now(); let cur = -1;
+    const finish = () => { beats.forEach(b => b.vid && b.vid.pause()); res(); };
+    const tick = () => { const t = (performance.now() - t0) / 1000; if (t >= total || (stopFlag && stopFlag.stop)) return finish();
       const i = starts.findIndex((s, k) => t >= s && (k === beats.length - 1 || t < starts[k + 1]));
       if (i !== cur) { if (cur >= 0 && beats[cur].vid) beats[cur].vid.pause(); cur = i; if (beats[i].vid) { beats[i].vid.currentTime = beats[i].start; beats[i].vid.play().catch(() => {}); } }
       draw(beats[i], t - starts[i], i, 1);
       const end = starts[i] + beats[i].dur; if (i + 1 < beats.length && t > end - XF) draw(beats[i + 1], 0, i + 1, (t - (end - XF)) / XF);
       if (opt.bar) { ctx.fillStyle = 'rgba(255,255,255,.28)'; ctx.fillRect(48, 150, W - 96, 6); ctx.fillStyle = '#ffffff'; ctx.fillRect(48, 150, (W - 96) * (t / total), 6); }
-      btn.textContent = `Recording ${Math.round(t / total * 100)}%`; requestAnimationFrame(tick); }; tick(); });
-    beats.forEach(b => b.vid && b.vid.pause()); rec.stop(); await done;
+      onProgress && onProgress(t / total, t); requestAnimationFrame(tick); }; tick(); });
+}
+async function makeReel(id, btn){
+  if (!window.html2canvas || !window.MediaRecorder || !HTMLCanvasElement.prototype.captureStream) { alert('This browser cannot make videos. Use Chrome on a computer.'); return; }
+  const opt = (state.rlopt || {})[id] || {}; btn.disabled = true; const old = btn.textContent; let prep = null;
+  try {
+    prep = await prepareReel(id, opt, m => btn.textContent = m, true);
+    const cv = document.createElement('canvas'); cv.width = 1080; cv.height = 1920;
+    const vtrack = cv.captureStream(30).getVideoTracks(); const stream = new MediaStream(prep.dest ? vtrack.concat(prep.dest.stream.getAudioTracks()) : vtrack);
+    const types = prep.dest ? ['video/mp4;codecs=avc1.640028,mp4a.40.2', 'video/mp4;codecs=avc1,mp4a.40.2', 'video/mp4;codecs=avc1.640028,opus', 'video/mp4;codecs=avc1,opus', 'video/mp4', 'video/webm;codecs=vp9,opus', 'video/webm'] : ['video/mp4;codecs=avc1.640028', 'video/mp4;codecs=avc1', 'video/mp4', 'video/webm;codecs=vp9', 'video/webm'];
+    const mime = types.find(t => MediaRecorder.isTypeSupported(t)) || '';
+    const rec = new MediaRecorder(stream, mime ? {mimeType: mime, videoBitsPerSecond: 10e6} : {}); const chunks = []; rec.ondataavailable = e => e.data.size && chunks.push(e.data);
+    const done = new Promise(r => rec.onstop = r); rec.start(200);
+    await playReel(prep, cv, opt, p => btn.textContent = `Recording ${Math.round(p * 100)}%`);
+    rec.stop(); await done;
     const ext = (rec.mimeType || mime).includes('mp4') ? 'mp4' : 'webm'; const blob = new Blob(chunks, {type: ext === 'mp4' ? 'video/mp4' : 'video/webm'});
     await offer(`${(state.name || 'call').toLowerCase().replace(/[^a-z0-9]+/g, '-')}-${id.toLowerCase()}.${ext}`, blob);
     if (ext !== 'mp4') status('Saved as WebM. Instagram needs MP4: use a newer Chrome to save MP4 directly, or convert it.');
-    else if (dest && !/mp4a/.test(mime)) status('Saved as MP4 with Opus sound. If Instagram rejects it, turn Clip sound off and add the sound in Instagram, or use Chrome on Mac or Windows.');
+    else if (prep.dest && !/mp4a/.test(mime)) status('Saved as MP4 with Opus sound. If Instagram rejects it, turn Clip sound off and add the sound in Instagram, or use Chrome on Mac or Windows.');
     else status('Video saved. Ready for Instagram.');
   } catch (e) { console.error(e); status('Video failed: ' + (e && e.message || e)); }
-  finally { if (ac) ac.close(); btn.disabled = false; btn.textContent = old; }
+  finally { if (prep && prep.ac) prep.ac.close(); btn.disabled = false; btn.textContent = old; }
+}
+// ---------- preview the whole reel with sound ----------
+async function previewReel(id, btn){
+  const opt = (state.rlopt || {})[id] || {}; const old = btn.textContent; btn.disabled = true; let prep;
+  try { prep = await prepareReel(id, opt, m => btn.textContent = m, false); } catch (e) { status(e.message || String(e)); btn.disabled = false; btn.textContent = old; return; }
+  btn.disabled = false; btn.textContent = old;
+  const m = document.createElement('div'); m.className = 'rmodal'; m.innerHTML = `<div class="rbox"><canvas width="1080" height="1920" class="rcv"></canvas>
+    <div class="rbar"><div class="rprog"><span></span></div><span class="rtime">0.0 / ${prep.total.toFixed(1)} s</span></div>
+    <div class="rbtns"><button type="button" class="btn" data-a="play">Replay</button><button type="button" class="btn ghost" data-a="close">Close</button></div>
+    <p class="hint" style="margin:6px 0 0">${opt.sound ? 'Playing with clip sound.' : 'Clip sound is off for this reel. Tick Clip sound to hear it.'}</p></div>`;
+  document.body.appendChild(m); const cv = m.querySelector('canvas'); const flag = {stop: false};
+  const run = async () => { flag.stop = false; await playReel(prep, cv, opt, (p, t) => { m.querySelector('.rprog span').style.width = (p * 100) + '%'; m.querySelector('.rtime').textContent = t.toFixed(1) + ' / ' + prep.total.toFixed(1) + ' s'; }, flag); };
+  const close = () => { flag.stop = true; m.remove(); };
+  m.querySelector('[data-a=play]').onclick = () => { flag.stop = true; setTimeout(run, 60); };
+  m.querySelector('[data-a=close]').onclick = close; m.onclick = e => { if (e.target === m) close(); };
+  run();
+}
+// ---------- trim a clip: drag the window along the clip, stretch it, play just that part ----------
+async function openTrimmer(key){
+  const url = VIDURL[key], meta = (state.vids || {})[key]; if (!url || !meta) return;
+  const len = meta.len || 1; let start = meta.start || 0; let dur = Math.min((state.durs || {})[key] ?? Math.min(5, len - start), len);
+  const m = document.createElement('div'); m.className = 'rmodal'; m.innerHTML = `<div class="rbox tbox"><video class="tvid" playsinline preload="auto"></video>
+    <div class="tl"><div class="strip"></div><div class="win"><span class="grip"></span></div></div>
+    <p class="tinfo"></p>
+    <div class="rbtns"><button type="button" class="btn" data-a="play">Play this part</button><label class="rlopt"><input type="checkbox" data-a="snd" checked> Sound</label><button type="button" class="btn" data-a="use">Use this part</button><button type="button" class="btn ghost" data-a="close">Cancel</button></div>
+    <p class="hint" style="margin:6px 0 0">Drag the highlighted part along the clip to choose where it starts. Drag its right edge to change the length.</p></div>`;
+  document.body.appendChild(m);
+  const v = m.querySelector('video'), tl = m.querySelector('.tl'), win = m.querySelector('.win'), strip = m.querySelector('.strip'), info = m.querySelector('.tinfo');
+  v.src = url; v.muted = false;
+  const lay = () => { win.style.left = (start / len * 100) + '%'; win.style.width = (dur / len * 100) + '%'; info.textContent = `Starts at ${start.toFixed(1)} s · plays for ${dur.toFixed(1)} s · clip is ${len.toFixed(1)} s`; };
+  lay(); await new Promise(r => { v.onloadeddata = r; v.onerror = r; }); v.currentTime = start;
+  // filmstrip
+  (async () => { const n = 10, cvs = document.createElement('canvas'), vv = document.createElement('video'); vv.muted = true; vv.src = url; await new Promise(r => { vv.onloadeddata = r; vv.onerror = r; });
+    cvs.height = 60; cvs.width = Math.round(60 * (vv.videoWidth / vv.videoHeight || .5625)); const c = cvs.getContext('2d');
+    for (let i = 0; i < n; i++) { vv.currentTime = (i + .5) * len / n; await new Promise(r => { vv.onseeked = r; setTimeout(r, 800); }); c.drawImage(vv, 0, 0, cvs.width, cvs.height);
+      const im = document.createElement('div'); im.style.backgroundImage = `url(${cvs.toDataURL('image/jpeg', .7)})`; strip.appendChild(im); } })();
+  let drag = null, stopAt = null;
+  const xToT = x => { const r = tl.getBoundingClientRect(); return Math.max(0, Math.min(len, (x - r.left) / r.width * len)); };
+  win.addEventListener('mousedown', e => { e.preventDefault(); drag = {mode: e.target.classList.contains('grip') ? 'size' : 'move', x0: e.clientX, s0: start, d0: dur}; });
+  tl.addEventListener('mousedown', e => { if (e.target !== tl && !e.target.closest('.strip')) return; start = Math.min(xToT(e.clientX), len - dur); lay(); v.currentTime = start; });
+  const mm = e => { if (!drag) return; const r = tl.getBoundingClientRect(); const dt = (e.clientX - drag.x0) / r.width * len;
+    if (drag.mode === 'move') { start = Math.max(0, Math.min(len - dur, drag.s0 + dt)); v.currentTime = start; }
+    else { dur = Math.max(.5, Math.min(len - start, drag.d0 + dt)); v.currentTime = Math.max(start, start + dur - .05); }
+    lay(); };
+  const mu = () => { drag = null; };
+  document.addEventListener('mousemove', mm); document.addEventListener('mouseup', mu);
+  v.ontimeupdate = () => { if (stopAt !== null && v.currentTime >= stopAt) { v.pause(); stopAt = null; v.currentTime = start; } };
+  m.querySelector('[data-a=play]').onclick = () => { v.currentTime = start; stopAt = start + dur; v.play().catch(() => {}); };
+  m.querySelector('[data-a=snd]').onchange = e => { v.muted = !e.target.checked; };
+  const close = () => { v.pause(); document.removeEventListener('mousemove', mm); document.removeEventListener('mouseup', mu); m.remove(); };
+  m.querySelector('[data-a=close]').onclick = close;
+  m.querySelector('[data-a=use]').onclick = async () => { meta.start = +start.toFixed(2); state.durs = state.durs || {}; state.durs[key] = +dur.toFixed(2); close(); await makePoster(key); render(); status('Clip trimmed.'); };
 }
 function storyPlanHTML(){
   const cur = state.name; const calls = Object.entries(PRESETS).filter(([n]) => !/blank/i.test(n)).map(([n, p]) => { const s = n === $('preset').value || (p.name || DEFAULTS.name) === cur ? state : {...DEFAULTS, ...p}; return {name: s.name, kw: (s.keyword || '').toUpperCase(), colour: s.colour, dl: new Date(s.deadline + 'T00:00:00')}; });
@@ -810,7 +872,7 @@ function render(){
       const i = RENDERED.push({ s, name: `${base}-${g.left !== undefined ? String(g.idx+1).padStart(2,'0')+'-' : 'story-'}${String(j+1).padStart(2,'0')}-${s.title}.png` }) - 1;
        const okey = 'ov|' + gid(g) + '|' + j; const has = !!state.images[okey];
       const vmeta = s.photoKey && (state.vids || {})[s.photoKey]; const dkey = s.photoKey || 'end';
-      const reelCtl = g.reel ? `<div class="rlctl"><label>Length <input type="number" min="0.5" max="30" step="0.5" value="${s.dur}" data-dur="${esc(dkey)}"> s</label>${vmeta ? `<label>Start at <input type="number" min="0" step="0.5" value="${vmeta.start || 0}" data-vstart="${esc(s.photoKey)}"> s</label><span class="vtag">Video ${(vmeta.len || 0).toFixed(1)} s</span><button type="button" data-vdel="${esc(s.photoKey)}">Remove clip</button>` : ''}${/^rx/.test(s.photoKey || '') ? `<button type="button" data-delclip="${esc(g.reel)}">Remove last added clip</button>` : ''}</div>` : '';
+      const reelCtl = g.reel ? `<div class="rlctl"><label>Length <input type="number" min="0.5" max="30" step="0.5" value="${s.dur}" data-dur="${esc(dkey)}"> s</label>${vmeta ? `<label>Start at <input type="number" min="0" step="0.5" value="${vmeta.start || 0}" data-vstart="${esc(s.photoKey)}"> s</label><button type="button" class="trimbtn" data-trim="${esc(s.photoKey)}">Trim clip</button><span class="vtag">Video ${(vmeta.len || 0).toFixed(1)} s</span><button type="button" data-vdel="${esc(s.photoKey)}">Remove clip</button>` : ''}${/^rx/.test(s.photoKey || '') ? `<button type="button" data-delclip="${esc(g.reel)}">Remove last added clip</button>` : ''}</div>` : '';
       const tpre = 'tx|' + gid(g) + '|' + j + '|'; const hasRm = Object.entries(TXT()).some(([k, v]) => k.startsWith(tpre) && v === '\u200b');
       const photoBtns = (has ? `<button type="button" data-phx="${esc(okey)}">Reset photo</button>` : '') + (hasRm ? `<button type="button" data-txr="${esc(tpre)}">Restore text</button>` : '');
       return `<div class="cell"><div class="frame${s.h ? ' tall' : ''}" data-okey="${esc(okey)}" data-tkey="${esc('tx|' + gid(g) + '|' + j)}">${slideNode(s)}</div>${reelCtl}<div class="act"><span>${s.label ? esc(s.label) : g.slides.length>1 ? 'Slide ' + (j+1) : 'Single'}</span><span class="acts"><button type="button" data-hide="${esc(hk)}" title="Hide this slide for now">Hide</button>${photoBtns}<button type="button" data-i="${i}">Save PNG</button></span></div></div>`; }).join('');
@@ -820,9 +882,11 @@ function render(){
     const canvaRow = g.cap !== undefined ? `<div class="canva" data-ckey="${esc(ckey)}">${clink
       ? `<a class="btn" href="${esc(clink)}" target="_blank" rel="noopener">Edit in Canva &rarr;</a><button class="btn ghost" type="button" data-cedit>Change link</button>`
       : `<span class="cmiss">Canva source file: not linked yet</span><button class="btn ghost" type="button" data-cedit>Add Canva link</button>`}</div>` : '';
-    return `<section class="group"><div class="ghead"><h2>${esc(g.title)}</h2><span class="ghr">${g.reel ? `<label class="rlopt"><input type="checkbox" data-rlo="${g.reel}|sound" ${((state.rlopt || {})[g.reel] || {}).sound ? 'checked' : ''}> Clip sound</label><label class="rlopt"><input type="checkbox" data-rlo="${g.reel}|bar" ${((state.rlopt || {})[g.reel] || {}).bar ? 'checked' : ''}> Progress bar</label><button type="button" class="btn ghost" data-addclip="${g.reel}">+ Add clip</button><label class="btn ghost" style="cursor:pointer">Add photos or clips<input type="file" accept="image/*,video/*" multiple data-rlup="${g.reel}" hidden></label><button type="button" class="btn" data-mkvid="${g.reel}">Make video</button>` : ''}${g.left !== undefined ? `<span class="vers" title="Each call starts on its own wording so the three calls never repeat">Wording ${[0,1,2].map(k => `<button type="button" data-ver="${esc(gid(g))}|${k}" aria-pressed="${postVer(gid(g)) % 3 === k}">${'ABC'[k]}</button>`).join('')}</span>` : ''}<button type="button" class="hidebtn" data-hide="${esc(gk)}">Hide this ${g.reel ? 'reel' : g.story ? 'day' : 'post'}</button></span></div><p class="meta">${esc(g.meta)}</p><div class="slides">${cells}</div>${canvaRow}${capBox}</section>`; }).join('');
+    return `<section class="group"><div class="ghead"><h2>${esc(g.title)}</h2><span class="ghr">${g.reel ? `<label class="rlopt"><input type="checkbox" data-rlo="${g.reel}|sound" ${((state.rlopt || {})[g.reel] || {}).sound ? 'checked' : ''}> Clip sound</label><label class="rlopt"><input type="checkbox" data-rlo="${g.reel}|bar" ${((state.rlopt || {})[g.reel] || {}).bar ? 'checked' : ''}> Progress bar</label><button type="button" class="btn ghost" data-addclip="${g.reel}">+ Add clip</button><label class="btn ghost" style="cursor:pointer">Add photos or clips<input type="file" accept="image/*,video/*" multiple data-rlup="${g.reel}" hidden></label><button type="button" class="btn ghost" data-prev="${g.reel}">Preview</button><button type="button" class="btn" data-mkvid="${g.reel}">Make video</button>` : ''}${g.left !== undefined ? `<span class="vers" title="Each call starts on its own wording so the three calls never repeat">Wording ${[0,1,2].map(k => `<button type="button" data-ver="${esc(gid(g))}|${k}" aria-pressed="${postVer(gid(g)) % 3 === k}">${'ABC'[k]}</button>`).join('')}</span>` : ''}<button type="button" class="hidebtn" data-hide="${esc(gk)}">Hide this ${g.reel ? 'reel' : g.story ? 'day' : 'post'}</button></span></div><p class="meta">${esc(g.meta)}</p><div class="slides">${cells}</div>${canvaRow}${capBox}</section>`; }).join('');
   $('out').querySelectorAll('[data-i]').forEach(b => b.onclick = () => saveOne(Number(b.dataset.i)));
   $('out').querySelectorAll('[data-mkvid]').forEach(b => b.onclick = () => makeReel(b.dataset.mkvid, b));
+  $('out').querySelectorAll('[data-prev]').forEach(b => b.onclick = () => previewReel(b.dataset.prev, b));
+  $('out').querySelectorAll('[data-trim]').forEach(b => b.onclick = () => openTrimmer(b.dataset.trim));
   $('out').querySelectorAll('[data-rlup]').forEach(inp => inp.onchange = async () => { const r = REELS.find(x => x.id === inp.dataset.rlup);
     const keys = r.beats().map(b => b.photoKey).filter(Boolean).concat(Array.from({length: (state.extra || {})[r.id] || 0}, (_, i) => `rx${r.id.slice(1)}${i}`)); let i = 0, n = 0;
     for (const file of inp.files) { while (i < keys.length && (state.images[keys[i]] || (state.vids || {})[keys[i]])) i++;
