@@ -837,7 +837,7 @@ function storyFrame(o){
 // Each beat is a 1080x1920 frame: a full-bleed photo (slot "rl<reel><beat>") with a few words on top.
 const daysToGo = () => { const t = new Date(); t.setHours(0, 0, 0, 0); return Math.max(0, Math.round((dl() - t) / 864e5)); };
 const rlPhoto = (k) => state.images[k] || '';
-function rlPh(i){ const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="1080" height="1920"><rect width="1080" height="1920" fill="#2b2124"/><rect x="60" y="60" width="960" height="1800" rx="28" fill="none" stroke="#f9ece5" stroke-opacity=".45" stroke-width="4" stroke-dasharray="18 14"/><text x="540" y="560" text-anchor="middle" font-family="sans-serif" font-weight="700" font-size="50" fill="#f9ece5" fill-opacity=".75" letter-spacing="6">PHOTOSHOOT ${i}</text><text x="540" y="630" text-anchor="middle" font-family="sans-serif" font-size="32" fill="#f9ece5" fill-opacity=".55">Click or drop a photo from a past edition</text></svg>`;
+function rlPh(i){ const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="1080" height="1920"><rect width="1080" height="1920" fill="#2b2124"/><rect x="60" y="60" width="960" height="1800" rx="28" fill="none" stroke="#f9ece5" stroke-opacity=".45" stroke-width="4" stroke-dasharray="18 14"/><text x="540" y="560" text-anchor="middle" font-family="sans-serif" font-weight="700" font-size="50" fill="#f9ece5" fill-opacity=".75" letter-spacing="6">PHOTO OR VIDEO ${i}</text><text x="540" y="630" text-anchor="middle" font-family="sans-serif" font-size="32" fill="#f9ece5" fill-opacity=".55">Click or drop a clip or photo</text></svg>`;
   return 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg).replace(/'/g, '%27').replace(/\(/g, '%28').replace(/\)/g, '%29'); }
 function reelBeat(o){ const k = o.key; const src = rlPhoto(k) || rlPh(o.n);
   const shade = `<div class="a" style="inset:0;background:linear-gradient(180deg,rgba(20,9,12,.55) 0%,rgba(20,9,12,0) 24%,rgba(20,9,12,0) 52%,rgba(20,9,12,.78) 78%,rgba(20,9,12,.9) 100%)"></div>`;
@@ -846,10 +846,11 @@ function reelBeat(o){ const k = o.key; const src = rlPhoto(k) || rlPh(o.n);
     <p class="a cn" style="left:64px;top:250px;color:${WHITE}">Arts to Hearts Project</p>
     ${kick}<p class="a H" style="left:86px;right:90px;top:${o.top}px;font-size:${o.size || 96}px;color:${WHITE}">${o.text}</p>
     ${o.sub ? `<p class="a sub" style="left:90px;right:120px;top:${o.subTop || o.top + 300}px;font-size:40px;color:${WHITE};opacity:.92">${o.sub}</p>` : ''}`;
-  return {h:1920, bg:INK, html, dur:o.dur || 2.6, photoKey:k};
+  const v = (state.vids || {})[k]; const d = (state.durs || {})[k] ?? (v ? Math.min(5, Math.max(1, +((v.len || 4) - (v.start || 0)).toFixed(1))) : (o.dur || 2.6));
+  return {h:1920, bg:INK, html, dur:d, photoKey:k, isVideo: !!v};
 }
 function reelEnd(n){ const g = G.call();
-  return {h:1920, bg:g.bg, dur:3.4, html:`<p class="a cn" style="left:64px;top:250px;color:${g.fg}">Arts to Hearts Project</p>
+  return {h:1920, bg:g.bg, dur:(state.durs || {}).end ?? 3.4, html:`<p class="a cn" style="left:64px;top:250px;color:${g.fg}">Arts to Hearts Project</p>
     <p class="a lab" style="left:0;right:0;top:620px;text-align:center;color:${g.acc}">Open call · closes ${dateLong()}</p>
     <p class="a c scr" style="left:40px;right:40px;top:680px;font-size:${String(state.name).length > 18 ? 110 : 140}px;line-height:1;color:${g.fg}">${esc(state.name)}</p>
     <div class="a" style="left:130px;right:130px;top:1060px;height:130px;border-radius:999px;background:${CREAM};color:${BURG};display:flex;align-items:center;justify-content:center;font-size:46px;font-weight:700;letter-spacing:-.02em">${CMODE() ? 'Apply via link in bio' : esc(VERB) + ' “' + KW() + '” to apply'}</div>
@@ -899,8 +900,25 @@ const REELS = [
     reelBeat({key:'rl6d', n:4, kicker:'3', text:'Seen by collectors, galleries and curators.', top:1240, size:88}),
     reelEnd()],
    caption: () => `3 reasons artists submit to the ${N()}: a juried credit for your CV, your work in print sold worldwide, and a book seen by collectors, galleries and curators.\n\n${kwLine()}\n${closeLn()}\n\nSave this for later.\n\n${tags}`},
+  {id:'R7', name:'Flip through the book', goal:'Show the real product', len:'12 s', audio:'Use the real page-turn sound: switch Clip sound on.', tip:'Film the flip in one steady shot, daylight, hands only.', video:true, beats: () => [
+    reelBeat({key:'rl7a', n:1, text:'Flip through a past edition.', top:1300, size:88, dur:4}),
+    reelBeat({key:'rl7b', n:2, text:'Every page, a different artist.', top:1300, size:88, dur:3}),
+    reelBeat({key:'rl7c', n:3, text:'Yours could be next.', top:1300, dur:3}),
+    reelEnd()],
+   caption: () => `Flip through a past edition. Every page, a different artist. Yours could be next in the ${N()}.\n\n${kwLine()}\n${closeLn()}\n\n${tags}`},
+  {id:'R8', name:'Unboxing the book', goal:'Desire: the physical object', len:'12 s', audio:'Soft ASMR: keep Clip sound on for the unboxing.', tip:'Open the box slowly. End on the cover in your hands.', video:true, beats: () => [
+    reelBeat({key:'rl8a', n:1, kicker:'Unboxing', text:'Our latest edition just arrived.', top:1300, size:88, dur:3.5}),
+    reelBeat({key:'rl8b', n:2, text:'Hardcover. Juried. Real.', top:1300, dur:3}),
+    reelBeat({key:'rl8c', n:3, text:'This could hold your work.', top:1300, size:88, dur:3}),
+    reelEnd()],
+   caption: () => `Our latest edition just arrived. The next one could hold your work: the ${N()} is open.\n\n${kwLine()}\n${closeLn()}\n\n${tags}`},
+  {id:'R9', name:'From studio to page', goal:'Story: an artist’s work in print', len:'12 s', audio:'Calm, then lift at the reveal.', tip:'Clip 1: the artist working. Clip 2: their page in the book.', video:true, beats: () => [
+    reelBeat({key:'rl9a', n:1, text:'It started in the studio.', top:1300, size:88, dur:3.5}),
+    reelBeat({key:'rl9b', n:2, text:'It ended up here.', top:1300, dur:3.5}),
+    reelBeat({key:'rl9c', n:3, text:'Your turn.', top:1300, size:120, dur:2.5}),
+    reelEnd()],
+   caption: () => `It started in the studio. It ended up in print. Your turn: the ${N()} is open.\n\n${kwLine()}\n${closeLn()}\n\n${tags}`},
 ];
-
 // ---------- COPY BANK: tested alternatives for key lines. No AI calls: variety and suggestions come from here ----------
 // Tokens: {S} artists selected · {D} deadline · {K} keyword · {W} who · {NG} edition name in the script font (auto-variety only)
 const COPY = {
