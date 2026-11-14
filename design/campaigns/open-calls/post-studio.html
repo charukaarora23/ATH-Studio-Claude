@@ -61,6 +61,7 @@ summary{font:600 12px/1 var(--mono);letter-spacing:.1em;text-transform:uppercase
 .frame.tall{height:calc(var(--pw) * 1.7778)}
 .group{margin-bottom:34px}
 .canva{display:flex;gap:10px;align-items:center;margin-top:12px}.canva .btn{padding:9px 14px;font-size:13px;text-decoration:none}.cmiss{font-size:13px;color:var(--muted)}
+.pool{display:grid;grid-template-columns:repeat(auto-fill,minmax(64px,1fr));gap:8px;margin:4px 0 10px}.pc{position:relative;font-size:10px;line-height:1.2;color:var(--muted)}.pc span{display:block;margin-top:3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.pt{width:100%;aspect-ratio:4/5;border:1.5px dashed var(--line);border-radius:8px;background:var(--panel) center/cover;font:700 14px var(--sans);color:var(--muted);cursor:pointer}.pc.on .pt{border:0}.px{position:absolute;top:3px;right:3px;width:20px;height:20px;border-radius:50%;border:0;background:rgba(0,0,0,.6);color:#fff;font-size:14px;line-height:20px;cursor:pointer;padding:0}
 .acts{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}.hint{font-size:13px;color:var(--muted);margin:0 0 10px;line-height:1.45}
 .capbox{max-width:720px;margin-top:10px;border-top:1px solid var(--line)}
 .cell .act{display:flex;justify-content:space-between;align-items:center;font-size:12px;color:var(--muted);width:var(--pw)}
@@ -173,14 +174,9 @@ summary{font:600 12px/1 var(--mono);letter-spacing:.1em;text-transform:uppercase
   </details>
 
   <details open><summary>Images and past artists</summary>
-    <p class="hint">Month artworks: these five images run through the whole 30 days. Upload one and every post using it updates. To change a single slide, use "Change photo" under that slide.</p>
-    <div class="row2">
-      <div class="f"><label for="imgArt1">Month artwork 1</label><div class="img-in"><span class="th" id="th-imgArt1"></span><input id="imgArt1" type="file" accept="image/*"></div></div>
-      <div class="f"><label for="imgArt2">Month artwork 2</label><div class="img-in"><span class="th" id="th-imgArt2"></span><input id="imgArt2" type="file" accept="image/*"></div></div>
-      <div class="f"><label for="imgArt3">Month artwork 3</label><div class="img-in"><span class="th" id="th-imgArt3"></span><input id="imgArt3" type="file" accept="image/*"></div></div>
-      <div class="f"><label for="imgArt4">Month artwork 4</label><div class="img-in"><span class="th" id="th-imgArt4"></span><input id="imgArt4" type="file" accept="image/*"></div></div>
-      <div class="f"><label for="imgArt5">Month artwork 5</label><div class="img-in"><span class="th" id="th-imgArt5"></span><input id="imgArt5" type="file" accept="image/*"></div></div>
-    </div>
+    <p class="hint"><b>Month artworks</b>: every photo in the 30 days gets its own artwork, none is used twice. <span id="artNeed"></span></p>
+    <div class="f"><label for="poolUp">Add artworks (select several at once; they fill the empty slots in posting order)</label><input id="poolUp" type="file" accept="image/*" multiple></div>
+    <div class="pool" id="poolGrid"></div>
     <p class="hint" style="margin-top:14px">Launch carousel and page photos:</p>
     <div class="f"><label for="imgCover">Cover artwork</label><div class="img-in"><span class="th" id="th-imgCover"></span><input id="imgCover" type="file" accept="image/*"></div></div>
     <div class="f"><label for="credit">Cover credit</label><input id="credit" placeholder="Artist name, Title"></div>
@@ -272,8 +268,8 @@ const PRESETS = {
   },
   'New call (blank)': { series:'', edition:'', editionLabel:'', name:'', keyword:'', selected:'', coverLine:'', quote:'', submit:'', theme:'', themeWork:'work', themeLine:'', juryLooks:'', kinds:'', pastEds:'', jury:'', images:{} },
 };
-const IMGKEYS = ['imgCover','imgTheme','imgBooks','imgSpread','imgA1','imgA2','imgArt1','imgArt2','imgArt3','imgArt4','imgArt5'];
-const thumbOf = k => state.images[k] || (/^imgArt\d$/.test(k) ? ART_DEFAULT[+k.slice(6) - 1] : '');
+const IMGKEYS = ['imgCover','imgTheme','imgBooks','imgSpread','imgA1','imgA2'];
+const thumbOf = k => state.images[k] || '';
 const FIELDS = Object.keys(DEFAULTS).filter(k => k !== 'colour');
 const DEFAULT_IMAGES = { imgCover:'art/flower-portrait.jpg', imgTheme:'art/night-bloom.jpg' };
 let state = {...DEFAULTS, images:{...DEFAULT_IMAGES}};
@@ -293,6 +289,19 @@ IMGKEYS.forEach(k => $(k).addEventListener('change', e => {
   shrink(file).then(url => { state.images[k] = url; $('th-'+k).style.backgroundImage = `url(${url})`; render(); status('Image added. Press "Save call" to keep it.'); });
 }));
 // keep uploads light: longest side 1600px, JPEG
+function renderPool(){
+  const keys = artPlan(); const g = $('poolGrid'); if (!g) return;
+  const have = keys.filter((k, i) => state.images['pool' + (i + 1)]).length;
+  $('artNeed').textContent = `This month needs ${keys.length} artworks. ${have} added.`;
+  g.innerHTML = keys.map((k, i) => { const u = state.images['pool' + (i + 1)]; const post = k.replace(/#\d+$/, '');
+    return `<div class="pc${u ? ' on' : ''}" title="${esc(post)}"><button type="button" class="pt" data-pool="${i}" style="${u ? `background-image:url(${u})` : ''}" aria-label="Artwork ${i + 1}: ${esc(post)}">${u ? '' : i + 1}</button>${u ? `<button type="button" class="px" data-poolx="${i}" aria-label="Remove artwork ${i + 1}">&times;</button>` : ''}<span>${esc(post)}</span></div>`; }).join('');
+  g.querySelectorAll('[data-pool]').forEach(b => b.onclick = () => { const inp = document.createElement('input'); inp.type = 'file'; inp.accept = 'image/*';
+    inp.onchange = () => { const file = inp.files[0]; if (file) shrink(file).then(url => { state.images['pool' + (+b.dataset.pool + 1)] = url; render(); status('Artwork ' + (+b.dataset.pool + 1) + ' added. Press "Save call" to keep it.'); }); }; inp.click(); });
+  g.querySelectorAll('[data-poolx]').forEach(b => b.onclick = () => { delete state.images['pool' + (+b.dataset.poolx + 1)]; render(); });
+}
+$('poolUp').addEventListener('change', async e => { const files = [...e.target.files]; if (!files.length) return; const n = artPlan().length; let i = 0, added = 0;
+  for (const file of files) { while (i < n && state.images['pool' + (i + 1)]) i++; if (i >= n) break; state.images['pool' + (i + 1)] = await shrink(file); i++; added++; }
+  e.target.value = ''; render(); status(added + ' artwork' + (added === 1 ? '' : 's') + ' added' + (added < files.length ? ` (${files.length - added} more than the month needs)` : '') + '. Press "Save call" to keep them.'); });
 function shrink(file){ return new Promise(res => { const r = new FileReader(); r.onload = () => { const im = new Image(); im.onload = () => {
   const s = Math.min(1, 1600 / Math.max(im.width, im.height)); const c = document.createElement('canvas'); c.width = Math.round(im.width * s); c.height = Math.round(im.height * s);
   c.getContext('2d').drawImage(im, 0, 0, c.width, c.height); res(c.toDataURL('image/jpeg', .88)); }; im.onerror = () => res(r.result); im.src = r.result; }; r.readAsDataURL(file); }); }
@@ -500,14 +509,15 @@ function render(){
     // re-render final week with the right verb
     VERB = verbFor(3); groups[2].slides = stories()[2].frames.map((f,j) => ({...f, title:'final-week-' + (j+1)})); VERB = 'DM';
   } else {
-    const all = monthPosts(); const list = pick === 'month' ? all : [all[Number(pick)]];
+    artPlan(); const all = monthPosts(); const list = pick === 'month' ? all : [all[Number(pick)]];
     list.forEach((p,pi) => { VERB = verbFor(p.left); CURLEFT = p.left;
-      const slides = p.slides().map(decorate); const cap = p.caption(); const pin = p.pin ? p.pin() : `${VERB === 'COMMENT' ? 'Comment' : 'DM us'} "${(state.keyword||'').toUpperCase()}" for the brief and your link. Closes ${short()}.`;
+      const slides = artFill(p, artBuild(p)).map(decorate); const cap = p.caption(); const pin = p.pin ? p.pin() : `${VERB === 'COMMENT' ? 'Comment' : 'DM us'} "${(state.keyword||'').toUpperCase()}" for the brief and your link. Closes ${short()}.`;
       groups.push({title: `${postDate(p.left)} · ${p.title}`, meta: `${p.kind} · ${slides.length} slide${slides.length>1?'s':''} · ${p.left === 0 ? 'deadline day' : p.left + ' days left'} · ${VERB} “${KW()}”`, slides: slides.map((s,j) => ({...s, title: s.title || (p.title.toLowerCase().replace(/[^a-z0-9]+/g,'-') + (slides.length>1 ? '-'+(j+1) : ''))})), cap, pin, left:p.left, idx:pi});
       VERB = 'DM'; });
   }
   groups.forEach(g => { const t = g.title.replace(/^[^·]*·\s*/, ''); g.slides = g.slides.map((s, j) => { const o = state.images['ov|' + t + '|' + j];
     return o && s.html ? {...s, html: s.html.replace(/background-image:url\([^)]*\)/, 'background-image:url(' + o + ')')} : s; }); });
+  renderPool();
   RENDERED = [];
   $('out').innerHTML = groups.map((g,gi) => {
     const cells = g.slides.map((s,j) => { const i = RENDERED.push({ s, name: `${base}-${g.left !== undefined ? String(g.idx+1).padStart(2,'0')+'-' : 'story-'}${String(j+1).padStart(2,'0')}-${s.title}.png` }) - 1;

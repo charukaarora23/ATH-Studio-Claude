@@ -3,7 +3,7 @@
    so it uses the helpers and state defined in post-studio.html. */
 
 // dummy artwork for examples until real artists' work is added (credit before posting)
-const EX = { portrait:'art/flower-portrait.jpg', bloom:'art/night-bloom.jpg', field:'art/call-garden.jpg', dahlia:'art/ref-dahlias.jpg', palms:'art/ref-palms.jpg', meadow:'art/ref-reid.jpg' };
+
 
 // the post being built sets this (days before the deadline)
 let CURLEFT = 30;
@@ -25,9 +25,37 @@ const isAwardStyle = () => state.style === 'award';
 const callBtn = () => `<span style="display:inline-flex;align-items:center;gap:16px;height:64px;padding:0 10px 0 28px;border-radius:999px;background:${state.colour};color:${WHITE}">
   <span class="cn" style="font-size:19px">Open call · ${esc(state.name)}</span>
   <span style="width:46px;height:46px;border-radius:50%;background:${WHITE};color:${state.colour};display:inline-flex;align-items:center;justify-content:center"><svg width="22" height="10" viewBox="0 0 46 20"><path d="M2 10h40M33 2l9 8-9 8" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/></svg></span></span>`;
-const ART_DEFAULT = ['art/flower-portrait.jpg','art/night-bloom.jpg','art/call-garden.jpg','art/ref-reid.jpg','art/ref-dahlias.jpg'];
-// the five month artworks: an uploaded "Month artwork N" replaces the sample everywhere it is used
-const ART = new Proxy(ART_DEFAULT, { get(t, k){ if (typeof k === 'string' && /^\d+$/.test(k)) { const u = (typeof state !== 'undefined' && state.images && state.images['imgArt' + (+k + 1)]); return u || t[k]; } return t[k]; } });
+// ---------- month artworks: every photo spot in the month gets its own artwork, never repeated ----------
+// Each post's n-th image read is a numbered slot ("post title#n"). Slots are filled, in posting order, by
+// the uploaded month artworks (state.images.pool1, pool2, ...). Empty slots borrow a sample (each sample once),
+// then show a dashed "Artwork N" placeholder.
+const SAMPLE_ART = ['art/call-garden.jpg','art/ref-reid.jpg','art/ref-dahlias.jpg','art/night-bloom.jpg','art/ref-palms.jpg','art/flower-portrait.jpg'];
+let ART_CTX = null, ART_ORDER = {}, ART_KEYS = [];
+// while a post is built every image read returns a token; only tokens that end up on a slide get a slot
+function artNext(){ return ART_CTX ? 'ARTSLOT' + (ART_CTX.n++) + 'X' : SAMPLE_ART[0]; }
+function artBuild(p){ ART_CTX = {n:0}; let slides; try { slides = p.slides(); } finally { ART_CTX = null; } return slides; }
+function artKeys(p, slides){ const ks = []; slides.forEach(s => String(s.html || '').replace(/ARTSLOT(\d+)X/g, (m, n) => { const k = p.title + '#' + n; if (!ks.includes(k)) ks.push(k); return m; })); return ks; }
+function artFill(p, slides){ return slides.map(s => s.html ? {...s, html: s.html.replace(/ARTSLOT(\d+)X/g, (m, n) => artFor(ART_ORDER[p.title + '#' + n]))} : s); }
+function artFor(i){
+  if (i === undefined) return SAMPLE_ART[0];
+  const up = state.images['pool' + (i + 1)]; if (up) return up;
+  const used = new Set([state.images.imgCover, state.images.imgTheme]);
+  const samples = SAMPLE_ART.filter(s => !used.has(s));
+  let k = 0; for (let j = 0; j < i; j++) if (!state.images['pool' + (j + 1)]) k++;
+  return samples[k] || artPlaceholder(i);
+}
+function artPlaceholder(i){
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="1080" height="1350"><rect width="1080" height="1350" fill="#2b2124"/><rect x="40" y="40" width="1000" height="1270" rx="24" fill="none" stroke="#f9ece5" stroke-opacity=".5" stroke-width="4" stroke-dasharray="18 14"/><text x="540" y="640" text-anchor="middle" font-family="sans-serif" font-weight="700" font-size="54" fill="#f9ece5" fill-opacity=".75" letter-spacing="6">ARTWORK ${i + 1}</text><text x="540" y="720" text-anchor="middle" font-family="sans-serif" font-size="34" fill="#f9ece5" fill-opacity=".55">Add it under Month artworks</text></svg>`;
+  return 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg).replace(/'/g, '%27').replace(/\(/g, '%28').replace(/\)/g, '%29');
+}
+// walk the whole month once to number the slots (stable, whatever post is being shown)
+function artPlan(){
+  const v = VERB, l = CURLEFT; ART_KEYS = [];
+  monthPosts().forEach(p => { try { VERB = verbFor(p.left); CURLEFT = p.left; ART_KEYS.push(...artKeys(p, artBuild(p))); } catch {} });
+  VERB = v; CURLEFT = l; ART_ORDER = {}; ART_KEYS.forEach((k, i) => ART_ORDER[k] = i); return ART_KEYS;
+}
+const ART = new Proxy([], { get(t, k){ return (typeof k === 'string' && /^\d+$/.test(k)) ? artNext() : t[k]; } });
+const EX = new Proxy({}, { get(){ return artNext(); } });
 // simple line icons for teaching slides
 const ICON = {
   sun:'<circle cx="60" cy="60" r="22"/><path d="M60 14v14M60 92v14M14 60h14M92 60h14M27 27l10 10M83 83l10 10M27 93l10-10M83 37l10-10"/>',
@@ -144,7 +172,7 @@ const T = {
   // the theme, recapped visually
   themeRecap(o = {}){
     const g = G[o.ground||'ink']();
-    const imgs = [ART[4], ART[3], ART[0], 'art/ref-palms.jpg']; const items = KINDS().slice(0,4).map((k,i) => [imgs[i], esc(k[0])]);
+    const imgs = [ART[0], ART[1], ART[2], ART[3]]; const items = KINDS().slice(0,4).map((k,i) => [imgs[i], esc(k[0])]);
     return {bg:g.bg, html:`${corners(g.fg, g.dm, o.tr || 'The theme')}
       <p class="a R" style="left:76px;right:80px;top:150px;font-size:76px;color:${g.fg}">${o.head || `${state.theme ? 'Theme: ' + TH() + '. ' : ''}All of this counts.`}</p>
       ${items.map(([src,l],i) => { const x = i%2 ? 556 : 80, y = i<2 ? 360 : 780; return `${imgDiv(src, `left:${x}px;top:${y}px;width:444px;height:330px;border-radius:16px`, 'center 30%')}<p class="a" style="left:${x}px;top:${y+346}px;font-size:28px;font-weight:600;color:${g.fg}">${l}</p>`; }).join('')}`};
@@ -672,7 +700,7 @@ ${closeLn()}
 
 ${tags}`},
  {left:6, title:'Five mistakes to avoid', kind:'Carousel · education', slides:() => [
-   T.hook({img:'art/ref-palms.jpg', pos:'center 30%', tr:'Before you submit', head:`Applying to the ${name}? Avoid these 5 mistakes.`, size:76, sub:'Six days left to get your submission right. Save this.'}),
+   T.hook({img:ART[0], pos:'center 30%', tr:'Before you submit', head:`Applying to the ${name}? Avoid these 5 mistakes.`, size:76, sub:'Six days left to get your submission right. Save this.'}),
    T.num({icon:'blur', n:'01', head:'A blurry or tilted photo.', text:'The jury can only judge what they can see.', tr:'Avoid this', ground:'ink'}),
    T.num({icon:'filter', n:'02', head:'Filters and editing.', text:'If the colours are wrong, the work is misread.', tr:'Avoid this'}),
    T.num({icon:'target', n:'03', head: state.themeWork === 'best work' ? 'A body of work without focus.' : 'Ignoring the theme.', text:state.theme && state.themeWork !== 'best work' ? `Show us your reading of the ${(state.theme||'').toLowerCase()} theme, however personal.` : 'Send work that shows your own voice clearly.', tr:'Avoid this', ground:'ink'}),
