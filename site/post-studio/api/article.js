@@ -109,6 +109,12 @@ export default async function handler(req, res){
   if (req.method !== 'POST') { res.setHeader('Allow', 'POST'); return res.status(405).json({error: 'method not allowed'}); }
   try {
     const body = typeof req.body === 'string' ? JSON.parse(req.body || '{}') : (req.body || {});
+    if (!body.url && typeof body.text === 'string') {   // text already read from a PDF in the browser: only write the copy
+      if (!process.env.ANTHROPIC_API_KEY) return res.status(200).json({ai: null, aiAvailable: false});
+      const imgs = Array.isArray(body.images) ? body.images.slice(0, 20).map(i => ({alt: String(i.alt || ''), cap: String(i.cap || '')})) : [];
+      try { return res.status(200).json({ai: await structure(body.text.slice(0, 120000), imgs, (body.text.match(/(^|\n)\s*Q\d+\./g) || []).length), aiAvailable: true}); }
+      catch (e) { return res.status(200).json({ai: null, aiAvailable: true, aiError: e instanceof Anthropic.APIError ? `Claude error ${e.status}.` : String(e && e.message || e)}); }
+    }
     let url; try { url = new URL(String(body.url || '').trim()); if (!/^https?:$/.test(url.protocol)) throw 0; } catch { return res.status(400).json({error: 'That does not look like a web link.'}); }
     const r = await fetch(url.href, {headers: {'User-Agent': UA, 'Accept': 'text/html'}, redirect: 'follow'});
     if (!r.ok) return res.status(502).json({error: `The page answered ${r.status}.`});

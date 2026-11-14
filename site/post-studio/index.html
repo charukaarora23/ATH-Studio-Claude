@@ -749,12 +749,13 @@ function ivField(p, fd, demo){ const v = (p.f || {})[fd.k] || ''; const im = (p.
   return `<div class="f"><label>${esc(fd.label)}</label><textarea data-df="${fd.k}" rows="${fd.type === 'lines' ? 4 : 3}" placeholder="${esc(fd.ph || (fd.type === 'lines' ? 'One per line' : ''))}"${dis}>${esc(v)}</textarea></div>`; }
 function renderIvSide(){ const el = $('ivside'); if (!el) return; const p = ivCurrent(), demo = !p || p.id === 'demo', list = ivPosts();
   const sec = (title, inner) => `<details${IV_OPEN.has(title) ? ' open' : ''} data-sec="${esc(title)}"><summary>${esc(title)}</summary>${inner}</details>`;
-  el.innerHTML = `<h1>ATH Post Studio</h1><p class="sub">Artist interviews. Paste the article link: the carousel, quote cards, stories and captions are written from it, in the Arts to Hearts look.</p>
+  el.innerHTML = `<h1>ATH Post Studio</h1><p class="sub">Artist interviews. Give it the article as a link or a PDF: the carousel, quote cards, stories and captions are written from it, in the Arts to Hearts look.</p>
     <div class="f"><label for="ivPick">Interview</label><div class="row2"><select id="ivPick"><option value="demo"${demo ? ' selected' : ''}>Example · PQHAÜS</option>${list.map(x => `<option value="${x.id}"${x.id === IVSEL ? ' selected' : ''}>${esc(x.f.name || 'Untitled')}${x.date ? ' · ' + esc(x.date) : ''}</option>`).join('')}</select><button class="btn ghost" type="button" data-ivnew>New</button></div>
     <p class="hint" style="margin:6px 0 0;display:flex;justify-content:space-between;gap:8px"><span>${DMODE === 'shared' ? 'Saved for the whole team.' : 'Saved in this browser.'}</span>${demo ? '' : '<button type="button" class="linkbtn" data-ivdel>Delete this interview</button>'}</p></div>
     ${sec('Start from the article', `<div class="f"><label for="ivUrl">Article link</label><input id="ivUrl" type="url" placeholder="https://artstoheartsproject.com/…" value="${esc(demo ? '' : (p.f || {}).src || '')}"></div>
       <button class="btn" type="button" data-ivimport style="width:100%">Build from link</button><p class="ivmsg" id="ivMsg"></p>
-      <details style="margin-top:10px"><summary style="font-size:13px">No link? Paste the article text</summary><textarea id="ivPaste" rows="4" placeholder="Copy everything on the article page and paste it here"></textarea><button class="btn ghost" type="button" data-ivpaste>Build from text</button></details>`)}
+      <div class="f" style="margin-top:12px"><label for="ivPdf">Or upload the article as a PDF (on the article page: Print, then Save as PDF)</label><input id="ivPdf" type="file" accept="application/pdf,.pdf"></div>
+      <details style="margin-top:10px"><summary style="font-size:13px">No link or PDF? Paste the article text</summary><textarea id="ivPaste" rows="4" placeholder="Copy everything on the article page and paste it here"></textarea><button class="btn ghost" type="button" data-ivpaste>Build from text</button></details>`)}
     ${demo ? `<div class="demo">This is the example, so its fields are locked. Paste a link above to build a new interview, or <button type="button" class="linkbtn" data-ivcopy>edit a copy of this one</button>.</div>` : ''}
     ${DCAT.interview.groups.map(([title, fields]) => sec(title, fields.map(fd => ivField(p, fd, demo)).join(''))).join('')}`;
   el.querySelectorAll('details[data-sec]').forEach(d => d.ontoggle = () => { d.open ? IV_OPEN.add(d.dataset.sec) : IV_OPEN.delete(d.dataset.sec); });
@@ -764,12 +765,52 @@ function renderIvSide(){ const el = $('ivside'); if (!el) return; const p = ivCu
   const cp = el.querySelector('[data-ivcopy]'); if (cp) cp.onclick = () => { const id = dNew(isoD(new Date()), 's1', 'interview'); DPOSTS[id].f = {...IV_EXAMPLE.f}; DPOSTS[id].imgs = JSON.parse(JSON.stringify(IV_EXAMPLE.imgs)); saveDaily(id); ivSelect(id); };
   el.querySelector('[data-ivimport]').onclick = () => ivImport({url: $('ivUrl').value.trim()});
   el.querySelector('[data-ivpaste]').onclick = () => ivImport({text: $('ivPaste').value});
+  $('ivPdf').onchange = e => { const fl = e.target.files[0]; if (fl) ivImport({file: fl}); };
   if (!demo) { wireDaily(el, p); el.querySelectorAll('[data-dimgs],[data-dimgx]').forEach(x => { const prev = x.onchange || x.onclick; const after = () => setTimeout(renderIvSide, 50);
     if (x.matches('[data-dimgs]')) x.onchange = async () => { await prev.call(x); after(); }; else x.onclick = () => { prev.call(x); after(); }; }); }
 }
-async function ivImport({url, text}){ const msg = (t, err) => { const m = $('ivMsg'); if (m) { m.textContent = t; m.className = 'ivmsg' + (err ? ' err' : ''); } status(t); };
+// Read a PDF of the article in the browser: text in reading order, images with the caption printed under each.
+async function readArticlePdf(file, onStep){
+  const pdfjs = await import('./vendor/pdfjs/pdf.min.js'); pdfjs.GlobalWorkerOptions.workerSrc = 'vendor/pdfjs/pdf.worker.min.js';
+  const doc = await pdfjs.getDocument({data: new Uint8Array(await file.arrayBuffer())}).promise;
+  const lines = [], images = [], seenImg = new Set(); let title = '', ended = false; const firstItems = [];
+  const END = /^(Leave a Reply|The Latest|Related (posts|articles)|You may also like|More from|Recent posts|\d*\s*Shares\b)/i;
+  for (let n = 1; n <= doc.numPages; n++) { onStep && onStep(`Reading page ${n} of ${doc.numPages}…`);
+    const page = await doc.getPage(n); const tc = await page.getTextContent();
+    // text: group items into lines by baseline, keep a blank line where the gap is wide
+    const rows = []; tc.items.forEach(it => { if (!it.str) return; const y = Math.round(it.transform[5]), sz = Math.abs(it.transform[3]) || Math.abs(it.transform[0]);
+      if (n === 1 && it.str.trim()) firstItems.push({sz, y, x: it.transform[4], s: it.str});
+      let r = rows.find(r => Math.abs(r.y - y) < sz * 0.5); if (!r) { r = {y, sz, parts: []}; rows.push(r); } r.parts.push({x: it.transform[4], s: it.str}); });
+    rows.sort((a, b) => b.y - a.y); let prev = null; const pageRows = []; let endY = -Infinity; const wasEnded = ended;
+    rows.forEach(r => { const t = r.parts.sort((a, b) => a.x - b.x).map(p => p.s).join('').replace(/\s+/g, ' ').trim(); if (!t || ended) return;
+      if (END.test(t)) { ended = true; endY = r.y; return; }   // the site's comments, share buttons and "latest posts" are not the article
+      if (prev && prev.y - r.y > Math.max(prev.sz, r.sz) * 1.9) lines.push(''); lines.push(t); pageRows.push({y: r.y, t}); prev = r; });
+    if (n === 1) { const mx = Math.max(...firstItems.map(i => i.sz)); title = firstItems.filter(i => i.sz >= mx * 0.92).sort((a, b) => b.y - a.y || a.x - b.x).map(i => i.s).join(' ').replace(/\s+/g, ' ').trim(); }
+    if (wasEnded) break;
+    lines.push('');
+    // images: follow the drawing matrix so each image knows where it sits, then read the caption just below it
+    const ops = await page.getOperatorList(); const O = pdfjs.OPS; let ctm = [1, 0, 0, 1, 0, 0]; const stack = [];
+    const mul = (m, t) => [m[0] * t[0] + m[2] * t[1], m[1] * t[0] + m[3] * t[1], m[0] * t[2] + m[2] * t[3], m[1] * t[2] + m[3] * t[3], m[0] * t[4] + m[2] * t[5] + m[4], m[1] * t[4] + m[3] * t[5] + m[5]];
+    for (let i = 0; i < ops.fnArray.length; i++) { const fn = ops.fnArray[i], a = ops.argsArray[i];
+      if (fn === O.save) stack.push(ctm.slice()); else if (fn === O.restore) ctm = stack.pop() || [1, 0, 0, 1, 0, 0]; else if (fn === O.transform) ctm = mul(ctm, a);
+      else if (fn === O.paintImageXObject) { const id = a[0]; const store = id.startsWith('g_') ? page.commonObjs : page.objs;
+        const img = await new Promise(res => { try { store.get(id, res); } catch { res(null); } }); if (!img) continue;
+        const w = img.width, h = img.height; if (!w || !h || Math.min(w, h) < 500 || seenImg.has(id)) continue; seenImg.add(id);
+        if (Math.max(ctm[5], ctm[5] + ctm[3]) < endY) continue;
+        const cv = document.createElement('canvas'); cv.width = w; cv.height = h; const cx = cv.getContext('2d');
+        if (img.bitmap) cx.drawImage(img.bitmap, 0, 0); else if (img.data) { const out = cx.createImageData(w, h), d = img.data, o = out.data;
+          if (d.length === w * h * 4) o.set(d); else if (d.length === w * h * 3) { for (let p = 0, q = 0; p < d.length; p += 3, q += 4) { o[q] = d[p]; o[q + 1] = d[p + 1]; o[q + 2] = d[p + 2]; o[q + 3] = 255; } } else continue; cx.putImageData(out, 0, 0); } else continue;
+        const bottom = Math.min(ctm[5], ctm[5] + ctm[3]); const capRow = pageRows.find(r => r.y < bottom && bottom - r.y < 140 && / \/ (19|20)\d{2} \/ /.test(r.t)) || pageRows.find(r => r.y < bottom && bottom - r.y < 70); const cap = (capRow || {}).t || '';
+        const blob = await new Promise(r => cv.toBlob(r, 'image/jpeg', .9)); images.push({w, h, file: new File([blob], `pdf-img-${images.length + 1}.jpg`, {type: 'image/jpeg'}), alt: '', cap: / \/ (19|20)\d{2} \/ /.test(cap) ? cap : ''}); } } }
+  return {title: title.replace(/\s+/g, ' ').trim(), text: lines.join('\n').replace(/\n{3,}/g, '\n\n'), images};
+}
+async function ivImport({url, text, file}){ const msg = (t, err) => { const m = $('ivMsg'); if (m) { m.textContent = t; m.className = 'ivmsg' + (err ? ' err' : ''); } status(t); };
   let page = {title: '', text: text || '', images: [], ai: null};
-  if (url) { msg('Reading the article and saving its images… this takes up to a minute.');
+  if (file) { try { const pdf = await readArticlePdf(file, t => msg(t)); msg(`Saving ${pdf.images.length} images…`);
+      for (const im of pdf.images) im.url = await dUpload(im.file); page = {title: pdf.title, text: pdf.text, images: pdf.images.map(({file, ...x}) => x), ai: null}; }
+    catch (e) { msg('Could not read that PDF (' + (e.message || e) + '). Try printing the article page to PDF again, or paste the text.', true); return; }
+    if (page.text.length > 500) { msg('Writing the carousel copy…'); try { const r = await fetch('api/article', {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({text: page.text, images: page.images.map(i => ({alt: i.alt, cap: i.cap}))})}); const j = await r.json().catch(() => ({})); if (r.ok) { page.ai = j.ai; page.aiError = j.aiError; } } catch {} } }
+  else if (url) { msg('Reading the article and saving its images… this takes up to a minute.');
     try { const r = await fetch('api/article', {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({url})}); const j = await r.json().catch(() => ({}));
       if (!r.ok) throw new Error(j.error || 'The importer did not answer (' + r.status + ').'); page = j; }
     catch (e) { msg((e.message || String(e)) + ' You can paste the article text instead.', true); return; } }
