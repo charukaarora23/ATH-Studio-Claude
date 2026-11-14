@@ -41,8 +41,10 @@ const EDT = {
   open(o){ return {bg: EP.white, html: `${edCorner(EP.burg)}
     <p class="a" style="left:72px;right:72px;top:210px;${BASK};font-size:${o.text.length > 200 ? 60 : 68}px;line-height:1.28;color:${EP.burg}">${hl(o.text, o.mark)}</p>${edHandle(EP.burg)}`}; },
   // Advice as a marked paragraph: the advice itself is highlighted inside the sentence that explains it
-  adviceMark(o){ const text = `${o.title}. ${o.how || ''}`.trim(); return {bg: EP.white, html: `${edCorner(EP.burg)}
-    <p class="a" style="left:72px;right:72px;top:210px;${BASK};font-size:${text.length > 170 ? 60 : 70}px;line-height:1.26;color:${EP.burg}">${hl(text, o.title + '.')}</p>${edHandle(EP.burg)}`}; },
+  adviceMark(o){ const text = `${o.title}. ${o.how || ''}`.trim(); return {bg: EP.white, html: `${o.first ? ivMono('burgundy', 'right:52px;top:36px;width:112px;height:63px') : edCorner(EP.burg)}
+    <div class="a" style="left:72px;right:72px;top:250px;display:flex;flex-direction:column;gap:34px">
+      ${o.label ? `<p style="${T_MED};font-size:28px;letter-spacing:.12em;text-transform:uppercase;line-height:1.4;color:${EP.burg}">${esc(o.label)}</p>` : ''}
+      <p style="${BASK};font-size:${text.length > 170 ? 60 : 70}px;line-height:1.26;color:${EP.burg}">${hl(text, o.title + '.')}</p></div>${edHandle(EP.burg)}`}; },
   // Advice on a Burgundy card over an artwork, the advice split above and below the how
   adviceCard(o){ if (!o.img) return EDT.adviceMark(o); const [a, b] = splitHalf(o.title); const sz = o.title.length > 34 ? 62 : 74;
     return {bg: EP.burg, html: `${ivArt(o.img, 'inset:0', o.slot, 'cover')}
@@ -160,14 +162,14 @@ DPACK.editorial = p => {
   const head = f.ctahead || 'Want the whole guide?', offer = f.offer || 'Comment the word and we’ll send it to you.';
   const label = q;
   const S = [
-    ...steps.slice(0, 6).map((st, i) => EDT.plainSlide({label, title: st.title, how: st.how, dark: i % 2 === 0, first: i === 0})),
+    ...steps.slice(0, 6).map((st, i) => (i % 2 === 0 ? EDT.plainSlide : EDT.adviceMark)({label, title: st.title, how: st.how, dark: true, first: i === 0})),
     ...(f.good ? [EDT.plainSlide({label: 'Instead of', struck: f.bad || 'I’ll work it out later.', title: f.good, dark: steps.slice(0, 6).length % 2 === 0})] : []),
     EDT.end({head, key, offer}),
   ];
   const tags = ['#artstoheartsproject', '#artbusiness', ...String(f.tags || '').split(/\s+/).filter(x => x.startsWith('#'))].slice(0, 5).join(' ');
   const who = [...new Set(credits.map(c => c[0]).filter(Boolean))].join(', ');
   const cap = `${f.hook || q}\n\n${f.why || ''}\n\n${steps.map(s => `${s.title}.${s.how ? ' ' + s.how : ''}`).join('\n\n')}\n\n${f.short ? 'The short version: ' + f.short + '\n\n' : ''}Comment ${key} and we'll send you the whole guide.${who ? `\n\nWorks shown: ${who}.` : ''}\n\n${tags}`.replace(/\n{3,}/g, '\n\n');
-  const SINGLES = steps.slice(0, 6).map((st, i) => ({...EDT.plainSlide({label, title: st.title, how: st.how, dark: i % 2 === 0, first: true}), label: 'Single ' + (i + 1)}));
+  const SINGLES = steps.slice(0, 6).map((st, i) => ({...(i % 2 === 0 ? EDT.plainSlide : EDT.adviceMark)({label, title: st.title, how: st.how, dark: true, first: true}), label: 'Single ' + (i + 1)}));
   const ST = steps.slice(0, 3).map((st, i) => ({...IV.story({dark: i % 2 === 0, mono: i === 0, label: q, text: esc(st.title), sub: esc(st.how || ''), zone: i === 2 ? 'Question sticker' : 'Link sticker: the whole guide'}), label: 'Story ' + (i + 1)}));
   return [
     {title: `${p.date} · Editorial carousel`, meta: `${S.length} slides · keyword ${key}`, slides: S.map((s, j) => ({...s, title: 'editorial-' + (j + 1)})), cap, pin: `Comment ${key} and we'll send you the whole guide.`},
