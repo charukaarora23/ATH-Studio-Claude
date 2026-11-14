@@ -70,7 +70,7 @@ const SCHEMA = {
     quotes: {type: 'array', items: {type: 'string'}, description: 'Exactly 3 quotes, copied word for word from the answers, 60 to 150 characters each'},
     picks: {type: 'array', items: {type: 'integer'}, description: 'Exactly 2 question numbers whose answers open with a story'},
     kicks: {type: 'array', items: {type: 'string'}, description: 'One label per pick, max 44 characters'},
-    inside: {type: 'array', items: {type: 'string'}, description: 'Exactly 3 sentences for an "Also in the interview" paragraph: what else the reader will find, said the way a person tells a friend, each under 90 characters, the last may start with "And"'},
+    inside: {type: 'array', items: {type: 'string'}, description: 'Exactly 3 questions from the interview that are not among the picks, copied word for word but trimmed to the actual question sentence, each under 110 characters'},
     ctahead: {type: 'string', description: 'End card line, one sentence pointing to the full interview on our website, max 70 characters'},
     hook: {type: 'string', description: 'First line of the Instagram caption, max 120 characters'},
     roles: {type: 'array', items: {type: 'string', enum: ['art', 'portrait', 'skip']}, description: 'One role per image, in the order given'},
