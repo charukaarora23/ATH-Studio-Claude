@@ -127,7 +127,7 @@ const IV = {
     <p class="a" style="left:72px;right:72px;top:250px;${BASK};font-size:${o.text.length > 140 ? 58 : o.text.length > 90 ? 66 : 76}px;line-height:1.2;color:#F9EEE5">&ldquo;${esc(o.text)}&rdquo;</p>
     <p class="a" style="left:72px;bottom:60px;${T_MED};font-size:30px;color:#FAD2E1"><span style="${T_REG}">From our interview with </span>${esc(o.name)}${o.handle ? ` <span style="${T_REG}">${esc(o.handle)}</span>` : ''}</p>`}; },
   // Stories: label, text and line below stack in one column and shrink to fit, so long names or titles never collide.
-  story(o){ const dark = o.dark || o.full, bg = o.full ? B.ink : o.dark ? B.burg : B.ground, fg = dark ? '#F9EEE5' : B.ink, acc = o.full ? '#FFFFFF' : o.dark ? '#FAD2E1' : B.burg;
+  story(o){ const dark = o.dark || o.full, bg = o.full ? B.ink : o.dark ? B.burg : o.cream ? '#F9EEE5' : B.ground, fg = dark ? '#F9EEE5' : B.ink, acc = o.full ? '#FFFFFF' : o.dark ? '#FAD2E1' : B.burg;
     const art = o.img && !o.full; const plain = String(o.text).replace(/<[^>]+>|&[a-z]+;/g, '');
     const size = o.serif ? (plain.length > 230 ? 50 : plain.length > 150 ? 56 : o.size || 64) : (plain.length > 60 ? 70 : plain.length > 36 ? 84 : o.size || 96);
     const box = art ? 'top:1050px' : o.full ? 'bottom:520px' : 'top:380px';

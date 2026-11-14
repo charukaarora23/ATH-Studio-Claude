@@ -89,7 +89,32 @@ Rules:
 - Write like a person, not a list: no labels such as "Why X matters", no noun-phrase fragments, no colons in hooks. Sentences someone would say out loud.
 - Images: "art" for the artist's artworks, "portrait" for photos of the artist or their studio, "skip" for anything else (logos, ads, unrelated photos).`;
 
-async function structure(text, images, qaCount){
+const ED_SCHEMA = {
+  type: 'object', additionalProperties: false,
+  required: ['headline', 'sub', 'why', 'steps', 'avoid', 'poll', 'ask', 'hook'],
+  properties: {
+    headline: {type: 'string', description: 'Cover headline: the result the reader gets, max 60 characters, sentence case'},
+    sub: {type: 'string', description: 'Line under the headline, for example "A guide for artists · 5 steps"'},
+    why: {type: 'string', description: 'The problem this guide solves, one or two sentences, max 220 characters, said to an artist'},
+    steps: {type: 'array', description: '3 to 7 steps in the order of the article', items: {type: 'object', additionalProperties: false, required: ['title', 'how'], properties: {
+      title: {type: 'string', description: 'An action that starts with a verb, max 40 characters'}, how: {type: 'string', description: 'How to do it, one concrete sentence, max 140 characters'}}}},
+    avoid: {type: 'string', description: 'One mistake to avoid that the article names, one sentence, or empty'},
+    poll: {type: 'string', description: 'A story poll question about two of the steps, max 40 characters'},
+    ask: {type: 'string', description: 'A story question-box prompt, max 45 characters'},
+    hook: {type: 'string', description: 'First line of the Instagram caption, max 110 characters'},
+  },
+};
+const ED_SYSTEM = `You are the senior editor at Arts to Hearts Project. You turn one art business guide from our website into an Instagram carousel that artists save, share and act on. Every step must be something an artist can do this week.
+
+Voice: plain, warm, specific, said to an artist. No hype, no exclamation marks, no emoji, no clichés ("unlock", "game-changer", "elevate", "journey", "dive into"). Short words. Keep every fact true to the article; never invent numbers, names or claims.`;
+async function structure(text, images, qaCount, kind){
+  if (kind === 'editorial') { const client = new Anthropic();
+    const response = await client.beta.messages.create({model: 'claude-opus-5-5', max_tokens: 16000, betas: ['server-side-fallback-2026-07-01'], fallbacks: 'default',
+      output_config: {effort: 'medium', format: {type: 'json_schema', schema: ED_SCHEMA}}, system: ED_SYSTEM, messages: [{role: 'user', content: `The guide article:\n\n${text}`}]});
+    if (response.stop_reason === 'refusal') throw new Error('Claude declined this article');
+    return JSON.parse(response.content.filter(b => b.type === 'text').map(b => b.text).join('')); }
+  return structureInterview(text, images, qaCount); }
+async function structureInterview(text, images, qaCount){
   const client = new Anthropic();
   const list = images.map((im, i) => `${i + 1}. alt: ${im.alt || '-'} | caption: ${im.cap || '-'}`).join('\n');
   const response = await client.beta.messages.create({
@@ -112,7 +137,7 @@ export default async function handler(req, res){
     if (!body.url && typeof body.text === 'string') {   // text already read from a PDF in the browser: only write the copy
       if (!process.env.ANTHROPIC_API_KEY) return res.status(200).json({ai: null, aiAvailable: false});
       const imgs = Array.isArray(body.images) ? body.images.slice(0, 20).map(i => ({alt: String(i.alt || ''), cap: String(i.cap || '')})) : [];
-      try { return res.status(200).json({ai: await structure(body.text.slice(0, 120000), imgs, (body.text.match(/(^|\n)\s*Q\d+\./g) || []).length), aiAvailable: true}); }
+      try { return res.status(200).json({ai: await structure(body.text.slice(0, 120000), imgs, (body.text.match(/(^|\n)\s*Q\d+[.,]/g) || []).length, body.kind), aiAvailable: true}); }
       catch (e) { return res.status(200).json({ai: null, aiAvailable: true, aiError: e instanceof Anthropic.APIError ? `Claude error ${e.status}.` : String(e && e.message || e)}); }
     }
     let url; try { url = new URL(String(body.url || '').trim()); if (!/^https?:$/.test(url.protocol)) throw 0; } catch { return res.status(400).json({error: 'That does not look like a web link.'}); }
