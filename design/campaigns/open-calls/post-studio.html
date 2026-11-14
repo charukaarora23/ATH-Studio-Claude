@@ -172,6 +172,12 @@ summary{font:600 12px/1 var(--mono);letter-spacing:.1em;text-transform:uppercase
       <div class="f"><label for="distribution">Where the work is seen</label><input id="distribution"></div>
     </div>
   </details>
+  <details><summary>Questions and artist story</summary>
+    <div class="f"><label for="rights">Do I keep the rights to my work? (answer)</label><textarea id="rights" style="min-height:70px" placeholder="e.g. Yes. You keep full copyright. We only use your image to publish and promote the book, always with credit."></textarea></div>
+    <div class="f"><label for="multiArt">Can I submit more than one artwork? (answer)</label><input id="multiArt" placeholder="e.g. Yes, up to 3 artworks per application."></div>
+    <div class="f"><label for="storyWork">Artist story: the work they sent (title, medium, why they chose it)</label><input id="storyWork"></div>
+    <div class="f"><label for="storyAfter">Artist story: edition and what happened next</label><input id="storyAfter"></div>
+  </details>
 
   <details open><summary>Images and past artists</summary>
     <p class="hint"><b>Month artworks</b>: every photo in the 30 days gets its own artwork, none is used twice. <span id="artNeed"></span></p>
@@ -225,7 +231,7 @@ const DEFAULTS = {
   bookText:'Every selected artist is published with their name, artwork title, medium and country.',
   benefits:'Published in the book | Your work in print\nCertificate of Recognition | For your CV and grant applications\nSold worldwide | Amazon · Barnes & Noble · ATH Shop\nThe book’s campaign | 190K+ followers · 100K+ email subscribers\nIntroductions | To collectors, galleries and curators',
   prize:'$500', prizeExtra:'a 4-page feature, a trophy and an Artsy listing', runners:'A 2-page feature and a trophy.',
-  jury:'', results:'', pub:'', fee:'', commentFrom:'2026-12-08', elig:'No degree, gallery or exhibition history needed. Individual artists, 18+, worldwide.',
+  jury:'', results:'', pub:'', fee:'', rights:'', multiArt:'', storyWork:'', storyAfter:'', commentFrom:'2026-12-08', elig:'No degree, gallery or exhibition history needed. Individual artists, 18+, worldwide.',
   credit:'', artists:'', coverArtists:'',
   editionLabel:'Edition 16', seriesNoun:'editions', style:'gallery',
   theme:'Garden', themeWork:'garden work', themeLine:'flowers, plants, landscapes, people and nature, abstract or imagined growth',

@@ -531,7 +531,7 @@ ${tags}`},
    T.qa({q:'Can I submit AI-generated work?', a:'No. Original work only.', ground:'cream'}),
    T.qa({q:'Is there a fee?', a:`An application fee applies${state.fee ? ': ' + esc(state.fee) : ''}.`, more: state.fee ? '' : '<span class="gap">Add the fee wording in the form</span>'}),
    T.qa({q:'When will I hear back?', a:`Results: ${gap(state.results,'Date')}.`, ground:'call'}),
-   T.qa({q:'Do I keep the rights to my work?', a:'<span class="gap">Confirm the rights wording</span>'}),
+   T.qa({q:'Do I keep the rights to my work?', a:gap(state.rights,'Confirm the rights wording')}),
    T.cta({kicker:'Still have a question? DM us'}),
  ], caption:() => `Thinking of applying to the ${N()}? The questions artists ask us most:
 
@@ -615,8 +615,8 @@ ${tags}`},
  {left:13, title:'From submission to print', kind:'Carousel · artist story', slides:() => [
    T.hook({img:ART[4], pos:'center 40%', tr:'An artist’s story', head:`Submit to the ${name} and see your work in print.`, size:76, sub:'How one past artist went from submission to a published page.'}),
    T.quote({tr:'An artist’s story'}),
-   T.photo({img:null, label:'Real photo needed<br>The artwork they submitted', tr:'An artist’s story', head:'The work they sent.', sub:'<span class="gap">Title, medium, and why they chose it</span>'}),
-   T.photo({img:null, label:'Real photo needed<br>Their page in the book', tr:'An artist’s story', head:'The page it became.', sub:'<span class="gap">Edition and what happened next</span>', ground:'ink'}),
+   T.photo({img:null, label:'Real photo needed<br>The artwork they submitted', tr:'An artist’s story', head:'The work they sent.', sub:gap(state.storyWork,'Title, medium, and why they chose it')}),
+   T.photo({img:null, label:'Real photo needed<br>Their page in the book', tr:'An artist’s story', head:'The page it became.', sub:gap(state.storyAfter,'Edition and what happened next'), ground:'ink'}),
    T.howto(),
    T.cta({kicker:'Your page could be next'}),
  ], caption:() => `Submit to the ${N()} and see your work in print.
@@ -767,7 +767,7 @@ ${tags}`},
    T.qa({q:'Is it too late to apply?', a:`No. Submissions are open until ${dateLong()}.`, more:`${VERB} “${KW()}” and we’ll send you the brief and your link straight away.`, ground:'cream', tr:'Last questions'}),
    T.qa({q:'How long does it take?', a:'About ten minutes.', more:'Have your photos, titles, medium and sizes ready, then submit through the link in bio.', tr:'Last questions', ground:'call'}),
    T.qa({q:'Will my work really be seen?', a:'Every eligible entry is reviewed by the jury.', more:'Selected work is published, sold worldwide and shared with collectors, galleries and curators.', ground:'ink', tr:'Last questions'}),
-   T.qa({q:'Can I submit more than one artwork?', a:'<span class="gap">Confirm the rule</span>', more:'Choose the works that best represent you.', ground:'cream', tr:'Last questions'}),
+   T.qa({q:'Can I submit more than one artwork?', a:gap(state.multiArt,'Confirm the rule'), more:'Choose the works that best represent you.', ground:'cream', tr:'Last questions'}),
    T.cta({kicker:'48 hours left'}),
  ], caption:() => `48 hours left. Your last questions about the ${N()} open call:
 
