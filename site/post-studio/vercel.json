@@ -1,1 +1,1 @@
-{ "cleanUrls": true, "headers": [ { "source": "/(.*)", "headers": [ { "key": "X-Robots-Tag", "value": "noindex" } ] } ] }
+{"cleanUrls": true, "headers": [{"source": "/(.*)", "headers": [{"key": "X-Robots-Tag", "value": "noindex"}]}], "functions": {"api/article.js": {"maxDuration": 90}}}

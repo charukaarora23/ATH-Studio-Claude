@@ -15,10 +15,12 @@ if (!window.JSZip) document.write('<script src="https://cdnjs.cloudflare.com/aja
 /* Post fonts ship with the page so previews and exported PNGs match exactly */
 @font-face{font-family:"ATH Grotesk";src:url(fonts/ath/HankenGrotesk.woff2) format("woff2");font-weight:100 900}
 @font-face{font-family:"ATH Serif";src:url(fonts/ath/Newsreader-Italic.woff2) format("woff2");font-style:italic;font-weight:200 800}
-@font-face{font-family:"ATH Display";src:url(fonts/ath/InstrumentSerif.woff2) format("woff2");font-style:normal}
-@font-face{font-family:"ATH Display";src:url(fonts/ath/InstrumentSerif-Italic.woff2) format("woff2");font-style:italic}
-@font-face{font-family:"ATH Text";src:url(fonts/ath/Newsreader.woff2) format("woff2");font-style:normal}
-@font-face{font-family:"ATH Text";src:url(fonts/ath/Newsreader-Text-Italic.woff2) format("woff2");font-style:italic}
+@font-face{font-family:"ATH Tight";src:url(fonts/ath/InterTight-Regular.woff2) format("woff2");font-weight:400}
+@font-face{font-family:"ATH Tight";src:url(fonts/ath/InterTight-Medium.woff2) format("woff2");font-weight:500}
+@font-face{font-family:"ATH Tight";src:url(fonts/ath/InterTight-Regular-ext.woff2) format("woff2");font-weight:400;unicode-range:U+0100-02AF,U+1E00-1EFF}
+@font-face{font-family:"ATH Tight";src:url(fonts/ath/InterTight-Medium-ext.woff2) format("woff2");font-weight:500;unicode-range:U+0100-02AF,U+1E00-1EFF}
+@font-face{font-family:"ATH Bask";src:url(fonts/ath/LibreBaskerville.woff2) format("woff2");font-style:normal}
+@font-face{font-family:"ATH Bask";src:url(fonts/ath/LibreBaskerville-Italic.woff2) format("woff2");font-style:italic}
 @font-face{font-family:"ATH Script";src:url(fonts/InstrumentSerif-Italic.ttf) format("truetype");font-style:italic}
 
 /* ===== Studio UI ===== */
@@ -36,7 +38,9 @@ body{margin:0;background:var(--bg);color:var(--ink);font:400 14px/1.45 var(--san
 .segbar b{font:700 13px var(--sans,sans-serif);letter-spacing:.22em;text-transform:uppercase;white-space:nowrap}
 .segbar nav{display:flex;gap:4px;height:100%;overflow-x:auto}.segbar button{border:0;background:none;color:rgba(249,236,229,.6);font:600 14px var(--sans,sans-serif);padding:0 14px;height:100%;border-bottom:3px solid transparent;cursor:pointer;white-space:nowrap}
 .segbar button[aria-current=page]{color:#F9ECE5;border-bottom-color:#FAD2E1}.segbar button:hover{color:#F9ECE5}
-body[data-seg=interviews] .app{grid-template-columns:minmax(0,1fr)}body[data-seg=interviews] aside,body[data-seg=interviews] #tabs,body[data-seg=interviews] #go,body[data-seg=interviews] #ptype{display:none}
+body[data-seg=interviews] aside:not(#ivside),body[data-seg=interviews] #tabs,body[data-seg=interviews] #go,body[data-seg=interviews] #ptype,body:not([data-seg=interviews]) #ivside{display:none}
+#ivside .thumbs{display:flex;gap:6px;flex-wrap:wrap;margin:6px 0}#ivside .thumbs span{width:54px;height:54px;border-radius:6px;background:#eee center/cover;position:relative}#ivside .thumbs b{position:absolute;left:3px;top:2px;font:700 10px var(--sans,sans-serif);color:#fff;text-shadow:0 0 3px #000}
+#ivside .ivmsg{font-size:13px;margin:8px 0 0;line-height:1.45}#ivside .ivmsg.err{color:#AA0003}#ivside .demo{background:#FAD2E1;border-radius:10px;padding:10px 12px;font-size:13px;line-height:1.45;margin:0 0 12px}
 body[data-seg=interviews] .top .f{display:none!important}
 .iv-list{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0}.iv-list button{border:1px solid var(--line);background:#fff;border-radius:999px;padding:8px 14px;font:600 13px var(--sans,sans-serif);cursor:pointer}.iv-list button[aria-current=true]{background:#14090C;color:#F9ECE5;border-color:#14090C}
 aside{background:var(--panel);border-right:1px solid var(--line);padding-block:20px;padding-left:max(18px,env(safe-area-inset-left,0px));padding-right:18px;overflow:auto;max-height:100vh;position:sticky;top:0}
@@ -225,6 +229,7 @@ summary{font:600 12px/1 var(--mono);letter-spacing:.1em;text-transform:uppercase
     <div class="pool" id="cvGrid"></div>
   </details>
 </aside>
+<aside id="ivside" aria-label="Interview"></aside>
 
 <main>
   <nav class="tabs" id="tabs" aria-label="Views">
@@ -660,7 +665,7 @@ function wireCal(){
   $('out').querySelectorAll('[data-mon]').forEach(b => b.onclick = () => { const k = +b.dataset.mon; const t = new Date(); if (!k) { calMonth = new Date(t.getFullYear(), t.getMonth(), 1); calDay = isoD(t); } else calMonth = new Date(calMonth.getFullYear(), calMonth.getMonth() + k, 1); $('out').innerHTML = calHTML(); wireCal(); });
   $('out').querySelectorAll('[data-post]').forEach(c => c.onchange = () => setPosted(c.dataset.post, c.checked));
   $('out').querySelectorAll('[data-open]').forEach(b => b.onclick = async () => { const o = JSON.parse(b.dataset.open);
-    if (o.daily) { if (DPOSTS[o.daily]) DSEL = o.daily; else { const [d, s, c] = o.daily.split('|'); dNew(d, s, c); } if ((DPOSTS[DSEL] || {}).cat === 'interview') { IVTAB = 'list'; setSeg('interviews'); return; } dWeek = dWeekStart(new Date(calDay + 'T00:00:00')); $('ptype').value = 'daily'; render(); window.scrollTo({top: 0}); return; }
+    if (o.daily) { if (DPOSTS[o.daily]) DSEL = o.daily; else { const [d, s, c] = o.daily.split('|'); dNew(d, s, c); } if ((DPOSTS[DSEL] || {}).cat === 'interview') { IVSEL = DSEL; setSeg('interviews'); return; } dWeek = dWeekStart(new Date(calDay + 'T00:00:00')); $('ptype').value = 'daily'; render(); window.scrollTo({top: 0}); return; }
     if ($('preset').value !== o.preset) { $('preset').value = o.preset; await $('preset').onchange(); }
     $('ptype').value = o.ptype; try { localStorage.setItem('athLastPtype', o.ptype); } catch {} render();
     const hit = o.find && [...document.querySelectorAll('.group h2')].find(x => x.textContent.trim() === o.find); if (hit) { hit.scrollIntoView({block: 'start'}); hit.closest('.group').classList.add('flash'); } else window.scrollTo({top: 0}); });
@@ -671,7 +676,7 @@ let DPOSTS = {}, DMODE = 'local', dLoaded = false, DSEL = null, dWeek = null, dS
 const slotLabel = id => { const s = SLOTS.find(x => x.id === id); return s ? `${s.ist} IST (${s.pt})` : ''; };
 async function loadDaily(){ try { const r = await fetch('api/posts', {cache: 'no-store'}); if (!r.ok) throw 0; DPOSTS = await r.json(); DMODE = 'shared'; }
   catch { try { DPOSTS = JSON.parse(localStorage.getItem('athDailyPosts') || '{}'); } catch { DPOSTS = {}; } DMODE = 'local'; }
-  dLoaded = true; if (['daily', 'calendar', 'interview'].includes($('ptype').value)) render(); }
+  dLoaded = true; if ($('ptype').value === 'interview') renderIvSide(); if (['daily', 'calendar', 'interview'].includes($('ptype').value)) render(); }
 function saveDaily(id){ clearTimeout(dSaveT); dSaveT = setTimeout(async () => { const p = DPOSTS[id] || null;
   if (DMODE === 'shared') { try { const r = await fetch('api/posts', {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({id, post: p})}); if (!r.ok) throw 0; const all = await r.json(); DPOSTS = {...all, ...(p ? {[id]: DPOSTS[id]} : {})}; status('Saved for the team.'); return; }
     catch { DMODE = 'local'; status('Could not reach the shared queue. Saved in this browser for now.'); } }
@@ -710,46 +715,76 @@ function dailyPanel(){
     ${editor}
     <details class="capbox"><summary>The framework: 13 formats, what each is for, what the numbers say</summary><div class="dp-fw">${DFRAME_HTML}</div></details></section>`;
 }
-function wireDaily(){
+function wireDaily(root = $('out'), pp){
   const re = () => render();
-  $('out').querySelectorAll('[data-dwk]').forEach(b => b.onclick = () => { const k = +b.dataset.dwk; dWeek = k ? new Date(+dWeek + k * 7 * DAYMS) : dWeekStart(new Date()); re(); });
-  $('out').querySelectorAll('[data-dsel]').forEach(b => b.onclick = () => { DSEL = b.dataset.dsel; re(); });
-  $('out').querySelectorAll('[data-dnew]').forEach(b => b.onclick = () => { const [d, s, c] = b.dataset.dnew.split('|'); dNew(d, s, c); re(); });
-  const p = DPOSTS[DSEL]; if (!p) return;
-  $('out').querySelectorAll('[data-df]').forEach(i => i.onchange = () => { p.f = p.f || {}; p.f[i.dataset.df] = i.value; saveDaily(p.id); re(); });
-  const dc = $('out').querySelector('[data-dcat]'); if (dc) dc.onchange = () => { p.cat = dc.value; saveDaily(p.id); re(); };
-  const dd = $('out').querySelector('[data-ddate]'); if (dd) dd.onchange = () => { p.date = dd.value; saveDaily(p.id); re(); };
-  const ds = $('out').querySelector('[data-dslot]'); if (ds) ds.onchange = () => { p.slot = ds.value; saveDaily(p.id); re(); };
-  const del = $('out').querySelector('[data-ddel]'); if (del) del.onclick = () => { if (!confirm('Delete this post for everyone?')) return; delete DPOSTS[p.id]; saveDaily(p.id); DSEL = null; re(); };
-  $('out').querySelectorAll('[data-dimg]').forEach(inp => inp.onchange = async () => { if (!inp.files[0]) return; status('Uploading image…'); p.imgs = p.imgs || {}; p.imgs[inp.dataset.dimg] = await dUpload(inp.files[0]); saveDaily(p.id); re(); });
-  $('out').querySelectorAll('[data-dimgs]').forEach(inp => inp.onchange = async () => { status('Uploading images…'); p.imgs = p.imgs || {}; const arr = [].concat(p.imgs[inp.dataset.dimgs] || []); for (const file of inp.files) arr.push(await dUpload(file)); p.imgs[inp.dataset.dimgs] = arr; saveDaily(p.id); re(); });
-  const fill = $('out').querySelector('[data-dfill]'); if (fill) fill.onclick = () => { const raw = $('out').querySelector('[data-dpaste]').value; if (!raw.trim()) { status('Paste the article text first.'); return; }
+  root.querySelectorAll('[data-dwk]').forEach(b => b.onclick = () => { const k = +b.dataset.dwk; dWeek = k ? new Date(+dWeek + k * 7 * DAYMS) : dWeekStart(new Date()); re(); });
+  root.querySelectorAll('[data-dsel]').forEach(b => b.onclick = () => { DSEL = b.dataset.dsel; re(); });
+  root.querySelectorAll('[data-dnew]').forEach(b => b.onclick = () => { const [d, s, c] = b.dataset.dnew.split('|'); dNew(d, s, c); re(); });
+  const p = pp || DPOSTS[DSEL]; if (!p) return;
+  root.querySelectorAll('[data-df]').forEach(i => i.onchange = () => { p.f = p.f || {}; p.f[i.dataset.df] = i.value; saveDaily(p.id); re(); });
+  const dc = root.querySelector('[data-dcat]'); if (dc) dc.onchange = () => { p.cat = dc.value; saveDaily(p.id); re(); };
+  const dd = root.querySelector('[data-ddate]'); if (dd) dd.onchange = () => { p.date = dd.value; saveDaily(p.id); re(); };
+  const ds = root.querySelector('[data-dslot]'); if (ds) ds.onchange = () => { p.slot = ds.value; saveDaily(p.id); re(); };
+  const del = root.querySelector('[data-ddel]'); if (del) del.onclick = () => { if (!confirm('Delete this post for everyone?')) return; delete DPOSTS[p.id]; saveDaily(p.id); DSEL = null; re(); };
+  root.querySelectorAll('[data-dimg]').forEach(inp => inp.onchange = async () => { if (!inp.files[0]) return; status('Uploading image…'); p.imgs = p.imgs || {}; p.imgs[inp.dataset.dimg] = await dUpload(inp.files[0]); saveDaily(p.id); re(); });
+  root.querySelectorAll('[data-dimgs]').forEach(inp => inp.onchange = async () => { status('Uploading images…'); p.imgs = p.imgs || {}; const arr = [].concat(p.imgs[inp.dataset.dimgs] || []); for (const file of inp.files) arr.push(await dUpload(file)); p.imgs[inp.dataset.dimgs] = arr; saveDaily(p.id); re(); });
+  const fill = root.querySelector('[data-dfill]'); if (fill) fill.onclick = () => { const raw = root.querySelector('[data-dpaste]').value; if (!raw.trim()) { status('Paste the article text first.'); return; }
     const r = parseInterview(raw); p.f = p.f || {}; if (r.intro && !p.f.intro) p.f.intro = r.intro; if (r.caps.length) p.f.caps = r.caps.join('\n'); if (r.qa.length) p.f.qa = qaText(r.qa); if (r.venues.length && !p.f.venues) p.f.venues = r.venues.join('\n');
     if (!p.f.title && r.title) p.f.title = r.title; saveDaily(p.id); re(); status(`Found ${r.qa.length} questions, ${r.caps.length} artwork labels${r.venues.length ? ', ' + r.venues.length + ' exhibitions' : ''}. Add the images, pull quotes and a short cover headline.`); };
-  const ex = $('out').querySelector('[data-dexample]'); if (ex) ex.onclick = () => { p.f = {...IV_EXAMPLE.f}; p.imgs = JSON.parse(JSON.stringify(IV_EXAMPLE.imgs)); saveDaily(p.id); re(); status('PQHAÜS example loaded.'); };
-  $('out').querySelectorAll('[data-dimgx]').forEach(b => b.onclick = () => { delete p.imgs[b.dataset.dimgx]; saveDaily(p.id); re(); });
+  const ex = root.querySelector('[data-dexample]'); if (ex) ex.onclick = () => { p.f = {...IV_EXAMPLE.f}; p.imgs = JSON.parse(JSON.stringify(IV_EXAMPLE.imgs)); saveDaily(p.id); re(); status('PQHAÜS example loaded.'); };
+  root.querySelectorAll('[data-dimgx]').forEach(b => b.onclick = () => { delete p.imgs[b.dataset.dimgx]; saveDaily(p.id); re(); });
 }
 // ---------- ARTIST INTERVIEWS: its own section ----------
-let IVTAB = 'template';
+let IVSEL = 'demo'; try { IVSEL = localStorage.getItem('athIvSel') || 'demo'; } catch {}
 const IV_DEMO = () => ({id: 'demo', cat: 'interview', date: 'Template', f: IV_EXAMPLE.f, imgs: IV_EXAMPLE.imgs});
 const ivPosts = () => Object.values(DPOSTS).filter(p => p.cat === 'interview').sort((a, b) => (b.date || '').localeCompare(a.date || ''));
-function ivCurrent(){ if (IVTAB === 'template') return IV_DEMO(); if (!DPOSTS[DSEL] || DPOSTS[DSEL].cat !== 'interview') DSEL = (ivPosts()[0] || {}).id || null; return DPOSTS[DSEL] || null; }
-function ivPanel(){ const list = ivPosts(), p = IVTAB === 'list' ? DPOSTS[DSEL] : null;
-  const empty = p && !Object.values(p.f || {}).some(Boolean) && !Object.keys(p.imgs || {}).length;
-  return `<section class="group dp"><div class="ghead"><h2>Artist interviews</h2><span class="ghr"><span class="cal-mode ${DMODE}">${DMODE === 'shared' ? 'Shared with the team' : 'Saved in this browser only'}</span></span></div>
-    <nav class="tabs" style="margin-top:6px"><button type="button" data-ivtab="template" aria-current="${IVTAB === 'template' ? 'page' : 'false'}">Template · PQHAÜS example</button><button type="button" data-ivtab="list" aria-current="${IVTAB === 'list' ? 'page' : 'false'}">Our interviews (${list.length})</button></nav>
-    ${IVTAB === 'template' ? `<p class="hint" style="font-size:14px">This is how every interview goes out: a 6-page carousel, quote cards for later weeks, 3 stories for the same day and a frame the artist reshares. Shown with the PQHAÜS interview.</p><div style="display:flex;gap:8px;margin-top:10px"><button type="button" class="btn" data-ivnew>Start a new interview</button></div>`
-    : `<div class="iv-list">${list.map(x => `<button type="button" data-ivsel="${x.id}" aria-current="${x.id === DSEL}">${esc(x.f.name || 'Untitled')}${x.date ? ' · ' + esc(x.date) : ''}</button>`).join('')}<button type="button" data-ivnew>+ New interview</button></div>
-      ${p ? `${empty ? '<p class="hint"><b>Start here:</b> paste the article text below and press “Fill from article”. Then add the artwork and portrait images. The pages below fill in as you go.</p>' : ''}${dEditor(p, true)}` : '<p class="hint">No interviews yet. Start one, or look at the Template tab to see how it comes out.</p>'}`}</section>`; }
-function wireIv(){
-  $('out').querySelectorAll('[data-ivtab]').forEach(b => b.onclick = () => { IVTAB = b.dataset.ivtab; render(); });
-  $('out').querySelectorAll('[data-ivsel]').forEach(b => b.onclick = () => { DSEL = b.dataset.ivsel; render(); });
-  $('out').querySelectorAll('[data-ivnew]').forEach(b => b.onclick = () => { IVTAB = 'list'; dNew(isoD(new Date()), 's1', 'interview'); render(); window.scrollTo({top: 0}); });
-  if (IVTAB === 'list') wireDaily();
+function ivCurrent(){ if (IVSEL !== 'demo' && !(DPOSTS[IVSEL] && DPOSTS[IVSEL].cat === 'interview')) { if (!dLoaded) return IV_DEMO(); IVSEL = 'demo'; } return IVSEL === 'demo' ? IV_DEMO() : DPOSTS[IVSEL]; }
+function ivSelect(id){ IVSEL = id; try { localStorage.setItem('athIvSel', id); } catch {} renderIvSide(); render(); }
+const IV_OPEN = new Set(['Start from the article', 'Cover']);
+function ivField(p, fd, demo){ const v = (p.f || {})[fd.k] || ''; const im = (p.imgs || {})[fd.k]; const dis = demo ? ' disabled' : '';
+  if (fd.type === 'imgs') { const arr = [].concat(im || []); return `<div class="f"><label>${esc(fd.label)}</label><div class="thumbs">${arr.map((u, i) => `<span style="background-image:url(${u})"><b>${i + 1}</b></span>`).join('')}</div>${demo ? '' : `<input type="file" accept="image/*" multiple data-dimgs="${fd.k}">${arr.length ? ` <button type="button" class="linkbtn" data-dimgx="${fd.k}">Clear</button>` : ''}`}</div>`; }
+  if (fd.type === 'qa') { const n = (String(v).match(/(^|\n)Q:/g) || []).length; return `<div class="f"><label>${esc(fd.label)} · ${n} found</label><textarea data-df="${fd.k}" rows="6"${dis}>${esc(v)}</textarea></div>`; }
+  if (fd.type === 'text') return `<div class="f"><label>${esc(fd.label)}</label><input data-df="${fd.k}" value="${esc(v)}" placeholder="${esc(fd.ph || '')}"${dis}></div>`;
+  return `<div class="f"><label>${esc(fd.label)}</label><textarea data-df="${fd.k}" rows="${fd.type === 'lines' ? 4 : 3}" placeholder="${esc(fd.ph || (fd.type === 'lines' ? 'One per line' : ''))}"${dis}>${esc(v)}</textarea></div>`; }
+function renderIvSide(){ const el = $('ivside'); if (!el) return; const p = ivCurrent(), demo = !p || p.id === 'demo', list = ivPosts();
+  const sec = (title, inner) => `<details${IV_OPEN.has(title) ? ' open' : ''} data-sec="${esc(title)}"><summary>${esc(title)}</summary>${inner}</details>`;
+  el.innerHTML = `<h1>ATH Post Studio</h1><p class="sub">Artist interviews. Paste the article link: the carousel, quote cards, stories and captions are written from it, in the Arts to Hearts look.</p>
+    <div class="f"><label for="ivPick">Interview</label><div class="row2"><select id="ivPick"><option value="demo"${demo ? ' selected' : ''}>Example · PQHAÜS</option>${list.map(x => `<option value="${x.id}"${x.id === IVSEL ? ' selected' : ''}>${esc(x.f.name || 'Untitled')}${x.date ? ' · ' + esc(x.date) : ''}</option>`).join('')}</select><button class="btn ghost" type="button" data-ivnew>New</button></div>
+    <p class="hint" style="margin:6px 0 0;display:flex;justify-content:space-between;gap:8px"><span>${DMODE === 'shared' ? 'Saved for the whole team.' : 'Saved in this browser.'}</span>${demo ? '' : '<button type="button" class="linkbtn" data-ivdel>Delete this interview</button>'}</p></div>
+    ${sec('Start from the article', `<div class="f"><label for="ivUrl">Article link</label><input id="ivUrl" type="url" placeholder="https://artstoheartsproject.com/…" value="${esc(demo ? '' : (p.f || {}).src || '')}"></div>
+      <button class="btn" type="button" data-ivimport style="width:100%">Build from link</button><p class="ivmsg" id="ivMsg"></p>
+      <details style="margin-top:10px"><summary style="font-size:13px">No link? Paste the article text</summary><textarea id="ivPaste" rows="4" placeholder="Copy everything on the article page and paste it here"></textarea><button class="btn ghost" type="button" data-ivpaste>Build from text</button></details>`)}
+    ${demo ? `<div class="demo">This is the example, so its fields are locked. Paste a link above to build a new interview, or <button type="button" class="linkbtn" data-ivcopy>edit a copy of this one</button>.</div>` : ''}
+    ${DCAT.interview.groups.map(([title, fields]) => sec(title, fields.map(fd => ivField(p, fd, demo)).join(''))).join('')}`;
+  el.querySelectorAll('details[data-sec]').forEach(d => d.ontoggle = () => { d.open ? IV_OPEN.add(d.dataset.sec) : IV_OPEN.delete(d.dataset.sec); });
+  $('ivPick').onchange = e => ivSelect(e.target.value);
+  el.querySelectorAll('[data-ivnew]').forEach(b => b.onclick = () => { const id = dNew(isoD(new Date()), 's1', 'interview'); IV_OPEN.add('Start from the article'); ivSelect(id); $('ivUrl').focus(); });
+  const del = el.querySelector('[data-ivdel]'); if (del) del.onclick = () => { if (!confirm('Delete this interview for everyone?')) return; delete DPOSTS[p.id]; saveDaily(p.id); ivSelect('demo'); };
+  const cp = el.querySelector('[data-ivcopy]'); if (cp) cp.onclick = () => { const id = dNew(isoD(new Date()), 's1', 'interview'); DPOSTS[id].f = {...IV_EXAMPLE.f}; DPOSTS[id].imgs = JSON.parse(JSON.stringify(IV_EXAMPLE.imgs)); saveDaily(id); ivSelect(id); };
+  el.querySelector('[data-ivimport]').onclick = () => ivImport({url: $('ivUrl').value.trim()});
+  el.querySelector('[data-ivpaste]').onclick = () => ivImport({text: $('ivPaste').value});
+  if (!demo) { wireDaily(el, p); el.querySelectorAll('[data-dimgs],[data-dimgx]').forEach(x => { const prev = x.onchange || x.onclick; const after = () => setTimeout(renderIvSide, 50);
+    if (x.matches('[data-dimgs]')) x.onchange = async () => { await prev.call(x); after(); }; else x.onclick = () => { prev.call(x); after(); }; }); }
 }
+async function ivImport({url, text}){ const msg = (t, err) => { const m = $('ivMsg'); if (m) { m.textContent = t; m.className = 'ivmsg' + (err ? ' err' : ''); } status(t); };
+  let page = {title: '', text: text || '', images: [], ai: null};
+  if (url) { msg('Reading the article and saving its images… this takes up to a minute.');
+    try { const r = await fetch('api/article', {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({url})}); const j = await r.json().catch(() => ({}));
+      if (!r.ok) throw new Error(j.error || 'The importer did not answer (' + r.status + ').'); page = j; }
+    catch (e) { msg((e.message || String(e)) + ' You can paste the article text instead.', true); return; } }
+  if (!page.text || page.text.length < 500) { msg('Paste the article link, or the full article text.', true); return; }
+  const r = parseInterview(page.text); const ai = page.ai, auto = autoStructure(r, page.title), c = {...auto, ...(ai || {})};
+  const capsArr = r.caps.map(x => x.split('|').map(y => y.trim()));
+  const sorted = assignImages(page.images || [], capsArr, ai && ai.roles && ai.roles.length === (page.images || []).length ? ai.roles : null);
+  let p = IVSEL !== 'demo' && DPOSTS[IVSEL] && !Object.values(DPOSTS[IVSEL].f || {}).some(Boolean) ? DPOSTS[IVSEL] : DPOSTS[dNew(isoD(new Date()), 's1', 'interview')];
+  p.f = {headline: c.headline, name: c.name, handle: c.handle || '', based: c.based || '', medium: c.medium || '', intro: c.standfirst, caps: r.caps.join('\n'), quotes: (c.quotes || []).join('\n'), qa: qaText(r.qa),
+    pick: (c.picks || []).join(', '), kicks: (c.kicks || []).join('\n'), inside: (c.inside || []).join('\n'), ctahead: c.ctahead || '', hook: c.hook || '', key: 'INTERVIEW', url: url ? url.replace(/^https?:\/\//, '').replace(/\/$/, '') : '', src: url || ''};
+  p.imgs = {arts: sorted.arts, studio: sorted.studio}; saveDaily(p.id); IV_OPEN.add('Cover'); ivSelect(p.id);
+  const need = [!sorted.arts.length && 'artworks', !sorted.studio.length && 'a portrait'].filter(Boolean);
+  msg(`Built from the article: ${r.qa.length} questions, ${sorted.arts.length} artworks, ${sorted.studio.length} photo${sorted.studio.length === 1 ? "" : "s"}. ${ai ? 'Copy written by Claude. Read it through and adjust anything.' : page.aiError ? 'Claude could not write the copy (' + page.aiError + '), so it was picked by rules. Check the headline and labels.' : 'Copy picked from the article by rules. Check the headline and labels.'}${need.length ? ' Please add ' + need.join(' and ') + ' in the sidebar.' : ''}`); }
 function setSeg(seg){ document.body.dataset.seg = seg; document.querySelectorAll('#seg [data-seg]').forEach(b => b.setAttribute('aria-current', b.dataset.seg === seg ? 'page' : 'false'));
   try { localStorage.setItem('athSeg', seg); } catch {}
-  if (seg === 'interviews') $('ptype').value = 'interview';
+  if (seg === 'interviews') { $('ptype').value = 'interview'; renderIvSide(); }
   else if ($('ptype').value === 'interview') { let pt = null; try { pt = localStorage.getItem('athLastPtype'); } catch {} $('ptype').value = pt && pt !== 'interview' && [...$('ptype').options].some(o => o.value === pt) ? pt : 'calendar'; }
   render(); window.scrollTo({top: 0}); }
 document.querySelectorAll('#seg [data-seg]').forEach(b => b.onclick = () => setSeg(b.dataset.seg));
@@ -1085,7 +1120,6 @@ function render(){
     inp.onchange = () => { const file = inp.files[0]; if (!file) return; shrink(file).then(url => { state.images[b.dataset.ph] = url; render(); status('Photo changed. Press "Save call" to keep it.'); }); }; inp.click(); });
   wireSlots();
   if (pick === 'daily') { $('out').insertAdjacentHTML('afterbegin', dailyPanel()); wireDaily(); }
-  if (pick === 'interview') { $('out').insertAdjacentHTML('afterbegin', ivPanel()); wireIv(); }
   $('out').querySelectorAll('[data-phx]').forEach(b => b.onclick = () => { delete state.images[b.dataset.phx]; render(); });
   $('out').querySelectorAll('[data-cap]').forEach(b => b.onclick = async () => { const t = $(b.dataset.cap); try { await navigator.clipboard.writeText(t.value); status('Caption copied.'); } catch { t.select(); status('Selected: press copy.'); } });
   $('out').querySelectorAll('[data-cedit]').forEach(b => b.onclick = () => { const k = b.parentElement.dataset.ckey;
