@@ -183,11 +183,14 @@ summary{font:600 12px/1 var(--mono);letter-spacing:.1em;text-transform:uppercase
     <div class="f"><label for="imgTheme">Theme artwork</label><div class="img-in"><span class="th" id="th-imgTheme"></span><input id="imgTheme" type="file" accept="image/*"></div></div>
     <div class="f"><label for="imgBooks">Photo: the books together</label><div class="img-in"><span class="th" id="th-imgBooks"></span><input id="imgBooks" type="file" accept="image/*"></div></div>
     <div class="f"><label for="imgSpread">Photo: an open spread</label><div class="img-in"><span class="th" id="th-imgSpread"></span><input id="imgSpread" type="file" accept="image/*"></div></div>
-    <div class="f"><label for="artists">Past artists, one per line: Name | Edition · Country | One line</label><textarea id="artists"></textarea></div>
-    <div class="row2">
-      <div class="f"><label for="imgA1">Artist 1 page</label><div class="img-in"><span class="th" id="th-imgA1"></span><input id="imgA1" type="file" accept="image/*"></div></div>
-      <div class="f"><label for="imgA2">Artist 2 page</label><div class="img-in"><span class="th" id="th-imgA2"></span><input id="imgA2" type="file" accept="image/*"></div></div>
-    </div>
+    <p class="hint" style="margin-top:14px"><b>Published artists</b>: the launch shows six, the month carousel the next twelve. No artist appears twice.</p>
+    <div class="f"><label for="artists">Past artists, one per line: Name | Edition · Country</label><textarea id="artists" placeholder="Jane Doe | Garden Edition · Canada"></textarea></div>
+    <div class="f"><label for="paUp">Their artwork or book page (select several; matched to the list in order)</label><input id="paUp" type="file" accept="image/*" multiple></div>
+    <div class="pool" id="paGrid"></div>
+    <p class="hint" style="margin-top:14px"><b>Past cover artists</b>: artists whose work was on a book cover.</p>
+    <div class="f"><label for="coverArtists">Cover artists, one per line: Name | Book or edition</label><textarea id="coverArtists" placeholder="Jane Doe | 101 Art Book, Edition 15"></textarea></div>
+    <div class="f"><label for="cvUp">The book covers (select several; matched to the list in order)</label><input id="cvUp" type="file" accept="image/*" multiple></div>
+    <div class="pool" id="cvGrid"></div>
   </details>
 </aside>
 
@@ -223,7 +226,7 @@ const DEFAULTS = {
   benefits:'Published in the book | Your work in print\nCertificate of Recognition | For your CV and grant applications\nSold worldwide | Amazon · Barnes & Noble · ATH Shop\nThe book’s campaign | 190K+ followers · 100K+ email subscribers\nIntroductions | To collectors, galleries and curators',
   prize:'$500', prizeExtra:'a 4-page feature, a trophy and an Artsy listing', runners:'A 2-page feature and a trophy.',
   jury:'', results:'', pub:'', fee:'', commentFrom:'2026-12-08', elig:'No degree, gallery or exhibition history needed. Individual artists, 18+, worldwide.',
-  credit:'', artists:'',
+  credit:'', artists:'', coverArtists:'',
   editionLabel:'Edition 16', seriesNoun:'editions', style:'gallery',
   theme:'Garden', themeWork:'garden work', themeLine:'flowers, plants, landscapes, people and nature, abstract or imagined growth',
   juryLooks:'Originality, a considered reading of the garden theme, and the quality of the work.',
@@ -268,7 +271,7 @@ const PRESETS = {
   },
   'New call (blank)': { series:'', edition:'', editionLabel:'', name:'', keyword:'', selected:'', coverLine:'', quote:'', submit:'', theme:'', themeWork:'work', themeLine:'', juryLooks:'', kinds:'', pastEds:'', jury:'', images:{} },
 };
-const IMGKEYS = ['imgCover','imgTheme','imgBooks','imgSpread','imgA1','imgA2'];
+const IMGKEYS = ['imgCover','imgTheme','imgBooks','imgSpread'];
 const thumbOf = k => state.images[k] || '';
 const FIELDS = Object.keys(DEFAULTS).filter(k => k !== 'colour');
 const DEFAULT_IMAGES = { imgCover:'art/flower-portrait.jpg', imgTheme:'art/night-bloom.jpg' };
@@ -289,7 +292,25 @@ IMGKEYS.forEach(k => $(k).addEventListener('change', e => {
   shrink(file).then(url => { state.images[k] = url; $('th-'+k).style.backgroundImage = `url(${url})`; render(); status('Image added. Press "Save call" to keep it.'); });
 }));
 // keep uploads light: longest side 1600px, JPEG
+const paImg = i => state.images['pa' + (i + 1)] || (i < 2 ? state.images['imgA' + (i + 1)] : '') || '';
+const cvImg = i => state.images['cv' + (i + 1)] || '';
+const PAST_ARTISTS = () => lines(state.artists).map(l => l.split('|').map(x => x.trim()));
+const COVER_ARTISTS = () => lines(state.coverArtists).map(l => l.split('|').map(x => x.trim()));
+function renderPeople(gridId, prefix, list, min, img){
+  const g = $(gridId); if (!g) return; const n = Math.max(list.length, min);
+  g.innerHTML = Array.from({length:n}, (_, i) => { const u = img(i); const nm = (list[i] || [])[0] || (prefix === 'cv' ? 'Cover ' : 'Artist ') + (i + 1);
+    return `<div class="pc${u ? ' on' : ''}" title="${esc(nm)}"><button type="button" class="pt" data-pp="${prefix}${i + 1}" style="${u ? `background-image:url(${u})` : ''}" aria-label="Image for ${esc(nm)}">${u ? '' : i + 1}</button>${u ? `<button type="button" class="px" data-ppx="${prefix}${i + 1}" aria-label="Remove image for ${esc(nm)}">&times;</button>` : ''}<span>${esc(nm)}</span></div>`; }).join('');
+  g.querySelectorAll('[data-pp]').forEach(b => b.onclick = () => { const inp = document.createElement('input'); inp.type = 'file'; inp.accept = 'image/*';
+    inp.onchange = () => { const file = inp.files[0]; if (file) shrink(file).then(url => { state.images[b.dataset.pp] = url; render(); status('Image added. Press "Save call" to keep it.'); }); }; inp.click(); });
+  g.querySelectorAll('[data-ppx]').forEach(b => b.onclick = () => { const k = b.dataset.ppx; delete state.images[k]; if (/^pa[12]$/.test(k)) delete state.images['imgA' + k.slice(2)]; render(); });
+}
+function multiFill(prefix, max){ return async e => { const files = [...e.target.files]; if (!files.length) return; let i = 0, added = 0;
+  for (const file of files) { while (i < max && state.images[prefix + (i + 1)]) i++; if (i >= max) break; state.images[prefix + (i + 1)] = await shrink(file); i++; added++; }
+  e.target.value = ''; render(); status(added + ' image' + (added === 1 ? '' : 's') + ' added. Press "Save call" to keep them.'); }; }
+$('paUp').addEventListener('change', multiFill('pa', 40));
+$('cvUp').addEventListener('change', multiFill('cv', 12));
 function renderPool(){
+  renderPeople('paGrid', 'pa', PAST_ARTISTS(), 6, paImg); renderPeople('cvGrid', 'cv', COVER_ARTISTS(), 3, cvImg);
   const keys = artPlan(); const g = $('poolGrid'); if (!g) return;
   const have = keys.filter((k, i) => state.images['pool' + (i + 1)]).length;
   $('artNeed').textContent = `This month needs ${keys.length} artworks. ${have} added.`;
@@ -442,17 +463,28 @@ function launch(){
     <p class="a c sub" style="left:150px;right:150px;top:720px;font-size:40px;color:${INK}">${esc(state.levels || '')}</p>
     <p class="a c sub" style="left:170px;right:170px;top:830px;opacity:.65;font-size:30px;color:${INK}">${esc(state.elig)}</p>`});
 
-  // 10 published artists
-  const al = lines(state.artists).map(l => l.split('|').map(x => x.trim()));
-  const card = i => { const [n,e,q] = al[i] || []; const k = 'imgA'+(i+1);
-    return `<div style="background:rgba(255,255,255,.06);border-radius:24px;padding:28px;position:relative">
-      ${state.images[k] ? `<div class="img" style="height:400px;border-radius:14px;background-image:url(${state.images[k]});background-position:center"></div>` : `<div class="ph" style="height:400px;color:${WHITE}">Their page<br>in the book</div>`}
-      <p style="font-size:30px;font-weight:600;margin-top:24px">${gap(n,'Artist name')}</p>
-      <p style="font-size:24px;opacity:.7;margin-top:10px">${gap(e,'Edition · Country')}</p>
-      <p style="font-family:'ATH Serif',serif;font-style:italic;font-size:30px;line-height:1.3;margin-top:20px;opacity:.9">“${gap(q,'One real line')}”</p></div>`; };
+  // 10 published artists: six, three across
+  const al = PAST_ARTISTS();
+  const card = i => { const [n, e] = al[i] || []; const u = paImg(i);
+    return `<div>${u ? `<div class="img" style="height:330px;border-radius:12px;background-image:url(${u});background-position:center"></div>` : `<div class="ph" style="height:330px;font-size:18px;color:${WHITE}">Their work</div>`}
+      <p style="font-size:26px;font-weight:600;line-height:1.2;margin-top:16px">${gap(n, 'Artist name')}</p>
+      <p style="font-size:20px;opacity:.7;line-height:1.3;margin-top:6px">${gap(e, 'Edition · Country')}</p></div>`; };
   S.push({bg:INK, html:`${corners(WHITE, PEONY, 'From past editions')}
-    <p class="a R c" style="left:80px;right:80px;top:170px;font-size:80px;color:${WHITE}">Published artists</p>
-    <div class="a" style="left:64px;right:64px;top:330px;display:grid;grid-template-columns:1fr 1fr;gap:24px;color:${WHITE}">${card(0)}${card(1)}</div>`});
+    <p class="a R c" style="left:80px;right:80px;top:150px;font-size:80px;color:${WHITE}">Published artists</p>
+    <p class="a c sub" style="left:120px;right:120px;top:256px;font-size:28px;opacity:.75;color:${WHITE}">A few of the artists in our books.</p>
+    <div class="a" style="left:64px;right:64px;top:340px;display:grid;grid-template-columns:repeat(3,1fr);column-gap:28px;row-gap:34px;color:${WHITE}">${[0,1,2,3,4,5].map(card).join('')}</div>`});
+
+  // 11 past cover artists
+  const ca = COVER_ARTISTS();
+  const cover = i => { const [n, e] = ca[i] || []; const u = cvImg(i);
+    return `<div style="display:flex;flex-direction:column;align-items:center;text-align:center">
+      ${u ? `<div class="img" style="width:310px;height:440px;border-radius:4px 10px 10px 4px;background-image:url(${u});background-position:center;box-shadow:0 26px 50px rgba(20,9,12,.35),inset 6px 0 0 rgba(0,0,0,.18)"></div>` : `<div class="ph" style="width:310px;height:440px;font-size:18px;color:${INK}">Book cover</div>`}
+      <p style="font-size:28px;font-weight:600;line-height:1.2;margin-top:30px">${gap(n, 'Artist name')}</p>
+      <p style="font-family:'ATH Serif',serif;font-style:italic;font-size:24px;line-height:1.3;opacity:.75;margin-top:8px">${gap(e, 'Book or edition')}</p></div>`; };
+  S.push({bg:CREAM, html:`${corners(INK, BURG, 'On the cover')}
+    <p class="a R c" style="left:80px;right:80px;top:160px;font-size:80px;color:${INK}">Past cover artists</p>
+    <p class="a c sub" style="left:140px;right:140px;top:266px;font-size:30px;opacity:.7;color:${INK}">Their work became the face of the book.</p>
+    <div class="a" style="left:40px;right:40px;top:470px;display:grid;grid-template-columns:repeat(3,1fr);gap:20px;color:${INK}">${[0,1,2].map(cover).join('')}</div>`});
 
   // 11 action
   const mini = [[PEONY,250],[CREAM,280],[BURG,240],[INK,270],[PEONY,230],[CREAM,260]].map(([c,h]) => `<div style="flex:1;height:${h}px;background:${c};border-radius:3px 3px 0 0;box-shadow:inset 0 0 0 2px rgba(255,255,255,.18)"></div>`).join('');
@@ -466,7 +498,7 @@ function launch(){
     <p class="a c" style="left:0;right:0;top:1020px;font-size:28px;opacity:.9;color:${WHITE}">or apply via link in bio</p>
     <p class="a c" style="left:0;right:0;top:1070px;font-size:26px;opacity:.7;color:${WHITE}">artstoheartsproject.com</p>`});
 
-  const titles = ['cover','who-we-are','the-series','the-theme','the-book','what-you-receive','recognition','selection','who-can-apply','published-artists','apply'];
+  const titles = ['cover','who-we-are','the-series','the-theme','the-book','what-you-receive','recognition','selection','who-can-apply','published-artists','cover-artists','apply'];
   return S.map((s,i) => ({...s, title: titles[i]}));
 }
 

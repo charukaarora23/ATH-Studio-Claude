@@ -228,6 +228,7 @@ const T = {
   // four artworks with credits
   grid(o){
     const g = G[o.ground||'cream']();
+    if (o.from !== undefined) o.items = o.items.map((_, i) => { const a = PAST_ARTISTS()[o.from + i] || []; return {name: a[0] ? esc(a[0]) : '', meta: a[1] ? esc(a[1]) : '', img: paImg(o.from + i)}; });
     const cell = (it,i) => { const x = i%2 ? 556 : 80, y = i<2 ? 260 : 760;
       return `${slot(it.img, 'Artwork', `left:${x}px;top:${y}px;width:444px;height:380px`, g.fg)}
         <p class="a" style="left:${x}px;top:${y+398}px;font-size:26px;font-weight:600;color:${g.fg}">${gap(it.name,'Artist name')}</p>
@@ -548,9 +549,9 @@ ${tags}`},
 
  {left:20, title:'Published artists', kind:'Carousel · proof', slides:() => [
    T.hook({img:EX.portrait, tr:'Past editions', head:`Their work is in print. Yours could be next, in the ${name}.`, size:72, sub:`Artists we published in our ${PAST().slice(0,3).join(', ')} editions.`}),
-   T.grid({head:`Published in the ${esc(PAST()[0] || 'last edition')}${/edition|year|\d/i.test(PAST()[0]||'') ? '' : ' Edition'}`, items:[{},{},{},{}], tr:'Past editions'}),
-   T.grid({head:`Published in the ${esc(PAST()[1] || PAST()[0] || 'last edition')}${/edition|year|\d/i.test(PAST()[1]||PAST()[0]||'') ? '' : ' Edition'}`, items:[{},{},{},{}], tr:'Past editions', ground:'ink'}),
-   T.grid({head:`Published in the ${esc(PAST()[2] || PAST()[0] || 'last edition')}${/edition|year|\d/i.test(PAST()[2]||PAST()[0]||'') ? '' : ' Edition'}`, items:[{},{},{},{}], tr:'Past editions'}),
+   T.grid({head:`Published in the ${esc(PAST()[0] || 'last edition')}${/edition|year|\d/i.test(PAST()[0]||'') ? '' : ' Edition'}`, items:[{},{},{},{}], from:6, tr:'Past editions'}),
+   T.grid({head:`Published in the ${esc(PAST()[1] || PAST()[0] || 'last edition')}${/edition|year|\d/i.test(PAST()[1]||PAST()[0]||'') ? '' : ' Edition'}`, items:[{},{},{},{}], from:10, tr:'Past editions', ground:'ink'}),
+   T.grid({head:`Published in the ${esc(PAST()[2] || PAST()[0] || 'last edition')}${/edition|year|\d/i.test(PAST()[2]||PAST()[0]||'') ? '' : ' Edition'}`, items:[{},{},{},{}], from:14, tr:'Past editions'}),
    T.cta({kicker:'Your work could be next'}),
  ], caption:() => `Their work is in print. Yours could be next, in the ${N()}.
 
