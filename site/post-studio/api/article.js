@@ -91,20 +91,21 @@ Rules:
 
 const ED_SCHEMA = {
   type: 'object', additionalProperties: false,
-  required: ['headline', 'sub', 'why', 'steps', 'avoid', 'poll', 'ask', 'hook'],
+  required: ['question', 'sub', 'why', 'steps', 'bad', 'good', 'short', 'ask', 'hook'],
   properties: {
-    headline: {type: 'string', description: 'Cover headline: the result the reader gets, max 60 characters, sentence case'},
-    sub: {type: 'string', description: 'Line under the headline, for example "A guide for artists · 5 steps"'},
-    why: {type: 'string', description: 'The problem this guide solves, one or two sentences, max 220 characters, said to an artist'},
-    steps: {type: 'array', description: '3 to 7 steps in the order of the article', items: {type: 'object', additionalProperties: false, required: ['title', 'how'], properties: {
-      title: {type: 'string', description: 'An action that starts with a verb, max 40 characters'}, how: {type: 'string', description: 'How to do it, one concrete sentence, max 140 characters'}}}},
-    avoid: {type: 'string', description: 'One mistake to avoid that the article names, one sentence, or empty'},
-    poll: {type: 'string', description: 'A story poll question about two of the steps, max 40 characters'},
+    question: {type: 'string', description: 'The question an artist would actually ask that this guide answers, in their own words, first person, max 50 characters. Example: How should I price my art?'},
+    sub: {type: 'string', description: 'A short line under the question, in the voice of Arts to Hearts Project, max 50 characters'},
+    why: {type: 'string', description: 'The problem, said plainly to an artist, one or two sentences, max 200 characters'},
+    steps: {type: 'array', description: '3 to 6 pieces of advice in the order of the article', items: {type: 'object', additionalProperties: false, required: ['title', 'how'], properties: {
+      title: {type: 'string', description: 'The advice as a sentence a person would say, max 45 characters, no numbering'}, how: {type: 'string', description: 'How to do it, one concrete sentence, max 130 characters'}}}},
+    bad: {type: 'string', description: 'A habit the article warns against, written as something an artist would say to themselves, max 60 characters'},
+    good: {type: 'string', description: 'What to do instead, one or two short sentences, max 110 characters'},
+    short: {type: 'string', description: 'The whole guide as one sentence someone could say to a friend, max 200 characters'},
     ask: {type: 'string', description: 'A story question-box prompt, max 45 characters'},
     hook: {type: 'string', description: 'First line of the Instagram caption, max 110 characters'},
   },
 };
-const ED_SYSTEM = `You are the senior editor at Arts to Hearts Project. You turn one art business guide from our website into an Instagram carousel that artists save, share and act on. Every step must be something an artist can do this week.
+const ED_SYSTEM = `You are the senior editor at Arts to Hearts Project. You turn one art business guide from our website into an Instagram carousel that artists save, share and act on. Every piece of advice must be something an artist can do this week. No listicle language: no numbered steps, no "why this matters", no labels. Write it the way a person who has worked with thousands of artists would say it.
 
 Voice: plain, warm, specific, said to an artist. No hype, no exclamation marks, no emoji, no clichés ("unlock", "game-changer", "elevate", "journey", "dive into"). Short words. Keep every fact true to the article; never invent numbers, names or claims.`;
 async function structure(text, images, qaCount, kind){
