@@ -70,8 +70,8 @@ const SCHEMA = {
     quotes: {type: 'array', items: {type: 'string'}, description: 'Exactly 3 quotes, copied word for word from the answers, 60 to 150 characters each'},
     picks: {type: 'array', items: {type: 'integer'}, description: 'Exactly 2 question numbers whose answers open with a story'},
     kicks: {type: 'array', items: {type: 'string'}, description: 'One label per pick, max 44 characters'},
-    inside: {type: 'array', items: {type: 'string'}, description: 'Exactly 3 reasons to read the full interview, max 60 characters each'},
-    ctahead: {type: 'string', description: 'Last page headline, max 24 characters'},
+    inside: {type: 'array', items: {type: 'string'}, description: 'Exactly 3 sentences for an "Also in the interview" paragraph: what else the reader will find, said the way a person tells a friend, each under 90 characters, the last may start with "And"'},
+    ctahead: {type: 'string', description: 'End card line, one sentence pointing to the full interview on our website, max 70 characters'},
     hook: {type: 'string', description: 'First line of the Instagram caption, max 120 characters'},
     roles: {type: 'array', items: {type: 'string', enum: ['art', 'portrait', 'skip']}, description: 'One role per image, in the order given'},
   },
@@ -85,7 +85,8 @@ Rules:
 - Quotes are the artist's exact words from their answers, copied character for character.
 - Cover lines and the reasons to read point at real stories in the interview, phrased so the reader wants the rest (a person, a moment, a decision), not summaries.
 - Teaser picks are answers whose opening sentences tell a story and stop before the point.
-- Do not assume the artist's pronouns. Use their name, or none, unless the article itself states them.
+- Use the pronouns the article uses for the artist. If it uses none, use their name.
+- Write like a person, not a list: no labels such as "Why X matters", no noun-phrase fragments, no colons in hooks. Sentences someone would say out loud.
 - Images: "art" for the artist's artworks, "portrait" for photos of the artist or their studio, "skip" for anything else (logos, ads, unrelated photos).`;
 
 async function structure(text, images, qaCount){
