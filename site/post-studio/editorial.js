@@ -20,7 +20,7 @@ const hl = (text, phrase, bg) => { const t = esc(text); const p = esc(phrase || 
 const edCorner = (fg) => `<p class="a cn" style="left:52px;top:48px;color:${fg}">Arts to Hearts Project</p>`;
 const edHandle = (fg, op = .8) => `<p class="a" style="left:72px;bottom:60px;${T_REG};font-size:24px;color:${fg};opacity:${op}">@artstoheartsproject</p>`;
 const arrowDot = (bg, fg, size = 150) => `<span style="display:inline-flex;vertical-align:.08em;align-items:center;justify-content:center;width:${size}px;height:${size}px;border-radius:50%;background:${bg};margin-right:.18em"><svg width="${size * .34}" height="${size * .34}" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7" fill="none" stroke="${fg}" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span>`;
-const swipePill = (bg, fg) => `<div class="a" style="left:0;right:0;bottom:120px;display:flex;justify-content:center"><div style="display:flex;align-items:center"><span style="width:84px;height:84px;border-radius:50%;border:2px solid ${bg};display:flex;align-items:center;justify-content:center;margin-right:-10px"><svg width="30" height="30" viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7" fill="none" stroke="${bg}" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span style="height:84px;padding:0 44px;border-radius:999px;background:${bg};color:${fg};display:flex;align-items:center;${T_MED};font-size:36px">Swipe to find out</span></div></div>`;
+const swipePill = (bg, fg) => `<div class="a" style="left:0;right:0;bottom:120px;display:flex;justify-content:center"><div style="display:flex;align-items:center"><span style="width:84px;height:84px;border-radius:50%;border:2px solid ${bg};display:flex;align-items:center;justify-content:center;margin-right:18px"><svg width="30" height="30" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7" fill="none" stroke="${bg}" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span style="height:84px;padding:0 44px;border-radius:999px;background:${bg};color:${fg};display:flex;align-items:center;${T_MED};font-size:36px">Swipe to find out</span></div></div>`;
 const splitHalf = t => { const w = String(t).split(' '); const k = Math.ceil(w.length / 2); return [w.slice(0, k).join(' '), w.slice(k).join(' ')]; };
 const EDT = {
   // Cover A: the question, huge, Rose on Night, opened by the round arrow
@@ -112,29 +112,29 @@ const edLoop = t => { t = String(t || '').trim().replace(/[.?]$/, ''); return /^
 EDT.coverHook = o => { const q = o.q; const sz = q.length > 44 ? 104 : q.length > 30 ? 120 : 136;
   return {bg: EP.burg, html: `<p class="a cn" style="left:52px;top:48px;color:${EP.pink}">Arts to Hearts Project</p>${ivMono('peony', 'right:52px;top:40px;width:96px;height:54px')}
     <div class="a" style="left:72px;right:72px;top:210px;display:flex;flex-direction:column;gap:48px">
-      ${ED_K('ATH Editorial · Art business', EP.pink)}
       <p style="${T_MED};font-size:${sz}px;line-height:1.02;letter-spacing:-.035em;color:${EP.rose}">${esc(q)}</p>
       ${o.why ? `<p style="${BASK};font-size:42px;line-height:1.36;color:${EP.pink}">${esc(o.why)}</p>` : ''}</div>
     ${swipePill(EP.rose, EP.burg)}`}; };
-EDT.mistake = o => ({bg: EP.white, html: `${edCorner(EP.burg)}${ED_COL(`${ED_K('The mistake we see most')}
+EDT.mistake = o => ({bg: EP.white, html: `${edCorner(EP.burg)}${ED_COL(`
     ${edBody(`<s style="text-decoration-thickness:3px">&ldquo;${esc(o.bad)}&rdquo;</s>`, o.sz, 'font-style:italic;opacity:.5')}
     ${edBody(mark(esc(o.good)), o.sz)}`)}`});
-EDT.step = o => ({bg: EP.white, html: `${edCorner(EP.burg)}${o.mono ? ivMono('burgundy', 'right:52px;top:40px;width:96px;height:54px') : ''}${ED_COL(`${ED_K(o.kick)}
+EDT.step = o => ({bg: EP.white, html: `${edCorner(EP.burg)}${o.mono ? ivMono('burgundy', 'right:52px;top:40px;width:96px;height:54px') : ''}${ED_COL(`
     ${edBody(`${mark(esc(o.title + '.'))}${o.how ? ' ' + esc(o.how) : ''}`, o.sz)}`)}${o.foot ? ED_FOOT(o.foot) : ''}`});
-EDT.more = o => ({bg: EP.white, html: `${edCorner(EP.burg)}${ED_COL(`${ED_K('Also in the guide')}
-    <div>${o.items.map(v => `<p style="${BASK};font-style:italic;font-size:${o.sz - 6}px;line-height:1.28;color:${EP.burg};padding:26px 0;border-top:2px solid ${EP.pink}">${esc(v)}</p>`).join('')}</div>`)}
-    <p class="a" style="left:72px;right:72px;top:1080px;${T_REG};font-size:34px;line-height:1.38;color:${EP.burg}">Read the whole guide: comment ${mark(`<span style="${T_MED}">${esc(o.key)}</span>`)} and we’ll send it to you, or tap the link in bio.</p>`});
+EDT.more = o => { const it = o.items.map(v => mark(esc(v.replace(/\?$/, '').replace(/^How\b/, 'how'))));
+  const list = it.length > 1 ? it.slice(0, -1).join(', ') + ', and ' + it[it.length - 1] : it[0];
+  return {bg: EP.white, html: `${edCorner(EP.burg)}${ED_COL(edBody(`The rest is in the article: ${list}.`, o.sz))}
+    <p class="a" style="left:72px;right:72px;top:1080px;${T_REG};font-size:34px;line-height:1.38;color:${EP.burg}">Comment <span style="${T_MED}">${esc(o.key)}</span> and we’ll send you the article, or tap the link in bio.</p>`}; };
 EDT.end = o => ({bg: EP.burg, html: `${ivMono('peony', 'left:430px;width:220px;top:150px;height:124px')}
     <div class="a" style="left:72px;right:72px;top:330px;bottom:200px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center">
       <p style="${BASK};font-size:48px;line-height:1.28;color:${EP.white}">${esc(o.head)}</p>
       <p style="${T_MED};font-size:${o.key.length > 8 ? 130 : 160}px;line-height:1;letter-spacing:-.04em;color:${EP.rose};margin-top:48px;display:flex;align-items:center">${arrowDot(EP.rose, EP.burg, 120)}${esc(o.key)}</p>
       <p style="${T_REG};font-size:36px;line-height:1.38;color:${EP.pink};margin-top:40px">${esc(o.offer)}</p>
       <div style="width:240px;border-top:2px solid rgba(250,210,225,.35);margin:56px 0 40px"></div>
-      <p style="${T_REG};font-size:30px;line-height:1.4;color:${EP.pink}">New guides for artists every week.<br>Follow @artstoheartsproject</p></div>
+      <p style="${T_REG};font-size:30px;line-height:1.4;color:${EP.pink}">New articles for artists every week.<br>Follow @artstoheartsproject</p></div>
     <p class="a c" style="left:0;right:0;bottom:96px;${T_REG};font-size:28px;color:${EP.pink}">artstoheartsproject.com</p>`});
 
 // ---------- the form ----------
-DCAT.editorial = {name: 'ATH Editorial', marker: '//EDITORIAL', key: 'GUIDE', pack: true, groups: [
+DCAT.editorial = {name: 'ATH Editorial', marker: '//EDITORIAL', key: 'ARTICLE', pack: true, groups: [
   ['The question', [
     {k: 'question', label: 'The question, in an artist’s own words (the small label on every slide)', type: 'text', ph: 'How should I price my art?'}]],
   ['The advice', [
@@ -144,9 +144,9 @@ DCAT.editorial = {name: 'ATH Editorial', marker: '//EDITORIAL', key: 'GUIDE', pa
     {k: 'bad', label: 'The habit artists should drop, in their words (struck through)', type: 'text', ph: 'I’ll price it lower so it sells.'},
     {k: 'good', label: 'What to do instead', type: 'text', ph: 'Price it so the next one can sell for more.'}]],
   ['The action', [
-    {k: 'key', label: 'Comment keyword (its DM must send the guide, not a submission pitch)', type: 'text', ph: 'GUIDE'},
-    {k: 'ctahead', label: 'End card: line above the keyword', type: 'text', ph: 'The whole guide is free.'},
-    {k: 'offer', label: 'End card: line under the keyword', type: 'text', ph: 'Comment the word and we’ll send it to you.'}]],
+    {k: 'key', label: 'Comment keyword (its DM must send the article link, not a submission pitch)', type: 'text', ph: 'ARTICLE'},
+    {k: 'ctahead', label: 'End card: line above the keyword', type: 'text', ph: 'Read the full article on our website.'},
+    {k: 'offer', label: 'End card: line under the keyword', type: 'text', ph: 'Comment the word and we’ll send you the link.'}]],
   ['Caption', [
     {k: 'hook', label: 'Caption first line', type: 'text'},
     {k: 'url', label: 'Article link', type: 'text'},
@@ -188,20 +188,20 @@ function editorialFields(e, ai){
   const short = c.short || (steps.length ? steps.map((s, i) => (i === 0 ? s.title : s.title.charAt(0).toLowerCase() + s.title.slice(1))).join(', ').replace(/, ([^,]*)$/, ', and $1') + '.' : '');
   return {cover: 'hook', question: c.question || askOf(e.title), sub: c.sub || 'What we tell artists who ask us this',
     why: c.why || e.why, steps: steps.map(s => `${s.title} | ${s.how || ''}`).join('\n'), bad: c.bad || '', good: c.good || e.avoid || '', short,
-    key: 'GUIDE', ctahead: 'The whole guide is free.', offer: 'Comment the word and we’ll send it to you.',
-    endline: 'New guides for artists every week.', invite: 'Follow @artstoheartsproject for the next one.', ask: c.ask || '', hook: c.hook || ''};
+    key: 'ARTICLE', ctahead: 'Read the full article on our website.', offer: 'Comment the word and we’ll send you the link.',
+    endline: 'New articles for artists every week.', invite: 'Follow @artstoheartsproject for the next one.', ask: c.ask || '', hook: c.hook || ''};
 }
 
 // ---------- the package ----------
 DPACK.editorial = p => {
   const f = p.f || {}, imgs = [].concat((p.imgs || {}).imgs || []), credits = dLines(f.credits);
   const steps = dLines(f.steps).map(x => ({title: x[0] || '', how: x.slice(1).join(' | ')})).filter(s => s.title);
-  const key = (f.key || 'GUIDE').toUpperCase().replace(/[^A-Z0-9]/g, '') || 'GUIDE';
+  const key = (f.key || 'ARTICLE').toUpperCase().replace(/[^A-Z0-9]/g, '') || 'ARTICLE';
   const q = (f.question || f.headline || 'Add the question in the sidebar').replace(/^“|”$/g, ''), sub = f.sub || 'What we tell artists who ask us this';
   const artCover = (f.cover || 'hook') === 'hook';
   const A = EDT.coverHook({q, sub}), Bc = EDT.coverCard({q, sub, img: imgs[0] || '', slot: 'imgs0'});
   const advice = (s, i) => (i % 2 ? EDT.adviceMark : EDT.adviceCard)({title: s.title, how: s.how, img: imgs[i + 1] || '', slot: 'imgs' + (i + 1), credit: credits[i + 1]});
-  const head = f.ctahead || 'The whole guide is free.', offer = f.offer || 'Comment the word and we’ll send it to you.';
+  const head = f.ctahead || 'Read the full article on our website.', offer = f.offer || 'Comment the word and we’ll send you the link.';
   const label = q;
   // Give two pieces of advice in full; the rest are named as questions the guide answers, so there is a reason to get it.
   const give = steps.slice(0, 2), keep = steps.slice(2, 5).map(s => edLoop(s.title));
@@ -211,19 +211,19 @@ DPACK.editorial = p => {
   const S = [
     EDT.coverHook({q, why: f.why}),
     ...(f.good ? [EDT.mistake({bad: f.bad || 'I’ll work it out later.', good: f.good, sz})] : []),
-    ...give.map((s, i) => EDT.step({kick: i === 0 ? 'Start here' : 'Then', title: s.title, how: s.how, sz, foot: i === give.length - 1 && keep.length ? 'There’s more in the guide &rarr;' : ''})),
+    ...give.map((s, i) => EDT.step({title: s.title, how: s.how, sz, foot: i === give.length - 1 && keep.length ? 'More in the article &rarr;' : ''})),
     ...(keep.length ? [EDT.more({items: keep, key, sz})] : []),
     EDT.end({head, key, offer}),
   ];
   const tags = ['#artstoheartsproject', '#artbusiness', ...String(f.tags || '').split(/\s+/).filter(x => x.startsWith('#'))].slice(0, 5).join(' ');
   const who = [...new Set(credits.map(c => c[0]).filter(Boolean))].join(', ');
-  const cap = `${f.hook || q}\n\n${f.why || ''}\n\nTwo things you can do today:\n\n${give.map(s => `${s.title}.${s.how ? ' ' + s.how : ''}`).join('\n\n')}${keep.length ? `\n\nAlso in the guide:\n${keep.map(k => '· ' + k.replace(/\?$/, '')).join('\n')}` : ''}\n\nComment ${key} and we'll send you the whole guide, free. Or read it through the link in bio.${who ? `\n\nWorks shown: ${who}.` : ''}\n\n${tags}`.replace(/\n{3,}/g, '\n\n');
-  const SINGLES = steps.slice(0, 6).map((st, i) => ({...EDT.step({kick: q, title: st.title, how: st.how, sz: 62, mono: true, foot: `Comment ${esc(key)} for the whole guide &rarr;`}), label: 'Single ' + (i + 1)}));
-  const ST = [...give.map((st, i) => ({...IV.story({dark: i === 0, mono: i === 0, label: q, text: esc(st.title), sub: esc(st.how || ''), zone: i === 0 ? 'Poll sticker: “Do you do this?”' : 'Link sticker: the whole guide'}), label: 'Story ' + (i + 1)})),
-    ...(keep.length ? [{...IV.story({dark: true, label: 'Also in the guide', text: esc(keep[0]), sub: `Comment ${esc(key)} on the post and we’ll send it to you.`, zone: 'Link sticker: the whole guide'}), label: 'Story ' + (give.length + 1)}] : [])];
+  const cap = `${f.hook || q}\n\n${f.why || ''}\n\nTwo things you can do today:\n\n${give.map(s => `${s.title}.${s.how ? ' ' + s.how : ''}`).join('\n\n')}${keep.length ? `\n\nAlso in the article:\n${keep.map(k => '· ' + k.replace(/\?$/, '')).join('\n')}` : ''}\n\nComment ${key} and we'll send you the full article, or read it through the link in bio.${who ? `\n\nWorks shown: ${who}.` : ''}\n\n${tags}`.replace(/\n{3,}/g, '\n\n');
+  const SINGLES = steps.slice(0, 6).map((st, i) => ({...EDT.step({title: st.title, how: st.how, sz: 62, mono: true, foot: `Comment ${esc(key)} for the full article &rarr;`}), label: 'Single ' + (i + 1)}));
+  const ST = [...give.map((st, i) => ({...IV.story({dark: i === 0, mono: i === 0, label: q, text: esc(st.title), sub: esc(st.how || ''), zone: i === 0 ? 'Poll sticker: “Do you do this?”' : 'Link sticker: the article'}), label: 'Story ' + (i + 1)})),
+    ...(keep.length ? [{...IV.story({dark: true, label: 'In the article', text: esc(keep[0]), sub: `Comment ${esc(key)} on the post and we’ll send you the link.`, zone: 'Link sticker: the article'}), label: 'Story ' + (give.length + 1)}] : [])];
   return [
-    {title: `${p.date} · Editorial carousel`, meta: `${S.length} slides · keyword ${key}`, slides: S.map((s, j) => ({...s, title: 'editorial-' + (j + 1)})), cap, pin: `Comment ${key} and we'll send you the whole guide, free.`},
-    ...(SINGLES.length ? [{title: `${p.date} · Editorial singles`, meta: `${SINGLES.length} single posts for later weeks, one piece of advice each, all sending people back to the guide`, slides: SINGLES.map((s, j) => ({...s, title: 'single-' + (j + 1)})), cap: steps[0] ? `${steps[0].title}.\n\n${steps[0].how}\n\nFrom our guide "${q}". Comment ${key} and we'll send you the whole thing.\n\n${tags}` : '', pin: ''}] : []),
+    {title: `${p.date} · Editorial carousel`, meta: `${S.length} slides · keyword ${key}`, slides: S.map((s, j) => ({...s, title: 'editorial-' + (j + 1)})), cap, pin: `Comment ${key} and we'll send you the full article.`},
+    ...(SINGLES.length ? [{title: `${p.date} · Editorial singles`, meta: `${SINGLES.length} single posts for later weeks, one piece of advice each, all sending people back to the article`, slides: SINGLES.map((s, j) => ({...s, title: 'single-' + (j + 1)})), cap: steps[0] ? `${steps[0].title}.\n\n${steps[0].how}\n\nFrom our article "${q}". Comment ${key} and we'll send you the link.\n\n${tags}` : '', pin: ''}] : []),
     {title: `${p.date} · Editorial stories`, meta: 'Same day as the carousel · add the stickers in Instagram', slides: ST.map((s, j) => ({...s, title: 'editorial-story-' + (j + 1)})), story: true},
   ];
 };
@@ -236,6 +236,6 @@ const ED_EXAMPLE = {cat: 'editorial', f: {
   credits: 'PQHAÜS | No help is coming | 2026\nPQHAÜS | I was the elephant in the room | 2025\nPQHAÜS | I am not a bad person | 2026\nPQHAÜS | 2903 miles | 2025\nPQHAÜS | 31 years old | 2024\nPQHAÜS | No help is coming | 2026',
   whymark: 'Buyers trust a price you can explain', pick: 'show one price everywhere', bad: 'I’ll drop the price a little so it sells.', good: 'Hold the price. The buyers who paid it are watching, and it is hard to go back up.',
   short: 'Know your costs, pick one way of pricing and keep it, compare yourself with artists like you, show one price everywhere, and raise it when you sell out.',
-  key: 'GUIDE', ctahead: 'The whole guide is free.', offer: 'Comment the word and we’ll send it to you.',
-  endline: 'New guides for artists every week.', invite: 'Follow @artstoheartsproject for the next one.', ask: 'What do you find hardest about pricing?', hook: 'How should I price my art? The question we get most, answered.', tags: '#pricingart #artistadvice'},
+  key: 'ARTICLE', ctahead: 'Read the full article on our website.', offer: 'Comment the word and we’ll send you the link.',
+  endline: 'New articles for artists every week.', invite: 'Follow @artstoheartsproject for the next one.', ask: 'What do you find hardest about pricing?', hook: 'How should I price my art? The question we get most, answered.', tags: '#pricingart #artistadvice'},
   imgs: {imgs: ['art/examples/pqhaus/art-no-help-is-coming.jpg', 'art/examples/pqhaus/art-i-was-the-elephant-in-the-room.jpg', 'art/examples/pqhaus/art-i-am-not-a-bad-person.jpg', 'art/examples/pqhaus/art-2903-miles.jpg', 'art/examples/pqhaus/art-31-years-old.jpg', 'art/examples/pqhaus/art-no-help-is-coming.jpg']}};
