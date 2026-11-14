@@ -74,7 +74,7 @@ const ATH_MARK = 'brand/heart.svg';   // the heart: drop the file at this path a
 const MARK_OK = {v: false};   // the monogram now carries recall; the heart slot stays off
 const MONO = c => `brand/monogram-${c}.svg`;   // ATH / PROJECT monogram (logo suite, panel 06)
 const ivMono = (c, style) => `<div class="a" style="${style};background:url(${MONO(c)}) center/contain no-repeat"></div>`;
-const ivCorners = (o, fg = B.ink, acc = B.burg) => `<p class="a cn" style="left:72px;top:58px;font-size:19px;color:${fg}">Arts to Hearts Project</p>${ivMono(fg === B.ink ? 'burgundy' : 'white', 'right:66px;top:40px;width:112px;height:63px')}
+const ivCorners = (o, fg = B.ink, acc = B.burg) => `${ivMono(fg === B.ink ? 'burgundy' : 'white', 'right:66px;top:40px;width:112px;height:63px')}
   <p class="a" style="left:72px;bottom:60px;${T_REG};font-size:24px;color:${fg};opacity:.8">@artstoheartsproject</p>
   ${o.last ? '' : `<div class="a" style="right:72px;bottom:46px;width:56px;height:56px;border-radius:50%;background:${acc};display:flex;align-items:center;justify-content:center;${T_MED};font-size:28px;color:#FFFFFF">&rarr;</div>`}`;
 const ivCredit = (name, c) => { const [t, y, sz, m] = (c || []).map(x => String(x || '').trim()); return t ? `${esc(name)}, <i style="${BASK};font-style:italic">${esc(t)}</i>${y ? ', ' + esc(y) : ''}${[m, sz].filter(Boolean).length ? ' · ' + [m, sz].filter(Boolean).map(x => esc(x.toLowerCase())).join(' · ') : ''}` : ''; };
@@ -86,8 +86,8 @@ const IV = {
       <p class="a" style="left:72px;right:72px;bottom:${h.length > 40 ? 250 : 210}px;${T_MED};font-size:${sz}px;line-height:.96;letter-spacing:-.035em;color:#FFFFFF">${esc(h)}</p>
       <p class="a" style="left:72px;right:72px;bottom:150px;${T_REG};font-size:30px;color:#FFFFFF">An interview with ${esc(o.name)}${o.meta ? ' · ' + esc(o.meta) : ''}</p>`};
     return {bg:B.ground, html:`${ivCorners(o)}${ivArt(o.img, 'left:72px;right:72px;top:130px;height:640px', o.slot)}
-    <p class="a cn" style="left:72px;top:800px;font-size:20px;color:${B.burg}">Artist Interview</p>
-    <p class="a" style="left:72px;right:72px;top:846px;${T_MED};font-size:${sz}px;line-height:.96;letter-spacing:-.035em;color:${B.burg}">${esc(h)}</p>
+    <p class="a cn" style="left:72px;top:800px;font-size:20px;color:${B.ink}">Artist Interview</p>
+    <p class="a" style="left:72px;right:72px;top:846px;${T_MED};font-size:${sz}px;line-height:.96;letter-spacing:-.035em;color:${B.ink}">${esc(h)}</p>
     <p class="a" style="left:72px;right:72px;bottom:140px;${T_REG};font-size:32px;line-height:1.3;color:${B.ink}">An interview with ${esc(o.name)}${o.meta ? ' · ' + esc(o.meta) : ''}</p>`}; },
   standfirst(o){ const t = String(o.text || ''); return {bg:B.ground, html:`${ivCorners(o)}${ivArt(o.img, 'left:72px;right:72px;top:130px;height:560px', o.slot, 'cover')}
     <p class="a" style="left:72px;right:72px;top:742px;${BASK};font-size:${t.length > 210 ? 40 : 44}px;line-height:1.32;color:${B.ink}">${esc(t)}</p>`}; },
@@ -96,31 +96,30 @@ const IV = {
     ${ivArt(o.img, `left:72px;right:72px;top:${top && q ? 400 : 130}px;height:${q ? 640 : 960}px`, o.slot)}
     <p class="a" style="left:72px;right:72px;${top || !q ? 'top:1120px' : 'top:1150px'};${T_REG};font-size:24px;line-height:1.35;color:${B.soft}">${ivCredit(o.name, o.cap)}</p>`}; },
   tease(o){ return {bg:B.ground, html:`${ivCorners(o)}
-    <p class="a" style="left:72px;right:72px;top:170px;${T_MED};font-size:26px;letter-spacing:.12em;text-transform:uppercase;line-height:1.4;color:${B.burg}">${esc(o.kick)}</p>
+    <p class="a" style="left:72px;right:72px;top:170px;${T_MED};font-size:26px;letter-spacing:.12em;text-transform:uppercase;line-height:1.4;color:${B.ink}">${esc(o.kick)}</p>
     <p class="a" style="left:72px;right:72px;top:${o.kick.length > 40 ? 270 : 230}px;${BASK};font-size:${o.text.length > 210 ? 52 : 58}px;line-height:1.24;color:${B.ink}">&ldquo;${esc(o.text)}&rdquo;</p>
-    <p class="a" style="left:72px;right:72px;top:1110px;${T_MED};font-size:36px;letter-spacing:-.02em;color:${B.burg}">Continued in the interview &rarr;</p>`}; },
+    <p class="a" style="left:72px;right:72px;top:1110px;${T_MED};font-size:36px;letter-spacing:-.02em;color:${B.ink}">Continued in the interview &rarr;</p>`}; },
   // Page 6: three more questions we asked, word for word, so it is clear what is waiting in the article.
   list(o){ return {bg:B.ground, html:`${ivCorners(o)}
-    <p class="a" style="left:72px;right:72px;top:170px;${T_MED};font-size:26px;letter-spacing:.12em;text-transform:uppercase;color:${B.burg}">We also asked</p>
+    <p class="a" style="left:72px;right:72px;top:170px;${T_MED};font-size:26px;letter-spacing:.12em;text-transform:uppercase;color:${B.ink}">We also asked</p>
     <div class="a" style="left:72px;right:72px;top:236px">${o.items.slice(0, 3).map(v => `<p style="${BASK};font-style:italic;font-size:${o.items.join('').length > 210 ? 40 : 46}px;line-height:1.28;color:${B.ink};padding:26px 0;border-top:1px solid ${B.rule}">${esc(v)}</p>`).join('')}</div>
-    <p class="a" style="left:72px;right:72px;top:1030px;${T_REG};font-size:34px;line-height:1.35;color:${B.ink}">Read the answers: comment <span style="${T_MED};color:${B.burg}">${esc(o.key)}</span> and we&rsquo;ll send you the link, or tap the link in bio.</p>`}; },
+    <p class="a" style="left:72px;right:72px;top:1030px;${T_REG};font-size:34px;line-height:1.35;color:${B.ink}">Read the answers: comment <span style="${T_MED};color:${B.ink}">${esc(o.key)}</span> and we&rsquo;ll send you the link, or tap the link in bio.</p>`}; },
   // Optional: one artwork given the whole slide, with its credit. Only shown when there are artworks to spare.
   plate(o){ return {bg:B.ground, html:`${ivCorners(o)}${ivArt(o.img, 'left:72px;right:72px;top:130px;height:960px', o.slot)}
     <p class="a" style="left:72px;right:72px;top:1130px;${T_REG};font-size:26px;line-height:1.35;color:${B.ink}">${ivCredit(o.name, o.cap)}</p>`}; },
   // End card: the one Burgundy moment of the carousel, so the feed remembers who made it.
   end(o){ return {bg:B.burg, html:`${ivMono('peony', 'right:72px;bottom:60px;width:170px;height:96px')}${o.mark ? `<div class="a" data-mark style="left:470px;width:140px;top:300px;height:140px;background:url(${ATH_MARK}) center/contain no-repeat"></div>` : ''}
-    <p class="a c cn" style="left:0;right:0;top:${o.mark ? 470 : 380}px;font-size:19px;color:#FAD2E1">Arts to Hearts Project</p>
     <p class="a c" style="left:110px;right:110px;top:${o.mark ? 540 : 450}px;${BASK};font-size:44px;line-height:1.3;color:#F9EEE5">${esc(o.line)}</p>
     ${o.invite ? `<div class="a" style="left:300px;right:300px;top:860px;border-top:1px solid rgba(250,210,225,.35)"></div><p class="a c" style="left:120px;right:120px;top:900px;${T_REG};font-size:32px;line-height:1.4;color:#FAD2E1">${esc(o.invite)}</p>` : ''}
     <p class="a" style="left:72px;bottom:96px;${T_REG};font-size:28px;color:#FAD2E1">artstoheartsproject.com</p>`}; },
   // Quote cards are singles posted in later weeks: Burgundy ground so the feed remembers who they are from.
-  quoteCard(o){ return {bg:B.burg, html:`<p class="a cn" style="left:72px;top:58px;font-size:19px;color:#FAD2E1">Arts to Hearts Project</p>${ivMono('peony', 'right:66px;top:40px;width:112px;height:63px')}
+  quoteCard(o){ return {bg:B.burg, html:`${ivMono('peony', 'right:66px;top:40px;width:112px;height:63px')}
     <p class="a" style="left:72px;right:72px;top:250px;${BASK};font-size:${o.text.length > 140 ? 58 : o.text.length > 90 ? 66 : 76}px;line-height:1.2;color:#F9EEE5">&ldquo;${esc(o.text)}&rdquo;</p>
     <p class="a" style="left:72px;bottom:60px;${T_MED};font-size:30px;color:#FAD2E1"><span style="${T_REG}">From our interview with </span>${esc(o.name)}${o.handle ? ` <span style="${T_REG}">${esc(o.handle)}</span>` : ''}</p>`}; },
-  story(o){ const dark = o.dark || o.full, bg = o.full ? B.ink : o.dark ? B.burg : B.ground, fg = dark ? '#F9EEE5' : B.ink, acc = o.full ? '#FFFFFF' : o.dark ? '#FAD2E1' : B.burg;
+  story(o){ const dark = o.dark || o.full, bg = o.full ? B.ink : o.dark ? B.burg : B.ground, fg = dark ? '#F9EEE5' : B.ink, acc = o.full ? '#FFFFFF' : o.dark ? '#FAD2E1' : B.ink;
     const art = o.img && !o.full; const top = art ? 1130 : o.full ? 1060 : 380;
     return {h:1920, bg, html:`${o.full ? `${ivArt(o.img, 'inset:0', o.slot, 'cover')}<div class="a" style="inset:0;background:rgba(20,9,12,.32)"></div>` : ''}
-    <p class="a cn" style="left:72px;top:262px;font-size:20px;color:${dark ? '#FAD2E1' : B.ink}">Arts to Hearts Project</p>${ivMono(o.full ? 'white' : dark ? 'peony' : 'burgundy', 'right:66px;top:244px;width:112px;height:63px')}
+    ${ivMono(o.full ? 'white' : dark ? 'peony' : 'burgundy', 'right:66px;top:244px;width:112px;height:63px')}
     ${art ? ivArt(o.img, 'left:72px;right:72px;top:340px;height:740px', o.slot) : ''}
     <p class="a" style="left:72px;right:72px;top:${top}px;${T_MED};font-size:28px;letter-spacing:.12em;text-transform:uppercase;line-height:1.4;color:${acc}">${esc(o.label)}</p>
     <p class="a" style="left:72px;right:72px;top:${top + 60}px;${o.serif ? BASK + `;font-size:${o.size || 64}px;line-height:1.22` : T_MED + `;font-size:${o.size || 96}px;line-height:.96;letter-spacing:-.035em`};color:${fg}">${o.text}</p>
