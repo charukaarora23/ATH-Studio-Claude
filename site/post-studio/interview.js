@@ -57,48 +57,49 @@ DCAT.interview = {name:'Artist interview', marker:'//INTERVIEW', key:'INTERVIEW'
 DCAT.interview.fields = DCAT.interview.groups.flatMap(g => g[1]);
 
 // ---------- Arts to Hearts social look (design/guidelines: social and graphics) ----------
-// Night ground, Rose headlines, Peony text, one accent (Sky) for indexes and the arrow badge.
+// White surface for the whole carousel so the artwork leads. Ink for reading, Burgundy only for the signature:
+// the cover headline, the badge, one label, the logo. No pink on the carousel.
 // Inter Tight for headlines and corners, Libre Baskerville for paragraphs and quotes. Four fixed corners. Artworks never cropped.
-const B = {night:'#52051A', rose:'#FFA1C2', peony:'#FAD2E1', sky:'#B7D9FF', white:'#FFFFFF'};
+const B = {ground:'#FFFFFF', ink:'#1C1310', burg:'#6A0620', soft:'rgba(28,19,16,.6)', rule:'rgba(28,19,16,.14)'};
 const T_MED = "font-family:'ATH Tight',sans-serif;font-weight:500";
 const T_REG = "font-family:'ATH Tight',sans-serif;font-weight:400";
 const BASK = "font-family:'ATH Bask',serif;font-weight:400";
 const pad2 = n => String(n).padStart(2, '0');
-const ivArt = (src, style, slot, fit) => src ? `<div class="a img" data-slot="${slot}" style="${style};background-image:url(${src});background-position:center;${fit === 'cover' ? '' : 'background-size:contain;background-repeat:no-repeat'}"></div>` : `<div class="a ph" data-slot="${slot}" style="${style};color:${B.peony}">Add the image in the sidebar</div>`;
-const ivCorners = (o, fg = B.peony, acc = B.sky) => `<p class="a" style="left:72px;top:52px;${T_MED};font-size:26px;letter-spacing:-.01em;color:${fg}">The Interview</p>
-  <p class="a" style="right:72px;top:52px;${T_MED};font-size:26px;color:${acc}">${pad2(o.n)} / ${pad2(o.t)}</p>
+const ivArt = (src, style, slot, fit) => src ? `<div class="a img" data-slot="${slot}" style="${style};background-image:url(${src});background-position:center;${fit === 'cover' ? '' : 'background-size:contain;background-repeat:no-repeat'}"></div>` : `<div class="a ph" data-slot="${slot}" style="${style};color:${B.ink}">Add the image in the sidebar</div>`;
+const ivCorners = (o, fg = B.ink, acc = B.burg) => `<p class="a" style="left:72px;top:52px;${T_MED};font-size:26px;letter-spacing:-.01em;color:${fg}">The Interview</p>
+  <p class="a" style="right:72px;top:52px;${T_MED};font-size:26px;color:${fg}">${pad2(o.n)} / ${pad2(o.t)}</p>
   <p class="a" style="left:72px;bottom:58px;${T_REG};font-size:26px;color:${fg}">@artstoheartsproject</p>
-  ${o.last ? '' : `<div class="a" style="right:72px;bottom:44px;width:60px;height:60px;border-radius:50%;background:${acc};display:flex;align-items:center;justify-content:center;${T_MED};font-size:30px;color:${B.night}">&rarr;</div>`}`;
+  ${o.last ? '' : `<div class="a" style="right:72px;bottom:44px;width:60px;height:60px;border-radius:50%;background:${acc};display:flex;align-items:center;justify-content:center;${T_MED};font-size:30px;color:#FFFFFF">&rarr;</div>`}`;
 const ivCredit = (name, c) => { const [t, y, sz, m] = (c || []).map(x => String(x || '').trim()); return t ? `${esc(name)}, <i style="${BASK};font-style:italic">${esc(t)}</i>${y ? ', ' + esc(y) : ''}${[m, sz].filter(Boolean).length ? ' · ' + [m, sz].filter(Boolean).map(x => esc(x.toLowerCase())).join(' · ') : ''}` : ''; };
 const IV = {
-  cover(o){ const h = o.head; return {bg:B.night, html:`${ivCorners(o)}${ivArt(o.img, 'left:72px;right:72px;top:130px;height:640px', o.slot)}
-    <p class="a" style="left:72px;right:72px;top:812px;${T_MED};font-size:${h.length > 56 ? 76 : h.length > 40 ? 88 : 100}px;line-height:.96;letter-spacing:-.035em;color:${B.rose}">${esc(h)}</p>
-    <p class="a" style="left:72px;right:72px;bottom:140px;${T_REG};font-size:32px;line-height:1.3;color:${B.peony}">An interview with ${esc(o.name)}${o.meta ? ' · ' + esc(o.meta) : ''}</p>`}; },
-  standfirst(o){ const t = String(o.text || ''); return {bg:B.night, html:`${ivCorners(o)}${ivArt(o.img, 'left:72px;right:72px;top:130px;height:560px', o.slot, 'cover')}
-    <p class="a" style="left:72px;right:72px;top:742px;${BASK};font-size:${t.length > 210 ? 40 : 44}px;line-height:1.32;color:${B.peony}">${esc(t)}</p>`}; },
+  cover(o){ const h = o.head; return {bg:B.ground, html:`${ivCorners(o)}${ivArt(o.img, 'left:72px;right:72px;top:130px;height:640px', o.slot)}
+    <p class="a" style="left:72px;right:72px;top:812px;${T_MED};font-size:${h.length > 56 ? 76 : h.length > 40 ? 88 : 100}px;line-height:.96;letter-spacing:-.035em;color:${B.burg}">${esc(h)}</p>
+    <p class="a" style="left:72px;right:72px;bottom:140px;${T_REG};font-size:32px;line-height:1.3;color:${B.ink}">An interview with ${esc(o.name)}${o.meta ? ' · ' + esc(o.meta) : ''}</p>`}; },
+  standfirst(o){ const t = String(o.text || ''); return {bg:B.ground, html:`${ivCorners(o)}${ivArt(o.img, 'left:72px;right:72px;top:130px;height:560px', o.slot, 'cover')}
+    <p class="a" style="left:72px;right:72px;top:742px;${BASK};font-size:${t.length > 210 ? 40 : 44}px;line-height:1.32;color:${B.ink}">${esc(t)}</p>`}; },
   work(o){ const q = o.line || ''; const top = o.flip;
-    return {bg:B.night, html:`${ivCorners(o)}${q ? `<p class="a" style="left:72px;right:72px;${top ? 'top:130px' : 'top:812px'};${BASK};font-size:${q.length > 120 ? 40 : 46}px;line-height:1.22;color:${B.rose}">&ldquo;${esc(q)}&rdquo;</p>` : ''}
+    return {bg:B.ground, html:`${ivCorners(o)}${q ? `<p class="a" style="left:72px;right:72px;${top ? 'top:130px' : 'top:812px'};${BASK};font-size:${q.length > 120 ? 40 : 46}px;line-height:1.22;color:${B.ink}">&ldquo;${esc(q)}&rdquo;</p>` : ''}
     ${ivArt(o.img, `left:72px;right:72px;top:${top && q ? 400 : 130}px;height:${q ? 640 : 960}px`, o.slot)}
-    <p class="a" style="left:72px;right:72px;${top || !q ? 'top:1120px' : 'top:1150px'};${T_REG};font-size:24px;line-height:1.35;color:${B.peony}">${ivCredit(o.name, o.cap)}</p>`}; },
-  tease(o){ return {bg:B.night, html:`${ivCorners(o)}
-    <p class="a" style="left:72px;right:72px;top:170px;${T_MED};font-size:26px;letter-spacing:.12em;text-transform:uppercase;line-height:1.4;color:${B.sky}">${esc(o.kick)}</p>
-    <p class="a" style="left:72px;right:72px;top:${o.kick.length > 40 ? 270 : 230}px;${BASK};font-size:${o.text.length > 210 ? 52 : 58}px;line-height:1.24;color:${B.rose}">&ldquo;${esc(o.text)}&rdquo;</p>
-    <p class="a" style="left:72px;right:72px;top:1110px;${T_MED};font-size:36px;letter-spacing:-.02em;color:${B.peony}">Continued in the interview &rarr;</p>`}; },
-  list(o){ return {bg:B.night, html:`${ivCorners(o)}
-    <p class="a" style="left:72px;right:72px;top:150px;${T_MED};font-size:64px;line-height:1;letter-spacing:-.03em;color:${B.rose}">In the full interview</p>
-    <div class="a" style="left:72px;right:72px;top:290px">${o.items.slice(0, 3).map((v, i) => `<div style="display:flex;gap:28px;padding:34px 0;border-top:1px solid rgba(250,210,225,.3)"><span style="${T_MED};font-size:26px;color:${B.sky};padding-top:10px;min-width:40px">${pad2(i + 1)}</span><span style="${T_MED};font-size:46px;line-height:1.08;letter-spacing:-.02em;color:${B.rose}">${esc(v)}</span></div>`).join('')}</div>
-    <p class="a" style="left:72px;right:72px;top:1080px;${T_REG};font-size:34px;line-height:1.35;color:${B.peony}">Comment <span style="${T_MED};color:${B.rose}">${esc(o.key)}</span> and we&rsquo;ll send you the link, or tap the link in bio.</p>`}; },
-  end(o){ return {bg:B.night, html:`<div class="a" style="left:240px;right:240px;top:470px;height:190px;background:url(brand/logo-rose.svg) center/contain no-repeat"></div>
-    <p class="a c" style="left:120px;right:120px;top:730px;${BASK};font-size:40px;line-height:1.3;color:${B.rose}">${esc(o.line)}</p>
-    <p class="a c" style="left:0;right:0;bottom:120px;${T_REG};font-size:30px;color:${B.peony}">artstoheartsproject.com</p>`}; },
-  quoteCard(o){ return {bg:B.rose, html:`<p class="a" style="left:72px;top:52px;${T_MED};font-size:26px;color:${B.night}">From the interview</p><p class="a" style="right:72px;top:52px;${T_REG};font-size:26px;color:${B.night}">@artstoheartsproject</p>
-    <p class="a" style="left:72px;right:72px;top:250px;${BASK};font-size:${o.text.length > 140 ? 58 : o.text.length > 90 ? 66 : 76}px;line-height:1.2;color:${B.night}">&ldquo;${esc(o.text)}&rdquo;</p>
-    <p class="a" style="left:72px;bottom:58px;${T_MED};font-size:30px;color:${B.night}">${esc(o.name)}${o.handle ? ` <span style="${T_REG}">${esc(o.handle)}</span>` : ''}</p>`}; },
-  story(o){ return {h:1920, bg:B.night, html:`${o.img ? ivArt(o.img, 'left:72px;right:72px;top:250px;height:820px', o.slot) : ''}
-    <p class="a" style="left:72px;right:72px;top:${o.img ? 1120 : 300}px;${T_MED};font-size:28px;letter-spacing:.12em;text-transform:uppercase;line-height:1.4;color:${B.sky}">${esc(o.label)}</p>
-    <p class="a" style="left:72px;right:72px;top:${o.img ? 1180 : 370}px;${o.serif ? BASK + `;font-size:${o.size || 64}px;line-height:1.22` : T_MED + `;font-size:${o.size || 96}px;line-height:.96;letter-spacing:-.035em`};color:${B.rose}">${o.text}</p>
-    ${o.sub ? `<p class="a" style="left:72px;right:72px;top:${o.subTop}px;${T_REG};font-size:36px;line-height:1.35;color:${B.peony}">${o.sub}</p>` : ''}
-    ${o.zone ? `<div class="a" style="left:150px;right:150px;top:1440px;height:120px;border:2px dashed ${B.peony};border-radius:24px;opacity:.55;display:flex;align-items:center;justify-content:center;${T_MED};font-size:24px;color:${B.peony}">${o.zone}</div>` : ''}`}; },
+    <p class="a" style="left:72px;right:72px;${top || !q ? 'top:1120px' : 'top:1150px'};${T_REG};font-size:24px;line-height:1.35;color:${B.soft}">${ivCredit(o.name, o.cap)}</p>`}; },
+  tease(o){ return {bg:B.ground, html:`${ivCorners(o)}
+    <p class="a" style="left:72px;right:72px;top:170px;${T_MED};font-size:26px;letter-spacing:.12em;text-transform:uppercase;line-height:1.4;color:${B.burg}">${esc(o.kick)}</p>
+    <p class="a" style="left:72px;right:72px;top:${o.kick.length > 40 ? 270 : 230}px;${BASK};font-size:${o.text.length > 210 ? 52 : 58}px;line-height:1.24;color:${B.ink}">&ldquo;${esc(o.text)}&rdquo;</p>
+    <p class="a" style="left:72px;right:72px;top:1110px;${T_MED};font-size:36px;letter-spacing:-.02em;color:${B.burg}">Continued in the interview &rarr;</p>`}; },
+  list(o){ return {bg:B.ground, html:`${ivCorners(o)}
+    <p class="a" style="left:72px;right:72px;top:150px;${T_MED};font-size:64px;line-height:1;letter-spacing:-.03em;color:${B.ink}">In the full interview</p>
+    <div class="a" style="left:72px;right:72px;top:290px">${o.items.slice(0, 3).map((v, i) => `<div style="display:flex;gap:28px;padding:34px 0;border-top:1px solid ${B.rule}"><span style="${T_MED};font-size:26px;color:${B.burg};padding-top:10px;min-width:40px">${pad2(i + 1)}</span><span style="${T_MED};font-size:46px;line-height:1.08;letter-spacing:-.02em;color:${B.ink}">${esc(v)}</span></div>`).join('')}</div>
+    <p class="a" style="left:72px;right:72px;top:1080px;${T_REG};font-size:34px;line-height:1.35;color:${B.ink}">Comment <span style="${T_MED};color:${B.burg}">${esc(o.key)}</span> and we&rsquo;ll send you the link, or tap the link in bio.</p>`}; },
+  end(o){ return {bg:B.ground, html:`<div class="a" style="left:240px;right:240px;top:470px;height:190px;background:url(brand/logo-burgundy.svg) center/contain no-repeat"></div>
+    <p class="a c" style="left:120px;right:120px;top:730px;${BASK};font-size:40px;line-height:1.3;color:${B.ink}">${esc(o.line)}</p>
+    <p class="a c" style="left:0;right:0;bottom:120px;${T_REG};font-size:30px;color:${B.soft}">artstoheartsproject.com</p>`}; },
+  quoteCard(o){ return {bg:B.ground, html:`<p class="a" style="left:72px;top:52px;${T_MED};font-size:26px;color:${B.burg}">From the interview</p><p class="a" style="right:72px;top:52px;${T_REG};font-size:26px;color:${B.ink}">@artstoheartsproject</p>
+    <p class="a" style="left:72px;right:72px;top:250px;${BASK};font-size:${o.text.length > 140 ? 58 : o.text.length > 90 ? 66 : 76}px;line-height:1.2;color:${B.ink}">&ldquo;${esc(o.text)}&rdquo;</p>
+    <p class="a" style="left:72px;bottom:58px;${T_MED};font-size:30px;color:${B.ink}">${esc(o.name)}${o.handle ? ` <span style="${T_REG}">${esc(o.handle)}</span>` : ''}</p>`}; },
+  story(o){ return {h:1920, bg:B.ground, html:`${o.img ? ivArt(o.img, 'left:72px;right:72px;top:250px;height:820px', o.slot) : ''}
+    <p class="a" style="left:72px;right:72px;top:${o.img ? 1120 : 300}px;${T_MED};font-size:28px;letter-spacing:.12em;text-transform:uppercase;line-height:1.4;color:${B.burg}">${esc(o.label)}</p>
+    <p class="a" style="left:72px;right:72px;top:${o.img ? 1180 : 370}px;${o.serif ? BASK + `;font-size:${o.size || 64}px;line-height:1.22` : T_MED + `;font-size:${o.size || 96}px;line-height:.96;letter-spacing:-.035em`};color:${B.ink}">${o.text}</p>
+    ${o.sub ? `<p class="a" style="left:72px;right:72px;top:${o.subTop}px;${T_REG};font-size:36px;line-height:1.35;color:${B.ink}">${o.sub}</p>` : ''}
+    ${o.zone ? `<div class="a" style="left:150px;right:150px;top:1470px;height:100px;border:2px dashed ${B.soft};border-radius:24px;opacity:.55;display:flex;align-items:center;justify-content:center;${T_MED};font-size:24px;color:${B.soft}">${o.zone}</div>` : ''}`}; },
 };
 
 // ---------- copy helpers: work from the article when no one has written the copy ----------
@@ -166,15 +167,15 @@ DPACK.interview = p => {
   const capQuote = `"${quotes[0] || ''}"\n\n${name} ${handle}, from our interview. Comment ${key} and we'll send you the full conversation.\n\n${tags}`;
   const t2 = teases[1] || teases[0];
   const ST = [
-    IV.story({...at(0), label: 'New interview', text: esc(head.replace(/^“|”$/g, '')), size: head.length > 50 ? 76 : 92, sub: `An interview with ${esc(name)}`, subTop: 1400, zone: 'Link sticker: the interview'}),
+    IV.story({...at(0), label: 'New interview', text: esc(head.replace(/^“|”$/g, '')), size: head.length > 50 ? 76 : 92, sub: `An interview with ${esc(name)}`, subTop: 1385, zone: 'Link sticker: the interview'}),
     IV.story({label: t2 ? t2.kick : 'From the interview', text: `&ldquo;${esc(t2 ? t2.text : head)}&rdquo;`, serif: true, size: 62, zone: 'Link sticker: read the rest'}),
     IV.story({...at(3), label: 'In their words', text: `&ldquo;${esc(quotes[2] || quotes[0] || '')}&rdquo;`, serif: true, size: 50, zone: 'Question sticker: what do you see?'}),
   ];
   const KIT = [IV.story({...at(0), label: 'Featured in Arts to Hearts Project', text: esc(name), size: 110, sub: 'Read the interview at artstoheartsproject.com', subTop: 1310, zone: 'Mention @artstoheartsproject'})];
   const dm = `Hi ${name.split(' ')[0]}, your interview is live on Arts to Hearts Project and on our Instagram today. We made this story frame for you: share it and tag @artstoheartsproject and we'll reshare it to our community. Thank you for the conversation.`;
   return [
-    {title: `${p.date} · Interview carousel`, meta: `7 slides · Night and Rose · keyword ${key}`, slides: S.map((s, j) => ({...s, title: 'interview-' + (j + 1)})), cap: capMain, pin: `Comment ${key} and we'll send you the full interview.`},
-    ...(QC.length ? [{title: `${p.date} · Interview quote cards`, meta: `${QC.length} singles · Night on Rose · post one in a later week to bring people back`, slides: QC.map((s, j) => ({...s, title: 'quote-card-' + (j + 1), label: 'Quote card ' + (j + 1)})), cap: capQuote, pin: ''}] : []),
+    {title: `${p.date} · Interview carousel`, meta: `7 slides · White surface, Burgundy signature · keyword ${key}`, slides: S.map((s, j) => ({...s, title: 'interview-' + (j + 1)})), cap: capMain, pin: `Comment ${key} and we'll send you the full interview.`},
+    ...(QC.length ? [{title: `${p.date} · Interview quote cards`, meta: `${QC.length} singles · post one in a later week to bring people back`, slides: QC.map((s, j) => ({...s, title: 'quote-card-' + (j + 1), label: 'Quote card ' + (j + 1)})), cap: capQuote, pin: ''}] : []),
     {title: `${p.date} · Interview stories`, meta: '3 frames · same day as the carousel · add the stickers in Instagram', slides: ST.map((s, j) => ({...s, title: 'interview-story-' + (j + 1)})), story: true},
     {title: `${p.date} · Artist share kit`, meta: 'Send this frame to the artist so they reshare it: their audience reaches us', slides: KIT.map((s, j) => ({...s, title: 'artist-share-' + (j + 1), label: 'For the artist'})), story: true, cap: dm, pin: ''},
   ];
