@@ -67,7 +67,7 @@ summary{font:600 12px/1 var(--mono);letter-spacing:.1em;text-transform:uppercase
 .frame.pointing{cursor:pointer}.post .slot-on{outline:14px solid #2f7cf6!important;outline-offset:-14px;filter:brightness(1.06)}.frame{position:relative}.frame.grab{cursor:grab}body.dragging-img,body.dragging-img *{cursor:grabbing!important}.imgbar{position:absolute;top:8px;left:50%;transform:translateX(-50%);z-index:22;display:none;gap:2px;background:rgba(20,9,12,.88)!important;border-radius:999px;padding:3px;box-shadow:0 2px 10px rgba(0,0,0,.35)}.imgbar.on{display:flex}.imgbar button{border:0;background:none;color:#fff;font:600 12px/1 var(--sans,sans-serif);padding:6px 9px;border-radius:999px;cursor:pointer}.imgbar button:hover{background:rgba(255,255,255,.18)}.frame.texting{cursor:text}.post .tx-on{outline:6px dashed #2f7cf6;outline-offset:6px;border-radius:4px}.txed{position:absolute;z-index:50;width:340px;background:var(--panel,#fff);border:1px solid var(--line);border-radius:12px;box-shadow:0 12px 32px rgba(0,0,0,.18);padding:12px}.txed label{display:block;font-size:12px;color:var(--muted);margin-bottom:6px}.txed textarea{width:100%;box-sizing:border-box;font:15px/1.4 var(--sans,sans-serif);padding:8px;border:1px solid var(--line);border-radius:8px;resize:vertical}.txb{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap}.txb .btn{padding:7px 12px;font-size:13px}.frame.pointing::after{content:attr(data-hint);position:absolute;left:50%;bottom:12px;transform:translateX(-50%);background:#2f7cf6;color:#fff;font:600 12px/1.2 var(--sans,sans-serif);padding:7px 12px;border-radius:999px;white-space:nowrap;z-index:20;pointer-events:none;box-shadow:0 2px 8px rgba(0,0,0,.25)}
 .sp-rules p{margin:0}.sp-rules{display:grid;gap:10px;margin:10px 0 18px;font-size:14px;line-height:1.5;max-width:900px}.sp-wrap{overflow-x:auto}.sp-t{border-collapse:collapse;font-size:13px;min-width:720px;width:100%}.sp-t th,.sp-t td{border:1px solid var(--line);padding:8px 10px;vertical-align:top;text-align:left}.sp-t thead th{position:sticky;top:0;background:var(--panel,#fff)}.sp-t tbody th{white-space:nowrap;font-weight:600}.sp-hot{background:#fbe3e3}.sp-off{color:var(--muted);text-align:center!important}.sp-n{text-align:center!important;font-weight:600}.sp-dot{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:6px}.sp-lib p{margin:4px 0;font-size:13px}
 .tabs{display:flex;gap:4px;flex-wrap:wrap;margin:0 0 14px;border-bottom:1px solid var(--line)}.tabs button{border:0;background:none;font:600 14px var(--sans,sans-serif);color:var(--muted);padding:10px 14px;border-bottom:3px solid transparent;margin-bottom:-1px;cursor:pointer}.tabs button[aria-current=page]{color:var(--ink);border-bottom-color:var(--ink)}.tabs button:hover{color:var(--ink)}
-.ghead{display:flex;align-items:baseline;gap:12px;justify-content:space-between}.hidebtn{border:0;background:none;color:var(--muted);font-size:12px;text-decoration:underline;cursor:pointer;padding:0}.hidebtn:hover{color:var(--ink)}.hiddenpost{opacity:.65}.hiddenpost h2{text-decoration:line-through}.hiddencell .frame>.post{opacity:.25}.hidmask{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font:700 14px var(--sans,sans-serif);color:var(--ink);background:repeating-linear-gradient(45deg,transparent 0 10px,rgba(0,0,0,.04) 10px 20px);letter-spacing:.08em;text-transform:uppercase}.post [data-removed]{outline:2px dashed rgba(47,124,246,.0)}
+.ghr{display:flex;align-items:center;gap:14px}.vers{display:inline-flex;align-items:center;gap:3px;font-size:12px;color:var(--muted)}.vers button{border:1px solid var(--line);background:var(--panel,#fff);border-radius:6px;font:600 12px var(--sans,sans-serif);padding:3px 8px;cursor:pointer;color:var(--ink)}.vers button[aria-pressed=true]{background:var(--ink);color:var(--panel,#fff);border-color:var(--ink)}.ghead{display:flex;align-items:baseline;gap:12px;justify-content:space-between}.hidebtn{border:0;background:none;color:var(--muted);font-size:12px;text-decoration:underline;cursor:pointer;padding:0}.hidebtn:hover{color:var(--ink)}.hiddenpost{opacity:.65}.hiddenpost h2{text-decoration:line-through}.hiddencell .frame>.post{opacity:.25}.hidmask{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font:700 14px var(--sans,sans-serif);color:var(--ink);background:repeating-linear-gradient(45deg,transparent 0 10px,rgba(0,0,0,.04) 10px 20px);letter-spacing:.08em;text-transform:uppercase}.post [data-removed]{outline:2px dashed rgba(47,124,246,.0)}
 .acts{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}.hint{font-size:13px;color:var(--muted);margin:0 0 10px;line-height:1.45}
 .capbox{max-width:720px;margin-top:10px;border-top:1px solid var(--line)}
 .cell .act{display:flex;justify-content:space-between;align-items:center;font-size:12px;color:var(--muted);width:var(--pw)}
@@ -585,7 +585,7 @@ function launch(){
   // 5 the book
   S.push({bg:CREAM, html:`${corners(INK, BURG, 'The book')}
     ${photo('imgSpread', 'An open spread of a past edition', 'left:80px;right:80px;top:150px;height:640px', INK)}
-    <p class="a R" style="left:80px;right:80px;top:850px;font-size:76px;color:${INK}">A juried hardcover edition.</p>
+    <p class="a R" style="left:80px;right:80px;top:850px;font-size:76px;color:${INK}">${pick('A juried hardcover edition.', 'A real book, juried and printed.', 'Hardcover. Juried. Yours.')}</p>
     <p class="a sub" style="left:80px;right:140px;top:960px;color:${INK}">${esc(state.bookText)}</p>`});
 
   // 6 what selected artists receive: the stack
@@ -595,13 +595,13 @@ function launch(){
   const stack = bl.map(([t,d],i) => { const [bg,fg] = fills[i]; const w = widths[i];
     return `<div style="width:${w}px;height:106px;margin-left:${(952-w)/2+offs[i]}px;background:${bg};color:${fg};border-radius:6px;display:flex;align-items:center;justify-content:space-between;padding:0 38px;box-shadow:inset 0 -5px 0 rgba(0,0,0,.14)"><span style="font-size:38px;font-weight:600;letter-spacing:-.025em">${esc(t)}</span><span style="font-size:24px;font-weight:500;text-align:right">${esc(d||'')}</span></div>`; }).reverse().join('');
   S.push({bg:INK, html:`${corners(WHITE, PEONY, 'If selected')}
-    <p class="a R c" style="left:80px;right:80px;top:170px;font-size:84px;color:${WHITE}">What selected artists receive</p>
+    <p class="a R c" style="left:80px;right:80px;top:170px;font-size:84px;color:${WHITE}">${pick('What selected artists receive', 'What you get if selected', 'If you are selected')}</p>
     <div class="a" style="left:64px;right:64px;bottom:274px;display:flex;flex-direction:column;gap:10px">${stack}</div>
     <div class="a" style="left:64px;right:64px;top:1076px;border-top:6px solid ${CREAM}"></div>`});
 
   // 7 recognition
   S.push({bg:CREAM, html:`${corners(INK, BURG, 'Recognition')}
-    <p class="a R c" style="left:80px;right:80px;top:180px;font-size:80px;color:${INK}">Three artists receive more.</p>
+    <p class="a R c" style="left:80px;right:80px;top:180px;font-size:80px;color:${INK}">${pick('Three artists receive more.', 'Three artists go further.', 'And three artists get more.')}</p>
     <p class="a lab c" style="left:0;right:0;top:360px;color:${C}">Winner</p>
     <p class="a c" style="left:0;right:0;top:410px;font-size:300px;font-weight:400;letter-spacing:-.07em;line-height:.85;color:${C}">${gap(state.prize,'Award')}</p>
     <p class="a c sub" style="left:150px;right:150px;top:700px;color:${INK}">plus ${esc(state.prizeExtra)}.</p>
@@ -625,7 +625,7 @@ function launch(){
 
   // 9 who can apply
   S.push({bg:CREAM, html:`${corners(INK, BURG, 'Who can apply')}
-    <p class="a R c" style="left:80px;right:80px;top:330px;font-size:100px;color:${INK}">Your work deserves the <span style="display:inline-block;background:${INK};color:${WHITE};border-radius:999px;padding:0 .3em .07em;line-height:1">spotlight.</span></p>
+    <p class="a R c" style="left:80px;right:80px;top:330px;font-size:100px;color:${INK}">${pick('Your work deserves the ', 'It is time for your ', 'Step into the ')}<span style="display:inline-block;background:${INK};color:${WHITE};border-radius:999px;padding:0 .3em .07em;line-height:1">spotlight.</span></p>
     <p class="a c sub" style="left:150px;right:150px;top:720px;font-size:40px;color:${INK}">${esc(state.levels || '')}</p>
     <p class="a c sub" style="left:170px;right:170px;top:830px;opacity:.65;font-size:30px;color:${INK}">${esc(state.elig)}</p>`});
 
@@ -637,7 +637,7 @@ function launch(){
       <p style="font-size:20px;opacity:.7;line-height:1.3;margin-top:6px">${gap(e, 'Edition · Country')}</p></div>`; };
   S.push({bg:INK, html:`${corners(WHITE, PEONY, 'From past editions')}
     <p class="a R c" style="left:80px;right:80px;top:150px;font-size:80px;color:${WHITE}">Published artists</p>
-    <p class="a c sub" style="left:120px;right:120px;top:256px;font-size:28px;opacity:.75;color:${WHITE}">A few of the artists in our books.</p>
+    <p class="a c sub" style="left:120px;right:120px;top:256px;font-size:28px;opacity:.75;color:${WHITE}">${pick('A few of the artists in our books.', 'Artists from our past editions.', 'Real artists. Real pages.')}</p>
     <div class="a" style="left:64px;right:64px;top:340px;display:grid;grid-template-columns:repeat(3,1fr);column-gap:28px;row-gap:34px;color:${WHITE}">${[0,1,2,3,4,5].map(card).join('')}</div>`});
 
   // 11 past cover artists
@@ -649,13 +649,13 @@ function launch(){
       <p style="font-family:'ATH Serif',serif;font-style:italic;font-size:24px;line-height:1.3;opacity:.75;margin-top:8px">${gap(e, 'Book or edition')}</p></div>`; };
   S.push({bg:CREAM, html:`${corners(INK, BURG, 'On the cover')}
     <p class="a R c" style="left:80px;right:80px;top:160px;font-size:80px;color:${INK}">Past cover artists</p>
-    <p class="a c sub" style="left:140px;right:140px;top:266px;font-size:30px;opacity:.7;color:${INK}">Their work became the face of the book.</p>
+    <p class="a c sub" style="left:140px;right:140px;top:266px;font-size:30px;opacity:.7;color:${INK}">${pick('Their work became the face of the book.', 'Their art was chosen for the cover.', 'The artists behind our covers.')}</p>
     <div class="a" style="left:40px;right:40px;top:470px;display:grid;grid-template-columns:repeat(3,1fr);gap:20px;color:${INK}">${[0,1,2].map(cover).join('')}</div>`});
 
   // 11 action
   const mini = [[PEONY,250],[CREAM,280],[BURG,240],[INK,270],[PEONY,230],[CREAM,260]].map(([c,h]) => `<div style="flex:1;height:${h}px;background:${c};border-radius:3px 3px 0 0;box-shadow:inset 0 0 0 2px rgba(255,255,255,.18)"></div>`).join('');
   S.push({bg:(state.style === 'award' ? '#1C130B' : C), html:`${corners(WHITE, PEONY, 'Submissions open')}
-    <p class="a H c" style="left:60px;right:60px;top:180px;font-size:108px;color:${WHITE}">Take your place<br>on the shelf.</p>
+    <p class="a H c" style="left:60px;right:60px;top:180px;font-size:108px;color:${WHITE}">${pick('Take your place<br>on the shelf.', 'Your book<br>is waiting.', 'Be on<br>the shelf.')}</p>
     <div class="a" style="left:250px;right:250px;top:450px;height:300px;display:flex;align-items:flex-end;gap:10px;border-bottom:6px solid ${CREAM};padding:0 14px">${mini}
       <div style="flex:1.5;height:290px;background:${Tn};border-radius:3px 3px 0 0;box-shadow:0 0 0 6px ${rgba(Tn,.3)};position:relative">${spineLab(state.name, INK, 30)}</div></div>
     <div class="a" style="left:110px;right:110px;top:850px;height:124px;border-radius:999px;background:${CREAM};color:${BURG};display:flex;align-items:center;justify-content:space-between;padding:0 20px 0 56px">
@@ -739,8 +739,9 @@ function render(){
     const canvaRow = g.cap !== undefined ? `<div class="canva" data-ckey="${esc(ckey)}">${clink
       ? `<a class="btn" href="${esc(clink)}" target="_blank" rel="noopener">Edit in Canva &rarr;</a><button class="btn ghost" type="button" data-cedit>Change link</button>`
       : `<span class="cmiss">Canva source file: not linked yet</span><button class="btn ghost" type="button" data-cedit>Add Canva link</button>`}</div>` : '';
-    return `<section class="group"><div class="ghead"><h2>${esc(g.title)}</h2><button type="button" class="hidebtn" data-hide="${esc(gk)}">Hide this ${g.story ? 'day' : 'post'}</button></div><p class="meta">${esc(g.meta)}</p><div class="slides">${cells}</div>${canvaRow}${capBox}</section>`; }).join('');
+    return `<section class="group"><div class="ghead"><h2>${esc(g.title)}</h2><span class="ghr">${g.left !== undefined ? `<span class="vers" title="Each call starts on its own wording so the three calls never repeat">Wording ${[0,1,2].map(k => `<button type="button" data-ver="${esc(gid(g))}|${k}" aria-pressed="${postVer(gid(g)) % 3 === k}">${'ABC'[k]}</button>`).join('')}</span>` : ''}<button type="button" class="hidebtn" data-hide="${esc(gk)}">Hide this ${g.story ? 'day' : 'post'}</button></span></div><p class="meta">${esc(g.meta)}</p><div class="slides">${cells}</div>${canvaRow}${capBox}</section>`; }).join('');
   $('out').querySelectorAll('[data-i]').forEach(b => b.onclick = () => saveOne(Number(b.dataset.i)));
+  $('out').querySelectorAll('[data-ver]').forEach(b => b.onclick = () => { const [t, k] = b.dataset.ver.split('|'); state.ver = state.ver || {}; state.ver[t] = +k; render(); status('Wording ' + 'ABC'[+k] + ' for ' + t + '.'); });
   $('out').querySelectorAll('[data-hide]').forEach(b => b.onclick = () => { HID()[b.dataset.hide] = 1; render(); status('Hidden for now. It is left out of Save all as ZIP. Restore it any time.'); });
   $('out').querySelectorAll('[data-txr]').forEach(b => b.onclick = () => { Object.keys(TXT()).forEach(k => { if (k.startsWith(b.dataset.txr) && TXT()[k] === '\u200b') delete TXT()[k]; }); render(); status('Removed text is back.'); });
   $('out').querySelectorAll('[data-unhide]').forEach(b => b.onclick = () => { delete HID()[b.dataset.unhide]; render(); status('Restored.'); });
