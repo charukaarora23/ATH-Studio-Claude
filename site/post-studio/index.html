@@ -72,6 +72,7 @@ summary{font:600 12px/1 var(--mono);letter-spacing:.1em;text-transform:uppercase
 .rmodal{position:fixed;inset:0;z-index:100;background:rgba(20,9,12,.72);display:flex;align-items:center;justify-content:center;padding:16px}.rbox{background:var(--panel,#fff);border-radius:16px;padding:16px;max-width:96vw;box-shadow:0 20px 60px rgba(0,0,0,.4)}.rcv{display:block;height:min(72vh,640px);width:auto;aspect-ratio:9/16;border-radius:10px;background:#000;margin:0 auto}.rbar{display:flex;align-items:center;gap:10px;margin-top:10px}.rprog{flex:1;height:6px;background:var(--line);border-radius:3px;overflow:hidden}.rprog span{display:block;height:100%;width:0;background:var(--ink)}.rtime{font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums}.rbtns{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:10px}.tbox{width:min(560px,96vw)}.tvid{display:block;height:min(52vh,460px);width:auto;aspect-ratio:9/16;object-fit:cover;border-radius:10px;background:#000;margin:0 auto}.tl{position:relative;height:60px;margin-top:12px;border-radius:8px;overflow:hidden;background:#222;cursor:pointer}.strip{position:absolute;inset:0;display:flex}.strip div{flex:1;background:center/cover}.win{position:absolute;top:0;bottom:0;border:3px solid #ffd23f;border-radius:6px;box-shadow:0 0 0 999px rgba(0,0,0,.55);cursor:grab}.grip{position:absolute;right:-3px;top:0;bottom:0;width:14px;background:#ffd23f;cursor:ew-resize}.tinfo{font-size:13px;margin:8px 0 0;font-variant-numeric:tabular-nums}.trimbtn{border:0;background:#2f7cf6!important;color:#fff!important;text-decoration:none!important;border-radius:999px;padding:3px 10px!important;font-weight:600}
 .cal-wrap{display:grid;grid-template-columns:minmax(300px,1fr) minmax(320px,1.1fr);gap:24px;align-items:start}@media(max-width:1100px){.cal-wrap{grid-template-columns:1fr}}.cal-nav{display:flex;align-items:center;gap:8px;margin-bottom:10px}.cal-nav b{flex:1;text-align:center}.cal-nav .btn{padding:6px 10px}.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}.cal-h{font-size:11px;color:var(--muted);text-align:center;padding:4px 0}.cal-c{min-height:68px;border:1px solid var(--line);background:var(--panel,#fff);border-radius:8px;padding:5px;display:flex;flex-direction:column;align-items:flex-start;gap:3px;cursor:pointer;font:inherit;text-align:left}.cal-c.off{border:0;background:none;cursor:default}.cal-c.sel{outline:2px solid var(--ink)}.cal-c.today .cal-n{background:var(--ink);color:var(--panel,#fff);border-radius:999px;padding:0 6px}.cal-c.alldone{background:#e6f4ea}.cal-c.late{background:#fdecec}.cal-n{font-size:12px;font-weight:700}.cal-dots{display:flex;gap:2px;flex-wrap:wrap}.cal-dot{display:inline-flex;min-width:14px;height:14px;border-radius:999px;color:#fff;font-size:9px;font-weight:700;align-items:center;justify-content:center;padding:0 3px;vertical-align:middle;margin-right:4px}.cal-p{font-size:10px;color:var(--muted);margin-top:auto}.cal-dh{margin:0}.cal-g h3{font-size:15px;margin:16px 0 8px;display:flex;align-items:center;gap:4px}.cal-g h3 small{color:var(--muted);font-weight:400;margin-left:6px}.cal-i{display:flex;align-items:center;gap:12px;padding:10px 12px;border:1px solid var(--line);border-radius:10px;margin-bottom:6px;background:var(--panel,#fff)}.cal-i.done{background:#e6f4ea;border-color:#b7dfc3}.cal-i.done .cal-t{opacity:.75}.cal-t{flex:1;font-size:14px;line-height:1.35}.cal-t small{color:var(--muted)}.cal-ck{display:flex;flex-direction:column;align-items:center;font-size:10px;color:var(--muted);gap:2px;min-width:44px}.cal-ck input{width:20px;height:20px}.cal-mode{font-size:12px;padding:3px 10px;border-radius:999px}.cal-mode.shared{background:#e6f4ea;color:#1e6b3a}.cal-mode.local{background:#fff4d6;color:#7a5a00}
 .group.flash{animation:flash 1.6s ease}@keyframes flash{0%{box-shadow:0 0 0 4px #2f7cf6}100%{box-shadow:0 0 0 0 transparent}}
+.dp-wrap{overflow-x:auto}.dp-t{border-collapse:collapse;width:100%;min-width:860px;font-size:12px}.dp-t th,.dp-t td{border:1px solid var(--line);padding:4px;vertical-align:top}.dp-t thead th{background:var(--panel,#fff);font-weight:600}.dp-t thead th.today{background:var(--ink);color:var(--panel,#fff)}.dp-t tbody th{text-align:left;white-space:nowrap;width:110px}.dp-t tbody th small{color:var(--muted);font-weight:400}.dp-c{width:100%;min-height:58px;border:1px dashed var(--line);background:none;border-radius:8px;padding:6px;text-align:left;font:inherit;font-size:11px;cursor:pointer;display:flex;flex-direction:column;gap:2px}.dp-c b{font-size:11px}.dp-c span{color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:120px}.dp-c.has{border:1px solid var(--line);background:var(--panel,#fff)}.dp-c.has.sel{outline:2px solid var(--ink)}.dp-c.done{background:#e6f4ea}.dp-c i{color:#1e6b3a;font-style:normal;font-weight:700}.dp-c.empty{align-items:center;justify-content:center;opacity:.5}.dp-ed{margin-top:16px;border:1px solid var(--line);border-radius:12px;padding:14px;background:var(--panel,#fff)}.dp-edh{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:10px}.dp-edh select,.dp-edh input{font:13px var(--sans,sans-serif);padding:5px 6px;border:1px solid var(--line);border-radius:6px}.dp-fields{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:4px 16px}.linkbtn{border:0;background:none;color:var(--muted);text-decoration:underline;cursor:pointer;font-size:12px}.dp-fw{font-size:13px;line-height:1.5}.dp-fw table{border-collapse:collapse;width:100%;font-size:12px}.dp-fw th,.dp-fw td{border:1px solid var(--line);padding:6px;text-align:left;vertical-align:top}
 .acts{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}.hint{font-size:13px;color:var(--muted);margin:0 0 10px;line-height:1.45}
 .capbox{max-width:720px;margin-top:10px;border-top:1px solid var(--line)}
 .cell .act{display:flex;justify-content:space-between;align-items:center;font-size:12px;color:var(--muted);width:var(--pw)}
@@ -216,6 +217,7 @@ summary{font:600 12px/1 var(--mono);letter-spacing:.1em;text-transform:uppercase
 <main>
   <nav class="tabs" id="tabs" aria-label="Views">
     <button type="button" data-view="calendar">Calendar</button>
+    <button type="button" data-view="daily">Daily posts</button>
     <button type="button" data-view="feed">Feed posts</button>
     <button type="button" data-view="storyplan">Stories plan</button>
     <button type="button" data-view="storydays">Stories by day</button>
@@ -461,7 +463,7 @@ function wireSlots(){
 }
 // ---------- view tabs ----------
 let lastFeed = 'month';
-function viewOf(v){ return ['calendar', 'storyplan', 'storydays', 'stories', 'reels'].includes(v) ? v : 'feed'; }
+function viewOf(v){ return ['calendar', 'daily', 'storyplan', 'storydays', 'stories', 'reels'].includes(v) ? v : 'feed'; }
 function updateTabs(){ const v = viewOf($('ptype').value); if (v === 'feed') lastFeed = $('ptype').value || 'month';
   document.querySelectorAll('#tabs [data-view]').forEach(b => b.setAttribute('aria-current', b.dataset.view === v ? 'page' : 'false'));
   $('ptype').closest('.f').style.display = v === 'feed' ? '' : 'none';
@@ -599,7 +601,9 @@ function callStates(){ return Object.keys(PRESETS).filter(n => !/blank/i.test(n)
   const s = n === $('preset').value ? state : {...DEFAULTS, ...PRESETS[n], ...(d || {})};
   return {preset: n, name: s.name, kw: (s.keyword || '').toUpperCase(), colour: s.colour, dl: new Date(s.deadline + 'T00:00:00'), hidden: s.hidden || {}}; }); }
 function dayItems(date, calls){ const posts = monthPosts(), postDays = new Set(posts.map(p => p.left)), iso = isoD(date), out = [];
-  calls.forEach(c => { const left = Math.round((c.dl - date) / DAYMS); if (left < -1 || left > 30) return;
+  calls.forEach(c => { if (c.preset === 'ATH') { const plan = WEEK_PLAN[date.getDay()] || {};
+      SLOTS.forEach(s => { const post = Object.values(DPOSTS).find(p => p.date === iso && p.slot === s.id); const cat = post ? post.cat : plan[s.id]; if (!cat || cat === 'opencall') return;
+        out.push({c, type: (DCAT[cat] || {}).name || cat, title: post ? (post.f.name || post.f.title || post.f.book || 'Draft') : 'Not created yet', detail: `${s.ist} IST · ${s.pt}`, id: `ath|${iso}|${s.id}`, open: {daily: post ? post.id : `${iso}|${s.id}|${cat}`}}); }); return; } const left = Math.round((c.dl - date) / DAYMS); if (left < -1 || left > 30) return;
     posts.forEach((p, i) => { if (p.left !== left || c.hidden['g|' + p.title]) return;
       out.push({c, type: 'Feed post', title: p.title, detail: p.kind, id: `${c.preset}|${iso}|feed|${p.title}`, open: {preset: c.preset, ptype: String(i)}}); });
     const ids = storyDay(left, postDays);
@@ -617,9 +621,10 @@ async function setPosted(id, val){ let who = ''; try { who = localStorage.getIte
     catch { status('Could not reach the shared list. Your tick is saved in this browser for now.'); STATUS_MODE = 'local'; } }
   if (STATUS_MODE === 'local') { try { localStorage.setItem('athCalStatus', JSON.stringify(STATUS)); } catch {} }
   $('out').innerHTML = calHTML(); wireCal(); }
+const ATHC = {preset: 'ATH', name: '@artstoheartsproject daily', kw: 'daily posts', colour: '#14090C', dl: new Date(2099, 0, 1), hidden: {}};
 function calHTML(){
   const today = new Date(); today.setHours(0, 0, 0, 0); if (!calMonth) calMonth = new Date(today.getFullYear(), today.getMonth(), 1); if (!calDay) calDay = isoD(today);
-  const calls = callStates(); const first = new Date(calMonth); const startDow = (first.getDay() + 6) % 7; const days = new Date(first.getFullYear(), first.getMonth() + 1, 0).getDate();
+  const calls = [ATHC].concat(callStates()); const first = new Date(calMonth); const startDow = (first.getDay() + 6) % 7; const days = new Date(first.getFullYear(), first.getMonth() + 1, 0).getDate();
   const cells = []; for (let i = 0; i < startDow; i++) cells.push('<div class="cal-c off"></div>');
   for (let d = 1; d <= days; d++) { const dt = new Date(first.getFullYear(), first.getMonth(), d); const its = dayItems(dt, calls); const done = its.filter(x => STATUS[x.id]).length; const iso = isoD(dt);
     const dots = calls.map(c => { const n = its.filter(x => x.c.preset === c.preset).length; return n ? `<span class="cal-dot" style="background:${c.colour}" title="${esc(c.name)}: ${n}">${n}</span>` : ''; }).join('');
@@ -628,7 +633,7 @@ function calHTML(){
   const sel = new Date(calDay + 'T00:00:00'); const its = dayItems(sel, calls); const done = its.filter(x => STATUS[x.id]).length;
   const tIts = dayItems(today, calls); const tDone = tIts.filter(x => STATUS[x.id]).length;
   const groups = calls.map(c => { const list = its.filter(x => x.c.preset === c.preset); if (!list.length) return '';
-    return `<div class="cal-g"><h3><span class="cal-dot" style="background:${c.colour}"></span>${esc(c.name)} <small>“${esc(c.kw)}” · closes ${c.dl.getDate()} ${MONTHS[c.dl.getMonth()]}</small></h3>${list.map(x => { const st = STATUS[x.id];
+    return `<div class="cal-g"><h3><span class="cal-dot" style="background:${c.colour}"></span>${esc(c.name)} <small>${c.preset === 'ATH' ? 'daily posts' : `“${esc(c.kw)}” · closes ${c.dl.getDate()} ${MONTHS[c.dl.getMonth()]}`}</small></h3>${list.map(x => { const st = STATUS[x.id];
       return `<div class="cal-i${st ? ' done' : ''}"><label class="cal-ck"><input type="checkbox" data-post="${esc(x.id)}" ${st ? 'checked' : ''}><span>${st ? 'Posted' : 'To post'}</span></label>
         <div class="cal-t"><b>${esc(x.type)}</b> · ${esc(x.title)}<br><small>${esc(x.detail)}${st ? ` · posted${st.by ? ' by ' + esc(st.by) : ''} ${new Date(st.at).toLocaleString([], {day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit'})}` : ''}</small></div>
         <button type="button" class="btn ghost" data-open='${esc(JSON.stringify(x.open))}'>Open</button></div>`; }).join('')}</div>`; }).join('');
@@ -644,10 +649,65 @@ function wireCal(){
   $('out').querySelectorAll('[data-mon]').forEach(b => b.onclick = () => { const k = +b.dataset.mon; const t = new Date(); if (!k) { calMonth = new Date(t.getFullYear(), t.getMonth(), 1); calDay = isoD(t); } else calMonth = new Date(calMonth.getFullYear(), calMonth.getMonth() + k, 1); $('out').innerHTML = calHTML(); wireCal(); });
   $('out').querySelectorAll('[data-post]').forEach(c => c.onchange = () => setPosted(c.dataset.post, c.checked));
   $('out').querySelectorAll('[data-open]').forEach(b => b.onclick = async () => { const o = JSON.parse(b.dataset.open);
+    if (o.daily) { if (DPOSTS[o.daily]) DSEL = o.daily; else { const [d, s, c] = o.daily.split('|'); dNew(d, s, c); } dWeek = dWeekStart(new Date(calDay + 'T00:00:00')); $('ptype').value = 'daily'; render(); window.scrollTo({top: 0}); return; }
     if ($('preset').value !== o.preset) { $('preset').value = o.preset; await $('preset').onchange(); }
     $('ptype').value = o.ptype; try { localStorage.setItem('athLastPtype', o.ptype); } catch {} render();
     const hit = o.find && [...document.querySelectorAll('.group h2')].find(x => x.textContent.trim() === o.find); if (hit) { hit.scrollIntoView({block: 'start'}); hit.closest('.group').classList.add('flash'); } else window.scrollTo({top: 0}); });
   clearInterval(calTimer); calTimer = setInterval(() => { if ($('ptype').value === 'calendar' && STATUS_MODE === 'shared' && !document.hidden) loadStatus(); else if ($('ptype').value !== 'calendar') clearInterval(calTimer); }, 30000);
+}
+// ---------- DAILY POSTS: shared queue, week planner, form → slides + caption ----------
+let DPOSTS = {}, DMODE = 'local', dLoaded = false, DSEL = null, dWeek = null, dSaveT = null;
+const slotLabel = id => { const s = SLOTS.find(x => x.id === id); return s ? `${s.ist} IST (${s.pt})` : ''; };
+async function loadDaily(){ try { const r = await fetch('api/posts', {cache: 'no-store'}); if (!r.ok) throw 0; DPOSTS = await r.json(); DMODE = 'shared'; }
+  catch { try { DPOSTS = JSON.parse(localStorage.getItem('athDailyPosts') || '{}'); } catch { DPOSTS = {}; } DMODE = 'local'; }
+  dLoaded = true; if (['daily', 'calendar'].includes($('ptype').value)) render(); }
+function saveDaily(id){ clearTimeout(dSaveT); dSaveT = setTimeout(async () => { const p = DPOSTS[id] || null;
+  if (DMODE === 'shared') { try { const r = await fetch('api/posts', {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({id, post: p})}); if (!r.ok) throw 0; const all = await r.json(); DPOSTS = {...all, ...(p ? {[id]: DPOSTS[id]} : {})}; status('Saved for the team.'); return; }
+    catch { DMODE = 'local'; status('Could not reach the shared queue. Saved in this browser for now.'); } }
+  try { localStorage.setItem('athDailyPosts', JSON.stringify(DPOSTS)); status('Saved in this browser.'); } catch { status('Could not save: the images may be too large for this browser.'); } }, 500); }
+async function dUpload(file){ const url = await shrink(file); if (DMODE !== 'shared') return url;
+  try { const r = await fetch('api/upload', {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({data: url})}); if (!r.ok) throw 0; return (await r.json()).url; } catch { return url; } }
+function dNew(date, slot, cat){ const id = 'p' + Date.now().toString(36) + Math.random().toString(36).slice(2, 5); DPOSTS[id] = {id, date, slot, cat, f: {}, imgs: {}}; DSEL = id; saveDaily(id); return id; }
+const dWeekStart = d => { const x = new Date(d); x.setHours(0, 0, 0, 0); x.setDate(x.getDate() - ((x.getDay() + 6) % 7)); return x; };
+function dailyPanel(){
+  if (!dWeek) dWeek = dWeekStart(new Date()); const days = Array.from({length: 7}, (_, i) => new Date(+dWeek + i * DAYMS)); const todayIso = isoD(new Date());
+  const cell = (d, s) => { const iso = isoD(d), planned = (WEEK_PLAN[d.getDay()] || {})[s.id]; const post = Object.values(DPOSTS).find(p => p.date === iso && p.slot === s.id);
+    if (post) { const st = STATUS['ath|' + iso + '|' + s.id]; return `<button type="button" class="dp-c has${post.id === DSEL ? ' sel' : ''}${st ? ' done' : ''}" data-dsel="${post.id}"><b>${esc((DCAT[post.cat] || {}).name || post.cat)}</b><span>${esc(post.f.name || post.f.title || post.f.book || post.f.quote || 'Draft')}</span>${st ? '<i>Posted</i>' : ''}</button>`; }
+    return planned ? `<button type="button" class="dp-c plan" data-dnew="${iso}|${s.id}|${planned}"><b>${esc(DCAT[planned].name)}</b><span>+ Create</span></button>` : `<button type="button" class="dp-c empty" data-dnew="${iso}|${s.id}|quote"><span>+</span></button>`; };
+  const p = DPOSTS[DSEL]; const cat = p && DCAT[p.cat];
+  const field = fd => { const v = (p.f || {})[fd.k] || ''; const im = (p.imgs || {})[fd.k];
+    if (fd.type === 'img') return `<div class="f"><label>${esc(fd.label)}</label><div class="img-in"><span class="th" style="${im ? `background-image:url(${im})` : ''}"></span><input type="file" accept="image/*" data-dimg="${fd.k}">${im ? `<button type="button" class="linkbtn" data-dimgx="${fd.k}">Remove</button>` : ''}</div></div>`;
+    if (fd.type === 'imgs') return `<div class="f"><label>${esc(fd.label)}</label><div class="img-in" style="flex-wrap:wrap">${[].concat(im || []).map((u, i) => `<span class="th" style="background-image:url(${u})" title="${i + 1}"></span>`).join('')}<input type="file" accept="image/*" multiple data-dimgs="${fd.k}">${[].concat(im || []).length ? `<button type="button" class="linkbtn" data-dimgx="${fd.k}">Clear</button>` : ''}</div></div>`;
+    const tag = fd.type === 'text' ? `<input data-df="${fd.k}" value="${esc(v)}" placeholder="${esc(fd.ph || '')}">` : `<textarea data-df="${fd.k}" rows="${fd.type === 'lines' ? 5 : 3}" placeholder="${esc(fd.ph || (fd.type === 'lines' ? 'One per line' : ''))}">${esc(v)}</textarea>`;
+    return `<div class="f"><label>${esc(fd.label)}</label>${tag}</div>`; };
+  const editor = p && cat ? `<div class="dp-ed"><div class="dp-edh"><b>Editing</b><select data-dcat>${Object.entries(DCAT).map(([k, c]) => `<option value="${k}" ${k === p.cat ? 'selected' : ''}>${esc(c.name)}</option>`).join('')}</select>
+      <input type="date" data-ddate value="${p.date}"><select data-dslot>${SLOTS.map(s => `<option value="${s.id}" ${s.id === p.slot ? 'selected' : ''}>${s.ist} IST</option>`).join('')}</select>
+      <button type="button" class="linkbtn" data-ddel>Delete post</button></div>
+    ${cat.link ? `<p class="hint">This slot is made in the ${cat.link === 'feed' ? 'Feed posts' : 'Reels'} section of the open call studio.</p><button type="button" class="btn" data-goto="${cat.link === 'feed' ? 'feed' : 'reels'}">Open ${cat.link === 'feed' ? 'Feed posts' : 'Reels'}</button>`
+      : `<div class="dp-fields">${cat.fields.map(field).join('')}${cat.key && !cat.fields.some(x => x.k === 'key') ? `<div class="f"><label>Comment keyword</label><input data-df="key" value="${esc((p.f || {}).key || '')}" placeholder="${esc(cat.key)}"></div>` : ''}</div><p class="hint">Slides and caption update below when you leave a field. Changes save automatically${DMODE === 'shared' ? ' for the whole team' : ' in this browser'}.</p>`}</div>`
+    : `<p class="hint" style="margin-top:12px">Click a planned slot to create that post, or an existing post to edit it.</p>`;
+  return `<section class="group dp"><div class="ghead"><h2>Daily posts · @artstoheartsproject</h2><span class="ghr"><span class="cal-mode ${DMODE}">${DMODE === 'shared' ? 'Shared with the team' : 'Saved in this browser only'}</span></span></div>
+    <p class="meta">Built from 61 days of your posts: 13 formats, about 4 to 5 posts a day · times in IST (PT in brackets)</p>
+    <div class="cal-nav" style="max-width:560px"><button type="button" class="btn ghost" data-dwk="-1">&larr;</button><b>Week of ${days[0].getDate()} ${MONTHS[days[0].getMonth()]}</b><button type="button" class="btn ghost" data-dwk="1">&rarr;</button><button type="button" class="btn ghost" data-dwk="0">This week</button></div>
+    <div class="dp-wrap"><table class="dp-t"><thead><tr><th>Slot</th>${days.map(d => `<th class="${isoD(d) === todayIso ? 'today' : ''}">${['Sun','Mon','Tue','Wed','Thu','Fri','Sat'][d.getDay()]} ${d.getDate()}</th>`).join('')}</tr></thead>
+      <tbody>${SLOTS.map(s => `<tr><th><b>${s.ist}</b><br><small>${esc(s.pt)}</small></th>${days.map(d => `<td>${cell(d, s)}</td>`).join('')}</tr>`).join('')}</tbody></table></div>
+    ${editor}
+    <details class="capbox"><summary>The framework: 13 formats, what each is for, what the numbers say</summary><div class="dp-fw">${DFRAME_HTML}</div></details></section>`;
+}
+function wireDaily(){
+  const re = () => render();
+  $('out').querySelectorAll('[data-dwk]').forEach(b => b.onclick = () => { const k = +b.dataset.dwk; dWeek = k ? new Date(+dWeek + k * 7 * DAYMS) : dWeekStart(new Date()); re(); });
+  $('out').querySelectorAll('[data-dsel]').forEach(b => b.onclick = () => { DSEL = b.dataset.dsel; re(); });
+  $('out').querySelectorAll('[data-dnew]').forEach(b => b.onclick = () => { const [d, s, c] = b.dataset.dnew.split('|'); dNew(d, s, c); re(); });
+  const p = DPOSTS[DSEL]; if (!p) return;
+  $('out').querySelectorAll('[data-df]').forEach(i => i.onchange = () => { p.f = p.f || {}; p.f[i.dataset.df] = i.value; saveDaily(p.id); re(); });
+  const dc = $('out').querySelector('[data-dcat]'); if (dc) dc.onchange = () => { p.cat = dc.value; saveDaily(p.id); re(); };
+  const dd = $('out').querySelector('[data-ddate]'); if (dd) dd.onchange = () => { p.date = dd.value; saveDaily(p.id); re(); };
+  const ds = $('out').querySelector('[data-dslot]'); if (ds) ds.onchange = () => { p.slot = ds.value; saveDaily(p.id); re(); };
+  const del = $('out').querySelector('[data-ddel]'); if (del) del.onclick = () => { if (!confirm('Delete this post for everyone?')) return; delete DPOSTS[p.id]; saveDaily(p.id); DSEL = null; re(); };
+  $('out').querySelectorAll('[data-dimg]').forEach(inp => inp.onchange = async () => { if (!inp.files[0]) return; status('Uploading image…'); p.imgs = p.imgs || {}; p.imgs[inp.dataset.dimg] = await dUpload(inp.files[0]); saveDaily(p.id); re(); });
+  $('out').querySelectorAll('[data-dimgs]').forEach(inp => inp.onchange = async () => { status('Uploading images…'); p.imgs = p.imgs || {}; const arr = [].concat(p.imgs[inp.dataset.dimgs] || []); for (const file of inp.files) arr.push(await dUpload(file)); p.imgs[inp.dataset.dimgs] = arr; saveDaily(p.id); re(); });
+  $('out').querySelectorAll('[data-dimgx]').forEach(b => b.onclick = () => { delete p.imgs[b.dataset.dimgx]; saveDaily(p.id); re(); });
 }
 function storyPlanHTML(){
   const cur = state.name; const calls = Object.entries(PRESETS).filter(([n]) => !/blank/i.test(n)).map(([n, p]) => { const s = n === $('preset').value || (p.name || DEFAULTS.name) === cur ? state : {...DEFAULTS, ...p}; return {name: s.name, kw: (s.keyword || '').toUpperCase(), colour: s.colour, dl: new Date(s.deadline + 'T00:00:00')}; });
@@ -893,16 +953,21 @@ const slideNode = s => `<div class="post" style="background:${s.bg};height:${s.h
 function verbFor(left){ if ((state.ctaMode || 'comment') === 'comment') return 'COMMENT'; const d = new Date(dl()); d.setDate(d.getDate() - left); const [y,m,dd] = String(state.commentFrom||'').split('-').map(Number); return (y && d >= new Date(y, m-1, dd)) ? 'COMMENT' : 'DM'; }
 function postDate(left){ const d = new Date(dl()); d.setDate(d.getDate() - left); return d.getDate() + ' ' + MONTHS[d.getMonth()]; }
 function buildPtype(){ const sel = $('ptype'), cur = sel.value;
-  sel.innerHTML = `<option value="month">Whole month (${monthPosts().length} feed posts)</option>` + monthPosts().map((p,i) => `<option value="${i}">${postDate(p.left)} · ${esc(p.title)} (${p.kind.split(' ·')[0]})</option>`).join('') + '<optgroup label="Stories"><option value="storyplan">Stories plan: all calls, day by day</option><option value="storydays">Stories: this call, every day ready to post</option><option value="stories">Stories: template library</option></optgroup><option value="reels">Reels</option><option value="calendar">Calendar</option>';
+  sel.innerHTML = `<option value="month">Whole month (${monthPosts().length} feed posts)</option>` + monthPosts().map((p,i) => `<option value="${i}">${postDate(p.left)} · ${esc(p.title)} (${p.kind.split(' ·')[0]})</option>`).join('') + '<optgroup label="Stories"><option value="storyplan">Stories plan: all calls, day by day</option><option value="storydays">Stories: this call, every day ready to post</option><option value="stories">Stories: template library</option></optgroup><option value="reels">Reels</option><option value="calendar">Calendar</option><option value="daily">Daily posts</option>';
   sel.value = cur || '0'; if (!sel.value) sel.value = '0'; }
 function render(){
   readForm(); scheduleDraft(); updateTabs();
   const base = (state.name || 'call').toLowerCase().replace(/[^a-z0-9]+/g,'-');
   const pick = $('ptype').value || '0';
   const groups = [];
-  if (pick === 'calendar') { renderPool(); RENDERED = []; $('out').innerHTML = calHTML(); wireCal(); if (!calLoaded) loadStatus(); return; }
+  if (pick === 'daily') { if (!dLoaded) loadDaily(); const p = DPOSTS[DSEL]; const cat = p && DCAT[p.cat];
+    if (p && cat && DSLIDES[p.cat]) { const slides = DSLIDES[p.cat](p).map((s, j) => ({...s, title: p.cat + '-' + (j + 1)}));
+      groups.push({title: `${p.date} · ${cat.name}`, meta: `${cat.marker || cat.name} · ${slides.length} slide${slides.length > 1 ? 's' : ''} · ${slotLabel(p.slot)}${cat.key || p.f.key ? ' · keyword “' + (p.f.key || cat.key) + '”' : ''}`, slides, cap: DCAPTION[p.cat](p), pin: (p.f.key || cat.key) ? `Comment '${p.f.key || cat.key}' and we'll send you the link.` : '', daily: true}); }
+  } else if (pick === 'calendar') { renderPool(); RENDERED = []; $('out').innerHTML = calHTML(); wireCal(); if (!calLoaded) loadStatus(); if (!dLoaded) loadDaily(); return; }
   if (pick === 'storyplan') { renderPool(); RENDERED = []; $('out').innerHTML = storyPlanHTML(); status('Stories plan for every call. Pick "Stories: this call, every day" to get the frames.'); return; }
-  if (pick === 'stories') {
+  if (pick === 'daily') {
+    /* daily slides were built above */
+  } else if (pick === 'stories') {
     const phases = {}; Object.keys(STORY_T).forEach(id => { const t = STORY_T[id]; VERB = verbFor(id[0] === 'F' ? 3 : 20); (phases[t.phase] = phases[t.phase] || []).push({id, t, f: storyMake(id, 21)}); });
     VERB = verbFor(99);
     Object.entries(phases).forEach(([phase, list]) => groups.push({title:'Story templates · ' + phase, meta: list.map(x => `${x.id} ${x.t.name}: ${x.t.sticker}`).join('  ·  '), slides: list.map(x => x.f), story:true}));
@@ -973,6 +1038,7 @@ function render(){
   $('out').querySelectorAll('[data-ph]').forEach(b => b.onclick = () => { const inp = document.createElement('input'); inp.type = 'file'; inp.accept = 'image/*';
     inp.onchange = () => { const file = inp.files[0]; if (!file) return; shrink(file).then(url => { state.images[b.dataset.ph] = url; render(); status('Photo changed. Press "Save call" to keep it.'); }); }; inp.click(); });
   wireSlots();
+  if (pick === 'daily') { $('out').insertAdjacentHTML('afterbegin', dailyPanel()); wireDaily(); }
   $('out').querySelectorAll('[data-phx]').forEach(b => b.onclick = () => { delete state.images[b.dataset.phx]; render(); });
   $('out').querySelectorAll('[data-cap]').forEach(b => b.onclick = async () => { const t = $(b.dataset.cap); try { await navigator.clipboard.writeText(t.value); status('Caption copied.'); } catch { t.select(); status('Selected: press copy.'); } });
   $('out').querySelectorAll('[data-cedit]').forEach(b => b.onclick = () => { const k = b.parentElement.dataset.ckey;
@@ -1044,4 +1110,5 @@ $('ptype').onchange = () => { try { localStorage.setItem('athLastPtype', $('ptyp
   $('ptype').value = pt && [...$('ptype').options].some(o => o.value === pt) ? pt : '0';
   sizePreviews(); await document.fonts.ready; render(); if (had) status('Welcome back. Your edits are restored.'); })();
 </script>
+<script src="daily.js"></script>
 </body></html>
