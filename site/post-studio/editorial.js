@@ -24,9 +24,11 @@ const swipePill = (bg, fg) => `<div class="a" style="left:0;right:0;bottom:120px
 const splitHalf = t => { const w = String(t).split(' '); const k = Math.ceil(w.length / 2); return [w.slice(0, k).join(' '), w.slice(k).join(' ')]; };
 const EDT = {
   // Cover A: the question, huge, Rose on Night, opened by the round arrow
-  coverHook(o){ const q = o.q; const sz = q.length > 44 ? 112 : q.length > 30 ? 132 : 150;
+  coverHook(o){ const q = o.q; const sz = q.length > 44 ? 100 : q.length > 30 ? 118 : 136;
     return {bg: EP.burg, html: `${ivMono('peony', 'right:52px;top:36px;width:112px;height:63px')}
-      <p class="a" style="left:72px;right:72px;top:210px;${T_MED};font-size:${sz}px;line-height:1.02;letter-spacing:-.035em;color:${EP.rose}">${arrowDot(EP.rose, EP.burg, Math.round(sz * 1.05))}${esc(q)}</p>
+      <div class="a" style="left:72px;right:72px;top:190px;display:flex;flex-direction:column;gap:56px">
+        <p style="${T_MED};font-size:${sz}px;line-height:1.02;letter-spacing:-.035em;color:${EP.rose}">${arrowDot(EP.rose, EP.burg, Math.round(sz * 1.05))}${esc(q)}</p>
+        ${o.why ? `<p style="${BASK};font-size:${o.why.length > 170 ? 38 : 44}px;line-height:1.36;color:${EP.pink}">${esc(o.why)}</p>` : ''}</div>
       ${swipePill(EP.rose, EP.burg)}`}; },
   // Cover B: a Burgundy card over the artwork, the question split above and below a small line
   coverCard(o){ const [a, b] = splitHalf(o.q); const sz = o.q.length > 40 ? 70 : 84;
@@ -66,10 +68,12 @@ const EDT = {
     <p class="a" style="left:72px;right:72px;top:520px;${T_MED};font-size:${o.key.length > 8 ? 150 : 180}px;line-height:1;letter-spacing:-.04em;color:${EP.burg}">${arrowDot(EP.burg, EP.white, 150)}${esc(o.key)}</p>
     <p class="a" style="left:72px;right:72px;top:780px;${T_REG};font-size:38px;line-height:1.35;color:${EP.burg}">Comment the word and we’ll send it to you.</p>
     <p class="a" style="left:72px;right:72px;bottom:130px;${T_REG};font-size:28px;line-height:1.4;color:${EP.burg};opacity:.8">${esc(o.offer)}</p>${edHandle(EP.burg)}`}; },
-  end(o){ return {bg: EP.burg, html: `${ivMono('peony', 'left:390px;width:300px;top:250px;height:170px')}
-    <p class="a c" style="left:110px;right:110px;top:520px;${BASK};font-size:44px;line-height:1.3;color:#F9EEE5">${esc(o.line)}</p>
-    ${o.invite ? `<div class="a" style="left:300px;right:300px;top:860px;border-top:1px solid rgba(250,210,225,.35)"></div><p class="a c" style="left:120px;right:120px;top:900px;${T_REG};font-size:32px;line-height:1.4;color:#FAD2E1">${esc(o.invite)}</p>` : ''}
-    <p class="a c" style="left:0;right:0;bottom:96px;${T_REG};font-size:28px;color:#FAD2E1">artstoheartsproject.com</p>`}; },
+  end(o){ return {bg: EP.burg, html: `${ivMono('peony', 'left:390px;width:300px;top:170px;height:170px')}
+    <div class="a" style="left:72px;right:72px;top:430px;display:flex;flex-direction:column;align-items:center;text-align:center;gap:22px">
+      <p style="${BASK};font-size:48px;line-height:1.26;color:${EP.pink}">${esc(o.head)}</p>
+      <p style="${T_MED};font-size:${o.key.length > 8 ? 140 : 170}px;line-height:1;letter-spacing:-.04em;color:${EP.rose};margin-top:20px">${arrowDot(EP.rose, EP.burg, 130)}${esc(o.key)}</p>
+      <p style="${T_REG};font-size:36px;line-height:1.35;color:${EP.pink};margin-top:6px">${esc(o.offer)}</p></div>
+    <p class="a c" style="left:0;right:0;bottom:96px;${T_REG};font-size:28px;color:${EP.pink}">artstoheartsproject.com</p>`}; },
 };
 const edLabelCredit = c => { const [who, t, y] = (c || []).map(x => String(x || '').trim()); return who ? `${esc(who)}${t ? `, <i style="${BASK};font-style:italic">${esc(t)}</i>` : ''}${y ? ', ' + esc(y) : ''}` : ''; };
 
@@ -80,22 +84,20 @@ DCAT.editorial = {name: 'ATH Editorial', marker: '//EDITORIAL', key: 'GUIDE', pa
     {k: 'question', label: 'The question, in an artist’s own words', type: 'text', ph: 'How should I price my art?'},
     {k: 'sub', label: 'Line under it', type: 'text', ph: 'What we tell artists who ask us this'}]],
   ['The advice', [
-    {k: 'why', label: 'Opening: the problem, said plainly', type: 'area'},
-    {k: 'whymark', label: 'Phrase to highlight in the opening (copy it exactly)', type: 'text'},
+    {k: 'why', label: 'Under the question on the cover: the problem, said plainly', type: 'area'},
     {k: 'steps', label: 'Advice, one per line: the advice as a sentence | one line on how', type: 'lines'},
     {k: 'imgs', label: 'Artworks from ATH artists: 1 behind the card cover, then behind every other piece of advice', type: 'imgs'},
     {k: 'credits', label: 'Their credits, same order: Artist | Title | Year', type: 'lines'}]],
   ['Instead of', [
     {k: 'bad', label: 'The habit artists should drop, in their words (struck through)', type: 'text', ph: 'I’ll price it lower so it sells.'},
     {k: 'good', label: 'What to do instead', type: 'text', ph: 'Price it so the next one can sell for more.'},
-    {k: 'short', label: 'The short version (the ticket): the whole guide in one sentence', type: 'area'},
+    {k: 'short', label: 'The short version, for a single ticket post: the whole guide in one sentence', type: 'area'},
     {k: 'pick', label: 'Words on the ticket to pick out in white (copy them exactly)', type: 'text'}]],
   ['The action', [
     {k: 'key', label: 'Comment keyword (its DM must send the guide, not a submission pitch)', type: 'text', ph: 'GUIDE'},
-    {k: 'ctahead', label: 'Line above the keyword', type: 'text', ph: 'Want the whole guide, with the examples?'},
-    {k: 'offer', label: 'What they get', type: 'text', ph: 'We’ll send it to you in your DMs. Or read it at artstoheartsproject.com, link in bio.'},
-    {k: 'endline', label: 'End card line', type: 'text', ph: 'New guides for artists every week.'},
-    {k: 'invite', label: 'End card invitation (leave empty to hide)', type: 'text', ph: 'Follow @artstoheartsproject for the next one.'}]],
+    {k: 'ctahead', label: 'End card: line above the keyword', type: 'text', ph: 'Want the whole guide?'},
+    {k: 'offer', label: 'End card: line under the keyword', type: 'text', ph: 'Comment the word and we’ll send it to you.'},
+    ]],
   ['Stories and caption', [
     {k: 'ask', label: 'Story question box', type: 'text', ph: 'What do you find hardest about pricing?'},
     {k: 'hook', label: 'Caption first line', type: 'text'},
@@ -138,7 +140,7 @@ function editorialFields(e, ai){
   const short = c.short || (steps.length ? steps.map((s, i) => (i === 0 ? s.title : s.title.charAt(0).toLowerCase() + s.title.slice(1))).join(', ').replace(/, ([^,]*)$/, ', and $1') + '.' : '');
   return {cover: 'hook', question: c.question || askOf(e.title), sub: c.sub || 'What we tell artists who ask us this',
     why: c.why || e.why, steps: steps.map(s => `${s.title} | ${s.how || ''}`).join('\n'), bad: c.bad || '', good: c.good || e.avoid || '', short,
-    key: 'GUIDE', ctahead: 'Want the whole guide, with the examples?', offer: 'We’ll send it to you in your DMs. Or read it at artstoheartsproject.com, link in bio.',
+    key: 'GUIDE', ctahead: 'Want the whole guide?', offer: 'Comment the word and we’ll send it to you.',
     endline: 'New guides for artists every week.', invite: 'Follow @artstoheartsproject for the next one.', ask: c.ask || '', hook: c.hook || ''};
 }
 
@@ -151,19 +153,18 @@ DPACK.editorial = p => {
   const artCover = (f.cover || 'hook') === 'hook';
   const A = EDT.coverHook({q, sub}), Bc = EDT.coverCard({q, sub, img: imgs[0] || '', slot: 'imgs0'});
   const advice = (s, i) => (i % 2 ? EDT.adviceMark : EDT.adviceCard)({title: s.title, how: s.how, img: imgs[i + 1] || '', slot: 'imgs' + (i + 1), credit: credits[i + 1]});
+  const head = f.ctahead || 'Want the whole guide?', offer = f.offer || 'Comment the word and we’ll send it to you.';
+  const A2 = EDT.coverHook({q, why: f.why}), B2 = EDT.coverCard({q, sub: f.why ? (f.why.match(/[^.!?]+[.!?]/) || [f.why])[0].trim() : sub, img: imgs[0] || '', slot: 'imgs0'});
   const S = [
-    {...(artCover ? A : Bc), label: 'Cover A (in use)'}, {...(artCover ? Bc : A), label: 'Cover B: hide the one you skip'},
-    ...(f.why ? [EDT.open({text: f.why, mark: f.whymark || (f.why.match(/[^.!?]+[.!?]/g) || [''])[1]?.trim()})] : []),
+    {...(artCover ? A2 : B2), label: 'Cover A (in use)'}, {...(artCover ? B2 : A2), label: 'Cover B: hide the one you skip'},
     ...steps.slice(0, 6).map(advice),
     ...(f.good ? [EDT.instead({bad: f.bad || 'I’ll work it out later.', good: f.good})] : []),
-    ...(f.short ? [EDT.short({text: f.short, pick: f.pick || f.short.split(/,\s*/)[0]})] : []),
-    EDT.cta({head: f.ctahead || 'Want the whole guide, with the examples?', key, offer: f.offer || 'We’ll send it to you in your DMs. Or read it at artstoheartsproject.com, link in bio.'}),
-    EDT.end({line: f.endline || 'New guides for artists every week.', invite: f.invite === undefined ? 'Follow @artstoheartsproject for the next one.' : f.invite}),
+    EDT.end({head, key, offer}),
   ];
   const tags = ['#artstoheartsproject', '#artbusiness', ...String(f.tags || '').split(/\s+/).filter(x => x.startsWith('#'))].slice(0, 5).join(' ');
   const who = [...new Set(credits.map(c => c[0]).filter(Boolean))].join(', ');
   const cap = `${f.hook || q}\n\n${f.why || ''}\n\n${steps.map(s => `${s.title}.${s.how ? ' ' + s.how : ''}`).join('\n\n')}\n\n${f.short ? 'The short version: ' + f.short + '\n\n' : ''}Comment ${key} and we'll send you the whole guide.${who ? `\n\nWorks shown: ${who}.` : ''}\n\n${tags}`.replace(/\n{3,}/g, '\n\n');
-  const SINGLES = steps.slice(0, 6).map((s, i) => ({...advice(s, i), label: 'Single ' + (i + 1)}));
+  const SINGLES = [...(f.short ? [{...EDT.short({text: f.short, pick: f.pick || f.short.split(/,\s*/)[0]}), label: 'The short version'}] : []), ...steps.slice(0, 6).map((s, i) => ({...advice(s, i), label: 'Single ' + (i + 1)}))];
   const ST = [
     {...IV.story({full: !!imgs[0], img: imgs[0], slot: 'imgs0', mono: true, label: 'ATH Editorial', text: `&ldquo;${esc(q)}&rdquo;`, serif: true, size: 72, sub: esc(sub), zone: 'Link sticker: read the guide'}), label: 'Story 1'},
     ...(f.good ? [{...IV.story({label: 'Which one sounds like you?', text: `<span style="text-decoration:line-through;opacity:.5">&ldquo;${esc(f.bad || 'I’ll work it out later.')}&rdquo;</span><br><br>${esc(f.good)}`, serif: true, size: 56, zone: 'Poll sticker: Guilty / Not me'}), label: 'Story 2 · poll'}] : []),
@@ -172,7 +173,7 @@ DPACK.editorial = p => {
   ];
   return [
     {title: `${p.date} · Editorial carousel`, meta: `${S.length - 1} slides plus a second cover to choose from · keyword ${key}`, slides: S.map((s, j) => ({...s, title: 'editorial-' + (j + 1)})), cap, pin: `Comment ${key} and we'll send you the whole guide.`},
-    ...(SINGLES.length ? [{title: `${p.date} · Editorial singles`, meta: `${SINGLES.length} single posts for later weeks: one piece of advice on one artwork, each sends people back to the guide`, slides: SINGLES.map((s, j) => ({...s, title: 'single-' + (j + 1)})), cap: steps[0] ? `${steps[0].title}.\n\n${steps[0].how}\n\nFrom our guide "${q}". Comment ${key} and we'll send you the whole thing.\n\n${tags}` : '', pin: ''}] : []),
+    ...(SINGLES.length ? [{title: `${p.date} · Editorial singles`, meta: `${SINGLES.length} single posts for later weeks: the short version on a ticket, then one piece of advice each, all sending people back to the guide`, slides: SINGLES.map((s, j) => ({...s, title: 'single-' + (j + 1)})), cap: steps[0] ? `${steps[0].title}.\n\n${steps[0].how}\n\nFrom our guide "${q}". Comment ${key} and we'll send you the whole thing.\n\n${tags}` : '', pin: ''}] : []),
     {title: `${p.date} · Editorial stories`, meta: 'Same day as the carousel · add the stickers in Instagram', slides: ST.map((s, j) => ({...s, title: 'editorial-story-' + (j + 1)})), story: true},
   ];
 };
@@ -180,11 +181,11 @@ DPACK.editorial = p => {
 // ---------- example: advice hung on works by PQHAÜS, an artist we featured ----------
 const ED_EXAMPLE = {cat: 'editorial', f: {
   cover: 'hook', question: 'How should I price my art?', sub: 'What we tell artists who ask us this',
-  why: 'Most artists price by gut feeling, then second-guess every sale. Buyers trust a price you can explain, and you sleep better when you can explain it.',
+  why: 'Most artists guess, then second-guess every sale. Here is how to land on a number you can explain, and stick to it.',
   steps: 'Know what a piece really costs you | Add up materials, framing and your hours before you think about any number.\nPick one way of pricing and keep it | Price by size, so every work in a series makes sense next to the others.\nCompare yourself with artists like you | Look at artists at your stage, size and medium, not at famous names or hobby sellers.\nShow one price everywhere | Your studio, your website and a gallery should all say the same thing, or buyers stop trusting it.\nRaise your prices when you sell out | A waiting list is your sign to move up 10 to 20 percent.',
   credits: 'PQHAÜS | No help is coming | 2026\nPQHAÜS | I was the elephant in the room | 2025\nPQHAÜS | I am not a bad person | 2026\nPQHAÜS | 2903 miles | 2025\nPQHAÜS | 31 years old | 2024\nPQHAÜS | No help is coming | 2026',
   whymark: 'Buyers trust a price you can explain', pick: 'show one price everywhere', bad: 'I’ll drop the price a little so it sells.', good: 'Hold the price. The buyers who paid it are watching, and it is hard to go back up.',
   short: 'Know your costs, pick one way of pricing and keep it, compare yourself with artists like you, show one price everywhere, and raise it when you sell out.',
-  key: 'GUIDE', ctahead: 'Want the whole guide, with the examples?', offer: 'We’ll send it to you in your DMs. Or read it at artstoheartsproject.com, link in bio.',
+  key: 'GUIDE', ctahead: 'Want the whole guide?', offer: 'Comment the word and we’ll send it to you.',
   endline: 'New guides for artists every week.', invite: 'Follow @artstoheartsproject for the next one.', ask: 'What do you find hardest about pricing?', hook: 'How should I price my art? The question we get most, answered.', tags: '#pricingart #artistadvice'},
   imgs: {imgs: ['art/examples/pqhaus/art-no-help-is-coming.jpg', 'art/examples/pqhaus/art-i-was-the-elephant-in-the-room.jpg', 'art/examples/pqhaus/art-i-am-not-a-bad-person.jpg', 'art/examples/pqhaus/art-2903-miles.jpg', 'art/examples/pqhaus/art-31-years-old.jpg', 'art/examples/pqhaus/art-no-help-is-coming.jpg']}};
