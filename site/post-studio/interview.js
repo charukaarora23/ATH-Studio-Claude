@@ -33,6 +33,7 @@ const excerpt = (s, n = 330) => { s = String(s || '').replace(/\s+/g, ' ').trim(
 DCAT.interview = {name:'Artist interview', marker:'//INTERVIEW', key:'INTERVIEW', pack:true, fields:[
   {k:'paste', label:'Paste the full article here, then press “Fill from article”', type:'paste'},
   {k:'headline', label:'Cover headline: the tension that makes someone stop (not the article title, not a summary)', type:'text', ph:'He paints what we never say out loud.'},
+  {k:'lines', label:'Cover lines: 3 short teasers of stories inside, one per line (like a magazine cover)', type:'lines'},
   {k:'name', label:'Artist name', type:'text'}, {k:'handle', label:'Instagram handle', type:'text', ph:'@pqhaus'},
   {k:'based', label:'Based in', type:'text'}, {k:'medium', label:'Medium', type:'text'},
   {k:'series', label:'Editorial series', type:'text', ph:'Best of the Art World'},
@@ -40,11 +41,11 @@ DCAT.interview = {name:'Artist interview', marker:'//INTERVIEW', key:'INTERVIEW'
   {k:'arts', label:'Artworks, in order: 1 cover · 2 full page · 3 and 4 side by side · 5 spare', type:'imgs'},
   {k:'caps', label:'Artwork labels, same order: Title | Year | Size | Medium', type:'lines'},
   {k:'studio', label:'Portraits: 1 opening page · 2 last page', type:'imgs'},
-  {k:'quotes', label:'Pull quotes (one per line, their exact words)', type:'lines'},
+  {k:'quotes', label:'Their exact words, one per line: 1 quote card · 2 under the full-page work · 3 over the pair', type:'lines'},
   {k:'qa', label:'Questions and answers (filled from the article)', type:'qa'},
   {k:'pick', label:'Answers to tease on slides (numbers). Pick the ones that open with a story, they get cut off mid-way', type:'text', ph:'9, 4'},
   {k:'kicks', label:'Headline above each teased answer, same order (leave empty to use the question)', type:'lines'},
-  {k:'inside', label:'Inside the interview: 3 to 4 hooks, one per line (leave empty to use the questions)', type:'lines'},
+  {k:'inside', label:'Last page, “In the full interview”: 3 reasons to read, one per line', type:'lines'},
   {k:'ctahead', label:'Last slide headline', type:'text', ph:'His full story is on our website.'},
   {k:'url', label:'Article link', type:'text', ph:'artstoheartsproject.com/pqhaus-cinematic-composition'},
   {k:'tags', label:'Extra hashtags', type:'text', ph:'#narrativeart #cinematicart'},
@@ -61,19 +62,20 @@ const ivArt = (src, style, slot, fit) => src ? `<div class="a img" data-slot="${
 const ivLabel = c => { const [t, y, sz, m] = (c || []).map(x => String(x || '').trim()); return {t: t ? `${esc(t)}${y ? ', ' + esc(y) : ''}` : '', d: [m, sz].filter(Boolean).map(esc).join(' &middot; ')}; };
 const nameSize = n => n.length > 16 ? 100 : n.length > 11 ? 128 : 172;
 const IV = {
-  // 1 · cover: the work, full width; a paper band with the name set large
-  cover(o){ return {bg:IVc.paper, html:`${ivArt(o.img, 'left:0;right:0;top:0;height:950px', o.slot)}
-    <p class="a" style="left:64px;top:1000px;${IV_CAPS};font-size:16px;color:${BURG}">The Interview</p><p class="a" style="right:64px;top:1000px;${IV_CAPS};font-size:16px;color:${INK}">Arts to Hearts Project</p>
-    <p class="a" style="left:56px;right:64px;top:1030px;${IV_DSP};font-size:${nameSize(o.name)}px;line-height:1;color:${INK}">${esc(o.name)}</p>
-    <p class="a" style="left:64px;right:120px;top:${1046 + nameSize(o.name)}px;${IV_TXT};font-style:italic;font-size:36px;line-height:1.25;color:${INK}">${esc(o.head)}</p>`}; },
+  // 1 · cover: the work, then the hook as the headline and three cover lines that tease what is inside
+  cover(o){ const h = o.head; return {bg:IVc.paper, html:`${ivArt(o.img, 'left:0;right:0;top:0;height:820px', o.slot)}
+    <p class="a" style="left:64px;top:866px;${IV_CAPS};font-size:16px;color:${BURG}">The Interview &middot; ${esc(o.name)}</p><p class="a" style="right:64px;top:866px;${IV_CAPS};font-size:16px;color:${INK}">Arts to Hearts Project</p>
+    <p class="a" style="left:56px;right:70px;top:904px;${IV_DSP};font-size:${h.length > 44 ? 80 : 94}px;line-height:1;color:${INK}">${esc(h)}</p>
+    ${o.lines.length ? `<div class="a" style="left:64px;right:64px;bottom:72px;display:flex;gap:28px;border-top:1px solid rgba(20,9,12,.25);padding-top:22px">${o.lines.slice(0, 3).map(l => `<p style="flex:1;${IV_TXT};font-style:italic;font-size:30px;line-height:1.22;color:${INK}">${esc(l)}</p>`).join('')}</div>` : ''}`}; },
   // 2 · opening: portrait, then the standfirst with a drop cap
   open(o){ const t = String(o.text || ''); return {bg:IVc.paper, html:`${ivArt(o.img, 'left:0;right:0;top:0;height:860px', o.slot)}
     <p class="a" style="left:64px;top:910px;${IV_CAPS};font-size:16px;color:${BURG}">In conversation</p><p class="a" style="right:64px;top:910px;${IV_CAPS};font-size:16px;color:${INK}">${pad2(o.n)} &mdash; ${pad2(o.t)}</p>
     <p class="a" style="left:64px;right:100px;top:962px;${IV_TXT};font-size:${t.length > 200 ? 36 : 40}px;line-height:1.38;color:${INK}"><span style="float:left;${IV_DSP};font-size:${t.length > 200 ? 128 : 140}px;line-height:.78;margin:12px 16px 0 0">${esc(t.charAt(0))}</span>${esc(t.slice(1))}</p>`}; },
-  // 3 · plate: one painting, room around it, a caption set like a catalogue
-  plate(o){ const L = ivLabel(o.cap); return {bg:IVc.paper, html:`${ivFolio(INK, o.n, o.t)}${ivArt(o.img, 'left:80px;right:80px;top:132px;bottom:210px', o.slot, 'contain')}
-    <p class="a" style="left:80px;right:420px;bottom:104px;${IV_TXT};font-style:italic;font-size:31px;line-height:1.2;color:${INK}">${L.t}</p>
-    <p class="a" style="right:80px;bottom:110px;width:330px;text-align:right;${IV_CAPS};font-size:13px;letter-spacing:.2em;line-height:1.7;color:${IVc.mute}">${L.d}</p>`}; },
+  // 3 · plate: one painting with the artist's line that makes you look again
+  plate(o){ const L = ivLabel(o.cap); return {bg:IVc.paper, html:`${ivFolio(INK, o.n, o.t)}${ivArt(o.img, `left:80px;right:80px;top:128px;bottom:${o.line ? 340 : 210}px`, o.slot, 'contain')}
+    ${o.line ? `<p class="a" style="left:76px;right:90px;bottom:168px;${IV_DSP};font-style:italic;font-size:${o.line.length > 100 ? 46 : 54}px;line-height:1.08;color:${INK}">&ldquo;${esc(o.line)}&rdquo;</p>` : ''}
+    <p class="a" style="left:80px;right:420px;bottom:96px;${IV_TXT};font-style:italic;font-size:${o.line ? 26 : 31}px;line-height:1.2;color:${INK}">${L.t}</p>
+    <p class="a" style="right:80px;bottom:100px;width:330px;text-align:right;${IV_CAPS};font-size:13px;letter-spacing:.2em;line-height:1.7;color:${IVc.mute}">${L.d}</p>`}; },
   // 4 · the story that stops short: their words, cut before the point
   tease(o){ return {bg:INK, html:`${ivFolio('#F3EDE5', o.n, o.t)}
     <p class="a" style="left:64px;right:64px;top:300px;${IV_CAPS};font-size:16px;line-height:1.7;color:${PEONY}">${esc(o.kick)}</p>
@@ -81,15 +83,15 @@ const IV = {
     <div class="a" style="left:64px;width:72px;bottom:176px;border-top:1px solid ${PEONY}"></div>
     <p class="a" style="left:64px;right:64px;bottom:108px;${IV_TXT};font-style:italic;font-size:30px;color:#F3EDE5;opacity:.85">Continued in the interview</p>`}; },
   // 5 · diptych: two works side by side
-  pair(o){ const row = (k, top) => { const L = ivLabel(o.caps[k]); return `${ivArt(o.imgs[k], `left:64px;right:64px;top:${top}px;height:500px`, o.slots[k], 'contain')}
-      <p class="a" style="left:64px;right:440px;top:${top + 518}px;${IV_TXT};font-style:italic;font-size:26px;line-height:1.2;color:${INK}">${L.t}</p><p class="a" style="right:64px;width:360px;text-align:right;top:${top + 524}px;${IV_CAPS};font-size:12px;letter-spacing:.2em;line-height:1.7;color:${IVc.mute}">${L.d}</p>`; };
-    return {bg:IVc.paper, html:`${ivFolio(INK, o.n, o.t)}${row(0, 120)}${row(1, 700)}`}; },
-  // 6 · close: one more image, then where to read it
-  close(o){ return {bg:IVc.paper, html:`${ivArt(o.img, 'left:0;right:0;top:0;height:860px', o.slot)}
-    <p class="a" style="left:64px;top:910px;${IV_CAPS};font-size:16px;color:${BURG}">The full interview</p><p class="a" style="right:64px;top:910px;${IV_CAPS};font-size:16px;color:${INK}">${pad2(o.n)} &mdash; ${pad2(o.t)}</p>
-    <p class="a" style="left:56px;right:64px;top:948px;${IV_DSP};font-size:${o.head.length > 26 ? 92 : 112}px;line-height:1;color:${INK}">${esc(o.head)}</p>
-    <p class="a" style="left:64px;right:160px;top:${o.head.length > 26 ? 1150 : 1080}px;${IV_TXT};font-size:31px;line-height:1.4;color:${INK}">On artstoheartsproject.com. Comment <i>${esc(o.key)}</i> and we&rsquo;ll send you the link.</p>
-    <p class="a" style="left:64px;bottom:64px;${IV_CAPS};font-size:15px;color:${INK}">${o.handle ? 'Follow ' + esc(o.handle) : ''}</p><p class="a" style="right:64px;bottom:64px;${IV_CAPS};font-size:15px;color:${INK}">Link in bio</p>`}; },
+  pair(o){ const row = (k, top, h) => { const L = ivLabel(o.caps[k]); return `${ivArt(o.imgs[k], `left:64px;right:64px;top:${top}px;height:${h}px`, o.slots[k], 'contain')}
+      <p class="a" style="left:64px;right:440px;top:${top + h + 14}px;${IV_TXT};font-style:italic;font-size:24px;line-height:1.2;color:${INK}">${L.t}</p><p class="a" style="right:64px;width:360px;text-align:right;top:${top + h + 20}px;${IV_CAPS};font-size:12px;letter-spacing:.2em;line-height:1.7;color:${IVc.mute}">${L.d}</p>`; };
+    return {bg:IVc.paper, html:`${ivFolio(INK, o.n, o.t)}${o.line ? `<p class="a" style="left:58px;right:80px;top:120px;${IV_DSP};font-style:italic;font-size:${o.line.length > 90 ? 48 : 56}px;line-height:1.06;color:${INK}">&ldquo;${esc(o.line)}&rdquo;</p>` : ''}${row(0, o.line ? 330 : 130, o.line ? 430 : 500)}${row(1, o.line ? 830 : 700, o.line ? 430 : 500)}`}; },
+  // 6 · close: what they get by reading, and how to get it
+  close(o){ return {bg:IVc.paper, html:`${ivArt(o.img, 'left:0;right:0;top:0;height:560px', o.slot)}
+    <p class="a" style="left:64px;top:604px;${IV_CAPS};font-size:16px;color:${BURG}">In the full interview</p><p class="a" style="right:64px;top:604px;${IV_CAPS};font-size:16px;color:${INK}">${pad2(o.n)} &mdash; ${pad2(o.t)}</p>
+    <div class="a" style="left:64px;right:64px;top:646px">${o.items.slice(0, 3).map(v => `<p style="${IV_DSP};font-size:46px;line-height:1.08;padding:18px 0;border-bottom:1px solid rgba(20,9,12,.2);color:${INK}">${esc(v)}</p>`).join('')}</div>
+    <p class="a" style="left:56px;right:64px;bottom:150px;${IV_DSP};font-style:italic;font-size:72px;line-height:1;color:${BURG}">${esc(o.head)}</p>
+    <p class="a" style="left:64px;right:64px;bottom:72px;${IV_TXT};font-size:28px;color:${INK}">Comment <b style="font-weight:600">${esc(o.key)}</b> and we&rsquo;ll send you the link &middot; or tap the link in bio${o.handle ? ' &middot; ' + esc(o.handle) : ''}</p>`}; },
   quoteCard(o){ const dark = o.i % 2; const bg = dark ? INK : IVc.paper, fg = dark ? '#F3EDE5' : INK;
     return {bg, html:`${ivFolio(fg, 0, 0)}<p class="a" style="right:64px;top:58px;${IV_CAPS};font-size:16px;color:${dark ? PEONY : BURG}">From the interview</p>
       <p class="a" style="left:60px;right:80px;top:300px;${IV_DSP};font-style:italic;font-size:${o.text.length > 140 ? 74 : o.text.length > 90 ? 86 : 100}px;line-height:1.05;color:${fg}">&ldquo;${esc(o.text)}&rdquo;</p>
@@ -120,12 +122,12 @@ DPACK.interview = p => {
   // six pages: cover · opening · plate · the story that stops short · diptych · where to read it
   const T = 6, at = k => arts[k] ? {img: arts[k], slot: 'arts' + k} : {img: '', slot: 'arts' + k};
   const S = [
-    IV.cover({...at(0), name, head}),
+    IV.cover({...at(0), name, head, lines: dLines(f.lines).map(x => x.join(' | ')).filter(Boolean)}),
     IV.open({img: studio[0], slot: 'studio0', text: excerpt(f.intro, 250), n: 2, t: T}),
-    IV.plate({...at(1), cap: caps[1], n: 3, t: T}),
+    IV.plate({...at(1), cap: caps[1], line: quotes[1], n: 3, t: T}),
     IV.tease({...(teases[0] || {kick: 'From the interview', text: quotes[0] || head}), n: 4, t: T}),
-    IV.pair({imgs: [arts[2], arts[3]], slots: ['arts2', 'arts3'], caps: [caps[2], caps[3]], n: 5, t: T}),
-    IV.close({img: studio[1] || arts[4] || arts[0], slot: studio[1] ? 'studio1' : arts[4] ? 'arts4' : 'arts0', head: f.ctahead || 'Read the full interview.', key, handle, n: 6, t: T}),
+    IV.pair({imgs: [arts[2], arts[3]], slots: ['arts2', 'arts3'], caps: [caps[2], caps[3]], line: quotes[2], n: 5, t: T}),
+    IV.close({img: studio[1] || arts[4] || arts[0], slot: studio[1] ? 'studio1' : arts[4] ? 'arts4' : 'arts0', head: f.ctahead || 'Read the full interview.', items: insideItems, key, handle, n: 6, t: T}),
   ];
   const capMain = `//INTERVIEW\n\n${head}\n\n${f.intro || ''}\n\n${teases[0] ? `${teases[0].kick}:\n"${teases[0].text}"\n\n` : ''}${insideItems.length ? `Also in the interview:\n${insideItems.map(x => '— ' + x).join('\n')}\n\n` : ''}Comment '${key}' and we'll send you the full interview. Or tap the link in bio.\n\nArtist: ${name} ${handle}\n${f.series ? `Featured in ${f.series}.\n` : ''}.\n.\n.\n#artstoheartsproject #emergingartists #artist #art #artistinterview ${f.tags || ''}`.replace(/\n{3,}/g, '\n\n');
   const QC = quotes.map((q, i) => IV.quoteCard({text: q, name, i}));
@@ -148,7 +150,7 @@ DPACK.interview = p => {
 
 // ---------- worked example: PQHAÜS ----------
 const IV_EXAMPLE = {cat:'interview', f:{
-  cover:'artwork', headline:'He paints what we never say out loud.', tease:'A friend he couldn’t help, an image that arrives in 4K, and the endings films never gave him.', ctahead:'Read his story.', name:'PQHAÜS', handle:'@pqhaus', based:'San Francisco Bay Area', medium:'Acrylic on canvas', series:'Best of the Art World',
+  cover:'artwork', headline:'He paints what we never say out loud.', lines:'The friend he couldn’t help\nThe image that arrives in 4K\nThe endings films never gave him', ctahead:'Read his story.', name:'PQHAÜS', handle:'@pqhaus', based:'San Francisco Bay Area', medium:'Acrylic on canvas', series:'Best of the Art World',
   intro:'As a teenager, he wrote his own endings to films that left him hanging. Now he paints scenes that feel like stills from a film you can’t stop thinking about, with titles that read like something someone finally admits out loud.',
   inside:'What the summer he could barely afford taught him\nWhy he would rather be disliked than loved for a version of himself\nWhat a painting does on a wall that it can’t do on your phone\nWhat he hopes you take from his work on a hard day',
   caps:'No help is coming | 2026 | 20×20 inch | Acrylic on canvas\nI was the elephant in the room | 2025 | 24×30 | Acrylic on canvas\nI am not a bad person | 2026 | 20×24 inch | Acrylic on canvas\n2903 miles | 2025 | 30×40 | Acrylic on canvas\n31 years old | 2024 | 24×30 | Acrylic on canvas',
