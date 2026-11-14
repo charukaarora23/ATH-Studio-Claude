@@ -47,7 +47,7 @@ function artFor(i){
   return samples[k] || artPlaceholder(i);
 }
 function artPlaceholder(i){
-  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="1080" height="1350"><rect width="1080" height="1350" fill="#2b2124"/><rect x="40" y="40" width="1000" height="1270" rx="24" fill="none" stroke="#f9ece5" stroke-opacity=".5" stroke-width="4" stroke-dasharray="18 14"/><text x="540" y="640" text-anchor="middle" font-family="sans-serif" font-weight="700" font-size="54" fill="#f9ece5" fill-opacity=".75" letter-spacing="6">ARTWORK ${i + 1}</text><text x="540" y="720" text-anchor="middle" font-family="sans-serif" font-size="34" fill="#f9ece5" fill-opacity=".55">Add it under Month artworks</text></svg>`;
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="1080" height="1350"><rect width="1080" height="1350" fill="#2b2124"/><rect x="40" y="40" width="1000" height="1270" rx="24" fill="none" stroke="#f9ece5" stroke-opacity=".5" stroke-width="4" stroke-dasharray="18 14"/><text x="540" y="380" text-anchor="middle" font-family="sans-serif" font-weight="700" font-size="54" fill="#f9ece5" fill-opacity=".75" letter-spacing="6">ARTWORK ${i + 1}</text><text x="540" y="450" text-anchor="middle" font-family="sans-serif" font-size="34" fill="#f9ece5" fill-opacity=".55">Add it under Month artworks</text></svg>`;
   return 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg).replace(/'/g, '%27').replace(/\(/g, '%28').replace(/\)/g, '%29');
 }
 // walk the whole month once to number the slots (stable, whatever post is being shown)
@@ -126,7 +126,7 @@ const T = {
     if (o.img !== undefined) {
       return {bg:g.bg, html:`${corners(g.fg, g.dm, o.tr)}${slot(o.img, o.imgLabel||'Example artwork', 'left:80px;right:80px;top:150px;height:560px', g.fg)}
         <p class="a" style="left:72px;top:760px;font-size:120px;font-weight:400;letter-spacing:-.06em;line-height:.85;color:${g.acc}">${esc(o.n)}</p>
-        <p class="a R" style="left:260px;right:80px;top:766px;font-size:60px;color:${g.fg}">${o.head}</p>
+        <p class="a R" style="left:260px;right:80px;top:766px;font-size:72px;color:${g.fg}">${o.head}</p>
         <p class="a sub" style="left:260px;right:100px;top:910px;color:${g.fg};opacity:.8">${o.text}</p>`};
     }
     return {bg:g.bg, html:`${corners(g.fg, g.dm, o.tr)}
@@ -236,7 +236,7 @@ const T = {
         <p class="a" style="left:${x}px;top:${y+398}px;font-size:26px;font-weight:600;color:${g.fg}">${gap(it.name,'Artist name')}</p>
         <p class="a" style="left:${x}px;top:${y+438}px;font-size:22px;opacity:.7;color:${g.fg}">${gap(it.meta,'Title · Country')}</p>`; };
     return {bg:g.bg, html:`${corners(g.fg, g.dm, o.tr)}
-      <p class="a R" style="left:76px;right:80px;top:140px;font-size:${String(o.head).replace(/<[^>]+>/g,"").length > 34 ? 48 : 64}px;color:${g.fg}">${o.head}</p>
+      <p class="a R" style="left:76px;right:80px;top:140px;font-size:${String(o.head).replace(/<[^>]+>/g,"").length > 34 ? 58 : 72}px;color:${g.fg}">${o.head}</p>
       ${o.items.map(cell).join('')}`};
   },
   // a checklist
@@ -260,7 +260,7 @@ const T = {
   // closing slide of every carousel: one clear action
   // every carousel opens on this: what it is, why it matters, when it closes, how to act
   hook(o){
-    const shrink = String(state.name).length > 16 ? .86 : 1;
+    const shrink = String(state.name).length > 16 && String(o.head).includes(esc(state.name)) ? .86 : 1;
     const head = (fg, acc, timerDark) => `
       <div class="a" style="left:80px;right:80px;top:600px;display:flex;justify-content:space-between;align-items:center">${OPENCALL(acc)}${timer(timerDark)}</div>
       <p class="a H" style="left:76px;right:80px;top:680px;font-size:${Math.round((o.size||84) * shrink)}px;color:${fg}">${o.head}</p>
@@ -328,8 +328,8 @@ const AW = {
       <div class="a" style="left:40px;right:40px;top:40px;bottom:40px;background:linear-gradient(180deg,rgba(28,19,11,.5) 0%,rgba(28,19,11,0) 18%,rgba(28,19,11,0) 30%,rgba(28,19,11,.9) 52%,#1C130B 100%)"></div>
       ${frame(c)}${corners(CREAM, PEONY, o.tr)}
       <div class="a" style="left:90px;right:90px;top:600px;display:flex;justify-content:space-between;align-items:center">${OPENCALL(c)}${timer(false)}</div>
-      <p class="a H" style="left:86px;right:90px;top:680px;font-size:${Math.round((o.size||80)*.8)}px;color:${CREAM}">${o.head}</p>
-      ${o.sub ? `<p class="a sub" style="left:90px;right:150px;top:970px;font-size:28px;color:${CREAM};opacity:.85">${o.sub}</p>` : ''}
+      <p class="a H" style="left:86px;right:90px;top:680px;font-size:${Math.max(88, Math.round((o.size||88) * (String(state.name).length > 16 && String(o.head).includes(esc(state.name)) ? .86 : 1)))}px;color:${CREAM}">${o.head}</p>
+      ${o.sub ? `<p class="a sub" style="left:90px;right:150px;top:990px;font-size:32px;color:${CREAM};opacity:.9">${o.sub}</p>` : ''}
       ${coverCTA(1140, CREAM, c)}`};
   },
   count(o){ const c = gold(); const chilli = o.tone === 'chilli'; const bg = chilli ? '#5A0A0A' : AWARD_BG;
@@ -492,9 +492,9 @@ function monthPosts(){ const name = GE(), sel = esc(state.selected); return [
  {left:30, title:'Launch', kind:'Carousel', slides:() => { const s = launch(); if (isAward() || isEd()) s[0] = {...(isEd() ? ED : AW).hook({img:state.images.imgCover, tr:esc(state.series), head: isEd() ? esc(state.headline || 'Call for artists') : `${esc(state.headline || 'Call for artists')}<br>${GE()}`, size: isEd() ? 112 : 120, sub:esc(state.coverLine)}), title:'cover'}; return s; }, caption:() => caption(), pin:() => pinned()},
 
  {left:28, title:'What you can submit', kind:'Carousel · theme', slides:() => [
-   T.hook({img:EX.bloom, tr:'The theme', head:pick(`What can you submit to the ${name}?`, `Does your ${TW()} belong in the ${name}?`, `Five ways into the ${name}.`), sub:pick(`Five kinds of ${TW()} the jury wants to see. ${sel} will be published.`, `Swipe for the five kinds of ${TW()} we are looking for. ${sel} places.`, `See which of these fits your work. ${sel} artists will be chosen.`)}),
+   T.hook({img:EX.bloom, tr:'The theme', head:pick(`What can you submit to the ${name}?`, `What can you submit?`, `Five ways to get in.`), sub:pick(`Five kinds of ${TW()} the jury wants to see. ${sel} will be published.`, `Any medium. ${sel} places. See what fits.`, `Find yours, then apply. ${sel} places.`)}),
    ...KINDS().slice(0,5).map((k,i) => T.num({img:[EX.dahlia, EX.meadow, EX.portrait, EX.palms, EX.field][i], n:String(i+1), head:esc(k[0]) + '.', text:esc(k[1] || ''), tr:'What you can submit', ground: i % 2 ? 'ink' : 'cream'})),
-   T.cta({kicker:'Any medium · Original work only', sub:pick(`If your work fits one of these, it belongs in the running for the ${name}.`, `Found yours? Then your work is in the running for the ${name}.`, `One of these sounds like you? Apply to the ${name}.`)}),
+   T.cta({kicker:'Any medium · Original work only', sub:pick(`If your work fits one of these, it belongs in the running for the ${name}.`, `Found yours? Apply now.`, `One of these is you? Apply.`)}),
  ], caption:() => `What can you submit to the ${N()}?
 
 The jury wants to see ${state.themeWork || 'work'} of five kinds:
@@ -508,7 +508,7 @@ ${closeLn()}
 Example artworks are shown for illustration. ${tags}`},
 
  {left:26, title:'Get published', kind:'Single · proof', slides:() => [
-   T.hook({ground:'cream', img2: state.images.imgBooks || null, imgLabel:'Real photo needed<br>The books together', size:84, tr:'The collection', head:pick(`Get published in the ${name}.`, `Your work, in the ${name}.`, `See your name in the ${name}.`), sub:pick(`Join ${esc(state.published)} artists in print. ${sel} places.`, `${sel} places in a juried hardcover book. Join ${esc(state.published)} published artists.`, `${esc(state.published)} artists are already in print. ${sel} more will be.`)}),
+   T.hook({ground:'cream', img2: state.images.imgBooks || null, imgLabel:'Real photo needed<br>The books together', size:84, tr:'The collection', head:pick(`Get published in the ${name}.`, `Get your work in print.`, `Be one of ${sel}.`), sub:pick(`Join ${esc(state.published)} artists in print. ${sel} places.`, `${sel} places in a juried hardcover book.`, `A juried hardcover book. ${sel} places.`)}),
  ], caption:() => `Get published in the ${N()}.
 
 Join ${state.published} artists already in print across ${state.editions} editions of the ${S()}. ${SEL()} places, juried.
@@ -519,12 +519,12 @@ ${closeLn()}
 ${tags}`},
 
  {left:24, title:'Inside the book', kind:'Carousel · proof', slides:() => [
-   T.hook({ground:'ink', img2: state.images.imgSpread || null, imgLabel:'Real photo needed<br>A spread from a past edition', size:72, tr:'Inside the book', head:pick('This is what being published with us looks like.', 'Open the book. This is where your work goes.', 'What a published page really looks like.'), sub:pick(`Selected artists appear in the ${name} exactly like this.`, `Every selected artist appears in the ${name} like this.`, `This is how your work would sit in the ${name}.`)}),
+   T.hook({ground:'ink', img2: state.images.imgSpread || null, imgLabel:'Real photo needed<br>A spread from a past edition', size:72, tr:'Inside the book', head:pick('This is what being published with us looks like.', 'Your work could be on this page.', 'This could be your page.'), sub:pick(`Selected artists appear in the ${name} exactly like this.`, `This is how selected artists appear.`, `Every selected artist, printed like this.`)}),
    T.photo({img:state.images.imgSpread, label:'Real photo needed<br>A spread from a past edition', tr:'Inside the book', head:pick('Every artist, in print.', 'Your name on the page.', 'Credited, page by page.'), sub:pick('Name, artwork title, medium and country, on the page.', 'Each work is credited with title, medium and country.', 'Your work, your name, your country, in print.')}),
    T.photo({key:'phSpread2', img:null, label:'Real photo needed<br>A second spread', tr:'Inside the book', head:pick('Juried and curated.', 'Chosen by a jury.', 'Curated as one collection.'), sub:pick('Each edition is selected by a jury and laid out as one collection.', 'A jury selects the work and shapes the book.', 'Every page is chosen to sit with the others.'), ground:'ink'}),
    T.photo({key:'phShelf', img:null, label:'Real photo needed<br>The book on a shelf or in a shop', tr:'Inside the book', head:'Seen worldwide.', sub:`Through ${esc(state.distribution || 'Amazon, Barnes & Noble and the ATH Shop')}.`}),
    T.photo({key:'phHolding', img:null, label:'Real photo needed<br>An artist holding their copy', tr:'Inside the book', head:pick('Introduced beyond the feed.', 'Seen by the art world.', 'Shared where it matters.'), sub:pick('Each book is shared with collectors, galleries and curators.', 'Collectors, galleries and curators receive the book.', 'The book goes to collectors, galleries and curators.'), ground:'ink'}),
-   T.cta({kicker:pick('Your page could be next', 'Picture your work here', 'This page could be yours')}),
+   T.cta({kicker:pick('Your page could be next', 'Your page is waiting', 'Claim your page')}),
  ], caption:() => `This is what being published with Arts to Hearts looks like.
 
 Every selected artist appears in print with their name, artwork title, medium and country, in a juried hardcover collection sold worldwide and shared with collectors, galleries and curators.
@@ -536,7 +536,7 @@ ${closeLn()}
 ${tags}`},
 
  {left:22, title:'Your questions, answered', kind:'Carousel · doubts', slides:() => [
-   T.hook({img:EX.meadow, pos:'center 40%', tr:'Your questions', head:pick(`Thinking of applying to the ${name}? Read this first.`, `Your questions about the ${name}, answered.`, `Before you apply to the ${name}: seven answers.`), sub:pick('The seven questions artists ask us most, answered.', 'Swipe for what artists ask us most.', 'Everything artists ask us, in one place.')}),
+   T.hook({img:EX.meadow, pos:'center 40%', tr:'Your questions', head:pick(`Thinking of applying to the ${name}? Read this first.`, `Your questions, answered.`, `7 answers before you apply.`), sub:pick('The seven questions artists ask us most, answered.', 'What artists ask us most.', 'Swipe, then apply.')}),
    T.qa({q:'I’m self-taught. Can I apply?', a:'Yes. No degree, gallery or exhibition history needed.', more:'The jury judges the work, not the CV.', ground:'call'}),
    T.qa({q:'I don’t live in the US.', a:`Open to ${esc(state.who || 'artists')} worldwide, 18 and over.`, more:'Past editions include artists from every continent.', ground:'cream'}),
    T.qa({q:'Is digital work accepted?', a:'Yes. Any medium, traditional or digital.', more:'Painting, photography, illustration, textile, sculpture, mixed media.', ground:'call'}),
@@ -544,7 +544,7 @@ ${tags}`},
    T.qa({q:'Is there a fee?', a:`An application fee applies${state.fee ? ': ' + esc(state.fee) : ''}.`, more: state.fee ? '' : '<span class="gap">Add the fee wording in the form</span>'}),
    T.qa({q:'When will I hear back?', a:`Results: ${gap(state.results,'Date')}.`, ground:'call'}),
    T.qa({q:'Do I keep the rights to my work?', a:gap(state.rights,'Confirm the rights wording')}),
-   T.cta({kicker:pick('Still have a question? DM us', 'More questions? Ask in the comments', 'Ask us anything in the comments')}),
+   T.cta({kicker:pick('Still have a question? DM us', 'Questions? Ask in the comments', 'Ask us in the comments')}),
  ], caption:() => `Thinking of applying to the ${N()}? The questions artists ask us most:
 
 · Self-taught? Yes, welcome.
@@ -560,7 +560,7 @@ ${closeLn()}
 ${tags}`},
 
  {left:20, title:'Published artists', kind:'Carousel · proof', slides:() => [
-   T.hook({img:EX.portrait, tr:'Past editions', head:pick(`Their work is in print. Yours could be next, in the ${name}.`, `Meet artists we published. Next could be you, in the ${name}.`, `From our past editions to the ${name}: your turn.`), size:72, sub:`Artists we published in our ${PAST().slice(0,3).join(', ')} editions.`}),
+   T.hook({img:EX.portrait, tr:'Past editions', head:pick(`Their work is in print. Yours could be next, in the ${name}.`, `They got published. You’re next.`, `Their work is in print. Yours next.`), size:72, sub:`Artists we published in our ${PAST().slice(0,3).join(', ')} editions.`}),
    T.grid({head:`Published in the ${esc(PAST()[0] || 'last edition')}${/edition|year|\d/i.test(PAST()[0]||'') ? '' : ' Edition'}`, items:[{},{},{},{}], from:6, tr:'Past editions'}),
    T.grid({head:`Published in the ${esc(PAST()[1] || PAST()[0] || 'last edition')}${/edition|year|\d/i.test(PAST()[1]||PAST()[0]||'') ? '' : ' Edition'}`, items:[{},{},{},{}], from:10, tr:'Past editions', ground:'ink'}),
    T.grid({head:`Published in the ${esc(PAST()[2] || PAST()[0] || 'last edition')}${/edition|year|\d/i.test(PAST()[2]||PAST()[0]||'') ? '' : ' Edition'}`, items:[{},{},{},{}], from:14, tr:'Past editions'}),
@@ -576,13 +576,13 @@ ${closeLn()}
 [Credit every artist here: Name · @handle]
 ${tags}`},
  {left:18, title:'Photograph your art for print', kind:'Carousel · education', slides:() => [
-   T.hook({img:EX.dahlia, pos:'center 40%', tr:'For your submission', head:pick(`Applying to the ${name}? Photograph your work like this.`, `Five photo rules for your ${name} submission.`, `Help the jury see your work: five photo tips.`), sub:pick('Five steps that help the jury see your work properly. Save this.', 'Save this before you photograph your work.', 'Good photos make strong submissions. Save this.')}),
+   T.hook({img:EX.dahlia, pos:'center 40%', tr:'For your submission', head:pick(`Applying to the ${name}? Photograph your work like this.`, `5 photo tips before you submit.`, `Shoot your work like this.`), sub:pick('Five steps that help the jury see your work properly. Save this.', 'Better photos, stronger entry. Save this.', 'Save this before you submit.')}),
    T.num({icon:'sun', n:'01', head:pick('Use daylight.', 'Find soft light.', 'Light it naturally.'), text:pick('Near a window, out of direct sun. Avoid flash and yellow indoor light.', 'Shoot by a window on a bright day. No flash.', 'Daylight shows true colour. Indoor bulbs turn it yellow.'), tr:'Photo tips'}),
    T.num({icon:'level', n:'02', head:pick('Shoot straight on.', 'Keep it square.', 'Face the work.'), text:pick('Camera parallel to the work, centred, so nothing looks tilted or stretched.', 'Hold the camera level and centred so the edges stay straight.', 'Stand square to the work so nothing looks warped.'), tr:'Photo tips', ground:'ink'}),
    T.num({icon:'crop', n:'03', head:pick('Fill the frame.', 'Crop it clean.', 'Only the artwork.'), text:pick('Crop to the artwork only. No walls, easels or hands.', 'Crop out the wall, the easel and your hands.', 'Let the work fill the whole photo.'), tr:'Photo tips'}),
    T.num({icon:'drop', n:'04', head:pick('Keep true colour.', 'Skip the filters.', 'Match the real thing.'), text:pick('No filters. Compare the photo to the artwork before you send it.', 'Filters change your colours. Leave them off.', 'Hold the photo next to the work. Do they match?'), tr:'Photo tips', ground:'ink'}),
    T.num({icon:'grid', n:'05', head:pick('Send it large.', 'Go full resolution.', 'Big files print better.'), text:pick('Use the highest resolution your camera allows. Print needs detail.', 'Send the original file, not a screenshot.', 'Print needs detail. Send the largest file you have.'), tr:'Photo tips'}),
-   T.cta({kicker:pick('Photos ready? Submit them', 'Shot your work? Submit it', 'Photos done? Send them in')}),
+   T.cta({kicker:pick('Photos ready? Submit them', 'Photos ready? Submit now', 'Shot it? Submit it')}),
  ], caption:() => `Applying to the ${N()}? Photograph your artworks like this:
 
 1. Daylight, near a window, no flash
@@ -598,11 +598,11 @@ ${closeLn()}
 ${tags}`},
 
  {left:15, title:'15 days left', kind:'Carousel · countdown', slides:() => [
-   T.count({img:ART[1], pos:'center 40%', big:'15', unit:'days left', tr:'Halfway', info:pick(`Halfway to the deadline. ${sel} artists will be published in a juried hardcover book.`, `Halfway there. ${sel} places are still open.`, `Two weeks and a day to submit. ${sel} artists will be published.`)}),
+   T.count({img:ART[1], pos:'center 40%', big:'15', unit:'days left', tr:'Halfway', info:pick(`Halfway to the deadline. ${sel} artists will be published in a juried hardcover book.`, `Halfway. ${sel} places still open.`, `15 days. ${sel} places.`)}),
    T.value(),
    T.stakes(),
    T.howto(),
-   T.cta({kicker:'15 days left', head:pick(`Start your submission<br>to the ${name}.`, `Halfway point:<br>start yours today.`, `Fifteen days to apply<br>to the ${name}.`)}),
+   T.cta({kicker:'15 days left', head:pick(`Start your submission<br>to the ${name}.`, `Halfway there.<br>Start today.`, `15 days left.<br>Apply now.`)}),
  ], caption:() => `Halfway. 15 days left to apply to the ${N()} open call.
 
 ${SEL()} places. Every eligible submission is reviewed, and selected artists are published, sold worldwide and introduced to collectors, galleries and curators.
@@ -625,12 +625,12 @@ ${closeLn()}
 ${tags}`},
 
  {left:13, title:'From submission to print', kind:'Carousel · artist story', slides:() => [
-   T.hook({img:ART[4], pos:'center 40%', tr:'An artist’s story', head:pick(`Submit to the ${name} and see your work in print.`, `From one submission to a printed page.`, `How a submission became a published page.`), size:76, sub:pick('How one past artist went from submission to a published page.', 'One artist’s path from entry to print.', 'Swipe through one artist’s journey into the book.')}),
+   T.hook({img:ART[4], pos:'center 40%', tr:'An artist’s story', head:pick(`Submit to the ${name} and see your work in print.`, `From submission to print.`, `One entry. One printed page.`), size:76, sub:pick('How one past artist went from submission to a published page.', 'One artist’s path into the book.', 'See how it happened.')}),
    T.quote({tr:'An artist’s story'}),
    T.photo({key:'phStoryWork', img:null, label:'Real photo needed<br>The artwork they submitted', tr:'An artist’s story', head:'The work they sent.', sub:gap(state.storyWork,'Title, medium, and why they chose it')}),
    T.photo({key:'phStoryPage', img:null, label:'Real photo needed<br>Their page in the book', tr:'An artist’s story', head:'The page it became.', sub:gap(state.storyAfter,'Edition and what happened next'), ground:'ink'}),
    T.howto(),
-   T.cta({kicker:pick('Your page could be next', 'Your turn to send it in', 'Start your own story')}),
+   T.cta({kicker:pick('Your page could be next', 'Your turn', 'Start yours today')}),
  ], caption:() => `Submit to the ${N()} and see your work in print.
 
 [Artist name] submitted [artwork] to the [Edition]. Here is the page it became, and what happened next, in their words.
@@ -641,12 +641,12 @@ ${closeLn()}
 
 ${tags}`},
  {left:12, title:'How selection works', kind:'Carousel · trust', slides:() => [
-   T.hook({img:ART[1], pos:'center 40%', tr:'Selection', head:pick(`How ${sel} artists are selected for the ${name}.`, `What the jury does with your submission.`, `Inside the selection for the ${name}.`), sub:pick('What happens to your submission, step by step.', 'Three steps, from entry to selection.', 'Step by step, from your entry to the book.')}),
+   T.hook({img:ART[1], pos:'center 40%', tr:'Selection', head:pick(`How ${sel} artists are selected for the ${name}.`, `How the jury picks ${sel} artists.`, `How selection works.`), sub:pick('What happens to your submission, step by step.', 'From entry to book, in 3 steps.', '3 steps from entry to print.')}),
    T.num({icon:'eye', n:'01', head:pick('Every entry is reviewed.', 'Your entry is seen.', 'Nothing is skipped.'), text:`Each eligible submission is seen by ${state.jury ? esc(state.jury) : 'the jury'}, in full.`, tr:'Selection'}),
    T.num({icon:'target', n:'02', head:pick('What the jury looks for.', 'What stands out to the jury.', 'What the jury wants to see.'), text:esc(state.juryLooks || ''), tr:'Selection', ground:'ink'}),
    T.num({icon:'people', n:'03', head:`${sel} are selected.`, text:'Chosen to work together as one collection, not ranked against each other.', tr:'Selection'}),
    T.next({ground:'ink'}),
-   T.cta({kicker:pick('Send your best work', 'Give the jury your strongest work', 'Show them your best')}),
+   T.cta({kicker:pick('Send your best work', 'Send your strongest work', 'Send your best')}),
  ], caption:() => `How ${SEL()} artists are selected for the ${N()}.
 
 Every eligible submission is reviewed. The jury looks for: ${state.juryLooks} ${SEL()} artists are selected to work together as one collection.
@@ -659,7 +659,7 @@ ${tags}`},
 
  {left:10, title:'10 days left', kind:'Carousel · countdown', slides:() => [
    T.count({img:ART[0], pos:'center 15%', big:'10', unit:'days left'}),
-   T.value({ground:'call', art:ART[2]}), T.cta({ground:'cream', head:pick(`Your place in the<br>${name} is open.`, `Ten days to claim<br>your place.`, `Claim your place in<br>the ${name}.`)}),
+   T.value({ground:'call', art:ART[2]}), T.cta({ground:'cream', head:pick(`Your place in the<br>${name} is open.`, `10 days to claim<br>your place.`, `Claim your<br>place now.`)}),
  ], caption:() => `10 days left to apply to the ${N()} open call.
 
 ${SEL()} artists will be published in a juried hardcover book, sold worldwide and shared with collectors, galleries and curators.
@@ -669,11 +669,11 @@ ${closeLn()}
 ${tags}`},
 
  {left:9, title:'Prepare your artworks', kind:'Carousel · ease + urgency', slides:() => [
-   T.count({img:ART[2], pos:'center 40%', big:'9', unit:'days to prepare', line:`your submission to the ${esc(state.name)}`, info:pick('Everything you need is in this post. Save it and start today.', 'Save this checklist and start today.', 'Start now and submit with time to spare.')}),
+   T.count({img:ART[2], pos:'center 40%', big:'9', unit:'days to prepare', line:`your submission to the ${esc(state.name)}`, info:pick('Everything you need is in this post. Save it and start today.', 'Save this checklist. Start today.', 'Start now. Submit early.')}),
    T.check({head:'Prepare your artworks.', tr:'Before you submit', items:[`Choose your strongest ${state.themeWork === 'best work' ? '' : (state.theme || '').toLowerCase() + '-themed '}works`,'Photograph each one in daylight, straight on','Note title, medium and size for each','Add your name and country','Submit through your link or the link in bio'], top:420, foot:'Most artists finish in about ten minutes.'}),
    T.howto(),
    T.value({ground:'cream', art:ART[0]}),
-   T.cta({kicker:'9 days left', head:pick(`Submit to the<br>${name} today.`, `Get it done<br>this week.`, `Nine days.<br>Start today.`)}),
+   T.cta({kicker:'9 days left', head:pick(`Submit to the<br>${name} today.`, `Get it done<br>this week.`, `9 days.<br>Start today.`)}),
  ], caption:() => `9 days to prepare your submission to the ${N()}.
 
 ☐ Choose your strongest ${state.themeWork === 'best work' ? '' : (state.theme || '').toLowerCase() + '-themed '}works
@@ -687,11 +687,11 @@ ${closeLn()}
 
 ${tags}`},
  {left:8, title:'Next on the shelf', kind:'Carousel · proof', slides:() => [
-   T.hook({img:ART[3], tr:'The collection', head:pick(`Get your work on our shelf: the ${name} is open.`, `The next book on our shelf could hold your work.`, `Add your work to our shelf in the ${name}.`), size:76, sub:pick(`${sel} artists will join the next book in the series.`, `${sel} artists will be in the next edition.`, `${sel} places in the next book of the series.`)}),
-   T.photo({key:'phPast1', img:null, label:`Real photo needed<br>${esc(PAST()[0] || 'A past edition')}`, tr:'The collection', head:`${esc(PAST()[0] || 'A past edition')}: published.`, size:56, subTop:1060, sub:`Seen through ${esc(state.distribution || 'Amazon, Barnes & Noble and the ATH Shop')}.`}),
-   T.photo({key:'phPast2', img:null, label:`Real photo needed<br>${esc(PAST()[1] || PAST()[0] || 'Another past edition')}`, tr:'The collection', head:`${esc(PAST()[1] || PAST()[0] || 'Another past edition')}: published.`, size:56, subTop:1060, sub:'Shared with collectors, galleries and curators.', ground:'ink'}),
+   T.hook({img:ART[3], tr:'The collection', head:pick(`Get your work on our shelf: the ${name} is open.`, `Your book could be next on our shelf.`, `Get your work on our shelf.`), size:76, sub:pick(`${sel} artists will join the next book in the series.`, `${sel} artists. One new book.`, `${sel} places in the next edition.`)}),
+   T.photo({key:'phPast1', img:null, label:`Real photo needed<br>${esc(PAST()[0] || 'A past edition')}`, tr:'The collection', head:`${esc(PAST()[0] || 'A past edition')}: published.`, size:64, subTop:1080, sub:`Seen through ${esc(state.distribution || 'Amazon, Barnes & Noble and the ATH Shop')}.`}),
+   T.photo({key:'phPast2', img:null, label:`Real photo needed<br>${esc(PAST()[1] || PAST()[0] || 'Another past edition')}`, tr:'The collection', head:`${esc(PAST()[1] || PAST()[0] || 'Another past edition')}: published.`, size:64, subTop:1080, sub:'Shared with collectors, galleries and curators.', ground:'ink'}),
    T.value({ground:'cream', art:ART[4]}),
-   T.cta({kicker:pick('Be in the next one', 'Join the next book', 'Your spot on the shelf')}),
+   T.cta({kicker:pick('Be in the next one', 'Join the next book', 'Claim your spot')}),
  ], caption:() => `Get your work on our shelf: the ${N()} is open.
 
 Our past editions (${PAST().join(', ')}) put their artists in print and in front of collectors, galleries and curators. The ${N()} is next, with ${SEL()} places.
@@ -701,10 +701,10 @@ ${closeLn()}
 
 ${tags}`},
  {left:7, title:'One week left', kind:'Carousel · countdown', slides:() => [
-   T.count({img:ART[4], pos:'center 40%', big:'One week', bigSize:200, bigTop:400, unit:'left', unitTop:640, info:pick(`One week to put your ${TW()} in print. ${sel} places, juried, worldwide.`, `Seven days to submit your ${TW()}. ${sel} places.`, `The final week to apply. ${sel} artists will be published.`)}),
-   T.stakes({head:pick(`One week. ${sel} places.`, `${sel} places. Seven days.`, `Seven days to apply.`)}),
+   T.count({img:ART[4], pos:'center 40%', big:'One week', bigSize:200, bigTop:400, unit:'left', unitTop:640, info:pick(`One week to put your ${TW()} in print. ${sel} places, juried, worldwide.`, `7 days. ${sel} places.`, `Final week to apply.`)}),
+   T.stakes({head:pick(`One week. ${sel} places.`, `${sel} places. 7 days.`, `7 days to apply.`)}),
    T.next(),
-   T.cta({kicker:'7 days left', head:pick(`Your ${TW()},<br>in print.`, `One week<br>to apply.`, `Make this<br>the week.`), sub:`Apply to the ${name} open call before ${dateLong()}.`}),
+   T.cta({kicker:'7 days left', head:pick(`Your ${TW()},<br>in print.`, `One week<br>to apply.`, `Apply<br>this week.`), sub:`Apply to the ${name} open call before ${dateLong()}.`}),
  ], caption:() => `One week left to apply to the ${N()} open call.
 
 ${SEL()} places. Seven days to prepare your artworks and submit. Your work could be in the next book in the series.
@@ -713,13 +713,13 @@ ${closeLn()}
 
 ${tags}`},
  {left:6, title:'Five mistakes to avoid', kind:'Carousel · education', slides:() => [
-   T.hook({img:ART[0], pos:'center 30%', tr:'Before you submit', head:pick(`Applying to the ${name}? Avoid these 5 mistakes.`, `5 submission mistakes to avoid.`, `Don’t let these 5 mistakes hold back your submission.`), size:76, sub:pick('Six days left to get your submission right. Save this.', 'Check your submission against these. Save this.', 'Six days to get it right. Save this.')}),
+   T.hook({img:ART[0], pos:'center 30%', tr:'Before you submit', head:pick(`Applying to the ${name}? Avoid these 5 mistakes.`, `5 mistakes to avoid.`, `Don’t make these 5 mistakes.`), size:76, sub:pick('Six days left to get your submission right. Save this.', 'Check yours before you submit. Save this.', '6 days to get it right. Save this.')}),
    T.num({icon:'blur', n:'01', head:pick('A blurry or tilted photo.', 'A poor photo.', 'Photos that hide the work.'), text:pick('The jury can only judge what they can see.', 'If it is blurry, the jury cannot see your skill.', 'A sharp, straight photo lets the work speak.'), tr:'Avoid this', ground:'ink'}),
    T.num({icon:'filter', n:'02', head:pick('Filters and editing.', 'Changing the colours.', 'Heavy editing.'), text:pick('If the colours are wrong, the work is misread.', 'The jury needs to see the work as it is.', 'Edits can make the work look like something else.'), tr:'Avoid this'}),
    T.num({icon:'target', n:'03', head: state.themeWork === 'best work' ? 'A body of work without focus.' : 'Ignoring the theme.', text:state.theme && state.themeWork !== 'best work' ? `Show us your reading of the ${(state.theme||'').toLowerCase()} theme, however personal.` : 'Send work that shows your own voice clearly.', tr:'Avoid this', ground:'ink'}),
    T.num({icon:'star', n:'04', head:pick('Holding back your best work.', 'Sending safe work.', 'Second-best pieces.'), text:pick('Send the pieces you are proudest of.', 'Lead with the work you love most.', 'Your strongest piece is the one to send.'), tr:'Avoid this'}),
    T.num({icon:'clock', n:'05', head:pick('Waiting for the last day.', 'Leaving it too late.', 'Rushing at the deadline.'), text:pick('Submit early and get it off your list.', 'Last-minute uploads lead to mistakes.', 'Give yourself time to check everything.'), tr:'Avoid this', ground:'ink'}),
-   T.cta({kicker:pick('Six days left', 'Six days to fix it', 'Six days to apply')}),
+   T.cta({kicker:pick('Six days left', '6 days to fix it', '6 days to apply')}),
  ], caption:() => `Applying to the ${N()}? Avoid these 5 mistakes:
 
 1. A blurry or tilted photo
@@ -733,9 +733,9 @@ ${closeLn()}
 
 ${tags}`},
  {left:5, title:'5 days left', kind:'Carousel · countdown', slides:() => [
-   T.count({img:ART[2], pos:'center 40%', big:'5', unit:'days left', info:pick(`Five days to get your ${TW()} into the ${GE()}.`, `Five days left. ${sel} places in the ${GE()}.`, `Five days to submit to the ${GE()}.`)}),
+   T.count({img:ART[2], pos:'center 40%', big:'5', unit:'days left', info:pick(`Five days to get your ${TW()} into the ${GE()}.`, `5 days. ${sel} places.`, `5 days to submit.`)}),
    T.howto({ground:'ink'}),
-   T.cta({kicker:pick('5 days left', 'Five days to go', 'Submit this week')}),
+   T.cta({kicker:pick('5 days left', '5 days to go', 'Apply this week')}),
  ], caption:() => `5 days left to apply to the ${N()} open call.
 
 1. ${kwLine()}
@@ -744,13 +744,13 @@ ${tags}`},
 
 ${tags}`},
  {left:4, title:'Why artists apply', kind:'Carousel · motivation', slides:() => [
-   T.hook({img:ART[0], pos:'center 15%', tr:'Why artists apply', head:pick(`What getting published in the ${name} does for your career.`, `Why artists apply to the ${name}.`, `What a juried book does for your career.`), size:72, sub:pick('Four days left to apply to the open call.', 'Four reasons, four days left.', 'Four days left. Here is why it matters.')}),
+   T.hook({img:ART[0], pos:'center 15%', tr:'Why artists apply', head:pick(`What getting published in the ${name} does for your career.`, `Why artists apply.`, `What a juried book does for you.`), size:72, sub:pick('Four days left to apply to the open call.', '4 reasons. 4 days left.', '4 days left to apply.')}),
    T.num({icon:'book', n:'01', head:pick('An independent signal of quality.', 'Proof someone chose your work.', 'A credit that carries weight.'), text:'A juried publication is a judgement made by someone else. Curators, residencies and grant panels read it that way.', tr:'Why artists apply'}),
    T.num({icon:'eye', n:'02', head:pick('Your work travels beyond your feed.', 'Seen far beyond Instagram.', 'Your work reaches new places.'), text:`Your work reaches people through ${esc(state.distribution || 'Amazon, Barnes & Noble and the ATH Shop')}, worldwide.`, tr:'Why artists apply', ground:'ink'}),
    T.num({icon:'people', n:'03', head:pick('One book, many first introductions.', 'Introduced to people who buy art.', 'New doors, one book.'), text:'Each edition is introduced to collectors, galleries and curators through our network.', tr:'Why artists apply'}),
    T.num({icon:'star', n:'04', head:pick('Read in context, not in a scroll.', 'Seen slowly, on paper.', 'Part of a collection, not a feed.'), text:`Shown alongside ${Number(state.selected) - 1 || 100} other artists responding to the same theme, your work becomes part of a conversation.`, tr:'Why artists apply', ground:'ink'}),
    T.quote({tr:'Why artists apply'}),
-   T.cta({kicker:pick('Four days left', 'Four days to apply', 'Apply in the next four days')}),
+   T.cta({kicker:pick('Four days left', '4 days to apply', 'Apply in 4 days')}),
  ], caption:() => `What getting published in the ${N()} does for your career:
 
 · An independent signal of quality that curators and grant panels recognise
@@ -763,10 +763,10 @@ ${kwLine()}
 
 ${tags}`},
  {left:3, title:'3 days left', kind:'Carousel · countdown', slides:() => [
-   T.count({img:ART[1], pos:'center 40%', big:'3', unit:'days left', info:pick(`Three days to take one of ${sel} places in the next book.`, `Three days left. ${sel} places.`, `Your last three days to apply.`)}),
-   T.stakes({head:pick(`${sel} places. Three days.`, `Three days. ${sel} places.`, `The final three days.`)}),
+   T.count({img:ART[1], pos:'center 40%', big:'3', unit:'days left', info:pick(`Three days to take one of ${sel} places in the next book.`, `3 days. ${sel} places.`, `Your last 3 days.`)}),
+   T.stakes({head:pick(`${sel} places. Three days.`, `3 days. ${sel} places.`, `The final 3 days.`)}),
    T.quote({tr:'From past editions'}),
-   T.cta({kicker:'3 days left', head:pick(`Take your place in the<br>${name}.`, `Three days<br>to apply.`, `Don’t miss<br>the ${name}.`), size:84, sub:pick('Submissions close in three days. Most artists finish in about ten minutes.', 'Submissions close in three days. It takes about ten minutes.', 'Three days left. Start now, it takes about ten minutes.')}),
+   T.cta({kicker:'3 days left', head:pick(`Take your place in the<br>${name}.`, `3 days<br>to apply.`, `Don’t<br>miss it.`), size:84, sub:pick('Submissions close in three days. Most artists finish in about ten minutes.', 'Closes in 3 days. About 10 minutes to apply.', '3 days left. 10 minutes to apply.')}),
  ], caption:() => `3 days left to apply to the ${N()} open call.
 
 ${SEL()} places in the next book. Most artists finish their submission in about ten minutes.
@@ -775,12 +775,12 @@ ${closeLn()}
 
 ${tags}`},
  {left:2, title:'48 hours: last questions', kind:'Carousel · countdown + doubts', slides:() => [
-   T.count({img:ART[3], big:'48', unit:'hours left', info:pick('Your last questions about the open call, answered inside.', 'Last questions before it closes, answered.', 'Two days left. Your final answers inside.')}),
+   T.count({img:ART[3], big:'48', unit:'hours left', info:pick('Your last questions about the open call, answered inside.', 'Last questions, answered.', '2 days left. Answers inside.')}),
    T.qa({q:'Is it too late to apply?', a:`No. Submissions are open until ${dateLong()}.`, more: CMODE() ? ctaSentence() : `${VERB} “${KW()}” and we’ll send you the brief and your link straight away.`, ground:'cream', tr:'Last questions'}),
    T.qa({q:'How long does it take?', a:'About ten minutes.', more:'Have your photos, titles, medium and sizes ready, then submit through the link in bio.', tr:'Last questions', ground:'call'}),
    T.qa({q:'Will my work really be seen?', a:'Every eligible entry is reviewed by the jury.', more:'Selected work is published, sold worldwide and shared with collectors, galleries and curators.', ground:'ink', tr:'Last questions'}),
    T.qa({q:'Can I submit more than one artwork?', a:gap(state.multiArt,'Confirm the rule'), more:'Choose the works that best represent you.', ground:'cream', tr:'Last questions'}),
-   T.cta({kicker:pick('48 hours left', 'Two days to apply', 'Last 48 hours')}),
+   T.cta({kicker:pick('48 hours left', '2 days to apply', 'Last 48 hours')}),
  ], caption:() => `48 hours left. Your last questions about the ${N()} open call:
 
 · Too late? No, submissions are open until ${dl().getDate()} ${MONTHS_L[dl().getMonth()]}.
@@ -792,9 +792,9 @@ ${kwLine()}
 ${tags}`},
 
  {left:1, title:'24 hours left', kind:'Carousel · countdown', slides:() => [
-   T.count({img:ART[0], pos:'center 15%', big:'24', unit:'hours left', info:pick('Submissions close tomorrow. This is your reminder.', 'This time tomorrow, it closes.', 'One day left to submit.')}),
+   T.count({img:ART[0], pos:'center 15%', big:'24', unit:'hours left', info:pick('Submissions close tomorrow. This is your reminder.', 'Closes tomorrow.', '1 day left.')}),
    T.brief({head:pick('Everything you need, in one place.', 'Your last-day checklist.', 'All you need to submit.')}),
-   T.cta({head:pick(`24 hours to apply.`, `Tomorrow it closes.`, `One day left.`)}),
+   T.cta({head:pick(`24 hours to apply.`, `Closes tomorrow.`, `1 day left.`)}),
  ], caption:() => `24 hours left to apply to the ${N()} open call.
 
 Everything you need is in this post. ${kwLine()}
@@ -802,9 +802,9 @@ Everything you need is in this post. ${kwLine()}
 ${tags}`},
 
  {left:0, title:'Last day', kind:'Carousel · last call', slides:() => [
-   T.urgent({head:pick('Last<br>day.', 'Final<br>day.', 'It closes<br>tonight.'), sub:pick('Submissions close at midnight tonight.', 'The open call closes tonight.', 'Today is your last chance to submit.'), tr:'Last day'}),
+   T.urgent({head:pick('Last<br>day.', 'Final<br>day.', 'Closes<br>tonight.'), sub:pick('Submissions close at midnight tonight.', 'The open call closes tonight.', 'Last chance to submit.'), tr:'Last day'}),
    T.brief(),
-   T.cta({head:pick('Apply today.', 'Submit today.', 'Don’t miss it.')}),
+   T.cta({head:pick('Apply today.', 'Submit today.', 'Apply now.')}),
  ], caption:() => `Last day to apply to the ${N()} open call.
 
 Submissions close at midnight tonight. ${SEL()} artists will be selected and published in a juried hardcover book.
@@ -813,7 +813,7 @@ ${kwLine()}
 ${tags}`},
 
  {left:0, title:'Final hours', kind:'Single · last call', slides:() => [
-   T.urgent({chilli:true, head:pick('Closes<br>tonight.', 'Final<br>hours.', 'Last<br>call.'), sub:pick('Final hours to submit. The jury starts tomorrow.', 'Final hours to submit your work.', 'Hours left. Submit now.'), tr:'Final hours'}),
+   T.urgent({chilli:true, head:pick('Closes<br>tonight.', 'Final<br>hours.', 'Last<br>call.'), sub:pick('Final hours to submit. The jury starts tomorrow.', 'Hours left to submit.', 'Submit now.'), tr:'Final hours'}),
  ], caption:() => `Final hours. The ${N()} open call closes at midnight tonight.
 
 ${kwLine()}
