@@ -829,21 +829,83 @@ function storyFrame(o){
     ${o.sub ? `<p class="a sub" style="left:80px;right:120px;top:${o.subTop||((o.top||820)+330)}px;color:${g.fg};opacity:.9">${o.sub}</p>` : ''}
     ${zone}`};
 }
-function stories(){ const kw = KW(); return [
-  {phase:'Launch day', frames:[
-    storyFrame({img:state.images.imgCover, pos:'center 10%', kicker:'Open call · Edition ' + state.edition, head:`The ${esc(state.name)} is open.`, sub:`${esc(SEL())} artists will be published.`, top:1000, zone:'Add link sticker: Apply', zoneTop:1500}),
-    storyFrame({ground:'call', kicker:'New edition', head:`${esc(SEL())} places.<br>Will you apply?`, top:500, zone:'Add poll: Yes, I’m in / Thinking about it', zoneTop:1100}),
-    storyFrame({ground:'cream', kicker:'How to start', head: CMODE() ? `Comment “${kw}”<br>for the link.` : `DM “${kw}”<br>for the full brief.`, top:500, zone:'Add countdown sticker: closes ' + short(), zoneTop:1100}),
-  ]},
-  {phase:'Mid-month', frames:[
-    storyFrame({img:state.images.imgTheme, pos:'center 40%', kicker:'The theme', head:'Does your work fit?', sub:`${KINDS().slice(0,3).map(k => k[0]).join(', ')}: most ${TW()} does.`, top:1000, zone:'Add quiz sticker', zoneTop:1520}),
-    storyFrame({ground:'ink', kicker:'Ask us', head:'What’s stopping you from applying?', top:500, zone:'Add question box', zoneTop:1100}),
-    storyFrame({ground:'cream', kicker:'Photo tip', head:'Shoot in daylight, straight on, no filters.', sub:'Print needs true colour.', top:500, subTop:930, zone:'Add link sticker: Apply', zoneTop:1250}),
-  ]},
-  {phase:'Final week', frames:[
-    storyFrame({ground:'ink', kicker:'One week', head:'7 days left.', size:180, top:520, zone:'Add countdown sticker', zoneTop:1100}),
-    storyFrame({ground:'call', kicker:'Three days', head:'3 days left.', size:180, top:520, zone:'Add link sticker: Apply', zoneTop:1100}),
-    storyFrame({ground:'cream', kicker:'Closes tomorrow', head: CMODE() ? 'Last chance:<br>link in bio.' : `Last chance:<br>${VERB} “${kw}”.`, top:520, zone:'Add countdown sticker', zoneTop:1100}),
-    Object.assign(storyFrame({ground:'ink', kicker:'Final day', head:'Closes tonight.', size:170, top:520, zone:'Add link sticker: Apply now', zoneTop:1100}), {bg:'#AA0003'}),
-  ]},
-]; }
+// ---------- STORIES: a template library, a day-by-day sequence for this call, and one plan across all calls ----------
+// Every day ends on a link sticker. Stories carry the link sticker, so they are the shortest path to applying.
+const stImg = (k, fb) => state.images[k] || fb;
+const stDiv = (k, fb, style, pos) => `<div data-slot="${k}" class="a img" style="${style};background-image:url(${stImg(k, fb)});background-position:${pos || 'center'}"></div>`;
+const stPh = (k, label, style, col) => state.images[k] ? stDiv(k, '', style + ';border-radius:22px') : `<div data-slot="${k}" class="a ph" style="${style};color:${col}">${label}</div>`;
+const zoneAt = (label, top, h, col) => `<div class="a" style="left:140px;right:140px;top:${top}px;height:${h || 190}px;border:3px dashed ${col};border-radius:28px;opacity:.55;display:flex;align-items:center;justify-content:center;text-align:center;font-size:30px;font-weight:600;line-height:1.35;padding:0 30px;color:${col}">${label}</div>`;
+const stTop = (fg, tr) => `<p class="a cn" style="left:64px;top:250px;color:${fg}">Arts to Hearts Project</p><p class="a cn" style="right:64px;top:250px;color:${fg}">${esc(tr || state.name)}</p>`;
+const LINK = 'Link sticker: Apply';
+const CHILLI = '#AA0003';
+function sFrame(ground, html, bg){ const g = G[ground](); return decorate({h:1920, bg: bg || g.bg, html}); }
+const STORY_T = {
+  L1: {phase:'Launch day', name:'It’s open', sticker:LINK, make: () => storyFrame({img:state.images.imgCover, pos:'center 10%', kicker:'Open call · ' + (state.editionLabel || 'Edition ' + state.edition), head:`The ${GE()} is open.`, sub:`${esc(SEL())} artists will be published. Closes ${dateLong()}.`, top:1000, zone:LINK, zoneTop:1500})},
+  L2: {phase:'Launch day', name:'What you get', sticker:'none', make: () => { const g = G.cream(); const rows = lines(state.benefits).slice(0, 4).map(l => l.split('|').map(x => x.trim()));
+    return sFrame('cream', `${stTop(g.fg, 'If selected')}<p class="a lab" style="left:80px;top:430px;color:${g.acc}">What selected artists receive</p>
+      <p class="a H" style="left:76px;right:80px;top:480px;font-size:96px;color:${g.fg}">Your work, in print.</p>
+      <div class="a" style="left:80px;right:80px;top:760px;color:${g.fg}">${rows.map(([t, d]) => `<div style="padding:30px 0;border-top:2px solid ${g.line}"><p style="font-size:44px;font-weight:600;letter-spacing:-.01em">${esc(t)}</p>${d ? `<p style="font-size:30px;opacity:.7;margin-top:8px">${esc(d)}</p>` : ''}</div>`).join('')}</div>`); }},
+  L3: {phase:'Launch day', name:'Will you apply?', sticker:'Poll: Yes, I’m in / Thinking about it', make: () => storyFrame({ground:'call', kicker:'New edition', head:`${esc(SEL())} places.<br>Will you apply?`, top:560, zone:'Poll sticker:<br>Yes, I’m in / Thinking about it', zoneTop:1120})},
+  L4: {phase:'Launch day', name:'How to apply', sticker:LINK + ' + countdown', make: () => { const g = G.ink();
+    const steps = CMODE() ? [['Tap the link sticker', `Or comment “${KW()}” on our latest post for the link.`], ['Choose your best work', `Your strongest ${esc(state.themeWork === 'best work' ? 'work' : (state.theme || 'work').toLowerCase())}, photographed in daylight.`], ['Submit by ' + dateLong(), 'It takes about ten minutes.']]
+      : [[`DM “${KW()}”`, 'We send you the brief and your link.'], ['Choose your best work', 'Photographed in daylight, straight on.'], ['Submit by ' + dateLong(), 'It takes about ten minutes.']];
+    return sFrame('ink', `${stTop(g.fg, 'How to apply')}<p class="a H" style="left:76px;right:80px;top:420px;font-size:100px;color:${g.fg}">How to apply</p>
+      <div class="a" style="left:80px;right:80px;top:640px;color:${g.fg}">${steps.map(([t, d], i) => `<div style="display:flex;gap:34px;padding:30px 0;border-top:2px solid ${g.line}"><span style="font-size:60px;font-weight:300;color:${g.acc};width:70px;flex:none">${i + 1}</span><div><p style="font-size:44px;font-weight:600">${t}</p><p style="font-size:30px;opacity:.7;margin-top:8px;line-height:1.35">${d}</p></div></div>`).join('')}</div>
+      ${zoneAt('Link sticker: Apply<br>Countdown sticker: closes ' + short(), 1390, 210, g.fg)}`); }},
+  E1: {phase:'Every day', name:'Share today’s post', sticker:'The shared post, then ' + LINK, make: () => { const g = G.cream();
+    return sFrame('cream', `${stTop(g.fg, 'New post')}<p class="a lab" style="left:80px;top:400px;color:${g.acc}">New on the feed</p><p class="a H" style="left:76px;right:80px;top:450px;font-size:88px;color:${g.fg}">Swipe through today’s post.</p>
+      ${zoneAt('Share today’s feed post here<br>(paper plane on the post → Add to story)', 700, 760, g.fg)}${zoneAt(LINK, 1500, 130, g.fg)}`); }},
+  E2: {phase:'Every day', name:'Days left', sticker:LINK + ' + countdown', make: (n = 21) => { const ground = n % 2 ? 'ink' : 'call'; const g = G[ground]();
+    return sFrame(ground, `${stTop(g.fg, leftLabel(n))}<p class="a" style="left:70px;top:430px;font-size:420px;font-weight:300;letter-spacing:-.05em;line-height:1;color:${g.fg}">${n}</p>
+      <p class="a" style="left:80px;top:900px;font-size:72px;font-weight:700;letter-spacing:.02em;text-transform:uppercase;color:${g.acc}">${n === 1 ? 'day left' : 'days left'}</p>
+      <p class="a sub" style="left:80px;right:120px;top:1000px;font-size:40px;color:${g.fg}">to apply to the ${GE()}. ${esc(SEL())} artists will be published.</p>
+      ${zoneAt('Link sticker: Apply<br>Countdown sticker', 1300, 200, g.fg)}`); }},
+  E3: {phase:'Every day', name:'Theme quiz', sticker:'Quiz', make: () => { const k = KINDS().slice(0, 3).map(x => x[0]);
+    return storyFrame({img:state.images.imgTheme, pos:'center 40%', kicker:'Quiz', head:'Which of these can you submit?', sub:`${k.join(', ')}: the answer is all of them.`, top:960, subTop:1260, zone:`Quiz sticker: ${k.join(' / ')} / All of them`, zoneTop:1420}); }},
+  E4: {phase:'Every day', name:'This or that', sticker:'Poll: Left / Right', make: () => { const g = G.cream();
+    return sFrame('cream', `${stTop(g.fg, 'This or that')}<p class="a H" style="left:76px;right:80px;top:400px;font-size:90px;color:${g.fg}">Which would you submit?</p>
+      ${stDiv('st4a', SAMPLE_ART[1], 'left:80px;top:680px;width:450px;height:600px;border-radius:22px', 'center 30%')}${stDiv('st4b', SAMPLE_ART[2], 'left:550px;top:680px;width:450px;height:600px;border-radius:22px', 'center 30%')}
+      ${zoneAt('Poll sticker: Left / Right', 1330, 150, g.fg)}`); }},
+  E5: {phase:'Every day', name:'Ask us', sticker:'Question box', make: () => storyFrame({ground:'call', kicker:'Ask us', head:'Anything you want to know before you apply?', top:520, zone:'Question box sticker:<br>Ask about the open call', zoneTop:1120, zoneH:260})},
+  E6: {phase:'Every day', name:'You asked', sticker:LINK, make: () => { const g = G.ink();
+    return sFrame('ink', `${stTop(g.fg, 'You asked')}<p class="a lab" style="left:80px;top:430px;color:${g.acc}">You asked</p>
+      <p class="a ser" style="left:80px;right:80px;top:490px;font-size:80px;line-height:1.1;color:${g.fg}">“Do I keep the rights to my work?”</p>
+      <p class="a sub" style="left:80px;right:100px;top:820px;font-size:44px;line-height:1.35;color:${g.fg}">${gap(state.rights, 'Confirm the rights wording')}</p>${zoneAt(LINK, 1400, 150, g.fg)}`); }},
+  E7: {phase:'Every day', name:'Published artist', sticker:LINK, make: () => { const g = G.ink(); const a = PAST_ARTISTS()[0] || [];
+    return sFrame('ink', `${stTop(g.fg, 'Published artist')}${paImg(0) ? `<div data-slot="pa1" class="a img" style="left:80px;right:80px;top:380px;height:760px;border-radius:22px;background-image:url(${paImg(0)});background-position:center"></div>` : `<div data-slot="pa1" class="a ph" style="left:80px;right:80px;top:380px;height:760px;color:${g.fg}">Their work</div>`}
+      <p class="a" style="left:80px;top:1180px;font-size:48px;font-weight:600;color:${g.fg}">${gap(a[0], 'Artist name')}</p><p class="a" style="left:80px;top:1250px;font-size:32px;opacity:.7;color:${g.fg}">${gap(a[1], 'Edition · Country')}</p>
+      <p class="a ser" style="left:80px;right:80px;top:1320px;font-size:46px;color:${g.acc}">Published. Your turn.</p>${zoneAt(LINK, 1430, 130, g.fg)}`); }},
+  E8: {phase:'Every day', name:'Inside the book', sticker:LINK, make: () => { const g = G.cream();
+    return sFrame('cream', `${stTop(g.fg, 'Inside the book')}${stPh('imgSpread', 'Real photo needed<br>An open spread of the book', 'left:80px;right:80px;top:380px;height:820px', g.fg)}
+      <p class="a H" style="left:76px;right:80px;top:1240px;font-size:80px;color:${g.fg}">Juried. Printed. Sold worldwide.</p>${zoneAt(LINK, 1450, 120, g.fg)}`); }},
+  E9: {phase:'Every day', name:'Submission tip', sticker:LINK, make: () => storyFrame({ground:'cream', kicker:'Submission tip', head:'Photograph your work in daylight, straight on.', sub:'No filters. Print needs true colour.', top:520, subTop:1010, zone:LINK, zoneTop:1250})},
+  E10:{phase:'Every day', name:'How ready are you?', sticker:'Slider', make: () => storyFrame({ground:'call', kicker:'Check in', head:'How ready is your submission?', top:560, zone:'Slider sticker', zoneTop:1120})},
+  F1: {phase:'Final week', name:'One week left', sticker:LINK + ' + countdown', make: () => storyFrame({ground:'ink', kicker:'One week', head:'One week left.', sub:`Seven days to submit to the ${GE()}.`, size:150, top:520, subTop:900, zone:'Link sticker: Apply<br>Countdown sticker', zoneTop:1150})},
+  F2: {phase:'Final week', name:'Checklist', sticker:LINK, make: () => { const g = G.cream(); const items = ['Your strongest work chosen', 'Photographed in daylight', 'Titles, medium and sizes ready'];
+    return sFrame('cream', `${stTop(g.fg, '3 days left')}<p class="a lab" style="left:80px;top:430px;color:${g.acc}">3 days left</p><p class="a H" style="left:76px;right:80px;top:480px;font-size:96px;color:${g.fg}">Before you submit:</p>
+      <div class="a" style="left:80px;right:80px;top:700px;color:${g.fg}">${items.map(t => `<div style="display:flex;align-items:center;gap:30px;padding:32px 0;border-top:2px solid ${g.line}"><span style="width:56px;height:56px;border:3px solid ${g.acc};border-radius:12px;flex:none"></span><span style="font-size:44px;font-weight:500">${t}</span></div>`).join('')}</div>${zoneAt(LINK, 1300, 150, g.fg)}`); }},
+  F3: {phase:'Final week', name:'48 hours', sticker:LINK, make: () => storyFrame({ground:'call', kicker:'48 hours', head:'48 hours left.', sub:`Submissions close ${dateLong()}.`, size:160, top:520, subTop:900, zone:LINK, zoneTop:1150})},
+  F4: {phase:'Final week', name:'Closes tomorrow', sticker:LINK + ' + countdown', make: () => storyFrame({ground:'ink', kicker:'Closes tomorrow', head:'Last chance.', sub:`Submissions close tomorrow, ${dateLong()}.`, size:160, top:520, subTop:900, zone:'Link sticker: Apply<br>Countdown sticker', zoneTop:1150})},
+  F5: {phase:'Final week', name:'Closes tonight', sticker:LINK, make: () => Object.assign(storyFrame({ground:'ink', kicker:'Final day', head:'Closes tonight.', size:170, top:560, zone:'Link sticker: Apply now', zoneTop:1100}), {bg:CHILLI})},
+  F6: {phase:'Final week', name:'Final hours', sticker:LINK, make: () => Object.assign(storyFrame({ground:'ink', kicker:'Final hours', head:'Hours left to apply.', sub:`The ${GE()} closes tonight.`, size:140, top:560, subTop:900, zone:'Link sticker: Apply now', zoneTop:1120}), {bg:CHILLI})},
+  F7: {phase:'After close', name:'Thank you', sticker:'none', make: () => storyFrame({ground:'cream', kicker:'Submissions closed', head:'Thank you to every artist who applied.', sub:`Results: ${gap(state.results, 'Date')}.`, top:560, subTop:1000})},
+  H1: {phase:'Highlight cover', name:'Highlight cover', sticker:'Use as the highlight cover', make: () => { const g = G.call();
+    return sFrame('call', `<div class="a" style="left:240px;top:660px;width:600px;height:600px;border-radius:50%;border:4px solid ${g.acc};display:flex;align-items:center;justify-content:center;text-align:center"><span style="font-size:${KW().length > 7 ? 70 : 90}px;font-weight:700;letter-spacing:.04em;color:${g.fg}">${KW()}</span></div>`); }},
+};
+// which templates go out on a given day for a call with `left` days to go (-1 = the day after it closes)
+const STORY_ROTATION = ['E3', 'E5', 'E4', 'E7', 'E9', 'E6', 'E8', 'E10'];
+function storyDay(left, postDays){
+  if (left === 30) return ['L1', 'L2', 'L3', 'L4'];
+  if (left === -1) return ['F7'];
+  if (left < -1 || left > 30) return [];
+  const out = []; if (postDays.has(left)) out.push('E1');
+  const end = {7:['F1'], 3:['F2', 'E2'], 2:['F3'], 1:['F4'], 0:['F5', 'F6']}[left];
+  if (end) return out.concat(end);
+  out.push(STORY_ROTATION[(30 - left) % STORY_ROTATION.length], 'E2');
+  return out;
+}
+const storyMake = (id, left) => { const t = STORY_T[id]; const f = id === 'E2' ? t.make(left) : t.make(); return {...f, title: id.toLowerCase() + '-' + t.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/-$/, ''), label: id + ' · ' + t.name}; };
+// kept for older callers
+function stories(){ const phases = {}; Object.entries(STORY_T).forEach(([id]) => { const t = STORY_T[id]; (phases[t.phase] = phases[t.phase] || []).push(storyMake(id, 21)); });
+  return Object.entries(phases).map(([phase, frames]) => ({phase, frames})); }
+

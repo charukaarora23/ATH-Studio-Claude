@@ -63,6 +63,7 @@ summary{font:600 12px/1 var(--mono);letter-spacing:.1em;text-transform:uppercase
 .canva{display:flex;gap:10px;align-items:center;margin-top:12px}.canva .btn{padding:9px 14px;font-size:13px;text-decoration:none}.cmiss{font-size:13px;color:var(--muted)}
 .pool{display:grid;grid-template-columns:repeat(auto-fill,minmax(64px,1fr));gap:8px;margin:4px 0 10px}.pc{position:relative;font-size:10px;line-height:1.2;color:var(--muted)}.pc span{display:block;margin-top:3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.pt{width:100%;aspect-ratio:4/5;border:1.5px dashed var(--line);border-radius:8px;background:var(--panel) center/cover;font:700 14px var(--sans);color:var(--muted);cursor:pointer}.pc.on .pt{border:0}.px{position:absolute;top:3px;right:3px;width:20px;height:20px;border-radius:50%;border:0;background:rgba(0,0,0,.6);color:#fff;font-size:14px;line-height:20px;cursor:pointer;padding:0}
 .frame.pointing{cursor:pointer}.post .slot-on{outline:14px solid #2f7cf6!important;outline-offset:-14px;filter:brightness(1.06)}.frame{position:relative}.frame.texting{cursor:text}.post .tx-on{outline:6px dashed #2f7cf6;outline-offset:6px;border-radius:4px}.txed{position:absolute;z-index:50;width:340px;background:var(--panel,#fff);border:1px solid var(--line);border-radius:12px;box-shadow:0 12px 32px rgba(0,0,0,.18);padding:12px}.txed label{display:block;font-size:12px;color:var(--muted);margin-bottom:6px}.txed textarea{width:100%;box-sizing:border-box;font:15px/1.4 var(--sans,sans-serif);padding:8px;border:1px solid var(--line);border-radius:8px;resize:vertical}.txb{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap}.txb .btn{padding:7px 12px;font-size:13px}.frame.pointing::after{content:attr(data-hint);position:absolute;left:50%;bottom:12px;transform:translateX(-50%);background:#2f7cf6;color:#fff;font:600 12px/1.2 var(--sans,sans-serif);padding:7px 12px;border-radius:999px;white-space:nowrap;z-index:20;pointer-events:none;box-shadow:0 2px 8px rgba(0,0,0,.25)}
+.sp-rules p{margin:0}.sp-rules{display:grid;gap:10px;margin:10px 0 18px;font-size:14px;line-height:1.5;max-width:900px}.sp-wrap{overflow-x:auto}.sp-t{border-collapse:collapse;font-size:13px;min-width:720px;width:100%}.sp-t th,.sp-t td{border:1px solid var(--line);padding:8px 10px;vertical-align:top;text-align:left}.sp-t thead th{position:sticky;top:0;background:var(--panel,#fff)}.sp-t tbody th{white-space:nowrap;font-weight:600}.sp-hot{background:#fbe3e3}.sp-off{color:var(--muted);text-align:center!important}.sp-n{text-align:center!important;font-weight:600}.sp-dot{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:6px}.sp-lib p{margin:4px 0;font-size:13px}
 .acts{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}.hint{font-size:13px;color:var(--muted);margin:0 0 10px;line-height:1.45}
 .capbox{max-width:720px;margin-top:10px;border-top:1px solid var(--line)}
 .cell .act{display:flex;justify-content:space-between;align-items:center;font-size:12px;color:var(--muted);width:var(--pw)}
@@ -359,6 +360,7 @@ function slotName(k){ k = String(k || ''); let m;
   if ((m = k.match(/^pool(\d+)$/))) return 'month artwork ' + m[1];
   if ((m = k.match(/^pa(\d+)$/))) return 'past artist ' + m[1];
   if ((m = k.match(/^cv(\d+)$/))) return 'book cover ' + m[1];
+  if (/^st4[ab]$/.test(k)) return k === 'st4a' ? 'left image' : 'right image';
   return {imgCover:'cover artwork', imgTheme:'theme artwork', imgBooks:'the books together', imgSpread:'open spread', phSpread2:'a second spread', phShelf:'book on a shelf', phHolding:'artist holding their copy', phStoryWork:'the artwork they sent', phStoryPage:'their page in the book', phPast1:'past edition 1', phPast2:'past edition 2'}[k] || 'this slide'; }
 function slotsUnder(frame, x, y){ return document.elementsFromPoint(x, y).filter(el => frame.contains(el) && el.matches('.post [data-slot], .post .img, .post .ph')); }
 function putImage(key, file){ if (!key || !file || !/^image\//.test(file.type)) return; shrink(file).then(url => { state.images[key] = url; render(); status('Image placed. Press "Save call" to keep it.'); }); }
@@ -376,6 +378,30 @@ function wireSlots(){
     frame.addEventListener('dragleave', () => hover(null));
     frame.addEventListener('drop', e => { const p = pick(e); hover(null); if (!p) return; e.preventDefault(); putImage(p.key, e.dataTransfer.files[0]); });
   });
+}
+function storyPlanHTML(){
+  const cur = state.name; const calls = Object.entries(PRESETS).filter(([n]) => !/blank/i.test(n)).map(([n, p]) => { const s = n === $('preset').value || (p.name || DEFAULTS.name) === cur ? state : {...DEFAULTS, ...p}; return {name: s.name, kw: (s.keyword || '').toUpperCase(), colour: s.colour, dl: new Date(s.deadline + 'T00:00:00')}; });
+  const posts = new Set(monthPosts().map(p => p.left)); const day = 864e5;
+  const today = new Date(); today.setHours(0, 0, 0, 0);
+  const last = new Date(Math.max(...calls.map(c => +c.dl)) + day);
+  const fmt = d => d.getDate() + ' ' + MONTHS[d.getMonth()] + ' ' + ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'][d.getDay()];
+  const rows = []; for (let d = new Date(today); d <= last; d = new Date(+d + day)) {
+    let total = 0; const cells = calls.map(c => { const left = Math.round((c.dl - d) / day); const ids = storyDay(left, posts); total += ids.length;
+      if (!ids.length) return '<td class="sp-off">–</td>';
+      const tag = left === 30 ? 'Launch' : left === -1 ? 'Closed' : left === 0 ? 'Deadline' : left <= 7 ? 'Final week' : leftLabel(left);
+      return `<td class="${left <= 7 && left >= 0 ? 'sp-hot' : ''}"><b>${tag}</b><br>${ids.map(id => `${id} ${STORY_T[id].name}`).join('<br>')}</td>`; });
+    const hot = calls.map(c => Math.round((c.dl - d) / day)).filter(l => l >= 0 && l <= 7);
+    rows.push(`<tr><th>${fmt(d)}</th>${cells.join('')}<td class="sp-n">${total}</td></tr>`); }
+  return `<section class="group sp"><h2>Stories plan · every call, every day</h2>
+    <p class="meta">From today to the last deadline · each row is one day of Stories</p>
+    <div class="sp-rules">
+      <p><b>The rule:</b> every day, every live call gets 2 to 4 frames. The last frame of each call always carries the link sticker. Stories are where the link lives, so they are the shortest path to applying.</p>
+      <p><b>Order when calls overlap:</b> the call in its final week goes first (pink cells), then the others by nearest deadline. Spread the day: one call in the morning, the next at lunch, the next in the evening.</p>
+      <p><b>Every day:</b> share the day’s feed post when there is one (E1), one engagement sticker (quiz, poll, question box or slider), then the countdown with the link sticker (E2).</p>
+      <p><b>Highlights:</b> one highlight per call with its keyword as the name (H1 cover). Keep in it: L1, L2, L4, E6 answers and the final-week frames. Archive it the week after the call closes.</p>
+      <p><b>Ready frames:</b> pick “Stories: this call, every day” for each call to get every day’s frames with the right countdown, then Save all as ZIP.</p></div>
+    <div class="sp-wrap"><table class="sp-t"><thead><tr><th>Day</th>${calls.map(c => `<th><span class="sp-dot" style="background:${c.colour}"></span>${esc(c.name)}<br><small>closes ${c.dl.getDate()} ${MONTHS[c.dl.getMonth()]} · “${esc(c.kw)}”</small></th>`).join('')}<th>Frames</th></tr></thead><tbody>${rows.join('')}</tbody></table></div>
+    <details class="capbox"><summary>What each template is for</summary><div class="sp-lib">${Object.entries(STORY_T).map(([id, t]) => `<p><b>${id} ${esc(t.name)}</b> · ${esc(t.phase)} · sticker: ${esc(t.sticker)}</p>`).join('')}</div></details></section>`;
 }
 function renderPool(){
   renderPeople('paGrid', 'pa', PAST_ARTISTS(), 6, paImg); renderPeople('cvGrid', 'cv', COVER_ARTISTS(), 3, cvImg);
@@ -596,18 +622,24 @@ const slideNode = s => `<div class="post" style="background:${s.bg};height:${s.h
 function verbFor(left){ if ((state.ctaMode || 'comment') === 'comment') return 'COMMENT'; const d = new Date(dl()); d.setDate(d.getDate() - left); const [y,m,dd] = String(state.commentFrom||'').split('-').map(Number); return (y && d >= new Date(y, m-1, dd)) ? 'COMMENT' : 'DM'; }
 function postDate(left){ const d = new Date(dl()); d.setDate(d.getDate() - left); return d.getDate() + ' ' + MONTHS[d.getMonth()]; }
 function buildPtype(){ const sel = $('ptype'), cur = sel.value;
-  sel.innerHTML = `<option value="month">Whole month (${monthPosts().length} feed posts)</option>` + monthPosts().map((p,i) => `<option value="${i}">${postDate(p.left)} · ${esc(p.title)} (${p.kind.split(' ·')[0]})</option>`).join('') + '<option value="stories">Stories (10 frames)</option>';
+  sel.innerHTML = `<option value="month">Whole month (${monthPosts().length} feed posts)</option>` + monthPosts().map((p,i) => `<option value="${i}">${postDate(p.left)} · ${esc(p.title)} (${p.kind.split(' ·')[0]})</option>`).join('') + '<optgroup label="Stories"><option value="storyplan">Stories plan: all calls, day by day</option><option value="storydays">Stories: this call, every day ready to post</option><option value="stories">Stories: template library</option></optgroup>';
   sel.value = cur || '0'; if (!sel.value) sel.value = '0'; }
 function render(){
   readForm();
   const base = (state.name || 'call').toLowerCase().replace(/[^a-z0-9]+/g,'-');
   const pick = $('ptype').value || '0';
   const groups = [];
+  if (pick === 'storyplan') { renderPool(); RENDERED = []; $('out').innerHTML = storyPlanHTML(); status('Stories plan for every call. Pick "Stories: this call, every day" to get the frames.'); return; }
   if (pick === 'stories') {
-    stories().forEach((ph,pi) => { VERB = verbFor([30,15,3][pi]); const frames = ph.frames; VERB = verbFor(99);
-      groups.push({title:'Stories · ' + ph.phase, meta: frames.length + ' frames · 1080 × 1920 · add the stickers in Instagram', slides: frames.map((f,j) => ({...f, title: ph.phase.toLowerCase().replace(/[^a-z]+/g,'-') + '-' + (j+1)})), story:true}); });
-    // re-render final week with the right verb
-    VERB = verbFor(3); groups[2].slides = stories()[2].frames.map((f,j) => ({...f, title:'final-week-' + (j+1)})); VERB = verbFor(99);
+    const phases = {}; Object.keys(STORY_T).forEach(id => { const t = STORY_T[id]; VERB = verbFor(id[0] === 'F' ? 3 : 20); (phases[t.phase] = phases[t.phase] || []).push({id, t, f: storyMake(id, 21)}); });
+    VERB = verbFor(99);
+    Object.entries(phases).forEach(([phase, list]) => groups.push({title:'Story templates · ' + phase, meta: list.map(x => `${x.id} ${x.t.name}: ${x.t.sticker}`).join('  ·  '), slides: list.map(x => x.f), story:true}));
+  } else if (pick === 'storydays') {
+    const posts = new Set(monthPosts().map(p => p.left));
+    for (let left = 30; left >= -1; left--) { const ids = storyDay(left, posts); if (!ids.length) continue; VERB = verbFor(Math.max(left, 0));
+      const label = left === 30 ? 'launch day' : left === -1 ? 'the day after it closes' : left === 0 ? 'deadline day' : leftLabel(left);
+      groups.push({title: `${postDate(left)} · Stories`, meta: `${ids.length} frame${ids.length > 1 ? 's' : ''} · ${label} · post in this order · ` + ids.map(id => `${id} ${STORY_T[id].name}: ${STORY_T[id].sticker}`).join('  ·  '), slides: ids.map(id => storyMake(id, left)), story:true}); }
+    VERB = verbFor(99);
   } else {
     artPlan(); const all = monthPosts(); const list = pick === 'month' ? all : [all[Number(pick)]];
     list.forEach((p,pi) => { VERB = verbFor(p.left); CURLEFT = p.left;
@@ -624,7 +656,7 @@ function render(){
     const cells = g.slides.map((s,j) => { const i = RENDERED.push({ s, name: `${base}-${g.left !== undefined ? String(g.idx+1).padStart(2,'0')+'-' : 'story-'}${String(j+1).padStart(2,'0')}-${s.title}.png` }) - 1;
        const okey = 'ov|' + g.title.replace(/^[^·]*·\s*/, '') + '|' + j; const has = !!state.images[okey];
       const photoBtns = has ? `<button type="button" data-phx="${esc(okey)}">Reset photo</button>` : '';
-      return `<div class="cell"><div class="frame${s.h ? ' tall' : ''}" data-okey="${esc(okey)}" data-tkey="${esc('tx|' + g.title.replace(/^[^·]*·\s*/, '') + '|' + j)}">${slideNode(s)}</div><div class="act"><span>${g.slides.length>1 ? 'Slide ' + (j+1) : 'Single'}</span><span class="acts">${photoBtns}<button type="button" data-i="${i}">Save PNG</button></span></div></div>`; }).join('');
+      return `<div class="cell"><div class="frame${s.h ? ' tall' : ''}" data-okey="${esc(okey)}" data-tkey="${esc('tx|' + g.title.replace(/^[^·]*·\s*/, '') + '|' + j)}">${slideNode(s)}</div><div class="act"><span>${s.label ? esc(s.label) : g.slides.length>1 ? 'Slide ' + (j+1) : 'Single'}</span><span class="acts">${photoBtns}<button type="button" data-i="${i}">Save PNG</button></span></div></div>`; }).join('');
     const capBox = g.cap ? `<details class="capbox"><summary>Caption and pinned comment</summary><div class="f"><textarea id="cap${gi}" style="min-height:220px">${esc(g.cap)}</textarea></div><div class="f"><label>Pinned comment</label><input value="${esc(g.pin)}"></div><button class="btn ghost" type="button" data-cap="cap${gi}" style="margin-top:8px">Copy caption</button></details>` : '';
     const ckey = (state.name || '') + ' | ' + g.title.replace(/^[^·]*·\s*/, '');
     const clink = canvaLink(ckey);
