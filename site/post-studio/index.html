@@ -164,7 +164,8 @@ summary{font:600 12px/1 var(--mono);letter-spacing:.1em;text-transform:uppercase
       <div class="f"><label for="pub">Publication month</label><input id="pub" placeholder="e.g. March"></div>
     </div>
     <div class="f"><label for="fee">Application fee wording</label><input id="fee" placeholder="e.g. applicable"></div>
-    <div class="f"><label for="commentFrom">Switch CTA from “DM” to “COMMENT” on</label><input id="commentFrom" type="date"></div>
+    <div class="f"><label for="ctaMode">Call to action</label><select id="ctaMode"><option value="comment">Link in bio + comment the keyword (DM automation off)</option><option value="dm">DM the keyword, then comment from a date</option></select></div>
+    <div class="f"><label for="commentFrom">If DM: switch to “COMMENT” on</label><input id="commentFrom" type="date"></div>
     <div class="f"><label for="elig">Eligibility line</label><input id="elig"></div>
     <div class="row2">
       <div class="f"><label for="who">Who (e.g. artists, women artists)</label><input id="who"></div>
@@ -234,7 +235,7 @@ const DEFAULTS = {
   bookText:'Every selected artist is published with their name, artwork title, medium and country.',
   benefits:'Published in the book | Your work in print\nCertificate of Recognition | For your CV and grant applications\nSold worldwide | Amazon · Barnes & Noble · ATH Shop\nThe book’s campaign | 190K+ followers · 100K+ email subscribers\nIntroductions | To collectors, galleries and curators',
   prize:'$500', prizeExtra:'a 4-page feature, a trophy and an Artsy listing', runners:'A 2-page feature and a trophy.',
-  jury:'', results:'', pub:'', fee:'', rights:'', multiArt:'', storyWork:'', storyAfter:'', commentFrom:'2026-12-08', elig:'No degree, gallery or exhibition history needed. Individual artists, 18+, worldwide.',
+  jury:'', results:'', pub:'', fee:'', rights:'', multiArt:'', storyWork:'', storyAfter:'', ctaMode:'comment', commentFrom:'2026-12-08', elig:'No degree, gallery or exhibition history needed. Individual artists, 18+, worldwide.',
   credit:'', artists:'', coverArtists:'',
   editionLabel:'Edition 16', seriesNoun:'editions', style:'gallery',
   theme:'Garden', themeWork:'garden work', themeLine:'flowers, plants, landscapes, people and nature, abstract or imagined growth',
@@ -377,7 +378,7 @@ const KW = () => esc((state.keyword || 'KEYWORD').toUpperCase());
 // four corner labels: the one header system on every slide
 const corners = (col, dmCol, tr) => `
   <p class="a cn" style="left:52px;top:48px;color:${col}">Arts to Hearts Project</p><p class="a cn" style="right:52px;top:48px;color:${col}">${esc(tr)}</p>
-  <p class="a cn" style="left:52px;bottom:48px;color:${dmCol}">${VERB} “${KW()}”</p><p class="a cn" style="right:52px;bottom:48px;color:${col}">Closes ${short()}</p>`;
+  <p class="a cn" style="left:52px;bottom:48px;color:${dmCol}">${(state.ctaMode || 'comment') === 'comment' ? `Link in bio · comment “${KW()}”` : `${VERB} “${KW()}”`}</p><p class="a cn" style="right:52px;bottom:48px;color:${col}">Closes ${short()}</p>`;
 const spineLab = (n,f,fs) => `<span style="position:absolute;left:50%;bottom:18px;transform:translateX(-50%) rotate(-90deg);white-space:nowrap;font-family:'ATH Serif',serif;font-style:italic;font-size:${fs}px;width:0;color:${f}">${esc(n)}</span>`;
 const SPINES = [['#14090C','#F9ECE5'],['#AA0003','#FFD6DE'],['#FAD2E1','#6A0620'],['#2E4A2A','#E3E8DE'],['#E3E8DE','#14090C'],['#6A0620','#FAD2E1'],['#C9D3BE','#14090C'],['#FFD6DE','#AA0003'],['#4C4240','#F9ECE5'],['#B7D9FF','#6A0620'],['#FFF3B2','#AA0003']];
 const HEIGHTS = [360,330,370,345,380,350,335,365,375,340,360,350,370,345,380];
@@ -502,9 +503,9 @@ function launch(){
     <div class="a" style="left:250px;right:250px;top:450px;height:300px;display:flex;align-items:flex-end;gap:10px;border-bottom:6px solid ${CREAM};padding:0 14px">${mini}
       <div style="flex:1.5;height:290px;background:${Tn};border-radius:3px 3px 0 0;box-shadow:0 0 0 6px ${rgba(Tn,.3)};position:relative">${spineLab(state.name, INK, 30)}</div></div>
     <div class="a" style="left:110px;right:110px;top:850px;height:124px;border-radius:999px;background:${CREAM};color:${BURG};display:flex;align-items:center;justify-content:space-between;padding:0 20px 0 56px">
-      <span style="font-size:44px;font-weight:700;letter-spacing:-.02em">DM “${kw}” to apply</span>
+      <span style="font-size:44px;font-weight:700;letter-spacing:-.02em">${ctaBtn()}</span>
       <span style="width:88px;height:88px;border-radius:50%;background:${BURG};color:${CREAM};display:inline-flex;align-items:center;justify-content:center"><svg width="36" height="16" viewBox="0 0 46 20"><path d="M2 10h40M33 2l9 8-9 8" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></span></div>
-    <p class="a c" style="left:0;right:0;top:1020px;font-size:28px;opacity:.9;color:${WHITE}">or apply via link in bio</p>
+    <p class="a c" style="left:0;right:0;top:1020px;font-size:28px;opacity:.9;color:${WHITE}">${ctaSub()}</p>
     <p class="a c" style="left:0;right:0;top:1070px;font-size:26px;opacity:.7;color:${WHITE}">artstoheartsproject.com</p>`});
 
   const titles = ['cover','who-we-are','the-series','the-theme','the-book','what-you-receive','recognition','selection','who-can-apply','published-artists','cover-artists','apply'];
@@ -522,19 +523,19 @@ ${state.selected} artists will be selected by ${state.jury || 'the jury'} and pu
 
 Open to individual artists 18+, worldwide, in any medium.
 
-DM us "${kw}" for the full brief, or apply through the link in bio.
+${kwLine()}
 Submissions close ${dl().getDate()} ${MONTHS_L[dl().getMonth()]}.
 
 Know an artist whose work belongs in this book? Send this to them.
 
 #ArtsToHeartsProject #OpenCall #CallForArtists #101ArtBook`;
 }
-const pinned = () => `DM "${(state.keyword || 'KEYWORD').toUpperCase()}" for the full brief and your submission link. Closes ${short()}.`;
+const pinned = () => CMODE() ? `Apply via the link in bio, or comment "${(state.keyword || 'KEYWORD').toUpperCase()}" and we'll send you the link. Closes ${short()}.` : `DM "${(state.keyword || 'KEYWORD').toUpperCase()}" for the full brief and your submission link. Closes ${short()}.`;
 
 // ---------- render + export ----------
 let RENDERED = [];
 const slideNode = s => `<div class="post" style="background:${s.bg};height:${s.h||1350}px">${s.html}</div>`;
-function verbFor(left){ const d = new Date(dl()); d.setDate(d.getDate() - left); const [y,m,dd] = String(state.commentFrom||'').split('-').map(Number); return (y && d >= new Date(y, m-1, dd)) ? 'COMMENT' : 'DM'; }
+function verbFor(left){ if ((state.ctaMode || 'comment') === 'comment') return 'COMMENT'; const d = new Date(dl()); d.setDate(d.getDate() - left); const [y,m,dd] = String(state.commentFrom||'').split('-').map(Number); return (y && d >= new Date(y, m-1, dd)) ? 'COMMENT' : 'DM'; }
 function postDate(left){ const d = new Date(dl()); d.setDate(d.getDate() - left); return d.getDate() + ' ' + MONTHS[d.getMonth()]; }
 function buildPtype(){ const sel = $('ptype'), cur = sel.value;
   sel.innerHTML = `<option value="month">Whole month (${monthPosts().length} feed posts)</option>` + monthPosts().map((p,i) => `<option value="${i}">${postDate(p.left)} · ${esc(p.title)} (${p.kind.split(' ·')[0]})</option>`).join('') + '<option value="stories">Stories (10 frames)</option>';
@@ -545,16 +546,16 @@ function render(){
   const pick = $('ptype').value || '0';
   const groups = [];
   if (pick === 'stories') {
-    stories().forEach((ph,pi) => { VERB = verbFor([30,15,3][pi]); const frames = ph.frames; VERB = 'DM';
+    stories().forEach((ph,pi) => { VERB = verbFor([30,15,3][pi]); const frames = ph.frames; VERB = verbFor(99);
       groups.push({title:'Stories · ' + ph.phase, meta: frames.length + ' frames · 1080 × 1920 · add the stickers in Instagram', slides: frames.map((f,j) => ({...f, title: ph.phase.toLowerCase().replace(/[^a-z]+/g,'-') + '-' + (j+1)})), story:true}); });
     // re-render final week with the right verb
-    VERB = verbFor(3); groups[2].slides = stories()[2].frames.map((f,j) => ({...f, title:'final-week-' + (j+1)})); VERB = 'DM';
+    VERB = verbFor(3); groups[2].slides = stories()[2].frames.map((f,j) => ({...f, title:'final-week-' + (j+1)})); VERB = verbFor(99);
   } else {
     artPlan(); const all = monthPosts(); const list = pick === 'month' ? all : [all[Number(pick)]];
     list.forEach((p,pi) => { VERB = verbFor(p.left); CURLEFT = p.left;
-      const slides = artFill(p, artBuild(p)).map(decorate); const cap = p.caption(); const pin = p.pin ? p.pin() : `${VERB === 'COMMENT' ? 'Comment' : 'DM us'} "${(state.keyword||'').toUpperCase()}" for the brief and your link. Closes ${short()}.`;
+      const slides = artFill(p, artBuild(p)).map(decorate); const cap = p.caption(); const pin = p.pin ? p.pin() : CMODE() ? pinned() : `${VERB === 'COMMENT' ? 'Comment' : 'DM us'} "${(state.keyword||'').toUpperCase()}" for the brief and your link. Closes ${short()}.`;
       groups.push({title: `${postDate(p.left)} · ${p.title}`, meta: `${p.kind} · ${slides.length} slide${slides.length>1?'s':''} · ${p.left === 0 ? 'deadline day' : p.left + ' days left'} · ${VERB} “${KW()}”`, slides: slides.map((s,j) => ({...s, title: s.title || (p.title.toLowerCase().replace(/[^a-z0-9]+/g,'-') + (slides.length>1 ? '-'+(j+1) : ''))})), cap, pin, left:p.left, idx:pi});
-      VERB = 'DM'; });
+      VERB = verbFor(99); });
   }
   groups.forEach(g => { const t = g.title.replace(/^[^·]*·\s*/, ''); g.slides = g.slides.map((s, j) => { const o = state.images['ov|' + t + '|' + j];
     return o && s.html ? {...s, html: s.html.replace(/background-image:url\([^)]*\)/, 'background-image:url(' + o + ')')} : s; }); });

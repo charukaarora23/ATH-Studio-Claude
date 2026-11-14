@@ -80,14 +80,14 @@ const OPENCALL = (c, center) => `<p style="font-size:38px;font-weight:800;letter
 // the action: keyword + time left in one button
 const actionBtn = (top, chilli) => { const fg = chilli ? '#AA0003' : BURG;
   return `<div class="a" style="left:80px;right:80px;top:${top}px;height:108px;border-radius:999px;background:${CREAM};color:${fg};display:flex;align-items:center;justify-content:space-between;padding:0 14px 0 46px;box-shadow:0 14px 30px -12px rgba(0,0,0,.45)">
-    <span style="font-size:38px;font-weight:800;letter-spacing:-.02em">${VERB} “${KW()}” to apply</span>
+    <span style="font-size:38px;font-weight:800;letter-spacing:-.02em">${ctaBtn()}</span>
     <span style="display:flex;align-items:center;gap:18px"><span class="cn" style="font-size:19px;color:${fg}">${leftLabel()}</span>
     <span style="width:80px;height:80px;border-radius:50%;background:${fg};color:${CREAM};display:inline-flex;align-items:center;justify-content:center"><svg width="32" height="14" viewBox="0 0 46 20"><path d="M2 10h40M33 2l9 8-9 8" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span></span></div>`; };
 
 // covers: a quiet action line instead of a big button
 const coverCTA = (top, fg, acc) => `<div class="a" style="left:80px;right:80px;top:${top}px;display:flex;justify-content:space-between;align-items:center;padding-top:24px;border-top:1.5px solid ${rgba(fg === INK ? '#14090C' : '#FFFFFF', .35)}">
   <span style="font-size:28px;font-weight:500;color:${fg};opacity:.85">Closes ${dateLong()}</span>
-  <span style="font-size:30px;font-weight:700;letter-spacing:-.01em;color:${acc}">${VERB} “${KW()}” to apply&nbsp;&rarr;</span></div>`;
+  <span style="font-size:30px;font-weight:700;letter-spacing:-.01em;color:${acc}">${ctaQuiet()}&nbsp;&rarr;</span></div>`;
 
 // ---------- grounds ----------
 const G = {
@@ -98,7 +98,7 @@ const G = {
 const imgDiv = (src, style, pos='center') => `<div class="a img" style="${style};background-image:url(${src});background-position:${pos}"></div>`;
 const slot = (src, label, style, col) => src ? imgDiv(src, style + ';border-radius:18px') : `<div class="a ph" style="${style};color:${col}">${label}</div>`;
 const btnCTA = (bg, fg, ring) => `<div class="a" style="left:110px;right:110px;top:{TOP}px;height:120px;border-radius:999px;background:${bg};color:${fg};display:flex;align-items:center;justify-content:space-between;padding:0 20px 0 54px">
-  <span style="font-size:42px;font-weight:700;letter-spacing:-.02em">${VERB} “${KW()}” to apply</span>
+  <span style="font-size:42px;font-weight:700;letter-spacing:-.02em">${ctaBtn()}</span>
   <span style="width:84px;height:84px;border-radius:50%;background:${ring};color:${bg};display:inline-flex;align-items:center;justify-content:center"><svg width="34" height="16" viewBox="0 0 46 20"><path d="M2 10h40M33 2l9 8-9 8" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></span></div>`;
 
 // ---------- feed templates (1080 x 1350) ----------
@@ -155,7 +155,7 @@ const T = {
   // the whole open call on one page
   brief(o = {}){
     const g = G[o.ground||'cream']();
-    const rows = [['The call', `${esc(state.series)}: ${GE()} · ${esc(state.editionLabel || ('Edition ' + state.edition))}`], ['Theme', state.themeLine ? esc(state.themeLine) : TH()], ['Who', esc(state.elig || '')], ['Selected', `${esc(state.selected)} artists, chosen by ${state.jury ? esc(state.jury) : 'the jury'}`], ['You receive', lines(state.benefits).map(l => esc(l.split('|')[0].trim())).join(', ')], ['Deadline', `${dateLong()}`], ['Apply', `${VERB} “${KW()}”, or the link in bio`]];
+    const rows = [['The call', `${esc(state.series)}: ${GE()} · ${esc(state.editionLabel || ('Edition ' + state.edition))}`], ['Theme', state.themeLine ? esc(state.themeLine) : TH()], ['Who', esc(state.elig || '')], ['Selected', `${esc(state.selected)} artists, chosen by ${state.jury ? esc(state.jury) : 'the jury'}`], ['You receive', lines(state.benefits).map(l => esc(l.split('|')[0].trim())).join(', ')], ['Deadline', `${dateLong()}`], ['Apply', CMODE() ? `Link in bio, or comment “${KW()}” for the link` : `${VERB} “${KW()}”, or the link in bio`]];
     return {bg:g.bg, html:`${corners(g.fg, g.dm, o.tr || 'The open call')}
       <p class="a R" style="left:76px;right:80px;top:150px;font-size:76px;color:${g.fg}">${o.head || `The ${GE()}, at a glance.`}</p>
       <div class="a" style="left:80px;right:80px;top:${o.top||340}px;border-bottom:2px solid ${g.line}">${rows.map(([k,v]) => `<div style="display:grid;grid-template-columns:230px 1fr;gap:20px;padding:20px 0;border-top:2px solid ${g.line}"><span class="lab" style="color:${g.acc};padding-top:6px">${k}</span><span style="font-size:31px;line-height:1.35;color:${g.fg}">${v}</span></div>`).join('')}</div>`};
@@ -186,7 +186,7 @@ const T = {
       <p class="a H c" style="left:70px;right:70px;top:${long ? 300 : 330}px;font-size:${Math.round((o.size||100) * (long ? .8 : 1))}px;color:${g.fg}">${o.head || `Apply to the<br>${GE()}.`}</p>
       <p class="a c" style="left:0;right:0;top:620px;font-size:34px;font-weight:600;letter-spacing:-.01em;color:${g.acc}">${CURLEFT === 0 ? `Closes tonight, ${dateLong()}` : `Closes ${dateLong()} · ${leftLabel()}`}</p>
       ${b}
-      <p class="a c" style="left:0;right:0;top:930px;font-size:28px;color:${g.fg};opacity:.8">or apply via the link in bio</p>`};
+      <p class="a c" style="left:0;right:0;top:930px;font-size:28px;color:${g.fg};opacity:.8">${ctaSub()}</p>`};
   },
   // scarcity: 101 places, one of them could be yours
   stakes(o = {}){
@@ -201,7 +201,7 @@ const T = {
   // how to apply, in three moves
   howto(o = {}){
     const g = G[o.ground||'cream']();
-    const steps = [['01', `${VERB} “${KW()}”`, 'We send you the full brief and your submission link.'], ['02', 'Prepare your artworks', `${state.theme && state.themeWork !== 'best work' ? 'On theme, p' : 'P'}hotographed in daylight, with title, medium and size.`], ['03', `Submit by ${dateLong()}`, 'Through your link or the link in bio. About ten minutes.']];
+    const steps = [(CMODE() ? ['01', 'Tap the link in bio', `Or comment “${KW()}” and we’ll send you the link.`] : ['01', `${VERB} “${KW()}”`, 'We send you the full brief and your submission link.']), ['02', 'Prepare your artworks', `${state.theme && state.themeWork !== 'best work' ? 'On theme, p' : 'P'}hotographed in daylight, with title, medium and size.`], ['03', `Submit by ${dateLong()}`, 'Through your link or the link in bio. About ten minutes.']];
     return {bg:g.bg, html:`${corners(g.fg, g.dm, o.tr || 'How to apply')}
       <p class="a R" style="left:76px;right:80px;top:160px;font-size:80px;color:${g.fg}">${o.head || `Apply to the ${GE()} in three steps.`}</p>
       <div class="a" style="left:80px;right:80px;top:470px;border-bottom:2px solid ${g.line}">${steps.map(([n,t,d]) => `<div style="display:grid;grid-template-columns:140px 1fr;padding:34px 0;border-top:2px solid ${g.line}"><p style="font-size:84px;letter-spacing:-.06em;line-height:.9;color:${g.acc}">${n}</p><div><p style="font-size:44px;font-weight:600;letter-spacing:-.02em;color:${g.fg}">${t}</p><p style="font-size:29px;line-height:1.4;margin-top:8px;color:${g.fg};opacity:.8">${d}</p></div></div>`).join('')}</div>`};
@@ -291,7 +291,7 @@ const T = {
       <div class="a" style="left:110px;right:110px;top:660px;height:116px;border-radius:999px;background:${BURG};color:${CREAM};display:flex;align-items:center;justify-content:center"><span style="font-size:40px;font-weight:700;letter-spacing:-.02em">${o.button}</span></div>
       <div class="a" style="left:110px;right:110px;top:880px;border-top:2px solid rgba(20,9,12,.18);padding-top:36px;text-align:center">
         <p class="lab" style="color:${state.colour}">Are you an artist?</p>
-        <p class="sub" style="margin-top:12px;color:${INK}">The ${GE()} is open until ${dateLong()}.<br>${VERB} “${KW()}” to apply.</p></div>`};
+        <p class="sub" style="margin-top:12px;color:${INK}">The ${GE()} is open until ${dateLong()}.<br>${ctaSentence()}</p></div>`};
   },
 };
 
@@ -317,7 +317,7 @@ const framedArt = (src, style, pos) => `<div class="a" style="${style};backgroun
   <div class="img" style="width:100%;height:100%;background-image:url(${src});background-size:cover;background-position:${pos || 'center 30%'}"></div></div>`;
 const serifNum = (n, size, c) => `<span style="font-family:'ATH Serif',serif;font-style:italic;font-weight:400;font-size:${size}px;line-height:.85;letter-spacing:-.03em;color:${c}">${n}</span>`;
 const strip = (fg, acc) => `<div class="a" style="left:90px;right:90px;top:1140px;display:flex;justify-content:space-between;align-items:center;padding-top:22px;border-top:1px solid ${acc}">
-  <span style="font-size:27px;font-weight:600;color:${fg}">Closes ${dateLong()}</span><span style="font-size:27px;font-weight:700;color:${acc}">${VERB} “${KW()}” to apply</span></div>`;
+  <span style="font-size:27px;font-weight:600;color:${fg}">Closes ${dateLong()}</span><span style="font-size:27px;font-weight:700;color:${acc}">${ctaQuiet()}</span></div>`;
 const awardTag = () => `<span class="cn" style="display:inline-flex;align-items:center;height:52px;padding:0 26px;border:1.5px solid ${gold()};color:${gold()};border-radius:999px;font-size:18px">Open call · ${esc(state.name)}</span>`;
 
 const AW = {
@@ -472,7 +472,13 @@ const CD = {
 
 // ---------- the month: built on each other, from attention to urgency ----------
 const tags = '#ArtsToHeartsProject #OpenCall #CallForArtists #101ArtBook';
-const kwLine = () => `${VERB === 'COMMENT' ? 'Comment' : 'DM us'} "${(state.keyword||'KEYWORD').toUpperCase()}"${VERB === 'COMMENT' ? ' below' : ''} for the full brief, or apply via the link in bio.`;
+// calls to action. "comment" mode (DM automation off): link in bio first, comment the keyword for the link
+const CMODE = () => (state.ctaMode || 'comment') === 'comment';
+const ctaBtn = () => CMODE() ? 'Apply via link in bio' : `${VERB} “${KW()}” to apply`;
+const ctaSub = () => CMODE() ? `or comment “${KW()}” for the link` : 'or apply via link in bio';
+const ctaQuiet = () => CMODE() ? `Link in bio · comment “${KW()}”` : `${VERB} “${KW()}” to apply`;
+const ctaSentence = () => CMODE() ? `Apply via the link in bio, or comment “${KW()}” for the link.` : `${VERB} “${KW()}” to apply.`;
+const kwLine = () => CMODE() ? `Apply via the link in bio, or comment "${(state.keyword||'KEYWORD').toUpperCase()}" below and we'll send you the link.` : `${VERB === 'COMMENT' ? 'Comment' : 'DM us'} "${(state.keyword||'KEYWORD').toUpperCase()}"${VERB === 'COMMENT' ? ' below' : ''} for the full brief, or apply via the link in bio.`;
 const closeLn = () => `Submissions close ${dl().getDate()} ${MONTHS_L[dl().getMonth()]}.`;
 const N = () => state.name, S = () => state.series, SEL = () => state.selected;
 
@@ -764,7 +770,7 @@ ${closeLn()}
 ${tags}`},
  {left:2, title:'48 hours: last questions', kind:'Carousel · countdown + doubts', slides:() => [
    T.count({img:ART[3], big:'48', unit:'hours left', info:'Your last questions about the open call, answered inside.'}),
-   T.qa({q:'Is it too late to apply?', a:`No. Submissions are open until ${dateLong()}.`, more:`${VERB} “${KW()}” and we’ll send you the brief and your link straight away.`, ground:'cream', tr:'Last questions'}),
+   T.qa({q:'Is it too late to apply?', a:`No. Submissions are open until ${dateLong()}.`, more: CMODE() ? ctaSentence() : `${VERB} “${KW()}” and we’ll send you the brief and your link straight away.`, ground:'cream', tr:'Last questions'}),
    T.qa({q:'How long does it take?', a:'About ten minutes.', more:'Have your photos, titles, medium and sizes ready, then submit through the link in bio.', tr:'Last questions', ground:'call'}),
    T.qa({q:'Will my work really be seen?', a:'Every eligible entry is reviewed by the jury.', more:'Selected work is published, sold worldwide and shared with collectors, galleries and curators.', ground:'ink', tr:'Last questions'}),
    T.qa({q:'Can I submit more than one artwork?', a:gap(state.multiArt,'Confirm the rule'), more:'Choose the works that best represent you.', ground:'cream', tr:'Last questions'}),
@@ -825,7 +831,7 @@ function stories(){ const kw = KW(); return [
   {phase:'Launch day', frames:[
     storyFrame({img:state.images.imgCover, pos:'center 10%', kicker:'Open call · Edition ' + state.edition, head:`The ${esc(state.name)} is open.`, sub:`${esc(SEL())} artists will be published.`, top:1000, zone:'Add link sticker: Apply', zoneTop:1500}),
     storyFrame({ground:'call', kicker:'New edition', head:`${esc(SEL())} places.<br>Will you apply?`, top:500, zone:'Add poll: Yes, I’m in / Thinking about it', zoneTop:1100}),
-    storyFrame({ground:'cream', kicker:'How to start', head:`DM “${kw}”<br>for the full brief.`, top:500, zone:'Add countdown sticker: closes ' + short(), zoneTop:1100}),
+    storyFrame({ground:'cream', kicker:'How to start', head: CMODE() ? `Comment “${kw}”<br>for the link.` : `DM “${kw}”<br>for the full brief.`, top:500, zone:'Add countdown sticker: closes ' + short(), zoneTop:1100}),
   ]},
   {phase:'Mid-month', frames:[
     storyFrame({img:state.images.imgTheme, pos:'center 40%', kicker:'The theme', head:'Does your work fit?', sub:`${KINDS().slice(0,3).map(k => k[0]).join(', ')}: most ${TW()} does.`, top:1000, zone:'Add quiz sticker', zoneTop:1520}),
@@ -835,7 +841,7 @@ function stories(){ const kw = KW(); return [
   {phase:'Final week', frames:[
     storyFrame({ground:'ink', kicker:'One week', head:'7 days left.', size:180, top:520, zone:'Add countdown sticker', zoneTop:1100}),
     storyFrame({ground:'call', kicker:'Three days', head:'3 days left.', size:180, top:520, zone:'Add link sticker: Apply', zoneTop:1100}),
-    storyFrame({ground:'cream', kicker:'Closes tomorrow', head:`Last chance:<br>${VERB} “${kw}”.`, top:520, zone:'Add countdown sticker', zoneTop:1100}),
+    storyFrame({ground:'cream', kicker:'Closes tomorrow', head: CMODE() ? 'Last chance:<br>link in bio.' : `Last chance:<br>${VERB} “${kw}”.`, top:520, zone:'Add countdown sticker', zoneTop:1100}),
     Object.assign(storyFrame({ground:'ink', kicker:'Final day', head:'Closes tonight.', size:170, top:520, zone:'Add link sticker: Apply now', zoneTop:1100}), {bg:'#AA0003'}),
   ]},
 ]; }
