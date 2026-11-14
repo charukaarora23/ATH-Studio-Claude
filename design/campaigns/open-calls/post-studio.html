@@ -212,6 +212,7 @@ summary{font:600 12px/1 var(--mono);letter-spacing:.1em;text-transform:uppercase
     <button type="button" data-view="storyplan">Stories plan</button>
     <button type="button" data-view="storydays">Stories by day</button>
     <button type="button" data-view="stories">Story templates</button>
+    <button type="button" data-view="reels">Reels</button>
   </nav>
   <div class="top">
     <div class="f"><label for="ptype">Post</label><select id="ptype"></select></div>
@@ -369,6 +370,7 @@ function slotName(k){ k = String(k || ''); let m;
   if ((m = k.match(/^pool(\d+)$/))) return 'month artwork ' + m[1];
   if ((m = k.match(/^pa(\d+)$/))) return 'past artist ' + m[1];
   if ((m = k.match(/^cv(\d+)$/))) return 'book cover ' + m[1];
+  if ((m = k.match(/^rl(\d)([a-z])$/))) return 'reel ' + m[1] + ' photo ' + (m[2].charCodeAt(0) - 96);
   if (/^st4[ab]$/.test(k)) return k === 'st4a' ? 'left image' : 'right image';
   return {imgCover:'cover artwork', imgTheme:'theme artwork', imgBooks:'the books together', imgSpread:'open spread', phSpread2:'a second spread', phShelf:'book on a shelf', phHolding:'artist holding their copy', phStoryWork:'the artwork they sent', phStoryPage:'their page in the book', phPast1:'past edition 1', phPast2:'past edition 2'}[k] || 'this slide'; }
 function slotsUnder(frame, x, y){ return document.elementsFromPoint(x, y).filter(el => frame.contains(el) && el.matches('.post [data-slot], .post .img, .post .ph')); }
@@ -438,7 +440,7 @@ function wireSlots(){
 }
 // ---------- view tabs ----------
 let lastFeed = 'month';
-function viewOf(v){ return ['storyplan', 'storydays', 'stories'].includes(v) ? v : 'feed'; }
+function viewOf(v){ return ['storyplan', 'storydays', 'stories', 'reels'].includes(v) ? v : 'feed'; }
 function updateTabs(){ const v = viewOf($('ptype').value); if (v === 'feed') lastFeed = $('ptype').value || 'month';
   document.querySelectorAll('#tabs [data-view]').forEach(b => b.setAttribute('aria-current', b.dataset.view === v ? 'page' : 'false'));
   $('ptype').closest('.f').style.display = v === 'feed' ? '' : 'none'; }
@@ -447,6 +449,42 @@ document.querySelectorAll('#tabs [data-view]').forEach(b => b.onclick = () => se
 document.addEventListener('click', e => { const g = e.target.closest('[data-goto]'); if (g) setView(g.dataset.goto); });
 const HID = () => (state.hidden = state.hidden || {});
 const gid = g => g.story ? g.title : g.title.replace(/^[^·]*·\s*/, '');
+// ---------- Make video: photo with a slow camera move, words fade in, soft cross-fades. Recorded in the browser ----------
+function loadImg(src){ return new Promise(res => { if (!src) return res(null); const im = new Image(); im.onload = () => res(im); im.onerror = () => res(null); im.src = src; }); }
+async function slideCanvas(s, transparent){ await document.fonts.ready; const stage = $('stage'); stage.innerHTML = slideNode(transparent ? {...s, bg:'transparent'} : s); const el = stage.firstElementChild;
+  const c = await html2canvas(el, {scale:1, width:1080, height:(s.h || 1350), backgroundColor:null, useCORS:true, logging:false}); stage.innerHTML = ''; return c; }
+async function makeReel(id, btn){
+  if (!window.html2canvas || !window.MediaRecorder || !HTMLCanvasElement.prototype.captureStream) { alert('This browser cannot make videos. Use Chrome on a computer.'); return; }
+  const items = RENDERED.filter(r => r.s.reel === id); if (!items.length) { status('Show the Reels tab first.'); return; }
+  btn.disabled = true; const old = btn.textContent;
+  try {
+    const beats = [];
+    for (let i = 0; i < items.length; i++) { btn.textContent = `Preparing ${i + 1}/${items.length}…`; const s = items[i].s;
+      const t = document.createElement('template'); t.innerHTML = s.html; const ph = t.content.querySelector('[data-slot^="rl"]'); let img = null, fx = 50, fy = 50;
+      if (ph) { const u = (ph.getAttribute('style').match(/url\(([^)]*)\)/) || [])[1]; img = await loadImg((u || '').replace(/^["']|["']$/g, '')); const bp = parsePos(ph.style.backgroundPosition); fx = bp.x; fy = bp.y; ph.remove(); }
+      const over = await slideCanvas({...s, html: t.innerHTML}, !!img); beats.push({dur: s.dur || 2.6, img, fx, fy, over, bg: s.bg}); }
+    const W = 1080, H = 1920, cv = document.createElement('canvas'); cv.width = W; cv.height = H; const ctx = cv.getContext('2d');
+    const draw = (b, lt, i, alpha) => { ctx.globalAlpha = alpha; const p = Math.min(1, lt / b.dur);
+      if (b.img) { const z = i % 2 ? 1.12 - .08 * p : 1.04 + .08 * p; const sc = Math.max(W / b.img.width, H / b.img.height) * z; const iw = b.img.width * sc, ih = b.img.height * sc;
+        const ox = (W - iw) * (b.fx / 100) + (i % 2 ? -1 : 1) * 12 * p, oy = (H - ih) * (b.fy / 100); ctx.fillStyle = '#14090c'; ctx.fillRect(0, 0, W, H); ctx.drawImage(b.img, ox, oy, iw, ih);
+        ctx.globalAlpha = alpha * Math.min(1, lt / .45); ctx.drawImage(b.over, 0, 0, W, H); }
+      else ctx.drawImage(b.over, 0, 0, W, H);
+      ctx.globalAlpha = 1; };
+    const mime = ['video/mp4;codecs=avc1.640028', 'video/mp4;codecs=avc1', 'video/mp4', 'video/webm;codecs=vp9', 'video/webm'].find(t => MediaRecorder.isTypeSupported(t)) || '';
+    const rec = new MediaRecorder(cv.captureStream(30), mime ? {mimeType: mime, videoBitsPerSecond: 10e6} : {}); const chunks = []; rec.ondataavailable = e => e.data.size && chunks.push(e.data);
+    const total = beats.reduce((a, b) => a + b.dur, 0), XF = .4; const starts = []; beats.reduce((a, b, i) => (starts[i] = a, a + b.dur), 0);
+    const done = new Promise(r => rec.onstop = r); rec.start(200); const t0 = performance.now();
+    await new Promise(res => { const tick = () => { const t = (performance.now() - t0) / 1000; if (t >= total) return res();
+      let i = starts.findIndex((s, k) => t >= s && (k === beats.length - 1 || t < starts[k + 1])); draw(beats[i], t - starts[i], i, 1);
+      const end = starts[i] + beats[i].dur; if (i + 1 < beats.length && t > end - XF) draw(beats[i + 1], 0, i + 1, (t - (end - XF)) / XF);
+      btn.textContent = `Recording ${Math.round(t / total * 100)}%`; requestAnimationFrame(tick); }; tick(); });
+    rec.stop(); await done;
+    const ext = (rec.mimeType || mime).includes('mp4') ? 'mp4' : 'webm'; const blob = new Blob(chunks, {type: ext === 'mp4' ? 'video/mp4' : 'video/webm'});
+    await offer(`${(state.name || 'call').toLowerCase().replace(/[^a-z0-9]+/g, '-')}-${id.toLowerCase()}.${ext}`, blob);
+    if (ext !== 'mp4') status('Saved as WebM. Instagram needs MP4: open it in a free converter, or use a newer Chrome to save MP4 directly.');
+  } catch (e) { console.error(e); status('Video failed: ' + (e && e.message || e)); }
+  finally { btn.disabled = false; btn.textContent = old; }
+}
 function storyPlanHTML(){
   const cur = state.name; const calls = Object.entries(PRESETS).filter(([n]) => !/blank/i.test(n)).map(([n, p]) => { const s = n === $('preset').value || (p.name || DEFAULTS.name) === cur ? state : {...DEFAULTS, ...p}; return {name: s.name, kw: (s.keyword || '').toUpperCase(), colour: s.colour, dl: new Date(s.deadline + 'T00:00:00')}; });
   const posts = new Set(monthPosts().map(p => p.left)); const day = 864e5;
@@ -691,7 +729,7 @@ const slideNode = s => `<div class="post" style="background:${s.bg};height:${s.h
 function verbFor(left){ if ((state.ctaMode || 'comment') === 'comment') return 'COMMENT'; const d = new Date(dl()); d.setDate(d.getDate() - left); const [y,m,dd] = String(state.commentFrom||'').split('-').map(Number); return (y && d >= new Date(y, m-1, dd)) ? 'COMMENT' : 'DM'; }
 function postDate(left){ const d = new Date(dl()); d.setDate(d.getDate() - left); return d.getDate() + ' ' + MONTHS[d.getMonth()]; }
 function buildPtype(){ const sel = $('ptype'), cur = sel.value;
-  sel.innerHTML = `<option value="month">Whole month (${monthPosts().length} feed posts)</option>` + monthPosts().map((p,i) => `<option value="${i}">${postDate(p.left)} · ${esc(p.title)} (${p.kind.split(' ·')[0]})</option>`).join('') + '<optgroup label="Stories"><option value="storyplan">Stories plan: all calls, day by day</option><option value="storydays">Stories: this call, every day ready to post</option><option value="stories">Stories: template library</option></optgroup>';
+  sel.innerHTML = `<option value="month">Whole month (${monthPosts().length} feed posts)</option>` + monthPosts().map((p,i) => `<option value="${i}">${postDate(p.left)} · ${esc(p.title)} (${p.kind.split(' ·')[0]})</option>`).join('') + '<optgroup label="Stories"><option value="storyplan">Stories plan: all calls, day by day</option><option value="storydays">Stories: this call, every day ready to post</option><option value="stories">Stories: template library</option></optgroup><option value="reels">Reels</option>';
   sel.value = cur || '0'; if (!sel.value) sel.value = '0'; }
 function render(){
   readForm(); scheduleDraft(); updateTabs();
@@ -703,6 +741,9 @@ function render(){
     const phases = {}; Object.keys(STORY_T).forEach(id => { const t = STORY_T[id]; VERB = verbFor(id[0] === 'F' ? 3 : 20); (phases[t.phase] = phases[t.phase] || []).push({id, t, f: storyMake(id, 21)}); });
     VERB = verbFor(99);
     Object.entries(phases).forEach(([phase, list]) => groups.push({title:'Story templates · ' + phase, meta: list.map(x => `${x.id} ${x.t.name}: ${x.t.sticker}`).join('  ·  '), slides: list.map(x => x.f), story:true}));
+  } else if (pick === 'reels') {
+    REELS.forEach(r => { const beats = r.beats().map((b, j) => ({...b, reel: r.id, title: r.id.toLowerCase() + '-beat-' + (j + 1), label: `Beat ${j + 1} · ${b.dur} s`}));
+      groups.push({title: `Reel ${r.id.slice(1)} · ${r.name}`, meta: `${r.goal} · ${r.len} · 1080 × 1920 · Audio: ${r.audio} · ${r.tip}`, slides: beats, story: true, reel: r.id, cap: r.caption(), pin: pinned()}); });
   } else if (pick === 'storydays') {
     const posts = new Set(monthPosts().map(p => p.left));
     for (let left = 30; left >= -1; left--) { const ids = storyDay(left, posts); if (!ids.length) continue; VERB = verbFor(Math.max(left, 0));
@@ -736,8 +777,11 @@ function render(){
     const canvaRow = g.cap !== undefined ? `<div class="canva" data-ckey="${esc(ckey)}">${clink
       ? `<a class="btn" href="${esc(clink)}" target="_blank" rel="noopener">Edit in Canva &rarr;</a><button class="btn ghost" type="button" data-cedit>Change link</button>`
       : `<span class="cmiss">Canva source file: not linked yet</span><button class="btn ghost" type="button" data-cedit>Add Canva link</button>`}</div>` : '';
-    return `<section class="group"><div class="ghead"><h2>${esc(g.title)}</h2><span class="ghr">${g.left !== undefined ? `<span class="vers" title="Each call starts on its own wording so the three calls never repeat">Wording ${[0,1,2].map(k => `<button type="button" data-ver="${esc(gid(g))}|${k}" aria-pressed="${postVer(gid(g)) % 3 === k}">${'ABC'[k]}</button>`).join('')}</span>` : ''}<button type="button" class="hidebtn" data-hide="${esc(gk)}">Hide this ${g.story ? 'day' : 'post'}</button></span></div><p class="meta">${esc(g.meta)}</p><div class="slides">${cells}</div>${canvaRow}${capBox}</section>`; }).join('');
+    return `<section class="group"><div class="ghead"><h2>${esc(g.title)}</h2><span class="ghr">${g.reel ? `<button type="button" class="btn" data-mkvid="${g.reel}">Make video</button><label class="btn ghost" style="cursor:pointer">Add photos<input type="file" accept="image/*" multiple data-rlup="${g.reel}" hidden></label>` : ''}${g.left !== undefined ? `<span class="vers" title="Each call starts on its own wording so the three calls never repeat">Wording ${[0,1,2].map(k => `<button type="button" data-ver="${esc(gid(g))}|${k}" aria-pressed="${postVer(gid(g)) % 3 === k}">${'ABC'[k]}</button>`).join('')}</span>` : ''}<button type="button" class="hidebtn" data-hide="${esc(gk)}">Hide this ${g.story ? 'day' : 'post'}</button></span></div><p class="meta">${esc(g.meta)}</p><div class="slides">${cells}</div>${canvaRow}${capBox}</section>`; }).join('');
   $('out').querySelectorAll('[data-i]').forEach(b => b.onclick = () => saveOne(Number(b.dataset.i)));
+  $('out').querySelectorAll('[data-mkvid]').forEach(b => b.onclick = () => makeReel(b.dataset.mkvid, b));
+  $('out').querySelectorAll('[data-rlup]').forEach(inp => inp.onchange = async () => { const r = REELS.find(x => x.id === inp.dataset.rlup); const keys = r.beats().map(b => b.photoKey).filter(Boolean); let i = 0, n = 0;
+    for (const file of inp.files) { while (i < keys.length && state.images[keys[i]]) i++; if (i >= keys.length) break; state.images[keys[i]] = await shrink(file); i++; n++; } render(); status(n + ' photo' + (n === 1 ? '' : 's') + ' added to the reel.'); });
   $('out').querySelectorAll('[data-ver]').forEach(b => b.onclick = () => { const [t, k] = b.dataset.ver.split('|'); state.ver = state.ver || {}; state.ver[t] = +k; render(); status('Wording ' + 'ABC'[+k] + ' for ' + t + '.'); });
   $('out').querySelectorAll('[data-hide]').forEach(b => b.onclick = () => { HID()[b.dataset.hide] = 1; render(); status('Hidden for now. It is left out of Save all as ZIP. Restore it any time.'); });
   $('out').querySelectorAll('[data-txr]').forEach(b => b.onclick = () => { Object.keys(TXT()).forEach(k => { if (k.startsWith(b.dataset.txr) && TXT()[k] === '\u200b') delete TXT()[k]; }); render(); status('Removed text is back.'); });
