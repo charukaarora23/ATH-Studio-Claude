@@ -161,10 +161,14 @@ function autoStructure(r, title){
   const based = ((flat.match(/\bbased in (?:the )?([A-Z][^,.;]+?)(?= and | where | with | who |[,.;])/) || [])[1] || '').trim();
   const medium = ((flat.match(/\bworks? (?:primarily )?in ([a-z ]+? on [a-z]+|oils?|watercolou?r|acrylics?|charcoal|ceramics|photography|textiles?)\b/i) || [])[1] || '').trim();
   const about = pre.find(p => name && p.includes(name) && /\b(is an?|based in|works? (?:in|across)|paints?)\b/.test(p) && !/^(At|Our) Arts to Hearts/i.test(p)) || pre.find(p => /\bbased in\b|\bthe artist behind\b/i.test(p)) || pre.find(p => name && p.includes(name)) || pre.find(p => !/Arts to Hearts/i.test(p)) || r.intro || '';
-  const head = quotes.slice().sort((a, b) => a.length - b.length)[0] || '';
+  const t0 = String(title || r.title || '').replace(/[’']s\s+(Uses|Explores|Paints|Creates|Turns|Finds|Brings|Captures|Blends|Makes)\b/, ' $1').replace(/\s+/g, ' ').trim();
+  const fromName = name && t0.includes(name) ? t0.slice(t0.indexOf(name)) : '';
+  const titleHook = (fromName.length >= 25 && fromName.length <= 80 ? fromName : t0.length <= 80 ? t0 : '').replace(/[.:]$/, '');
+  const q0 = quotes.slice().sort((a, b) => a.length - b.length)[0] || '';
+  const head = titleHook ? null : q0;
   const first = (name || '').split(' ')[0];
   const kk = picks.map(n => kickOf(qa[n - 1].q) || `In ${first}’s words`);
-  return {kicks: kk, name, based, medium: medium ? medium.charAt(0).toUpperCase() + medium.slice(1) : '', headline: head ? `“${head.replace(/\.$/, '')}”` : '', standfirst: excerpt(sentences(about).slice(0, 2).join(' '), 250), quotes, picks, inside: rest.map(o => { const c = sentences(o.x.q).filter(x => x.endsWith('?')).pop() || o.x.q; return c.length > 110 ? excerpt(c, 104) : c; }), ctahead: 'The full interview is on our website.', hook: '', handle: ''};
+  return {kicks: kk, name, based, medium: medium ? medium.charAt(0).toUpperCase() + medium.slice(1) : '', headline: titleHook || (head ? `“${head.replace(/\.$/, '')}”` : ''), standfirst: excerpt(sentences(about).slice(0, 2).join(' '), 250), quotes, picks, inside: rest.map(o => { const c = sentences(o.x.q).filter(x => x.endsWith('?')).pop() || o.x.q; return c.length > 110 ? excerpt(c, 104) : c; }), ctahead: 'The full interview is on our website.', hook: '', handle: ''};
 }
 // Sort imported images into artworks (in credit order) and portraits.
 function assignImages(images, caps, roles){
@@ -212,12 +216,12 @@ DPACK.interview = p => {
     IV.end({line: f.ctahead || `The full interview with ${name} is on our website.`, mark: MARK_OK.v, invite: f.invite === undefined ? 'Want to be our next interview? Apply through the link in bio.' : f.invite, last: true}),
   ];
   const tags = ['#artstoheartsproject', '#artistinterview', ...String(f.tags || '').split(/\s+/).filter(x => x.startsWith('#'))].slice(0, 5).join(' ');
-  const hook = f.hook || head.replace(/^“|”$/g, '');
+  const hook = f.hook || head;
   const capMain = `${hook} ${handle}\n\n${f.intro || ''}\n\n${teases[0] ? `${teases[0].kick}:\n"${teases[0].text}"\n\n` : ''}${items.length ? `In the full interview:\n${items.map(x => '— ' + x).join('\n')}\n\n` : ''}Comment ${key} and we'll send you the link, or read it at artstoheartsproject.com (link in bio).\n\n${f.invite !== '' ? 'Want to be our next interview? Apply through the link in bio.\n\n' : ''}${caps[0] && caps[0][0] ? `Cover: ${name}, ${caps[0][0]}${caps[0][1] ? ', ' + caps[0][1] : ''}\n\n` : ''}${tags}`.replace(/\n{3,}/g, '\n\n');
   const QC = quotes.map((q, i) => IV.quoteCard({text: q, name, handle, i}));
   const capQuote = `"${quotes[0] || ''}"\n\n${name} ${handle}, from our interview. Comment ${key} and we'll send you the full conversation.\n\n${tags}`;
   const t2 = teases[1] || teases[0];
-  const hd = esc(head.replace(/^“|”$/g, ''));
+  const hd = esc(head);
   const ST = [
     {...IV.story({...at(0), mono: true, full: coverFull, label: 'New interview', text: hd, size: head.length > 50 ? 76 : 92, sub: `An interview with ${esc(name)}`, subTop: 1385, zone: 'Link sticker: the interview'}), label: 'Story 1 · A'},
     {...IV.story({...at(0), mono: true, full: !coverFull, label: 'New interview', text: hd, size: head.length > 50 ? 76 : 92, sub: `An interview with ${esc(name)}`, subTop: 1385, zone: 'Link sticker: the interview'}), label: 'Story 1 · B (hide one)'},
