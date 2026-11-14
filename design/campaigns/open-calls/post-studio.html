@@ -95,7 +95,7 @@ summary{font:600 12px/1 var(--mono);letter-spacing:.1em;text-transform:uppercase
 
   <div class="f"><label for="preset">Open call</label><select id="preset"></select></div>
   <div class="f"><label for="saved">Saved calls (this browser)</label>
-    <div class="row2"><select id="saved"></select><button class="btn ghost" id="saveCall" type="button">Save call</button></div></div>
+    <div class="row2"><select id="saved"></select><button class="btn ghost" id="saveCall" type="button">Save call</button></div><p class="hint" style="margin:8px 0 0;display:flex;justify-content:space-between;gap:8px;align-items:center"><span id="autosaved">Changes save automatically in this browser.</span><button type="button" id="resetCall" style="border:0;background:none;color:var(--muted);text-decoration:underline;cursor:pointer;font-size:12px;padding:0">Start this call fresh</button></p></div>
 
   <details open><summary>The call</summary>
     <div class="row2">
@@ -625,7 +625,7 @@ function buildPtype(){ const sel = $('ptype'), cur = sel.value;
   sel.innerHTML = `<option value="month">Whole month (${monthPosts().length} feed posts)</option>` + monthPosts().map((p,i) => `<option value="${i}">${postDate(p.left)} · ${esc(p.title)} (${p.kind.split(' ·')[0]})</option>`).join('') + '<optgroup label="Stories"><option value="storyplan">Stories plan: all calls, day by day</option><option value="storydays">Stories: this call, every day ready to post</option><option value="stories">Stories: template library</option></optgroup>';
   sel.value = cur || '0'; if (!sel.value) sel.value = '0'; }
 function render(){
-  readForm();
+  readForm(); scheduleDraft();
   const base = (state.name || 'call').toLowerCase().replace(/[^a-z0-9]+/g,'-');
   const pick = $('ptype').value || '0';
   const groups = [];
@@ -715,6 +715,27 @@ document.querySelector('aside').addEventListener('change', e => { if (e.target.t
 function sizePreviews(){ const w = $('out').clientWidth || 900; const pw = Math.max(200, Math.min(300, Math.floor((w - 32) / 3))); document.documentElement.style.setProperty('--pw', pw + 'px'); document.documentElement.style.setProperty('--sc', String(pw / 1080)); }
 window.addEventListener('resize', sizePreviews);
 $('preset').innerHTML = Object.keys(PRESETS).map(k => `<option>${esc(k)}</option>`).join('');
-$('preset').onchange = () => { const p = PRESETS[$('preset').value] || {}; state = {...DEFAULTS, ...p, images: {...(p.images || DEFAULT_IMAGES)}}; fillForm(); buildPtype(); render(); };
-refreshSaved(); fillForm(); buildPtype(); $('ptype').value = '0'; $('ptype').onchange = render; sizePreviews(); document.fonts.ready.then(render);
+// ---------- autosave: every change is kept in this browser, and the page reopens where you left off ----------
+const DKEY = n => 'athDraft2:' + n; let draftTimer = null, restoring = false;
+function scheduleDraft(){ if (restoring) return; clearTimeout(draftTimer); draftTimer = setTimeout(saveDraft, 500); }
+async function saveDraft(){ const n = $('preset').value; const files = {}, paths = {};
+  Object.entries(state.images || {}).forEach(([k, v]) => (String(v).startsWith('data:image/jpeg') || String(v).startsWith('data:image/png') ? files : paths)[k] = v);
+  try { localStorage.setItem(DKEY(n), JSON.stringify({...state, images: paths})); localStorage.setItem('athLastPreset', n); } catch {}
+  try { await idbSet('draft:' + n, files); } catch {}
+  const t = new Date(); $('autosaved').textContent = 'All changes saved automatically · ' + t.getHours() + ':' + String(t.getMinutes()).padStart(2, '0'); }
+async function loadCall(n){ const p = PRESETS[n] || {}; let d = null; try { d = JSON.parse(localStorage.getItem(DKEY(n)) || 'null'); } catch {}
+  let files = {}; if (d) { try { files = await idbGet('draft:' + n) || {}; } catch {} }
+  state = d ? {...DEFAULTS, ...p, ...d, images: {...(d.images || {}), ...files}} : {...DEFAULTS, ...p, images: {...(p.images || DEFAULT_IMAGES)}};
+  return !!d; }
+$('preset').onchange = async () => { restoring = true; const had = await loadCall($('preset').value); restoring = false; try { localStorage.setItem('athLastPreset', $('preset').value); } catch {}
+  fillForm(); buildPtype(); render(); if (had) status('Your edits to this call are back.'); };
+$('resetCall').onclick = async () => { const n = $('preset').value; if (!confirm('Start "' + n + '" fresh? Your edits, images and text changes for this call will be removed from this browser.')) return;
+  try { localStorage.removeItem(DKEY(n)); await idbSet('draft:' + n, {}); } catch {} restoring = true; await loadCall(n); restoring = false; fillForm(); buildPtype(); render(); status('"' + n + '" is back to the original.'); };
+$('ptype').onchange = () => { try { localStorage.setItem('athLastPtype', $('ptype').value); } catch {} render(); };
+(async () => { refreshSaved(); let last = null; try { last = localStorage.getItem('athLastPreset'); } catch {}
+  if (last && PRESETS[last]) $('preset').value = last;
+  restoring = true; const had = await loadCall($('preset').value); restoring = false;
+  fillForm(); buildPtype(); let pt = null; try { pt = localStorage.getItem('athLastPtype'); } catch {}
+  $('ptype').value = pt && [...$('ptype').options].some(o => o.value === pt) ? pt : '0';
+  sizePreviews(); await document.fonts.ready; render(); if (had) status('Welcome back. Your edits are restored.'); })();
 </script>
