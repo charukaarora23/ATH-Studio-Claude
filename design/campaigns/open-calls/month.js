@@ -846,7 +846,7 @@ function reelBeat(o){ const k = o.key; const src = rlPhoto(k) || rlPh(o.n);
     <p class="a cn" style="left:64px;top:250px;color:${WHITE}">Arts to Hearts Project</p>
     ${kick}<p class="a H" style="left:86px;right:90px;top:${o.top}px;font-size:${o.size || 96}px;color:${WHITE}">${o.text}</p>
     ${o.sub ? `<p class="a sub" style="left:90px;right:120px;top:${o.subTop || o.top + 300}px;font-size:40px;color:${WHITE};opacity:.92">${o.sub}</p>` : ''}`;
-  const v = (state.vids || {})[k]; const d = (state.durs || {})[k] ?? (v ? Math.min(5, Math.max(1, +((v.len || 4) - (v.start || 0)).toFixed(1))) : (o.dur || 2.6));
+  const v = (state.vids || {})[k]; const d = (state.durs || {})[k] ?? (v ? Math.min(5, Math.max(1, +(((v.len || 4) - (v.start || 0)) / (v.speed || 1)).toFixed(1))) : (o.dur || 2.6));
   return {h:1920, bg:INK, html, dur:d, photoKey:k, isVideo: !!v};
 }
 function reelEnd(n){ const g = G.call();
