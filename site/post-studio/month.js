@@ -364,7 +364,7 @@ G.ink   = () => isEd() ? ({bg:mix(state.colour, '#000000', .55), fg:CREAM, acc:t
 const ED = {
   // magazine cover: full-bleed portrait, masthead across the top, cover lines at the bottom
   mast(){ const acc = tint(state.colour);
-    return `<p class="a c cn" style="left:0;right:0;top:70px;color:${CREAM};font-size:19px;letter-spacing:.32em;opacity:.85">Arts to Hearts Project · ${esc(state.editionLabel || '')}</p>
+    return `<p class="a c cn" style="left:0;right:0;top:70px;color:${CREAM}">Arts to Hearts Project · ${esc(state.editionLabel || '')}</p>
       <p class="a c scr" style="left:40px;right:40px;top:104px;font-size:${String(state.name).length > 18 ? 96 : 112}px;line-height:1;white-space:nowrap;color:${CREAM};text-shadow:0 4px 30px rgba(0,0,0,.35)">${esc(state.name)}</p>
       <div class="a" style="left:80px;right:80px;top:244px;border-top:2px solid ${acc}"></div>`; },
   shade(){ return `<div class="a" style="inset:0;background:linear-gradient(180deg,${rgba(mix(state.colour,'#000000',.5),.75)} 0%,rgba(0,0,0,.05) 30%,rgba(0,0,0,0) 45%,${rgba(mix(state.colour,'#000000',.5),.9)} 72%,${mix(state.colour,'#000000',.55)} 100%)"></div>`; },

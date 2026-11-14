@@ -69,7 +69,7 @@ const DG = {
 };
 const dLines = s => String(s || '').split('\n').map(l => l.trim()).filter(Boolean).map(l => l.split('|').map(x => x.trim()));
 const dImg = (src, style, slot) => src ? `<div class="a img" data-slot="${slot}" style="${style};background-image:url(${src});background-position:center"></div>` : `<div class="a ph" data-slot="${slot}" style="${style}">Add image in the form</div>`;
-const dFrame = (g, label, last) => `<p class="a cn" style="left:56px;top:52px;color:${g.fg}">Arts to Hearts Project</p><p class="a cn" style="right:56px;top:52px;color:${g.acc}">${esc(label || '')}</p>
+const dFrame = (g, label, last) => `<p class="a cn" style="left:52px;top:48px;color:${g.fg}">Arts to Hearts Project</p><p class="a cn" style="right:56px;top:52px;color:${g.acc}">${esc(label || '')}</p>
   <p class="a cn" style="left:56px;bottom:52px;color:${g.fg};opacity:.8">@artstoheartsproject</p><p class="a cn" style="right:56px;bottom:52px;color:${g.fg};opacity:.8">${last ? 'Link in bio' : 'Swipe &rarr;'}</p>`;
 const dShade = `<div class="a" style="inset:0;background:linear-gradient(180deg,rgba(20,9,12,.5) 0%,rgba(20,9,12,0) 22%,rgba(20,9,12,0) 50%,rgba(20,9,12,.82) 80%,rgba(20,9,12,.92) 100%)"></div>`;
 const D = {
