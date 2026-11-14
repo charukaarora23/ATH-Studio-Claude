@@ -91,6 +91,13 @@ EDT.plainSlide = o => { const dark = o.dark, bg = dark ? EP.burg : EP.white, fg 
       ${o.how ? `<p style="${T_REG};font-size:38px;line-height:1.4;color:${fg}">${esc(o.how)}</p>` : ''}</div>
     ${o.last ? '' : edHandle(fg)}`}; };
 
+
+// Two pieces of advice on one white slide, each one's line marked in Pink
+EDT.markPair = o => { let html = '', plain = ''; o.items.forEach(it => { const t = `${it.title}.`, h = it.how ? ' ' + it.how : ''; html += `${mark(esc(t))}${esc(h)} `; plain += t + h + ' '; });
+  const sz = plain.length > 300 ? 50 : plain.length > 220 ? 56 : 64;
+  return {bg: EP.white, html: `${edCorner(EP.burg)}
+    <p class="a" style="left:72px;right:72px;top:210px;${BASK};font-size:${sz}px;line-height:1.3;color:${EP.burg}">${html.trim()}</p>${edHandle(EP.burg)}`}; };
+
 // ---------- the form ----------
 DCAT.editorial = {name: 'ATH Editorial', marker: '//EDITORIAL', key: 'GUIDE', pack: true, groups: [
   ['The question', [
@@ -161,9 +168,11 @@ DPACK.editorial = p => {
   const advice = (s, i) => (i % 2 ? EDT.adviceMark : EDT.adviceCard)({title: s.title, how: s.how, img: imgs[i + 1] || '', slot: 'imgs' + (i + 1), credit: credits[i + 1]});
   const head = f.ctahead || 'Want the whole guide?', offer = f.offer || 'Comment the word and we’ll send it to you.';
   const label = q;
+  const pairs = []; steps.slice(0, 6).forEach((st, i) => { if (i % 2 === 0) pairs.push([st]); else pairs[pairs.length - 1].push(st); });
   const S = [
-    ...steps.slice(0, 6).map((st, i) => (i % 2 === 0 ? EDT.plainSlide : EDT.adviceMark)({label, title: st.title, how: st.how, dark: true, first: i === 0})),
-    ...(f.good ? [EDT.plainSlide({label: 'Instead of', struck: f.bad || 'I’ll work it out later.', title: f.good, dark: steps.slice(0, 6).length % 2 === 0})] : []),
+    EDT.coverHook({q, why: f.why}),
+    ...pairs.map(items => EDT.markPair({items})),
+    ...(f.good ? [EDT.instead({bad: f.bad || 'I’ll work it out later.', good: f.good})] : []),
     EDT.end({head, key, offer}),
   ];
   const tags = ['#artstoheartsproject', '#artbusiness', ...String(f.tags || '').split(/\s+/).filter(x => x.startsWith('#'))].slice(0, 5).join(' ');
