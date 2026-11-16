@@ -1,0 +1,50 @@
+# ATH Studio · project memory (read first)
+
+Arts to Hearts Project (ATH) publishes ~3 art books/magazines a month (100+ artists each), runs 2–3 open calls a month, and posts on Instagram @artstoheartsproject. **ATH Post Studio** is our in-house tool that turns calls, articles and books into on-brand Instagram carousels, stories and captions.
+
+## Where things are
+- App: `site/post-studio/` (static HTML/JS + Vercel serverless `api/`). Live: https://ath-post-studio.vercel.app
+- Work branch: `claude/wonderful-cori-nknrbi` (all recent work is here).
+- Tabs (segbar): **Open calls** (`index.html` + `month.js`), **Artist interviews** (`interview.js`), **ATH Editorial** (`editorial.js`), **The Heart List** (`heartlist.js`). Daily post templates: `daily.js`.
+- Shared article sidebar + importer live in `index.html` (`SECTIONS`, `IVK`, `renderIvSide`, `ivImport` → `ivImportRun`, `htmlToArticle`, `grabImage`, `ivSavePics`, `readArticlePdf`).
+- API: `api/article.js` (link import with r.jina.ai fallback, image rehost `{rehost:[url]}`, optional Claude copy if `ANTHROPIC_API_KEY` is set), `api/upload.js` (Vercel Blob images), `api/posts.js` (shared posts store in Blob).
+- Brand guidelines: `design/guidelines/src/` (social.html, playbook.html). Monogram SVGs: `site/post-studio/brand/`.
+
+## Deploy (how every change ships)
+1. Commit + push to `claude/wonderful-cori-nknrbi`.
+2. Vercel MCP `create_deployment`: project `prj_fbCj5xEhPrPRblRxYOvzTkcjwUXJ`, team `team_seGKYPoypwDvUv92NVdxc87l`, gitSource `{type:'github', org:'charukaarora23', repo:'ATH-Studio-Claude', ref:<branch>, sha:<commit>}`, `target:'production'`, `skipAutoDetectionConfirmation:'1'`. Poll `get_deployment` until READY.
+3. Tell the user to hard-refresh (Ctrl/⌘+Shift+R).
+
+## Test before claiming done
+Serve `site/post-studio` with `python3 -m http.server 8765`, drive it with Playwright (preinstalled; `require('playwright')`). Render slides via `RENDERED` + `slideNode(s)`; export via `slideCanvas(s)`. Check overlaps (text boxes intersecting) and compare export vs preview. Never say "fixed" without a render.
+
+## Brand + design rules (the user is strict about these)
+- Colours: White, Burgundy/Maroon `#6A0620`, Pink `#FAD2E1`, Rose `#FFA1C2`, Ink `#1C1310`. No yellow, no gradients. Burgundy = accents and labels, never the headline colour on white.
+- Fonts: Inter Tight (headlines/body, 'ATH Tight'), Libre Baskerville (quotes/paragraphs, italic for one phrase/titles; **never in capitals**), Hanken Grotesk for the brand line `.cn` "ARTS TO HEARTS PROJECT" (top-left, identical everywhere).
+- ATH monogram only on cover/first slide (top-right) and end card (top centre). White on photos.
+- **Artworks are never cropped** (except a full-bleed cover). Artworks big — "artworks in focus".
+- **Every image carries a credit** (title by artist @handle). Auto from Heart List/interview/editorial data; otherwise the red "Credit" button; open-call cover uses the "Cover credit" field.
+- No AI markers: no "01/07" counters, no section labels like "The mistake we see most / Start here", no listicle voice. Human, warm, plain English.
+- Don't reinvent the user's words. Use exactly the title/copy they give (e.g. Heart List cover: "Top 5 Artists / On our Heart List / This week").
+- Don't add unrequested details (open-call blurbs, extra labels). Keep it clean and consistent across tabs.
+
+## What each tab does now
+- **Open calls**: month of posts, stories, reels; styles gallery/award/editorial; credits; drag-to-move text; click text to edit; click/drop image to replace.
+- **Interviews / Editorial / Heart List**: paste an article (Ctrl+A, Ctrl+C on the page, Ctrl+V into the box) — primary import; PDF upload and link import are fallbacks. Pictures save to Blob in the background. Paste again updates the open post.
+- **Editorial**: carousel = cover hook → mistake (struck habit) → 2 tips in full → "the rest is in the article" (Pink highlights) → end card, keyword ARTICLE.
+- **Heart List**: poster cover (artwork full-bleed or solid Maroon; own cover picture) → per artist: big artwork slide + Pink-highlight "about the artist" slide → "Tag your favourite artist" → end card (keyword HEART, "Check out our open calls. Link in bio."). Parser reads "1. Title by Artist @handle" and "01. Title — Artist @handle".
+- Downloads render with `vendor/html-to-image.js` (html2canvas only as fallback); `freezeLines()` locks line breaks to the preview.
+- Edits (text, moves, hidden slides, image swaps) on article posts are saved on the post (`p.edits`), shared with the team.
+
+## Next big piece: Books section (planned, not built)
+Goal: sell the books and promote the ~100 artists per book without one post per artist.
+- Data sources: Shopify (public `shop.artstoheartsproject.com/products.json`: cover, price, pre-order, link) + Google Sheets. Master index: "Books Data" sheet `18YXSenrWqh70doiXHJYERqSooqBw3aN88BVIGikhppA` (one row per book: Dropbox links, cover artist, designer, pages…). Per-book artist sheets exist, e.g. "Big Book" `1qL7DLn7xbrI8H_by5t-u7H0M6oK-RT8Uie9Ur5W9p3E` tab "Painters" (Name, Email, Website, Instagram, 1 Liner, Bio, Artist Image, Artwork 1/2 + details, reel/carousel status) and "Review – The Big Book of Painters 2026" `1E55IxXMMVrrn9yKAh1_Co1bQWYdxzfTb2GP1ZTk0d1c` (quote, country, interview answers, artwork title/medium/year). Artwork images are hosted on media.artstoheartsproject.com.
+- Print PDFs (e.g. Painters 910 MB) have text converted to outlines → not readable; images extract fine with `pdfimages`. Don't OCR (slow/expensive) — use the sheets.
+- Plan: a **Sync** (button + nightly) pulls Shopify + master sheet + each artist sheet into one library in Blob → **Books tab** with: launch carousel, **The Edit** (themed groups of 6–8 artists across books: aesthetic, mood, people, same-theme, place, this-or-that/rank, page teasers, gift/backlist), cover artist + invited voices, artist share kits, 10-week calendar per book, backlist rotation. ~4 feed posts/week + daily stories; every artist gets a story + share kit.
+- Open decisions (ask the user): Google access via **service account** (recommended) or "Publish to web → CSV" per sheet; add **Launch date** column to Books Data and **Page** + **Section** columns to artist sheets; which AI models.
+- AI in the studio (on the user's API key in Vercel, not chat usage): tagging artists with **Haiku 5.5** (+ Batch API for the ~70-book backfill, cache results so each artist is tagged once), copy with **Sonnet 5.5**, prompt caching for the brand voice. Est. $1–3/month.
+
+## Working style with this user
+- Be concise; show a render; deploy; give the live link. Batch fixes. Don't over-explain.
+- Fix root causes and check every slide/style, not just the one in the screenshot.
+- Keep sessions focused to save usage; start a new session per feature.
