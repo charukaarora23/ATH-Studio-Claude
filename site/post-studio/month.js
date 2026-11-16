@@ -185,8 +185,9 @@ const T = {
     const b = (g.bg === CREAM ? btnCTA(BURG, CREAM, CREAM) : btnCTA(CREAM, BURG, BURG)).replace('{TOP}', 760);
     const long = String(state.name).length > 16;
     return {bg:g.bg, html:`${corners(g.fg, g.dm, o.tr||'Submissions open')}
-      <p class="a H c" style="left:70px;right:70px;top:${long ? 300 : 330}px;font-size:${Math.round((o.size||100) * (long ? .8 : 1))}px;color:${g.fg}">${o.head || `Apply to the<br>${GE()}.`}</p>
-      <p class="a c" style="left:0;right:0;top:620px;font-size:34px;font-weight:600;letter-spacing:-.01em;color:${g.acc}">${CURLEFT === 0 ? `Closes tonight, ${dateLong()}` : `Closes ${dateLong()} · ${leftLabel()}`}</p>
+      <div class="a" style="left:70px;right:70px;top:150px;bottom:${1350 - 715}px;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;gap:34px;text-align:center">
+        <p class="H c" style="font-size:${Math.round((o.size||100) * (long ? .8 : 1))}px;color:${g.fg}">${o.head || `Apply to the<br>${GE()}.`}</p>
+        <p class="c" style="font-size:34px;font-weight:600;letter-spacing:-.01em;color:${g.acc}">${CURLEFT === 0 ? `Closes tonight, ${dateLong()}` : `Closes ${dateLong()} · ${leftLabel()}`}</p></div>
       ${b}
       <p class="a c" style="left:0;right:0;top:930px;font-size:28px;color:${g.fg};opacity:.8">${ctaSub()}</p>`};
   },

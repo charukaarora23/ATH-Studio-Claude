@@ -94,8 +94,8 @@ summary{font:600 12px/1 var(--mono);letter-spacing:.1em;text-transform:uppercase
 .dp-wrap{overflow-x:auto}.dp-t{border-collapse:collapse;width:100%;min-width:860px;font-size:12px}.dp-t th,.dp-t td{border:1px solid var(--line);padding:4px;vertical-align:top}.dp-t thead th{background:var(--panel,#fff);font-weight:600}.dp-t thead th.today{background:var(--ink);color:var(--panel,#fff)}.dp-t tbody th{text-align:left;white-space:nowrap;width:110px}.dp-t tbody th small{color:var(--muted);font-weight:400}.dp-c{width:100%;min-height:58px;border:1px dashed var(--line);background:none;border-radius:8px;padding:6px;text-align:left;font:inherit;font-size:11px;cursor:pointer;display:flex;flex-direction:column;gap:2px}.dp-c b{font-size:11px}.dp-c span{color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:120px}.dp-c.has{border:1px solid var(--line);background:var(--panel,#fff)}.dp-c.has.sel{outline:2px solid var(--ink)}.dp-c.done{background:#e6f4ea}.dp-c i{color:#1e6b3a;font-style:normal;font-weight:700}.dp-c.empty{align-items:center;justify-content:center;opacity:.5}.dp-ed{margin-top:16px;border:1px solid var(--line);border-radius:12px;padding:14px;background:var(--panel,#fff)}.dp-edh{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:10px}.dp-edh select,.dp-edh input{font:13px var(--sans,sans-serif);padding:5px 6px;border:1px solid var(--line);border-radius:6px}.dp-wide{grid-column:1/-1}.dp-fields select{font:14px var(--sans,sans-serif);padding:6px;border:1px solid var(--line);border-radius:6px;width:100%}.dp-fields{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:4px 16px}.linkbtn{border:0;background:none;color:var(--muted);text-decoration:underline;cursor:pointer;font-size:12px}.dp-fw{font-size:13px;line-height:1.5}.dp-fw table{border-collapse:collapse;width:100%;font-size:12px}.dp-fw th,.dp-fw td{border:1px solid var(--line);padding:6px;text-align:left;vertical-align:top}
 .acts{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}.hint{font-size:13px;color:var(--muted);margin:0 0 10px;line-height:1.45}
 .capbox{max-width:720px;margin-top:10px;border-top:1px solid var(--line)}
-.cell .act{display:flex;justify-content:space-between;align-items:center;font-size:12px;color:var(--muted);width:var(--pw)}
-.frame [data-nocredit]{outline:6px dashed #E0004D;outline-offset:-6px}.cell .act button.needcred{background:#E0004D;color:#fff;border-color:#E0004D}
+.cell .act{display:flex;justify-content:space-between;align-items:flex-start;gap:8px;font-size:12px;color:var(--muted);width:var(--pw)}
+.cell .act>span:first-child{white-space:nowrap;padding-top:6px}.cell .act .acts{display:flex;flex-wrap:wrap;justify-content:flex-end;gap:4px}.cell .act button.needcred{background:#E0004D;color:#fff;border-color:#E0004D}
 .cell .act button{font:600 12px/1 var(--sans);border:1px solid var(--line);background:var(--panel);color:var(--ink);border-radius:8px;padding:6px 9px;cursor:pointer}
 #stage{position:fixed;left:-30000px;top:0}
 @media (max-width:900px){.app{grid-template-columns:1fr}aside{position:static;max-height:none;border-right:0;border-bottom:1px solid var(--line)}}
@@ -531,17 +531,25 @@ function setCredit(u, g, text){ const k = credKey(u); const p = g && g.pid && DP
   if (p) { p.credits = p.credits || {}; if (text) p.credits[k] = text; else delete p.credits[k]; saveDaily(p.id); }
   else if (u === state.images.imgCover) { state.credit = text || ''; if ($('credit')) $('credit').value = state.credit; }
   else { state.credits = state.credits || {}; if (text) state.credits[k] = text; else delete state.credits[k]; } }
-const isArtImg = (el, u) => u && !/^\s*$/.test(u) && !/brand\/|monogram|logo/.test(u) && !el.closest('svg');
+// placeholders (the studio's own "Artwork 23 · add it" cards) and brand marks are not artworks
+const isArtImg = (el, u) => u && !/^\s*$/.test(u) && !/^data:image\/svg/.test(u) && !/brand\/|monogram|logo/.test(u) && !el.closest('svg');
 function withCredits(s, g){ if (!s.html) return s; const t = document.createElement('template'); t.innerHTML = s.html; const slideTxt = plainTxt(s.html).toLowerCase(); let changed = false;
   t.content.querySelectorAll('[style*="background-image"]').forEach(el => { const m = (el.getAttribute('style') || '').match(/background-image:\s*url\(["']?([^"')]*)["']?\)/); const u = m && m[1]; if (!isArtImg(el, u)) return;
     const c = creditFor(u, g); changed = true;
     // full-bleed pictures keep their credit clear of the corner labels; z-index lifts it above any darkening layer on the photo
-    const st = el.getAttribute('style') || ''; const full = /inset:\s*0/.test(st) || (/left:\s*0(px)?;/.test(st) && /right:\s*0(px)?;/.test(st) && /top:\s*0(px)?;/.test(st));
-    const pos = full ? 'left:52px;bottom:104px' : 'left:14px;bottom:14px';
-    if (!c) { el.setAttribute('data-nocredit', ''); el.insertAdjacentHTML('beforeend', `<span class="crd need" style="position:absolute;${pos};z-index:30;font:500 22px/1.3 'ATH Tight',sans-serif;color:#fff;background:#E0004D;padding:6px 12px;border-radius:6px;letter-spacing:0;text-transform:none;opacity:1">Artwork credit needed: title by artist</span>`); return; }
+    // Where the credit goes: a picture that fills the slide gets it as a thin vertical line on the right edge (clear of headlines and corner labels);
+    // a framed picture gets it inside its own bottom-left corner. z-index lifts it above any darkening layer.
+    const st = el.getAttribute('style') || ''; const num = k => { const m = st.match(new RegExp('(?:^|;)\\s*' + k + ':\\s*(-?[\\d.]+)px')); return m ? +m[1] : null; };
+    const H = s.h || 1350; const l = num('left'), r = num('right'), t = num('top'), b = num('bottom'), w = num('width'), hh = num('height');
+    const wid = /inset:\s*0/.test(st) ? 1080 : w !== null ? w : (l !== null && r !== null ? 1080 - l - r : 0);
+    const hei = /inset:\s*0/.test(st) ? H : hh !== null ? hh : (t !== null && b !== null ? H - t - b : 0);
+    const full = wid >= 1080 * .9 && hei >= H * .8;
+    const look = full ? `position:absolute;right:20px;bottom:190px;transform:rotate(180deg);writing-mode:vertical-rl;max-height:80%;z-index:30;font:400 19px/1.2 'ATH Tight',sans-serif;letter-spacing:.02em;text-transform:none;padding:10px 5px;border-radius:5px`
+      : `position:absolute;left:14px;bottom:14px;max-width:calc(100% - 28px);z-index:30;font:400 22px/1.3 'ATH Tight',sans-serif;letter-spacing:0;text-transform:none;padding:6px 12px;border-radius:6px;white-space:normal;text-align:left`;
+    if (!c) { el.setAttribute('data-nocredit', ''); el.insertAdjacentHTML('beforeend', `<span class="crd need" style="${look};color:#fff;background:#E0004D;opacity:1">Artwork credit needed</span>`); return; }
     const named = c.artist ? slideTxt.includes(c.artist.toLowerCase()) && (!c.title || slideTxt.includes(c.title.toLowerCase())) : slideTxt.includes(c.text.toLowerCase());
     if (named) return;
-    el.insertAdjacentHTML('beforeend', `<span class="crd" style="position:absolute;${pos};z-index:30;max-width:calc(100% - 28px);font:400 22px/1.3 'ATH Tight',sans-serif;color:#fff;background:rgba(20,9,12,.6);padding:6px 12px;border-radius:6px;white-space:normal;text-align:left;letter-spacing:0;text-transform:none">${esc(c.text)}</span>`); });
+    el.insertAdjacentHTML('beforeend', `<span class="crd" style="${look};color:#fff;background:rgba(20,9,12,.55)">${esc(c.text)}</span>`); });
   return changed ? {...s, html: t.innerHTML} : s; }
 // Edits made on a daily or article post's slides (text, moved pictures, hidden slides, swapped photos) belong to that post and are shared with the team.
 const EDIT_MERGED = new Set();
@@ -1188,8 +1196,9 @@ function launch(){
   // 5 the book
   S.push({bg:CREAM, html:`${corners(INK, BURG, 'The book')}
     ${photo('imgSpread', 'An open spread of a past edition', 'left:80px;right:80px;top:150px;height:640px', INK)}
-    <p class="a R" style="left:80px;right:80px;top:850px;font-size:76px;color:${INK}">${pick('A juried hardcover edition.', 'A real book, juried and printed.', 'Hardcover. Juried. Yours.')}</p>
-    <p class="a sub" style="left:80px;right:140px;top:960px;color:${INK}">${esc(state.bookText)}</p>`});
+    <div class="a" style="left:80px;right:80px;top:830px;display:flex;flex-direction:column;gap:22px">
+      <p class="R" style="font-size:72px;color:${INK}">${pick('A juried hardcover edition.', 'A real book, juried and printed.', 'Hardcover. Juried. Yours.')}</p>
+      <p class="sub" style="margin-right:60px;color:${INK}">${esc(state.bookText)}</p></div>`});
 
   // 6 what selected artists receive: the stack
   const bl = lines(state.benefits).slice(0,6).map(l => l.split('|').map(x => x.trim()));
@@ -1354,7 +1363,7 @@ function render(){
       const reelCtl = g.reel ? `<div class="rlctl"><label>Length <input type="number" min="0.5" max="30" step="0.5" value="${s.dur}" data-dur="${esc(dkey)}"> s</label>${vmeta ? `<label>Start at <input type="number" min="0" step="0.5" value="${vmeta.start || 0}" data-vstart="${esc(s.photoKey)}"> s</label><label>Speed <select data-vspeed="${esc(s.photoKey)}">${[0.25, 0.5, 0.75, 1, 1.25, 1.5, 2, 3].map(x => `<option value="${x}" ${(vmeta.speed || 1) == x ? 'selected' : ''}>${x}×</option>`).join('')}</select></label><button type="button" class="trimbtn" data-trim="${esc(s.photoKey)}">Trim clip</button><span class="vtag">Video ${(vmeta.len || 0).toFixed(1)} s${(vmeta.speed || 1) !== 1 ? ` · ${vmeta.speed}×` : ''}</span><button type="button" data-vdel="${esc(s.photoKey)}">Remove clip</button>` : ''}${/^rx/.test(s.photoKey || '') ? `<button type="button" data-delclip="${esc(g.reel)}">Remove last added clip</button>` : ''}</div>` : '';
       const tpre = 'tx|' + gid(g) + '|' + j + '|'; const hasRm = Object.entries(TXT()).some(([k, v]) => k.startsWith(tpre) && v === '\u200b');
       const nCr = (s.html || '').split('data-nocredit').length - 1; const hasImg = /background-image:\s*url\(["']?[^"')\s]/.test(s.html || '') && /data-nocredit|class="crd"|background-image/.test(s.html || '');
-      const credBtn = /data-slot|class="a img|class="img/.test(s.html || '') ? `<button type="button" data-credit="${gi}|${j}"${nCr ? ' class="needcred" title="This image has no credit yet"' : ''}>${nCr ? 'Add credit' : 'Credit'}</button>` : '';
+      const credBtn = nCr || /class="crd"/.test(s.html || '') ? `<button type="button" data-credit="${gi}|${j}"${nCr ? ' class="needcred" title="This image has no credit yet"' : ''}>Credit</button>` : '';
       const photoBtns = credBtn + (has ? `<button type="button" data-phx="${esc(okey)}">Reset photo</button>` : '') + (hasRm ? `<button type="button" data-txr="${esc(tpre)}">Restore text</button>` : '');
       return `<div class="cell"><div class="frame${s.h ? ' tall' : ''}"${g.pid ? ` data-pid="${esc(g.pid)}"` : ''} data-okey="${esc(okey)}" data-tkey="${esc('tx|' + gid(g) + '|' + j)}">${slideNode(s)}</div>${reelCtl}<div class="act"><span>${s.label ? esc(s.label) : g.slides.length>1 ? 'Slide ' + (j+1) : 'Single'}</span><span class="acts"><button type="button" data-pv="${i}" title="See it large">Preview</button><button type="button" data-hide="${esc(hk)}" title="Hide this slide for now">Hide</button>${photoBtns}<button type="button" data-i="${i}">Save PNG</button></span></div></div>`; }).join('');
     const capBox = g.cap ? `<details class="capbox"><summary>Caption and pinned comment</summary><div class="f"><textarea id="cap${gi}" style="min-height:220px">${esc(g.cap)}</textarea></div><div class="f"><label>Pinned comment</label><input value="${esc(g.pin)}"></div><button class="btn ghost" type="button" data-cap="cap${gi}" style="margin-top:8px">Copy caption</button></details>` : '';
