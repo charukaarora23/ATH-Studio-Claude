@@ -6,6 +6,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Hanken+Grotesk:wght@400;500;600;700&display=swap">
 <script src="vendor/html2canvas.min.js"></script>
+<script src="vendor/html-to-image.js"></script>
 <script src="vendor/jszip.min.js"></script>
 <script>
 if (!window.html2canvas) document.write('<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"><\/script>');
@@ -40,6 +41,7 @@ body{margin:0;background:var(--bg);color:var(--ink);font:400 14px/1.45 var(--san
 .segbar nav{display:flex;gap:4px;height:100%;overflow-x:auto}.segbar button{border:0;background:none;color:rgba(249,236,229,.6);font:600 14px var(--sans,sans-serif);padding:0 14px;height:100%;border-bottom:3px solid transparent;cursor:pointer;white-space:nowrap}
 .segbar button[aria-current=page]{color:#F9ECE5;border-bottom-color:#FAD2E1}.segbar button:hover{color:#F9ECE5}
 body:is([data-seg=interviews],[data-seg=editorial],[data-seg=heartlist]) :is(aside:not(#ivside),#tabs,#go,#ptype),body:not([data-seg=interviews]):not([data-seg=editorial]):not([data-seg=heartlist]) #ivside{display:none}
+#ivside .thumbs .rep{position:absolute;right:3px;bottom:3px;width:22px;height:22px;border-radius:50%;background:#fff;color:#1C1310;display:flex;align-items:center;justify-content:center;font:700 13px/1 var(--sans,sans-serif);cursor:pointer;box-shadow:0 1px 3px rgba(0,0,0,.3)}#ivside .thumbs .rep:hover{background:#FAD2E1}
 #ivside .thumbs{display:flex;gap:6px;flex-wrap:wrap;margin:6px 0}#ivside .thumbs span{width:54px;height:54px;border-radius:6px;background:#eee center/cover;position:relative}#ivside .thumbs b{position:absolute;left:3px;top:2px;font:700 10px var(--sans,sans-serif);color:#fff;text-shadow:0 0 3px #000}
 #ivside .pastebox{min-height:96px;max-height:96px;overflow:hidden;border:2px dashed rgba(106,6,32,.45);border-radius:10px;padding:12px;font-size:14px;color:#1C1310;background:#FFF;cursor:text;outline:none}#ivside .pastebox:empty:before{content:attr(data-ph);color:rgba(28,19,16,.55)}#ivside .pastebox:focus,#ivside .pastebox.over{border-color:#6A0620;background:#FDF3F6}#ivside .pastebox.done:empty:before{color:#1C1310;font-weight:500}
 #ivside .ivmsg{font-size:13px;margin:10px 0 0;line-height:1.45}#ivside .ivmsg:not(:empty){background:#F9EEE5;color:#1C1310;border-radius:8px;padding:10px 12px}#ivside .ivmsg.err{color:#AA0003}#ivside .demo{background:#FAD2E1;border-radius:10px;padding:10px 12px;font-size:13px;line-height:1.45;margin:0 0 12px}
@@ -402,6 +404,16 @@ function slotName(k){ k = String(k || ''); let m;
   if ((m = k.match(/^rx(\d)(\d+)$/))) return 'added clip ' + (+m[2] + 1);
   if (/^st4[ab]$/.test(k)) return k === 'st4a' ? 'left image' : 'right image';
   return {imgCover:'cover artwork', imgTheme:'theme artwork', imgBooks:'the books together', imgSpread:'open spread', phSpread2:'a second spread', phShelf:'book on a shelf', phHolding:'artist holding their copy', phStoryWork:'the artwork they sent', phStoryPage:'their page in the book', phPast1:'past edition 1', phPast2:'past edition 2'}[k] || 'this slide'; }
+// A picture clicked or dropped on a slide goes where that slide reads it from: the post's own pictures for daily and article posts, the open call otherwise.
+async function placeImage(frame, key, file){
+  const pid = frame.dataset.pid; if (!pid) return putImage(key, file);
+  if (!file || !/^image\//.test(file.type)) { status('That is not an image.'); return; }
+  const p = DPOSTS[pid]; if (!p) { status('This is the example, so its pictures are locked. Press New, or “edit a copy of this one”, to change them.'); return; }
+  status('Uploading image…'); const url = await dUpload(file); p.imgs = p.imgs || {}; const m = String(key || '').match(/^(.*?)(\d+)$/);
+  if (!m && Array.isArray(p.imgs[key])) { const arr = p.imgs[key]; const hole = arr.findIndex(x => !x); if (hole >= 0) arr[hole] = url; else arr.push(url); }
+  else if (m && (Array.isArray(p.imgs[m[1]]) || !(key in p.imgs))) { const arr = [].concat(p.imgs[m[1]] || []); arr[+m[2]] = url; for (let j = 0; j < arr.length; j++) if (arr[j] === undefined) arr[j] = ''; p.imgs[m[1]] = arr; }
+  else p.imgs[key] = url;
+  saveDaily(pid); render(); if (document.body.dataset.seg && document.body.dataset.seg !== 'calls') renderIvSide(); status('Image replaced.'); }
 function slotsUnder(frame, x, y){ return document.elementsFromPoint(x, y).filter(el => frame.contains(el) && el.matches('.post [data-slot], .post .img, .post .ph')); }
 const VIDURL = {};
 async function putMedia(key, file, quiet){ if (!key || !file) return;
@@ -473,10 +485,10 @@ function wireSlots(){
       const post = frame.querySelector('.post'); const list = imgEls(post); natSize(urlOf(p.el));
       DRAG = {frame, el: p.el, key: frame.dataset.tkey.slice(3) + '|' + imgId(p.el, list), x0: e.clientX, y0: e.clientY, sc: p.el.getBoundingClientRect().width / p.el.offsetWidth, p0: parsePos(p.el.style.backgroundPosition), g: imgGeom(p.el), moved: false};
       e.preventDefault(); });
-    frame.addEventListener('click', e => { if (frame._dragged) { frame._dragged = false; return; } const t = textAt(frame, e.clientX, e.clientY); if (t && t.idx >= 0) { editText(frame, t, e.clientX, e.clientY); return; } const p = pick(e); if (!p) return; const inp = document.createElement('input'); inp.type = 'file'; inp.accept = /^r[lx]/.test(p.key) ? 'image/*,video/*' : 'image/*'; inp.onchange = () => putImage(p.key, inp.files[0]); inp.click(); });
+    frame.addEventListener('click', e => { if (frame._dragged) { frame._dragged = false; return; } const t = textAt(frame, e.clientX, e.clientY); if (t && t.idx >= 0) { editText(frame, t, e.clientX, e.clientY); return; } const p = pick(e); if (!p) return; const inp = document.createElement('input'); inp.type = 'file'; inp.accept = /^r[lx]/.test(p.key) ? 'image/*,video/*' : 'image/*'; inp.onchange = () => placeImage(frame, p.key, inp.files[0]); inp.click(); });
     frame.addEventListener('dragover', e => { const p = pick(e); if (p) { e.preventDefault(); hover(p.el, p.key); } });
     frame.addEventListener('dragleave', () => hover(null));
-    frame.addEventListener('drop', e => { const p = pick(e); hover(null); if (!p) return; e.preventDefault(); putImage(p.key, e.dataTransfer.files[0]); });
+    frame.addEventListener('drop', e => { const p = pick(e); hover(null); if (!p) return; e.preventDefault(); placeImage(frame, p.key, e.dataTransfer.files[0]); });
   });
 }
 // ---------- view tabs ----------
@@ -490,11 +502,46 @@ function setView(v){ $('ptype').value = v === 'feed' ? lastFeed : v; try { if (v
 document.querySelectorAll('#tabs [data-view]').forEach(b => b.onclick = () => setView(b.dataset.view));
 document.addEventListener('click', e => { const g = e.target.closest('[data-goto]'); if (g) setView(g.dataset.goto); });
 const HID = () => (state.hidden = state.hidden || {});
-const gid = g => g.story ? g.title : g.title.replace(/^[^·]*·\s*/, '');
+const gid = g => (g.pid ? g.pid + '|' : '') + (g.story ? g.title : g.title.replace(/^[^·]*·\s*/, ''));   // a post's own id keeps edits on one week's list off every other week's
+// Edits made on a daily or article post's slides (text, moved pictures, hidden slides, swapped photos) belong to that post and are shared with the team.
+const EDIT_MERGED = new Set();
+function postEdits(t){ const pick = (o, pre) => Object.fromEntries(Object.entries(o || {}).filter(([k]) => pre.some(x => k.startsWith(x))));
+  return {texts: pick(state.texts, ['tx|' + t + '|']), pos: pick(state.pos, [t + '|']), hidden: pick(state.hidden, ['h|' + t + '|', 'g|' + t]), images: pick(state.images, ['ov|' + t + '|'])}; }
+function mergePostEdits(groups){ groups.forEach(g => { const p = g.pid && DPOSTS[g.pid]; const key = g.pid + '|' + g.title; if (!p || EDIT_MERGED.has(key)) return; EDIT_MERGED.add(key);
+  const e = (p.edits || {})[gid(g)]; if (!e) return; state.texts = {...(state.texts || {}), ...e.texts}; state.pos = {...(state.pos || {}), ...e.pos}; state.hidden = {...(state.hidden || {}), ...e.hidden}; Object.assign(state.images, e.images || {}); }); }
+function storePostEdits(groups){ const touched = new Set(); groups.forEach(g => { const p = g.pid && DPOSTS[g.pid]; if (!p) return; const t = gid(g); const now = postEdits(t); const empty = !Object.values(now).some(o => Object.keys(o).length);
+  p.edits = p.edits || {}; const before = JSON.stringify(p.edits[t] || null); const after = empty ? 'null' : JSON.stringify(now); if (before === after) return;
+  if (empty) delete p.edits[t]; else p.edits[t] = now; touched.add(p.id); }); touched.forEach(id => saveDaily(id)); }
 // ---------- Make video: photo with a slow camera move, words fade in, soft cross-fades. Recorded in the browser ----------
 function loadImg(src){ return new Promise(res => { if (!src) return res(null); const im = new Image(); im.onload = () => res(im); im.onerror = () => res(null); im.src = src; }); }
-async function slideCanvas(s, transparent){ await document.fonts.ready; const stage = $('stage'); stage.innerHTML = slideNode(transparent ? {...s, bg:'transparent'} : s); const el = stage.firstElementChild;
-  const c = await html2canvas(el, {scale:1, width:1080, height:(s.h || 1350), backgroundColor:null, useCORS:true, logging:false}); stage.innerHTML = ''; return c; }
+// Draw a slide to a canvas with the browser's own renderer (an SVG of the live page), so a download looks exactly like the preview.
+// html2canvas re-draws text itself and drops words around highlighted phrases that wrap; it is kept only as a fallback.
+async function renderSlide(s, transparent){ await document.fonts.ready; const stage = $('stage'); stage.innerHTML = slideNode(transparent ? {...s, bg:'transparent'} : s); const el = stage.firstElementChild; const h = s.h || 1350;
+  await Promise.all([...el.querySelectorAll('[style*="background-image"]')].map(x => { const m = (x.style.backgroundImage || '').match(/url\(["']?(.*?)["']?\)/); return m ? loadImg(m[1]) : null; }));
+  freezeLines(el);
+  try { if (!window.htmlToImage) throw new Error('renderer missing');
+    const opt = {width: 1080, height: h, pixelRatio: 1, canvasWidth: 1080, canvasHeight: h, backgroundColor: transparent ? undefined : null, cacheBust: false};
+    let c = await htmlToImage.toCanvas(el, opt);
+    if (/Safari/.test(navigator.userAgent) && !/Chrome/.test(navigator.userAgent)) c = await htmlToImage.toCanvas(el, opt);   // Safari paints pictures on the second pass
+    stage.innerHTML = ''; return c; }
+  catch (e) { console.warn('Falling back to html2canvas:', e); const c = await html2canvas(el, {scale:1, width:1080, height:h, backgroundColor:null, useCORS:true, logging:false}); stage.innerHTML = ''; return c; } }
+async function slideCanvas(s, transparent){ return renderSlide(s, transparent); }
+// Keep every line break where the preview put it: the image renderer measures text a fraction narrower, which could move a word to the next line.
+function freezeLines(root){
+  const walk = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, {acceptNode: n => n.parentElement.closest('svg,style') || /pre|nowrap/.test(getComputedStyle(n.parentElement).whiteSpace) ? 2 : 1});
+  const nodes = []; while (walk.nextNode()) nodes.push(walk.currentNode);
+  nodes.forEach(n => { n.nodeValue = n.nodeValue.replace(/\s+/g, ' '); });   // same layout, no stray source line breaks
+  const blockOf = n => { let e = n.parentElement; while (e && e !== root && getComputedStyle(e).display.startsWith('inline')) e = e.parentElement; return e; };
+  const cuts = [], last = new Map();
+  for (const n of nodes) { const blk = blockOf(n), t = n.nodeValue, re = /\S+/g; let m;
+    while ((m = re.exec(t))) { const r = document.createRange(); r.setStart(n, m.index); r.setEnd(n, m.index + m[0].length); const box = r.getClientRects()[0]; if (!box) continue;
+      const prev = last.get(blk); if (prev && prev.gap && box.top > prev.top + box.height * .5) cuts.push(prev.gap);
+      const end = m.index + m[0].length; last.set(blk, {top: box.top, gap: t[end] === ' ' ? {node: n, at: end} : null}); } }
+  const blocks = new Set();
+  cuts.sort((a, b) => b.at - a.at).forEach(c => { c.node.nodeValue = c.node.nodeValue.slice(0, c.at) + '\n' + c.node.nodeValue.slice(c.at + 1); blocks.add(blockOf(c.node)); });
+  blocks.forEach(b => { if (b && b !== root) b.style.whiteSpace = 'pre-line'; });
+}
+
 // ---------- reel engine: prepare once, then play to a canvas (preview) or record it (export) ----------
 async function prepareReel(id, opt, progress, forRecord){
   const items = RENDERED.filter(r => r.s.reel === id); if (!items.length) throw new Error('Show the Reels tab first.');
@@ -728,8 +775,12 @@ function wireDaily(root = $('out'), pp){
   const dd = root.querySelector('[data-ddate]'); if (dd) dd.onchange = () => { p.date = dd.value; saveDaily(p.id); re(); };
   const ds = root.querySelector('[data-dslot]'); if (ds) ds.onchange = () => { p.slot = ds.value; saveDaily(p.id); re(); };
   const del = root.querySelector('[data-ddel]'); if (del) del.onclick = () => { if (!confirm('Delete this post for everyone?')) return; delete DPOSTS[p.id]; saveDaily(p.id); DSEL = null; re(); };
-  root.querySelectorAll('[data-dimg]').forEach(inp => inp.onchange = async () => { if (!inp.files[0]) return; status('Uploading image…'); p.imgs = p.imgs || {}; p.imgs[inp.dataset.dimg] = await dUpload(inp.files[0]); saveDaily(p.id); re(); });
-  root.querySelectorAll('[data-dimgs]').forEach(inp => inp.onchange = async () => { status('Uploading images…'); p.imgs = p.imgs || {}; const arr = [].concat(p.imgs[inp.dataset.dimgs] || []); for (const file of inp.files) arr.push(await dUpload(file)); p.imgs[inp.dataset.dimgs] = arr; saveDaily(p.id); re(); });
+  root.querySelectorAll('[data-dimg]').forEach(inp => inp.onchange = async () => { const f = inp.files[0]; inp.value = ''; if (!f) return; status('Uploading image…'); p.imgs = p.imgs || {}; p.imgs[inp.dataset.dimg] = await dUpload(f); saveDaily(p.id); re(); status('Image replaced.'); });
+  root.querySelectorAll('[data-dimgs]').forEach(inp => inp.onchange = async () => { const files = [...inp.files]; inp.value = ''; if (!files.length) return; status('Uploading images…'); p.imgs = p.imgs || {}; const arr = [].concat(p.imgs[inp.dataset.dimgs] || []);
+    for (const file of files) { const u = await dUpload(file); const hole = arr.findIndex(x => !x); if (hole >= 0) arr[hole] = u; else arr.push(u); }
+    p.imgs[inp.dataset.dimgs] = arr; saveDaily(p.id); re(); status(`${files.length} image${files.length > 1 ? 's' : ''} added${arr.length ? ', empty places first' : ''}.`); });
+  root.querySelectorAll('[data-dimgi]').forEach(inp => inp.onchange = async () => { const f = inp.files[0]; inp.value = ''; if (!f) return; const [k, i] = inp.dataset.dimgi.split('|'); status('Uploading image…');
+    p.imgs = p.imgs || {}; const arr = [].concat(p.imgs[k] || []); arr[+i] = await dUpload(f); for (let j = 0; j < arr.length; j++) if (arr[j] === undefined) arr[j] = ''; p.imgs[k] = arr; saveDaily(p.id); re(); status(`Picture ${+i + 1} replaced.`); });
   const fill = root.querySelector('[data-dfill]'); if (fill) fill.onclick = () => { const raw = root.querySelector('[data-dpaste]').value; if (!raw.trim()) { status('Paste the article text first.'); return; }
     const r = parseInterview(raw); p.f = p.f || {}; if (r.intro && !p.f.intro) p.f.intro = r.intro; if (r.caps.length) p.f.caps = r.caps.join('\n'); if (r.qa.length) p.f.qa = qaText(r.qa); if (r.venues.length && !p.f.venues) p.f.venues = r.venues.join('\n');
     if (!p.f.title && r.title) p.f.title = r.title; saveDaily(p.id); re(); status(`Found ${r.qa.length} questions, ${r.caps.length} artwork labels${r.venues.length ? ', ' + r.venues.length + ' exhibitions' : ''}. Add the images, pull quotes and a short cover headline.`); };
@@ -752,7 +803,7 @@ function ivCurrent(){ if (IVSEL !== 'demo' && !(DPOSTS[IVSEL] && DPOSTS[IVSEL].c
 function ivSelect(id){ IVSEL = id; try { localStorage.setItem(SECTIONS[IVK].selKey, id); } catch {} renderIvSide(); render(); }
 const IV_OPEN = new Set(['Start from the article', 'Cover']);
 function ivField(p, fd, demo){ const v = (p.f || {})[fd.k] || ''; const im = (p.imgs || {})[fd.k]; const dis = demo ? ' disabled' : '';
-  if (fd.type === 'imgs') { const arr = [].concat(im || []); return `<div class="f"><label>${esc(fd.label)}</label><div class="thumbs">${arr.map((u, i) => `<span style="background-image:url(${u})"><b>${i + 1}</b></span>`).join('')}</div>${demo ? '' : `<input type="file" accept="image/*" multiple data-dimgs="${fd.k}">${arr.length ? ` <button type="button" class="linkbtn" data-dimgx="${fd.k}">Clear</button>` : ''}`}</div>`; }
+  if (fd.type === 'imgs') { const arr = [].concat(im || []); return `<div class="f"><label>${esc(fd.label)}</label><div class="thumbs">${arr.map((u, i) => `<span style="background-image:url(${u || ''})"><b>${i + 1}</b>${demo ? '' : `<label class="rep" title="${u ? 'Replace' : 'Add'} picture ${i + 1}">${u ? '&#8635;' : '+'}<input type="file" accept="image/*" data-dimgi="${fd.k}|${i}" hidden></label>`}</span>`).join('')}</div>${demo ? '' : `<input type="file" accept="image/*" multiple data-dimgs="${fd.k}">${arr.length ? ` <button type="button" class="linkbtn" data-dimgx="${fd.k}">Clear</button>` : ''}`}</div>`; }
   if (fd.type === 'select') return `<div class="f"><label>${esc(fd.label)}</label><select data-df="${fd.k}"${dis}>${fd.options.map(([val, l]) => `<option value="${val}" ${(v || fd.options[0][0]) === val ? 'selected' : ''}>${esc(l)}</option>`).join('')}</select></div>`;
   if (fd.type === 'qa') { const n = (String(v).match(/(^|\n)Q:/g) || []).length; return `<div class="f"><label>${esc(fd.label)} · ${n} found</label><textarea data-df="${fd.k}" rows="6"${dis}>${esc(v)}</textarea></div>`; }
   if (fd.type === 'text') return `<div class="f"><label>${esc(fd.label)}</label><input data-df="${fd.k}" value="${esc(v)}" placeholder="${esc(fd.ph || '')}"${dis}></div>`;
@@ -792,8 +843,8 @@ function renderIvSide(){ const el = $('ivside'); if (!el) return; const p = ivCu
     if (pdf) return ivImport({file: pdf}); const html = e.dataTransfer.getData('text/html'); const imgs = fl.filter(f => /^image\//.test(f.type)); if (html || imgs.length) ivImport({html, files: imgs}); };
   const rb = el.querySelector('[data-ivrebuild]'); if (rb) rb.onclick = () => { if (confirm('Rewrite the headline, intro, quotes and labels from the article? Your images stay. Text you typed by hand in those fields will be replaced.')) ivImport({rebuild: p}); };
   $('ivPdf').onchange = e => { const fl = e.target.files[0]; if (fl) ivImport({file: fl}); };
-  if (!demo) { wireDaily(el, p); el.querySelectorAll('[data-dimgs],[data-dimgx]').forEach(x => { const prev = x.onchange || x.onclick; const after = () => setTimeout(renderIvSide, 50);
-    if (x.matches('[data-dimgs]')) x.onchange = async () => { await prev.call(x); after(); }; else x.onclick = () => { prev.call(x); after(); }; }); }
+  if (!demo) { wireDaily(el, p); el.querySelectorAll('[data-dimgs],[data-dimgi],[data-dimg],[data-dimgx]').forEach(x => { const prev = x.onchange || x.onclick; const after = () => setTimeout(renderIvSide, 50);
+    if (x.matches('[data-dimgs],[data-dimgi],[data-dimg]')) x.onchange = async () => { await prev.call(x); after(); }; else x.onclick = () => { prev.call(x); after(); }; }); }
 }
 // Read a PDF of the article in the browser: text in reading order, images with the caption printed under each.
 async function readArticlePdf(file, onStep){
@@ -1000,7 +1051,7 @@ function openImage(url){ const box = document.createElement('div'); box.classNam
   const close = () => { box.remove(); document.removeEventListener('keydown', key); }; const key = e => { if (e.key === 'Escape') close(); };
   box.onclick = close; document.addEventListener('keydown', key); document.body.appendChild(box); }
 document.addEventListener('click', e => { const pv = e.target.closest('[data-pv]'); if (pv) { openPreview(+pv.dataset.pv); return; }
-  const th = e.target.closest('#ivside .thumbs span, .dp .img-in .th'); if (th) { const m = (th.style.backgroundImage || '').match(/url\(["']?(.*?)["']?\)$/); if (m) openImage(m[1]); } });
+  const th = !e.target.closest('.rep') && e.target.closest('#ivside .thumbs span, .dp .img-in .th'); if (th) { const m = (th.style.backgroundImage || '').match(/url\(["']?(.*?)["']?\)$/); if (m) openImage(m[1]); } });
 function shrink(file){ return new Promise(res => { const r = new FileReader(); r.onload = () => { const im = new Image(); im.onload = () => {
   const s = Math.min(1, 1600 / Math.max(im.width, im.height)); const c = document.createElement('canvas'); c.width = Math.round(im.width * s); c.height = Math.round(im.height * s);
   c.getContext('2d').drawImage(im, 0, 0, c.width, c.height); res(c.toDataURL('image/jpeg', .88)); }; im.onerror = () => res(r.result); im.src = r.result; }; r.readAsDataURL(file); }); }
@@ -1210,14 +1261,14 @@ function buildPtype(){ const sel = $('ptype'), cur = sel.value;
   sel.value = cur || '0'; if (!sel.value) sel.value = '0'; }
 function render(){
   readForm(); scheduleDraft(); updateTabs();
-  const base = (state.name || 'call').toLowerCase().replace(/[^a-z0-9]+/g,'-');
+  const seg0 = document.body.dataset.seg || 'calls'; const base = (seg0 !== 'calls' && $('ptype').value === 'interview' && SECTIONS[IVK] ? 'ath-' + SECTIONS[IVK].title : (state.name || 'call')).toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g, '');
   const pick = $('ptype').value || '0';
   const groups = [];
   if (pick === 'daily') { if (!dLoaded) loadDaily(); const p = DPOSTS[DSEL]; const cat = p && DCAT[p.cat];
-    if (p && cat && window.DPACK && DPACK[p.cat]) { DPACK[p.cat](p).forEach(g => groups.push({...g, daily: true})); }
+    if (p && cat && window.DPACK && DPACK[p.cat]) { DPACK[p.cat](p).forEach(g => groups.push({...g, daily: true, pid: p.id})); }
     else if (p && cat && DSLIDES[p.cat]) { const slides = DSLIDES[p.cat](p).map((s, j) => ({...s, title: p.cat + '-' + (j + 1)}));
       groups.push({title: `${p.date} · ${cat.name}`, meta: `${cat.marker || cat.name} · ${slides.length} slide${slides.length > 1 ? 's' : ''} · ${slotLabel(p.slot)}${cat.key || p.f.key ? ' · keyword “' + (p.f.key || cat.key) + '”' : ''}`, slides, cap: DCAPTION[p.cat](p), pin: (p.f.key || cat.key) ? `Comment '${p.f.key || cat.key}' and we'll send you the link.` : '', daily: true}); }
-  } else if (pick === 'interview') { if (!dLoaded) loadDaily(); const p = ivCurrent(); if (p) DPACK[IVK](p).forEach(g => groups.push({...g, daily: true}));
+  } else if (pick === 'interview') { if (!dLoaded) loadDaily(); const p = ivCurrent(); if (p) DPACK[IVK](p).forEach(g => groups.push({...g, daily: true, pid: p.id}));
   } else if (pick === 'calendar') { renderPool(); RENDERED = []; $('out').innerHTML = calHTML(); wireCal(); if (!calLoaded) loadStatus(); if (!dLoaded) loadDaily(); return; }
   if (pick === 'storyplan') { renderPool(); RENDERED = []; $('out').innerHTML = storyPlanHTML(); status('Stories plan for every call. Pick "Stories: this call, every day" to get the frames.'); return; }
   if (pick === 'daily' || pick === 'interview') {
@@ -1246,6 +1297,7 @@ function render(){
       groups.push({title: `${postDate(p.left)} · ${p.title}`, meta: `${p.kind} · ${slides.length} slide${slides.length>1?'s':''} · ${p.left === 0 ? 'deadline day' : p.left + ' days left'} · ${VERB} “${KW()}”`, slides: slides.map((s,j) => ({...s, title: s.title || (p.title.toLowerCase().replace(/[^a-z0-9]+/g,'-') + (slides.length>1 ? '-'+(j+1) : ''))})), cap, pin, left:p.left, idx:pi});
       VERB = verbFor(99); });
   }
+  mergePostEdits(groups);
   groups.forEach(g => { const t = gid(g); g.slides = g.slides.map((s, j) => { const o = state.images['ov|' + t + '|' + j];
     const s2 = o && s.html ? {...s, html: s.html.replace(/background-image:url\([^)]*\)/, 'background-image:url(' + o + ')')} : s;
     return applyPos(applyTexts(s2, 'tx|' + t + '|' + j), t + '|' + j); }); });
@@ -1255,13 +1307,13 @@ function render(){
     const gk = 'g|' + gid(g), gHidden = !!HID()[gk];
     if (gHidden) return `<section class="group hiddenpost"><h2>${esc(g.title)}</h2><p class="meta">Hidden for now · not in Save all as ZIP</p><button type="button" class="btn ghost" data-unhide="${esc(gk)}">Restore this ${g.reel ? 'reel' : g.story ? 'day' : 'post'}</button></section>`;
     const cells = g.slides.map((s,j) => { const hk = 'h|' + gid(g) + '|' + j; if (HID()[hk]) return `<div class="cell hiddencell"><div class="frame${s.h ? ' tall' : ''}">${slideNode(s)}<div class="hidmask">Hidden</div></div><div class="act"><span>${s.label ? esc(s.label) : 'Slide ' + (j+1)}</span><span class="acts"><button type="button" data-unhide="${esc(hk)}">Restore</button></span></div></div>`;
-      const i = RENDERED.push({ s, name: `${base}-${g.left !== undefined ? String(g.idx+1).padStart(2,'0')+'-' : 'story-'}${String(j+1).padStart(2,'0')}-${s.title}.png` }) - 1;
+      const i = RENDERED.push({ s, name: `${base}-${g.left !== undefined ? String(g.idx+1).padStart(2,'0')+'-' : g.story ? 'story-' : ''}${String(j+1).padStart(2,'0')}-${s.title}.png` }) - 1;
        const okey = 'ov|' + gid(g) + '|' + j; const has = !!state.images[okey];
       const vmeta = s.photoKey && (state.vids || {})[s.photoKey]; const dkey = s.photoKey || 'end';
       const reelCtl = g.reel ? `<div class="rlctl"><label>Length <input type="number" min="0.5" max="30" step="0.5" value="${s.dur}" data-dur="${esc(dkey)}"> s</label>${vmeta ? `<label>Start at <input type="number" min="0" step="0.5" value="${vmeta.start || 0}" data-vstart="${esc(s.photoKey)}"> s</label><label>Speed <select data-vspeed="${esc(s.photoKey)}">${[0.25, 0.5, 0.75, 1, 1.25, 1.5, 2, 3].map(x => `<option value="${x}" ${(vmeta.speed || 1) == x ? 'selected' : ''}>${x}×</option>`).join('')}</select></label><button type="button" class="trimbtn" data-trim="${esc(s.photoKey)}">Trim clip</button><span class="vtag">Video ${(vmeta.len || 0).toFixed(1)} s${(vmeta.speed || 1) !== 1 ? ` · ${vmeta.speed}×` : ''}</span><button type="button" data-vdel="${esc(s.photoKey)}">Remove clip</button>` : ''}${/^rx/.test(s.photoKey || '') ? `<button type="button" data-delclip="${esc(g.reel)}">Remove last added clip</button>` : ''}</div>` : '';
       const tpre = 'tx|' + gid(g) + '|' + j + '|'; const hasRm = Object.entries(TXT()).some(([k, v]) => k.startsWith(tpre) && v === '\u200b');
       const photoBtns = (has ? `<button type="button" data-phx="${esc(okey)}">Reset photo</button>` : '') + (hasRm ? `<button type="button" data-txr="${esc(tpre)}">Restore text</button>` : '');
-      return `<div class="cell"><div class="frame${s.h ? ' tall' : ''}" data-okey="${esc(okey)}" data-tkey="${esc('tx|' + gid(g) + '|' + j)}">${slideNode(s)}</div>${reelCtl}<div class="act"><span>${s.label ? esc(s.label) : g.slides.length>1 ? 'Slide ' + (j+1) : 'Single'}</span><span class="acts"><button type="button" data-pv="${i}" title="See it large">Preview</button><button type="button" data-hide="${esc(hk)}" title="Hide this slide for now">Hide</button>${photoBtns}<button type="button" data-i="${i}">Save PNG</button></span></div></div>`; }).join('');
+      return `<div class="cell"><div class="frame${s.h ? ' tall' : ''}"${g.pid ? ` data-pid="${esc(g.pid)}"` : ''} data-okey="${esc(okey)}" data-tkey="${esc('tx|' + gid(g) + '|' + j)}">${slideNode(s)}</div>${reelCtl}<div class="act"><span>${s.label ? esc(s.label) : g.slides.length>1 ? 'Slide ' + (j+1) : 'Single'}</span><span class="acts"><button type="button" data-pv="${i}" title="See it large">Preview</button><button type="button" data-hide="${esc(hk)}" title="Hide this slide for now">Hide</button>${photoBtns}<button type="button" data-i="${i}">Save PNG</button></span></div></div>`; }).join('');
     const capBox = g.cap ? `<details class="capbox"><summary>Caption and pinned comment</summary><div class="f"><textarea id="cap${gi}" style="min-height:220px">${esc(g.cap)}</textarea></div><div class="f"><label>Pinned comment</label><input value="${esc(g.pin)}"></div><button class="btn ghost" type="button" data-cap="cap${gi}" style="margin-top:8px">Copy caption</button></details>` : '';
     const ckey = (state.name || '') + ' | ' + g.title.replace(/^[^·]*·\s*/, '');
     const clink = canvaLink(ckey);
@@ -1287,6 +1339,7 @@ function render(){
   $('out').querySelectorAll('[data-vdel]').forEach(b => b.onclick = () => { const k = b.dataset.vdel; delete state.vids[k]; delete state.images[k]; if (state.durs) delete state.durs[k]; render(); });
   $('out').querySelectorAll('[data-rlo]').forEach(c => c.onchange = () => { const [id, k] = c.dataset.rlo.split('|'); state.rlopt = state.rlopt || {}; state.rlopt[id] = {...(state.rlopt[id] || {}), [k]: c.checked}; scheduleDraft(); });
   $('out').querySelectorAll('[data-ver]').forEach(b => b.onclick = () => { const [t, k] = b.dataset.ver.split('|'); state.ver = state.ver || {}; state.ver[t] = +k; render(); status('Wording ' + 'ABC'[+k] + ' for ' + t + '.'); });
+  storePostEdits(groups);
   $('out').querySelectorAll('[data-hide]').forEach(b => b.onclick = () => { HID()[b.dataset.hide] = 1; render(); status('Hidden for now. It is left out of Save all as ZIP. Restore it any time.'); });
   $('out').querySelectorAll('[data-txr]').forEach(b => b.onclick = () => { Object.keys(TXT()).forEach(k => { if (k.startsWith(b.dataset.txr) && TXT()[k] === '\u200b') delete TXT()[k]; }); render(); status('Removed text is back.'); });
   $('out').querySelectorAll('[data-unhide]').forEach(b => b.onclick = () => { delete HID()[b.dataset.unhide]; render(); status('Restored.'); });
@@ -1305,9 +1358,7 @@ function loadCanva(){ try { return JSON.parse(localStorage.getItem('athCanvaLink
 function canvaLink(k){ return loadCanva()[k] || (window.CANVA_LINKS || {})[k] || ''; }
 async function toBlob(s){
   await document.fonts.ready;
-  const stage = $('stage'); stage.innerHTML = slideNode(s); const el = stage.firstElementChild;
-  const canvas = await html2canvas(el, { scale:1, width:1080, height:(s.h||1350), backgroundColor:null, useCORS:true, logging:false });
-  stage.innerHTML = '';
+  const canvas = await renderSlide(s);
   return await new Promise(r => canvas.toBlob(r, 'image/png'));
 }
 let DL = null; const dlReady = (async () => { try { DL = await window.claude?.use?.('downloads'); } catch { DL = null; } })();
@@ -1320,9 +1371,10 @@ async function offer(filename, data){
 function preflight(){
   const issues = [];
   const today = new Date(); today.setHours(0,0,0,0);
-  if (dl() < today) issues.push('the deadline (' + short() + ') has already passed');
+  const seg = document.body.dataset.seg || 'calls';
+  if (seg === 'calls' && dl() < today) issues.push('the deadline (' + short() + ') has already passed');   // only open calls have a deadline
   const gaps = document.querySelectorAll('#out .gap, #out .ph').length;
-  if (gaps) issues.push(gaps + ' detail' + (gaps === 1 ? ' is' : 's are') + ' still dashed (missing)');
+  if (gaps) issues.push(gaps + (seg === 'calls' ? ' detail' + (gaps === 1 ? ' is' : 's are') + ' still dashed (missing)' : ' picture' + (gaps === 1 ? ' is' : 's are') + ' still missing'));
   if (!issues.length) return true;
   return confirm('Before you save: ' + issues.join(' and ') + '. Save anyway?');
 }
@@ -1332,7 +1384,8 @@ let zipping = false;
 $('zip').onclick = async () => { if (zipping) return; if (!RENDERED.length) render(); if (!libsOk() || !preflight()) return;
   zipping = true; const btn = $('zip'); btn.disabled = true;
   try { const zip = new JSZip(); for (let i = 0; i < RENDERED.length; i++){ status(`Rendering ${i+1} of ${RENDERED.length}…`); zip.file(RENDERED[i].name, await toBlob(RENDERED[i].s)); }
-    status('Packing…'); await offer((state.name || 'ath-call').toLowerCase().replace(/[^a-z0-9]+/g,'-') + '-posts.zip', await zip.generateAsync({ type:'blob' })); }
+    status('Packing…'); const seg = document.body.dataset.seg || 'calls'; const sec = seg !== 'calls' && SECTIONS[IVK] ? 'ath-' + SECTIONS[IVK].title + '-' + ((ivCurrent() || {}).date || isoD(new Date())) : (state.name || 'ath-call');
+    await offer(sec.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g, '') + '-posts.zip', await zip.generateAsync({ type:'blob' })); }
   catch (e) { console.error(e); status('ZIP failed: ' + (e && e.message || e)); }
   finally { zipping = false; btn.disabled = false; } };
 $('go').onclick = render;
