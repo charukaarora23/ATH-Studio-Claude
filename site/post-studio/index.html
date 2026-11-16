@@ -220,7 +220,7 @@ summary{font:600 12px/1 var(--mono);letter-spacing:.1em;text-transform:uppercase
     <div class="pool" id="poolGrid"></div>
     <p class="hint" style="margin-top:14px">Launch carousel and page photos:</p>
     <div class="f"><label for="imgCover">Cover artwork</label><div class="img-in"><span class="th" id="th-imgCover"></span><input id="imgCover" type="file" accept="image/*"></div></div>
-    <div class="f"><label for="credit">Cover credit</label><input id="credit" placeholder="Artist name, Title"></div>
+    <div class="f"><label for="credit">Cover credit (printed on the cover image)</label><input id="credit" placeholder="Title by Artist Name @handle"></div>
     <div class="f"><label for="imgTheme">Theme artwork</label><div class="img-in"><span class="th" id="th-imgTheme"></span><input id="imgTheme" type="file" accept="image/*"></div></div>
     <div class="f"><label for="imgBooks">Photo: the books together</label><div class="img-in"><span class="th" id="th-imgBooks"></span><input id="imgBooks" type="file" accept="image/*"></div></div>
     <div class="f"><label for="imgSpread">Photo: an open spread</label><div class="img-in"><span class="th" id="th-imgSpread"></span><input id="imgSpread" type="file" accept="image/*"></div></div>
@@ -519,19 +519,29 @@ const CREDIT_OF = {
   editorial: p => { const imgs = [].concat((p.imgs || {}).imgs || []), cr = dLines((p.f || {}).credits); const o = {};
     imgs.forEach((u, i) => { const c = cr[i]; if (u && c && c[0]) o[u] = {text: `${c[1] ? c[1] + ' by ' : ''}${c[0]}${c[2] ? ', ' + c[2] : ''}`, artist: c[0], title: c[1] || ''}; }); return o; },
 };
+// Open calls: the cover credit field, and the names already listed for past artists and cover artists
+function callCredits(){ const o = {}; const put = (u, t) => { if (u && t && t.trim()) o[u] = {text: t.trim()}; };
+  put(state.images.imgCover, state.credit);
+  PAST_ARTISTS().forEach((a, i) => put(paImg(i), [a[0], a[1]].filter(Boolean).join(' · ')));
+  COVER_ARTISTS().forEach((a, i) => put(cvImg(i), [a[0], a[1]].filter(Boolean).join(' · ')));
+  return o; }
 function creditFor(u, g){ const auto = g && g.credits && g.credits[u]; if (auto) return auto; const k = credKey(u);
   const p = g && g.pid && DPOSTS[g.pid]; const t = (p && (p.credits || {})[k]) || (state.credits || {})[k]; return t ? {text: t} : null; }
 function setCredit(u, g, text){ const k = credKey(u); const p = g && g.pid && DPOSTS[g.pid];
   if (p) { p.credits = p.credits || {}; if (text) p.credits[k] = text; else delete p.credits[k]; saveDaily(p.id); }
+  else if (u === state.images.imgCover) { state.credit = text || ''; if ($('credit')) $('credit').value = state.credit; }
   else { state.credits = state.credits || {}; if (text) state.credits[k] = text; else delete state.credits[k]; } }
 const isArtImg = (el, u) => u && !/^\s*$/.test(u) && !/brand\/|monogram|logo/.test(u) && !el.closest('svg');
 function withCredits(s, g){ if (!s.html) return s; const t = document.createElement('template'); t.innerHTML = s.html; const slideTxt = plainTxt(s.html).toLowerCase(); let changed = false;
   t.content.querySelectorAll('[style*="background-image"]').forEach(el => { const m = (el.getAttribute('style') || '').match(/background-image:\s*url\(["']?([^"')]*)["']?\)/); const u = m && m[1]; if (!isArtImg(el, u)) return;
     const c = creditFor(u, g); changed = true;
-    if (!c) { el.setAttribute('data-nocredit', ''); return; }
+    // full-bleed pictures keep their credit clear of the corner labels; z-index lifts it above any darkening layer on the photo
+    const st = el.getAttribute('style') || ''; const full = /inset:\s*0/.test(st) || (/left:\s*0(px)?;/.test(st) && /right:\s*0(px)?;/.test(st) && /top:\s*0(px)?;/.test(st));
+    const pos = full ? 'left:52px;bottom:104px' : 'left:14px;bottom:14px';
+    if (!c) { el.setAttribute('data-nocredit', ''); el.insertAdjacentHTML('beforeend', `<span class="crd need" style="position:absolute;${pos};z-index:30;font:500 22px/1.3 'ATH Tight',sans-serif;color:#fff;background:#E0004D;padding:6px 12px;border-radius:6px;letter-spacing:0;text-transform:none;opacity:1">Artwork credit needed: title by artist</span>`); return; }
     const named = c.artist ? slideTxt.includes(c.artist.toLowerCase()) && (!c.title || slideTxt.includes(c.title.toLowerCase())) : slideTxt.includes(c.text.toLowerCase());
     if (named) return;
-    el.insertAdjacentHTML('beforeend', `<span class="crd" style="position:absolute;left:14px;bottom:14px;max-width:calc(100% - 28px);font:400 22px/1.3 'ATH Tight',sans-serif;color:#fff;background:rgba(20,9,12,.6);padding:6px 12px;border-radius:6px;white-space:normal;text-align:left;letter-spacing:0;text-transform:none">${esc(c.text)}</span>`); });
+    el.insertAdjacentHTML('beforeend', `<span class="crd" style="position:absolute;${pos};z-index:30;max-width:calc(100% - 28px);font:400 22px/1.3 'ATH Tight',sans-serif;color:#fff;background:rgba(20,9,12,.6);padding:6px 12px;border-radius:6px;white-space:normal;text-align:left;letter-spacing:0;text-transform:none">${esc(c.text)}</span>`); });
   return changed ? {...s, html: t.innerHTML} : s; }
 // Edits made on a daily or article post's slides (text, moved pictures, hidden slides, swapped photos) belong to that post and are shared with the team.
 const EDIT_MERGED = new Set();
@@ -1328,7 +1338,7 @@ function render(){
       VERB = verbFor(99); });
   }
   mergePostEdits(groups);
-  groups.forEach(g => { const p = (g.pid && DPOSTS[g.pid]) || (g.pid === 'demo' ? ivCurrent() : null); if (p && CREDIT_OF[p.cat]) g.credits = CREDIT_OF[p.cat](p); });
+  groups.forEach(g => { const p = (g.pid && DPOSTS[g.pid]) || (g.pid === 'demo' ? ivCurrent() : null); if (p && CREDIT_OF[p.cat]) g.credits = CREDIT_OF[p.cat](p); else if (!g.pid) g.credits = callCredits(); });
   groups.forEach(g => { const t = gid(g); g.slides = g.slides.map((s, j) => { const o = state.images['ov|' + t + '|' + j];
     const s2 = o && s.html ? {...s, html: s.html.replace(/background-image:url\([^)]*\)/, 'background-image:url(' + o + ')')} : s;
     return withCredits(applyPos(applyTexts(s2, 'tx|' + t + '|' + j), t + '|' + j), g); }); });
