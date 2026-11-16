@@ -448,6 +448,19 @@ function imgGeom(el, z){ const n = NATV[urlOf(el)]; const W = el.offsetWidth, H 
   const sz = el.style.backgroundSize; const fit = sz === 'contain'; const base = fit ? Math.min(W / n.w, H / n.h) : Math.max(W / n.w, H / n.h);
   let iw = n.w * base, ih = n.h * base; const m = /^([\d.]+)px/.exec(sz || ''); if (m && !fit) { const k = parseFloat(m[1]) / iw; iw *= k; ih *= k; }
   return {W, H, iw, ih, n, cover: Math.max(W / n.w, H / n.h)}; }
+// ---------- move any text block: drag it in the preview (a plain click still edits the words) ----------
+const MOVES = () => (state.moves = state.moves || {});
+const textBlocks = root => [...root.querySelectorAll('.a')];
+function applyMoves(s, base){ const keys = Object.keys(MOVES()).filter(k => k.startsWith(base + '|')); if (!keys.length || !s.html) return s;
+  const t = document.createElement('template'); t.innerHTML = s.html; const blocks = textBlocks(t.content);
+  keys.forEach(k => { const el = blocks[+k.slice(base.length + 1)]; const m = MOVES()[k]; if (el && m) el.style.translate = `${m.x}px ${m.y}px`; });
+  return {...s, html: t.innerHTML}; }
+let TDRAG = null;
+document.addEventListener('mousemove', e => { const d = TDRAG; if (!d) return; const dx = (e.clientX - d.x0) / d.sc, dy = (e.clientY - d.y0) / d.sc;
+  if (!d.moved && Math.abs(dx) + Math.abs(dy) < 6 / d.sc) return; d.moved = true; document.body.classList.add('dragging-img');
+  d.now = {x: Math.round(d.base.x + dx), y: Math.round(d.base.y + dy)}; d.el.style.translate = `${d.now.x}px ${d.now.y}px`; e.preventDefault(); });
+document.addEventListener('mouseup', () => { const d = TDRAG; if (!d) return; TDRAG = null; document.body.classList.remove('dragging-img');
+  if (d.moved && d.now) { d.frame._dragged = true; MOVES()[d.key] = d.now; if (!d.now.x && !d.now.y) delete MOVES()[d.key]; render(); status('Text moved. Use “Reset text” under the slide to put it back.'); } });
 let DRAG = null;
 document.addEventListener('mousemove', e => { if (!DRAG) return; const d = DRAG; const dx = (e.clientX - d.x0) / d.sc, dy = (e.clientY - d.y0) / d.sc;
   if (Math.abs(dx) + Math.abs(dy) > 4) d.moved = true; if (!d.g) d.g = imgGeom(d.el); if (d.moved) document.body.classList.add('dragging-img'); if (!d.moved || !d.g) return;
@@ -477,12 +490,15 @@ function wireSlots(){
     const clearTx = () => frame.querySelectorAll('.tx-on').forEach(x => x.classList.remove('tx-on'));
     const hover = (el, key) => { frame.querySelectorAll('.slot-on').forEach(x => x !== el && x.classList.remove('slot-on')); if (el) { el.classList.add('slot-on'); frame.dataset.hint = 'Click or drop an image: ' + slotName(key); } frame.classList.toggle('pointing', !!el); };
     frame.addEventListener('mousemove', e => { const t = textAt(frame, e.clientX, e.clientY); clearTx();
-      if (t) { hover(null); t.node.parentElement.classList.add('tx-on'); frame.dataset.hint = 'Click to edit this text'; frame.classList.add('pointing', 'texting'); return; }
+      if (t) { hover(null); t.node.parentElement.classList.add('tx-on'); frame.dataset.hint = 'Click to edit this text · drag to move it'; frame.classList.add('pointing', 'texting'); return; }
       frame.classList.remove('texting'); const p = pick(e); hover(p && p.el, p && p.key);
       const bar = imgBar(frame); if (p && urlOf(p.el)) { natSize(urlOf(p.el)); const list = imgEls(frame.querySelector('.post')); bar._t = {el: p.el, key: frame.dataset.tkey.slice(3) + '|' + imgId(p.el, list)}; bar.querySelector('[data-z=hide]').textContent = p.el.dataset.removed ? 'Restore image' : 'Remove'; bar.classList.add('on'); frame.classList.add('grab'); frame.dataset.hint = 'Drag to move · click to replace: ' + slotName(p.key); }
       else frame.classList.remove('grab'); });
     frame.addEventListener('mouseleave', () => { hover(null); clearTx(); frame.classList.remove('texting', 'grabbing'); const b = frame.querySelector('.imgbar'); if (b) b.classList.remove('on'); });
-    frame.addEventListener('mousedown', e => { if (e.button !== 0 || textAt(frame, e.clientX, e.clientY)) return; const p = pick(e); if (!p || !urlOf(p.el)) return;
+    frame.addEventListener('mousedown', e => { if (e.button !== 0) return; const th = textAt(frame, e.clientX, e.clientY);
+      if (th) { const post = frame.querySelector('.post'); const el = th.node.parentElement.closest('.a'); if (!el || !post.contains(el)) return; const idx = textBlocks(post).indexOf(el);
+        const key = 'mv|' + frame.dataset.tkey.slice(3) + '|' + idx; const m = MOVES()[key] || {x: 0, y: 0};
+        TDRAG = {frame, el, key, x0: e.clientX, y0: e.clientY, sc: post.getBoundingClientRect().width / post.offsetWidth, base: {x: m.x || 0, y: m.y || 0}, moved: false}; e.preventDefault(); return; } const p = pick(e); if (!p || !urlOf(p.el)) return;
       const post = frame.querySelector('.post'); const list = imgEls(post); natSize(urlOf(p.el));
       DRAG = {frame, el: p.el, key: frame.dataset.tkey.slice(3) + '|' + imgId(p.el, list), x0: e.clientX, y0: e.clientY, sc: p.el.getBoundingClientRect().width / p.el.offsetWidth, p0: parsePos(p.el.style.backgroundPosition), g: imgGeom(p.el), moved: false};
       e.preventDefault(); });
@@ -554,9 +570,9 @@ function withCredits(s, g){ if (!s.html) return s; const t = document.createElem
 // Edits made on a daily or article post's slides (text, moved pictures, hidden slides, swapped photos) belong to that post and are shared with the team.
 const EDIT_MERGED = new Set();
 function postEdits(t){ const pick = (o, pre) => Object.fromEntries(Object.entries(o || {}).filter(([k]) => pre.some(x => k.startsWith(x))));
-  return {texts: pick(state.texts, ['tx|' + t + '|']), pos: pick(state.pos, [t + '|']), hidden: pick(state.hidden, ['h|' + t + '|', 'g|' + t]), images: pick(state.images, ['ov|' + t + '|'])}; }
+  return {texts: pick(state.texts, ['tx|' + t + '|']), moves: pick(state.moves, ['mv|' + t + '|']), pos: pick(state.pos, [t + '|']), hidden: pick(state.hidden, ['h|' + t + '|', 'g|' + t]), images: pick(state.images, ['ov|' + t + '|'])}; }
 function mergePostEdits(groups){ groups.forEach(g => { const p = g.pid && DPOSTS[g.pid]; const key = g.pid + '|' + g.title; if (!p || EDIT_MERGED.has(key)) return; EDIT_MERGED.add(key);
-  const e = (p.edits || {})[gid(g)]; if (!e) return; state.texts = {...(state.texts || {}), ...e.texts}; state.pos = {...(state.pos || {}), ...e.pos}; state.hidden = {...(state.hidden || {}), ...e.hidden}; Object.assign(state.images, e.images || {}); }); }
+  const e = (p.edits || {})[gid(g)]; if (!e) return; state.texts = {...(state.texts || {}), ...e.texts}; state.moves = {...(state.moves || {}), ...(e.moves || {})}; state.pos = {...(state.pos || {}), ...e.pos}; state.hidden = {...(state.hidden || {}), ...e.hidden}; Object.assign(state.images, e.images || {}); }); }
 function storePostEdits(groups){ const touched = new Set(); groups.forEach(g => { const p = g.pid && DPOSTS[g.pid]; if (!p) return; const t = gid(g); const now = postEdits(t); const empty = !Object.values(now).some(o => Object.keys(o).length);
   p.edits = p.edits || {}; const before = JSON.stringify(p.edits[t] || null); const after = empty ? 'null' : JSON.stringify(now); if (before === after) return;
   if (empty) delete p.edits[t]; else p.edits[t] = now; touched.add(p.id); }); touched.forEach(id => saveDaily(id)); }
@@ -1350,7 +1366,7 @@ function render(){
   groups.forEach(g => { const p = (g.pid && DPOSTS[g.pid]) || (g.pid === 'demo' ? ivCurrent() : null); if (p && CREDIT_OF[p.cat]) g.credits = CREDIT_OF[p.cat](p); else if (!g.pid) g.credits = callCredits(); });
   groups.forEach(g => { const t = gid(g); g.slides = g.slides.map((s, j) => { const o = state.images['ov|' + t + '|' + j];
     const s2 = o && s.html ? {...s, html: s.html.replace(/background-image:url\([^)]*\)/, 'background-image:url(' + o + ')')} : s;
-    return withCredits(applyPos(applyTexts(s2, 'tx|' + t + '|' + j), t + '|' + j), g); }); });
+    return withCredits(applyMoves(applyPos(applyTexts(s2, 'tx|' + t + '|' + j), t + '|' + j), 'mv|' + t + '|' + j), g); }); });
   renderPool();
   RENDERED = [];
   $('out').innerHTML = groups.map((g,gi) => {
@@ -1364,7 +1380,8 @@ function render(){
       const tpre = 'tx|' + gid(g) + '|' + j + '|'; const hasRm = Object.entries(TXT()).some(([k, v]) => k.startsWith(tpre) && v === '\u200b');
       const nCr = (s.html || '').split('data-nocredit').length - 1; const hasImg = /background-image:\s*url\(["']?[^"')\s]/.test(s.html || '') && /data-nocredit|class="crd"|background-image/.test(s.html || '');
       const credBtn = nCr || /class="crd"/.test(s.html || '') ? `<button type="button" data-credit="${gi}|${j}"${nCr ? ' class="needcred" title="This image has no credit yet"' : ''}>Credit</button>` : '';
-      const photoBtns = credBtn + (has ? `<button type="button" data-phx="${esc(okey)}">Reset photo</button>` : '') + (hasRm ? `<button type="button" data-txr="${esc(tpre)}">Restore text</button>` : '');
+      const mpre = 'mv|' + gid(g) + '|' + j + '|'; const hasMv = Object.keys(MOVES()).some(k => k.startsWith(mpre));
+      const photoBtns = credBtn + (hasMv ? `<button type="button" data-mvr="${esc(mpre)}" title="Put moved text back where it was">Reset text</button>` : '') + (has ? `<button type="button" data-phx="${esc(okey)}">Reset photo</button>` : '') + (hasRm ? `<button type="button" data-txr="${esc(tpre)}">Restore text</button>` : '');
       return `<div class="cell"><div class="frame${s.h ? ' tall' : ''}"${g.pid ? ` data-pid="${esc(g.pid)}"` : ''} data-okey="${esc(okey)}" data-tkey="${esc('tx|' + gid(g) + '|' + j)}">${slideNode(s)}</div>${reelCtl}<div class="act"><span>${s.label ? esc(s.label) : g.slides.length>1 ? 'Slide ' + (j+1) : 'Single'}</span><span class="acts"><button type="button" data-pv="${i}" title="See it large">Preview</button><button type="button" data-hide="${esc(hk)}" title="Hide this slide for now">Hide</button>${photoBtns}<button type="button" data-i="${i}">Save PNG</button></span></div></div>`; }).join('');
     const capBox = g.cap ? `<details class="capbox"><summary>Caption and pinned comment</summary><div class="f"><textarea id="cap${gi}" style="min-height:220px">${esc(g.cap)}</textarea></div><div class="f"><label>Pinned comment</label><input value="${esc(g.pin)}"></div><button class="btn ghost" type="button" data-cap="cap${gi}" style="margin-top:8px">Copy caption</button></details>` : '';
     const ckey = (state.name || '') + ' | ' + g.title.replace(/^[^·]*·\s*/, '');
@@ -1398,6 +1415,7 @@ function render(){
     for (const [n, u] of urls.entries()) { const cur = creditFor(u, g); if (cur && g.credits && g.credits[u]) { status('This image is credited from the article: ' + cur.text); continue; }
       const v = prompt(`Credit for image ${n + 1} of ${urls.length} on this slide.\nFor example: Title by Artist Name @handle`, cur ? cur.text : ''); if (v === null) return; setCredit(u, g, v.trim()); }
     render(); status('Credit saved. It shows on every slide that uses this image.'); });
+  $('out').querySelectorAll('[data-mvr]').forEach(b => b.onclick = () => { Object.keys(MOVES()).forEach(k => { if (k.startsWith(b.dataset.mvr)) delete MOVES()[k]; }); render(); status('Text is back in its place.'); });
   $('out').querySelectorAll('[data-hide]').forEach(b => b.onclick = () => { HID()[b.dataset.hide] = 1; render(); status('Hidden for now. It is left out of Save all as ZIP. Restore it any time.'); });
   $('out').querySelectorAll('[data-txr]').forEach(b => b.onclick = () => { Object.keys(TXT()).forEach(k => { if (k.startsWith(b.dataset.txr) && TXT()[k] === '\u200b') delete TXT()[k]; }); render(); status('Removed text is back.'); });
   $('out').querySelectorAll('[data-unhide]').forEach(b => b.onclick = () => { delete HID()[b.dataset.unhide]; render(); status('Restored.'); });
