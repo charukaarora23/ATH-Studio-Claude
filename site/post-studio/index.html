@@ -567,7 +567,7 @@ function withCredits(s, g){ if (!s.html) return s; const t = document.createElem
     const full = wid >= 1080 * .9 && hei >= H * .8;
     const look = full ? `position:absolute;right:20px;top:110px;transform:rotate(180deg);writing-mode:vertical-rl;max-height:80%;z-index:30;font:400 19px/1.2 'ATH Tight',sans-serif;letter-spacing:.02em;text-transform:none;padding:10px 5px;border-radius:5px`
       : `position:absolute;left:14px;bottom:14px;max-width:calc(100% - 28px);z-index:30;font:400 22px/1.3 'ATH Tight',sans-serif;letter-spacing:0;text-transform:none;padding:6px 12px;border-radius:6px;white-space:normal;text-align:left`;
-    if (!c) { el.setAttribute('data-nocredit', ''); el.insertAdjacentHTML('beforeend', `<span class="crd need" style="${look};color:#fff;background:#E0004D;opacity:1">Artwork credit needed</span>`); return; }
+    if (!c) { el.setAttribute('data-nocredit', ''); return; }   // credits are optional: nothing shows until one is added
     const named = c.artist ? slideTxt.includes(c.artist.toLowerCase()) && (!c.title || slideTxt.includes(c.title.toLowerCase())) : slideTxt.includes(c.text.toLowerCase());
     if (named) return;
     el.insertAdjacentHTML('beforeend', `<span class="crd" style="${look};color:#fff;background:rgba(20,9,12,.55)">${esc(c.text)}</span>`); });
@@ -1385,7 +1385,7 @@ function render(){
       const reelCtl = g.reel ? `<div class="rlctl"><label>Length <input type="number" min="0.5" max="30" step="0.5" value="${s.dur}" data-dur="${esc(dkey)}"> s</label>${vmeta ? `<label>Start at <input type="number" min="0" step="0.5" value="${vmeta.start || 0}" data-vstart="${esc(s.photoKey)}"> s</label><label>Speed <select data-vspeed="${esc(s.photoKey)}">${[0.25, 0.5, 0.75, 1, 1.25, 1.5, 2, 3].map(x => `<option value="${x}" ${(vmeta.speed || 1) == x ? 'selected' : ''}>${x}×</option>`).join('')}</select></label><button type="button" class="trimbtn" data-trim="${esc(s.photoKey)}">Trim clip</button><span class="vtag">Video ${(vmeta.len || 0).toFixed(1)} s${(vmeta.speed || 1) !== 1 ? ` · ${vmeta.speed}×` : ''}</span><button type="button" data-vdel="${esc(s.photoKey)}">Remove clip</button>` : ''}${/^rx/.test(s.photoKey || '') ? `<button type="button" data-delclip="${esc(g.reel)}">Remove last added clip</button>` : ''}</div>` : '';
       const tpre = 'tx|' + gid(g) + '|' + j + '|'; const hasRm = Object.entries(TXT()).some(([k, v]) => k.startsWith(tpre) && v === '\u200b');
       const nCr = (s.html || '').split('data-nocredit').length - 1; const hasImg = /background-image:\s*url\(["']?[^"')\s]/.test(s.html || '') && /data-nocredit|class="crd"|background-image/.test(s.html || '');
-      const credBtn = nCr || /class="crd"/.test(s.html || '') ? `<button type="button" data-credit="${gi}|${j}"${nCr ? ' class="needcred" title="This image has no credit yet"' : ''}>Credit</button>` : '';
+      const credBtn = nCr || /class="crd"/.test(s.html || '') ? `<button type="button" data-credit="${gi}|${j}" title="Add or change the artwork credit (optional)">Credit</button>` : '';
       const mpre = 'mv|' + gid(g) + '|' + j + '|'; const hasMv = Object.keys(MOVES()).some(k => k.startsWith(mpre));
       const ppre = gid(g) + '|' + j + '|'; const edited = Object.keys(TXT()).some(k => k.startsWith(tpre)) || hasMv || has || Object.keys(POS()).some(k => k.startsWith(ppre));
       const photoBtns = credBtn + `<button type="button" data-reset="${gi}|${j}"${edited ? '' : ' disabled'} title="Put this slide back as it was: words, positions and picture">Reset</button>`;
@@ -1463,8 +1463,6 @@ function preflight(){
   if (seg === 'calls' && dl() < today) issues.push('the deadline (' + short() + ') has already passed');   // only open calls have a deadline
   const gaps = document.querySelectorAll('#out .gap, #out .ph').length;
   if (gaps) issues.push(gaps + (seg === 'calls' ? ' detail' + (gaps === 1 ? ' is' : 's are') + ' still dashed (missing)' : ' picture' + (gaps === 1 ? ' is' : 's are') + ' still missing'));
-  const nocred = document.querySelectorAll('#out .cell:not(.hiddencell) .post [data-nocredit]').length;
-  if (nocred) issues.push(nocred + ' image' + (nocred === 1 ? ' has' : 's have') + ' no credit (red “Add credit” under the slide)');
   if (!issues.length) return true;
   return confirm('Before you save: ' + issues.join(' and ') + '. Save anyway?');
 }
