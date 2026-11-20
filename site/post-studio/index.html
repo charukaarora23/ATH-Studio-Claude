@@ -95,7 +95,7 @@ summary{font:600 12px/1 var(--mono);letter-spacing:.1em;text-transform:uppercase
 .acts{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}.hint{font-size:13px;color:var(--muted);margin:0 0 10px;line-height:1.45}
 .capbox{max-width:720px;margin-top:10px;border-top:1px solid var(--line)}
 .cell .act{display:flex;justify-content:space-between;align-items:flex-start;gap:8px;font-size:12px;color:var(--muted);width:var(--pw)}
-.cell .act>span:first-child{white-space:nowrap;padding-top:6px}.cell .act .acts{display:flex;flex-wrap:wrap;justify-content:flex-end;gap:4px}.cell .act button.needcred{background:#E0004D;color:#fff;border-color:#E0004D}
+.frame .crd{cursor:pointer}.cell .act{flex-wrap:wrap;row-gap:6px}.cell .act>span:first-child{white-space:nowrap;width:100%;padding-top:2px}.cell .act .acts{display:flex;flex-wrap:nowrap;justify-content:flex-start;gap:4px;width:100%}.cell .act .acts button{padding:6px 8px;font-size:11.5px}.cell .act button:disabled{opacity:.4;cursor:default}.cell .act button.needcred{background:#E0004D;color:#fff;border-color:#E0004D}
 .cell .act button{font:600 12px/1 var(--sans);border:1px solid var(--line);background:var(--panel);color:var(--ink);border-radius:8px;padding:6px 9px;cursor:pointer}
 #stage{position:fixed;left:-30000px;top:0}
 @media (max-width:900px){.app{grid-template-columns:1fr}aside{position:static;max-height:none;border-right:0;border-bottom:1px solid var(--line)}}
@@ -368,7 +368,7 @@ function slotKeyFor(el, frame){
 }
 // ---------- edit any text on a slide: click the words in the preview ----------
 const TXT = () => (state.texts = state.texts || {});
-const textNodes = root => { const w = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, {acceptNode: n => /\S/.test(n.nodeValue) && !n.parentElement.closest('svg,style') ? 1 : 2}); const out = []; while (w.nextNode()) out.push(w.currentNode); return out; };
+const textNodes = root => { const w = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, {acceptNode: n => /\S/.test(n.nodeValue) && !n.parentElement.closest('svg,style,.crd') ? 1 : 2}); const out = []; while (w.nextNode()) out.push(w.currentNode); return out; };
 function applyTexts(s, base){
   const keys = Object.keys(TXT()).filter(k => k.startsWith(base + '|')); if (!keys.length || !s.html) return s;
   const t = document.createElement('template'); t.innerHTML = s.html; const nodes = textNodes(t.content);
@@ -415,6 +415,10 @@ async function placeImage(frame, key, file){
   else if (m && (Array.isArray(p.imgs[m[1]]) || !(key in p.imgs))) { const arr = [].concat(p.imgs[m[1]] || []); arr[+m[2]] = url; for (let j = 0; j < arr.length; j++) if (arr[j] === undefined) arr[j] = ''; p.imgs[m[1]] = arr; }
   else p.imgs[key] = url;
   saveDaily(pid); render(); if (document.body.dataset.seg && document.body.dataset.seg !== 'calls') renderIvSide(); status('Image replaced.'); }
+function creditFromLabel(frame, crd){ const holder = crd.parentElement; const m = (holder.getAttribute('style') || '').match(/background-image:\s*url\(["']?([^"')]*)["']?\)/); if (!m) return;
+  const g = {pid: frame.dataset.pid || undefined}; const cur = creditFor(m[1], g);
+  if (crd.classList.contains('crd') && !crd.classList.contains('need') && !(cur && cur.text === crd.textContent.trim())) { status('This credit comes from the article. Change it in the sidebar.'); return; }
+  const v = prompt('Credit for this picture.\nFor example: Title by Artist Name @handle', cur ? cur.text : ''); if (v === null) return; setCredit(m[1], g, v.trim()); render(); status(v.trim() ? 'Credit saved. It shows on every slide that uses this picture.' : 'Credit removed.'); }
 function slotsUnder(frame, x, y){ return document.elementsFromPoint(x, y).filter(el => frame.contains(el) && el.matches('.post [data-slot], .post .img, .post .ph')); }
 const VIDURL = {};
 async function putMedia(key, file, quiet){ if (!key || !file) return;
@@ -502,7 +506,8 @@ function wireSlots(){
       const post = frame.querySelector('.post'); const list = imgEls(post); natSize(urlOf(p.el));
       DRAG = {frame, el: p.el, key: frame.dataset.tkey.slice(3) + '|' + imgId(p.el, list), x0: e.clientX, y0: e.clientY, sc: p.el.getBoundingClientRect().width / p.el.offsetWidth, p0: parsePos(p.el.style.backgroundPosition), g: imgGeom(p.el), moved: false};
       e.preventDefault(); });
-    frame.addEventListener('click', e => { if (frame._dragged) { frame._dragged = false; return; } const t = textAt(frame, e.clientX, e.clientY); if (t && t.idx >= 0) { editText(frame, t, e.clientX, e.clientY); return; } const p = pick(e); if (!p) return; const inp = document.createElement('input'); inp.type = 'file'; inp.accept = /^r[lx]/.test(p.key) ? 'image/*,video/*' : 'image/*'; inp.onchange = () => placeImage(frame, p.key, inp.files[0]); inp.click(); });
+    frame.addEventListener('click', e => { if (frame._dragged) { frame._dragged = false; return; }
+      const crd = e.target.closest && e.target.closest('.crd'); if (crd) { e.stopPropagation(); creditFromLabel(frame, crd); return; } const t = textAt(frame, e.clientX, e.clientY); if (t && t.idx >= 0) { editText(frame, t, e.clientX, e.clientY); return; } const p = pick(e); if (!p) return; const inp = document.createElement('input'); inp.type = 'file'; inp.accept = /^r[lx]/.test(p.key) ? 'image/*,video/*' : 'image/*'; inp.onchange = () => placeImage(frame, p.key, inp.files[0]); inp.click(); });
     frame.addEventListener('dragover', e => { const p = pick(e); if (p) { e.preventDefault(); hover(p.el, p.key); } });
     frame.addEventListener('dragleave', () => hover(null));
     frame.addEventListener('drop', e => { const p = pick(e); hover(null); if (!p) return; e.preventDefault(); placeImage(frame, p.key, e.dataTransfer.files[0]); });
@@ -560,7 +565,7 @@ function withCredits(s, g){ if (!s.html) return s; const t = document.createElem
     const wid = /inset:\s*0/.test(st) ? 1080 : w !== null ? w : (l !== null && r !== null ? 1080 - l - r : 0);
     const hei = /inset:\s*0/.test(st) ? H : hh !== null ? hh : (t !== null && b !== null ? H - t - b : 0);
     const full = wid >= 1080 * .9 && hei >= H * .8;
-    const look = full ? `position:absolute;right:20px;bottom:190px;transform:rotate(180deg);writing-mode:vertical-rl;max-height:80%;z-index:30;font:400 19px/1.2 'ATH Tight',sans-serif;letter-spacing:.02em;text-transform:none;padding:10px 5px;border-radius:5px`
+    const look = full ? `position:absolute;right:20px;top:110px;transform:rotate(180deg);writing-mode:vertical-rl;max-height:80%;z-index:30;font:400 19px/1.2 'ATH Tight',sans-serif;letter-spacing:.02em;text-transform:none;padding:10px 5px;border-radius:5px`
       : `position:absolute;left:14px;bottom:14px;max-width:calc(100% - 28px);z-index:30;font:400 22px/1.3 'ATH Tight',sans-serif;letter-spacing:0;text-transform:none;padding:6px 12px;border-radius:6px;white-space:normal;text-align:left`;
     if (!c) { el.setAttribute('data-nocredit', ''); el.insertAdjacentHTML('beforeend', `<span class="crd need" style="${look};color:#fff;background:#E0004D;opacity:1">Artwork credit needed</span>`); return; }
     const named = c.artist ? slideTxt.includes(c.artist.toLowerCase()) && (!c.title || slideTxt.includes(c.title.toLowerCase())) : slideTxt.includes(c.text.toLowerCase());
@@ -1382,7 +1387,8 @@ function render(){
       const nCr = (s.html || '').split('data-nocredit').length - 1; const hasImg = /background-image:\s*url\(["']?[^"')\s]/.test(s.html || '') && /data-nocredit|class="crd"|background-image/.test(s.html || '');
       const credBtn = nCr || /class="crd"/.test(s.html || '') ? `<button type="button" data-credit="${gi}|${j}"${nCr ? ' class="needcred" title="This image has no credit yet"' : ''}>Credit</button>` : '';
       const mpre = 'mv|' + gid(g) + '|' + j + '|'; const hasMv = Object.keys(MOVES()).some(k => k.startsWith(mpre));
-      const photoBtns = credBtn + (hasMv ? `<button type="button" data-mvr="${esc(mpre)}" title="Put moved text back where it was">Reset text</button>` : '') + (has ? `<button type="button" data-phx="${esc(okey)}">Reset photo</button>` : '') + (hasRm ? `<button type="button" data-txr="${esc(tpre)}">Restore text</button>` : '');
+      const ppre = gid(g) + '|' + j + '|'; const edited = Object.keys(TXT()).some(k => k.startsWith(tpre)) || hasMv || has || Object.keys(POS()).some(k => k.startsWith(ppre));
+      const photoBtns = credBtn + `<button type="button" data-reset="${gi}|${j}"${edited ? '' : ' disabled'} title="Put this slide back as it was: words, positions and picture">Reset</button>`;
       return `<div class="cell"><div class="frame${s.h ? ' tall' : ''}"${g.pid ? ` data-pid="${esc(g.pid)}"` : ''} data-okey="${esc(okey)}" data-tkey="${esc('tx|' + gid(g) + '|' + j)}">${slideNode(s)}</div>${reelCtl}<div class="act"><span>${s.label ? esc(s.label) : g.slides.length>1 ? 'Slide ' + (j+1) : 'Single'}</span><span class="acts"><button type="button" data-pv="${i}" title="See it large">Preview</button><button type="button" data-hide="${esc(hk)}" title="Hide this slide for now">Hide</button>${photoBtns}<button type="button" data-i="${i}">Save PNG</button></span></div></div>`; }).join('');
     const capBox = g.cap ? `<details class="capbox"><summary>Caption and pinned comment</summary><div class="f"><textarea id="cap${gi}" style="min-height:220px">${esc(g.cap)}</textarea></div><div class="f"><label>Pinned comment</label><input value="${esc(g.pin)}"></div><button class="btn ghost" type="button" data-cap="cap${gi}" style="margin-top:8px">Copy caption</button></details>` : '';
     const ckey = (state.name || '') + ' | ' + g.title.replace(/^[^·]*·\s*/, '');
@@ -1416,6 +1422,11 @@ function render(){
     for (const [n, u] of urls.entries()) { const cur = creditFor(u, g); if (cur && g.credits && g.credits[u]) { status('This image is credited from the article: ' + cur.text); continue; }
       const v = prompt(`Credit for image ${n + 1} of ${urls.length} on this slide.\nFor example: Title by Artist Name @handle`, cur ? cur.text : ''); if (v === null) return; setCredit(u, g, v.trim()); }
     render(); status('Credit saved. It shows on every slide that uses this image.'); });
+  $('out').querySelectorAll('[data-reset]').forEach(b => b.onclick = () => { const [gi, j] = b.dataset.reset.split('|').map(Number); const t = gid(groups[gi]);
+    const tp = 'tx|' + t + '|' + j + '|', mp = 'mv|' + t + '|' + j + '|', pp = t + '|' + j + '|';
+    Object.keys(TXT()).forEach(k => { if (k.startsWith(tp)) delete TXT()[k]; }); Object.keys(MOVES()).forEach(k => { if (k.startsWith(mp)) delete MOVES()[k]; });
+    Object.keys(POS()).forEach(k => { if (k.startsWith(pp)) delete POS()[k]; }); delete state.images['ov|' + t + '|' + j];
+    render(); status('Slide reset: words, positions and picture are back to the original.'); });
   $('out').querySelectorAll('[data-mvr]').forEach(b => b.onclick = () => { Object.keys(MOVES()).forEach(k => { if (k.startsWith(b.dataset.mvr)) delete MOVES()[k]; }); render(); status('Text is back in its place.'); });
   $('out').querySelectorAll('[data-hide]').forEach(b => b.onclick = () => { HID()[b.dataset.hide] = 1; render(); status('Hidden for now. It is left out of Save all as ZIP. Restore it any time.'); });
   $('out').querySelectorAll('[data-txr]').forEach(b => b.onclick = () => { Object.keys(TXT()).forEach(k => { if (k.startsWith(b.dataset.txr) && TXT()[k] === '\u200b') delete TXT()[k]; }); render(); status('Removed text is back.'); });
