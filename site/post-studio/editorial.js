@@ -170,7 +170,7 @@ function parseEditorial(raw, headings, title){
   if (!stopped) flush();
   const sent = t => (String(t).match(/[^.!?]+[.!?]+["”’]?/g) || [String(t)]).map(s => s.trim());
   const firstSay = (paras, max) => { let o = ''; for (const s of sent((paras || []).join(' '))) { if ((o + ' ' + s).length > max && o) break; o = (o + ' ' + s).trim(); } return o; };
-  const steps = sections.filter(s => (s.body || []).join(' ').length > 40).map(s => ({title: s.h.replace(/^(step\s*)?\d{1,2}[.):]\s*/i, '').replace(/[:.]$/, '').trim(), how: firstSay(s.body, 150)})).slice(0, 7);
+  const steps = sections.filter(s => (s.body || []).join(' ').length > 40).map(s => ({title: s.h.replace(/^(step\s*)?\d{1,2}[.):]\s*/i, '').replace(/[:.]$/, '').trim(), how: firstSay(s.body, 240)})).slice(0, 7);
   const introParas = intro.filter(p => p.length > 80 && !BOIL.test(p) && p !== cleanT);
   const why = firstSay(introParas.slice(0, 2), 220);
   const all2 = sections.flatMap(s => s.body || []).join(' ');
@@ -203,8 +203,8 @@ DPACK.editorial = p => {
   const advice = (s, i) => (i % 2 ? EDT.adviceMark : EDT.adviceCard)({title: s.title, how: s.how, img: imgs[i + 1] || '', slot: 'imgs' + (i + 1), credit: credits[i + 1]});
   const head = f.ctahead || 'Read the full article on our website.', offer = f.offer || 'Comment the word and we’ll send you the link.';
   const label = q;
-  // Give two pieces of advice in full; the rest are named as questions the guide answers, so there is a reason to get it.
-  const give = steps.slice(0, 2), keep = steps.slice(2, 5).map(s => edLoop(s.title));
+  // Give up to four pieces of advice in full; the rest are named as questions the guide answers, so there is a reason to get it.
+  const nGive = Math.max(2, Math.min(4, steps.length - 2)), give = steps.slice(0, nGive), keep = steps.slice(nGive, nGive + 3).map(s => edLoop(s.title));
   const texts = [...give.map(s => s.title + '. ' + (s.how || '')), ...(f.good ? [(f.bad || '') + ' ' + f.good] : [])];
   const longest = Math.max(0, ...texts.map(t => t.length));
   const sz = longest > 230 ? 50 : longest > 170 ? 56 : 62;
@@ -217,7 +217,7 @@ DPACK.editorial = p => {
   ];
   const tags = ['#artstoheartsproject', '#artbusiness', ...String(f.tags || '').split(/\s+/).filter(x => x.startsWith('#'))].slice(0, 5).join(' ');
   const who = [...new Set(credits.map(c => c[0]).filter(Boolean))].join(', ');
-  const cap = `${f.hook || q}\n\n${f.why || ''}\n\nTwo things you can do today:\n\n${give.map(s => `${s.title}.${s.how ? ' ' + s.how : ''}`).join('\n\n')}${keep.length ? `\n\nAlso in the article:\n${keep.map(k => '· ' + k.replace(/\?$/, '')).join('\n')}` : ''}\n\nComment ${key} and we'll send you the full article, or read it through the link in bio.${who ? `\n\nWorks shown: ${who}.` : ''}\n\n${tags}`.replace(/\n{3,}/g, '\n\n');
+  const cap = `${f.hook || q}\n\n${f.why || ''}\n\nWhat you can do today:\n\n${give.map(s => `${s.title}.${s.how ? ' ' + s.how : ''}`).join('\n\n')}${keep.length ? `\n\nAlso in the article:\n${keep.map(k => '· ' + k.replace(/\?$/, '')).join('\n')}` : ''}\n\nComment ${key} and we'll send you the full article, or read it through the link in bio.${who ? `\n\nWorks shown: ${who}.` : ''}\n\n${tags}`.replace(/\n{3,}/g, '\n\n');
   const SINGLES = steps.slice(0, 6).map((st, i) => ({...EDT.step({title: st.title, how: st.how, sz: 62, mono: true, foot: `Comment ${esc(key)} for the full article &rarr;`}), label: 'Single ' + (i + 1)}));
   const ST = [...give.map((st, i) => ({...IV.story({dark: i === 0, mono: i === 0, label: q, text: esc(st.title), sub: esc(st.how || ''), zone: i === 0 ? 'Poll sticker: “Do you do this?”' : 'Link sticker: the article'}), label: 'Story ' + (i + 1)})),
     ...(keep.length ? [{...IV.story({dark: true, label: 'In the article', text: esc(keep[0]), sub: `Comment ${esc(key)} on the post and we’ll send you the link.`, zone: 'Link sticker: the article'}), label: 'Story ' + (give.length + 1)}] : [])];

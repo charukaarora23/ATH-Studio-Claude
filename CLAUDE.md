@@ -29,9 +29,11 @@ Serve `site/post-studio` with `python3 -m http.server 8765`, drive it with Playw
 - Don't add unrequested details (open-call blurbs, extra labels). Keep it clean and consistent across tabs.
 
 ## What each tab does now
-- **Open calls**: month of posts, stories, reels; styles gallery/award/editorial; credits; drag-to-move text; click text to edit; click/drop image to replace.
+- **Open calls**: 15 feed posts, all carousels of 6+ slides (no thin countdown posts, no pushy lines); countdowns and one-slide reminders are optional **Single graphics** (`singlePosts()` in month.js, own group in the Post menu); stories, reels; styles gallery/award/editorial; credits; drag-to-move text; click text to edit; click/drop image to replace.
+- Article AI (`api/article.js`) runs on Sonnet 5.5, max 6000 tokens.
+- **Interviews**: carousel shows every artwork plus two cut-off answers.
 - **Interviews / Editorial / Heart List**: paste an article (Ctrl+A, Ctrl+C on the page, Ctrl+V into the box) — primary import; PDF upload and link import are fallbacks. Pictures save to Blob in the background. Paste again updates the open post.
-- **Editorial**: carousel = cover hook → mistake (struck habit) → 2 tips in full → "the rest is in the article" (Pink highlights) → end card, keyword ARTICLE.
+- **Editorial**: carousel = cover hook → mistake (struck habit) → 2–4 tips in full (always leaves 1–3 for the article) → "the rest is in the article" (Pink highlights) → end card, keyword ARTICLE.
 - **Heart List**: poster cover (artwork full-bleed or solid Maroon; own cover picture) → per artist: big artwork slide + Pink-highlight "about the artist" slide → "Tag your favourite artist" → end card (keyword HEART, "Check out our open calls. Link in bio."). Parser reads "1. Title by Artist @handle" and "01. Title — Artist @handle".
 - Downloads render with `vendor/html-to-image.js` (html2canvas only as fallback); `freezeLines()` locks line breaks to the preview.
 - Edits (text, moves, hidden slides, image swaps) on article posts are saved on the post (`p.edits`), shared with the team.

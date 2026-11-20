@@ -96,8 +96,8 @@ const ED_SCHEMA = {
     question: {type: 'string', description: 'The question an artist would actually ask that this guide answers, in their own words, first person, max 50 characters. Example: How should I price my art?'},
     sub: {type: 'string', description: 'A short line under the question, in the voice of Arts to Hearts Project, max 50 characters'},
     why: {type: 'string', description: 'The problem, said plainly to an artist, one or two sentences, max 200 characters'},
-    steps: {type: 'array', description: '3 to 6 pieces of advice in the order of the article', items: {type: 'object', additionalProperties: false, required: ['title', 'how'], properties: {
-      title: {type: 'string', description: 'The advice as a sentence a person would say, max 45 characters, no numbering'}, how: {type: 'string', description: 'How to do it, one concrete sentence, max 130 characters'}}}},
+    steps: {type: 'array', description: '4 to 7 pieces of advice in the order of the article, each one specific to this article', items: {type: 'object', additionalProperties: false, required: ['title', 'how'], properties: {
+      title: {type: 'string', description: 'The advice as a sentence a person would say, max 45 characters, no numbering'}, how: {type: 'string', description: 'How to do it, taken from the article: one or two concrete sentences with the detail that makes it useful, max 230 characters'}}}},
     bad: {type: 'string', description: 'A habit the article warns against, written as something an artist would say to themselves, max 60 characters'},
     good: {type: 'string', description: 'What to do instead, one or two short sentences, max 110 characters'},
     short: {type: 'string', description: 'The whole guide as one sentence someone could say to a friend, max 200 characters'},
@@ -110,7 +110,7 @@ const ED_SYSTEM = `You are the senior editor at Arts to Hearts Project. You turn
 Voice: plain, warm, specific, said to an artist. No hype, no exclamation marks, no emoji, no clichés ("unlock", "game-changer", "elevate", "journey", "dive into"). Short words. Keep every fact true to the article; never invent numbers, names or claims.`;
 async function structure(text, images, qaCount, kind){
   if (kind === 'editorial') { const client = new Anthropic();
-    const response = await client.beta.messages.create({model: 'claude-opus-5-5', max_tokens: 16000, betas: ['server-side-fallback-2026-07-01'], fallbacks: 'default',
+    const response = await client.beta.messages.create({model: 'claude-sonnet-5-5', max_tokens: 6000, betas: ['server-side-fallback-2026-07-01'], fallbacks: 'default',
       output_config: {effort: 'medium', format: {type: 'json_schema', schema: ED_SCHEMA}}, system: ED_SYSTEM, messages: [{role: 'user', content: `The guide article:\n\n${text}`}]});
     if (response.stop_reason === 'refusal') throw new Error('Claude declined this article');
     return JSON.parse(response.content.filter(b => b.type === 'text').map(b => b.text).join('')); }
@@ -119,7 +119,7 @@ async function structureInterview(text, images, qaCount){
   const client = new Anthropic();
   const list = images.map((im, i) => `${i + 1}. alt: ${im.alt || '-'} | caption: ${im.cap || '-'}`).join('\n');
   const response = await client.beta.messages.create({
-    model: 'claude-opus-5-5', max_tokens: 16000,
+    model: 'claude-sonnet-5-5', max_tokens: 6000,
     betas: ['server-side-fallback-2026-07-01'], fallbacks: 'default',
     output_config: {effort: 'medium', format: {type: 'json_schema', schema: SCHEMA}},
     system: SYSTEM,
