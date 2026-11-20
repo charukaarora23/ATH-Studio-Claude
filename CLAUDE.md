@@ -23,7 +23,7 @@ Serve `site/post-studio` with `python3 -m http.server 8765`, drive it with Playw
 - Fonts: Inter Tight (headlines/body, 'ATH Tight'), Libre Baskerville (quotes/paragraphs, italic for one phrase/titles; **never in capitals**), Hanken Grotesk for the brand line `.cn` "ARTS TO HEARTS PROJECT" (top-left, identical everywhere).
 - ATH monogram only on cover/first slide (top-right) and end card (top centre). White on photos.
 - **Artworks are never cropped** (except a full-bleed cover). Artworks big — "artworks in focus".
-- **Every image carries a credit** (title by artist @handle). Auto from Heart List/interview/editorial data; otherwise the red "Credit" button; open-call cover uses the "Cover credit" field.
+- **Every image carries a credit** (title by artist @handle). Auto from Heart List/interview/editorial data; otherwise the plain "Credit" button (credits are optional: no warning or label when missing); open-call cover uses the "Cover credit" field.
 - No AI markers: no "01/07" counters, no section labels like "The mistake we see most / Start here", no listicle voice. Human, warm, plain English.
 - Don't reinvent the user's words. Use exactly the title/copy they give (e.g. Heart List cover: "Top 5 Artists / On our Heart List / This week").
 - Don't add unrequested details (open-call blurbs, extra labels). Keep it clean and consistent across tabs.
