@@ -5,6 +5,7 @@
 // Needs GOOGLE_SERVICE_ACCOUNT (the service account JSON). No AI here: plain data, no tokens spent.
 import { put, list, del } from '@vercel/blob';
 import crypto from 'node:crypto';
+import { readInside } from './_inside.js';
 
 const MASTER = '18YXSenrWqh70doiXHJYERqSooqBw3aN88BVIGikhppA';
 const SHOP = 'https://shop.artstoheartsproject.com';
@@ -19,7 +20,7 @@ async function googleToken(){
   if (!sa.client_email || !/BEGIN PRIVATE KEY/.test(sa.private_key || '')) throw new Error('GOOGLE_SERVICE_ACCOUNT in Vercel is not the full JSON file. Paste the whole file again.');
   const now = Math.floor(Date.now() / 1000);
   const b64 = o => Buffer.from(JSON.stringify(o)).toString('base64url');
-  const body = b64({alg: 'RS256', typ: 'JWT'}) + '.' + b64({iss: sa.client_email, scope: 'https://www.googleapis.com/auth/spreadsheets', aud: sa.token_uri || 'https://oauth2.googleapis.com/token', iat: now, exp: now + 3600});
+  const body = b64({alg: 'RS256', typ: 'JWT'}) + '.' + b64({iss: sa.client_email, scope: 'https://www.googleapis.com/auth/spreadsheets https://www.googleapis.com/auth/drive.readonly', aud: sa.token_uri || 'https://oauth2.googleapis.com/token', iat: now, exp: now + 3600});
   const sig = crypto.createSign('RSA-SHA256').update(body).sign(sa.private_key).toString('base64url');
   const r = await fetch(sa.token_uri || 'https://oauth2.googleapis.com/token', {method: 'POST', headers: {'Content-Type': 'application/x-www-form-urlencoded'}, body: new URLSearchParams({grant_type: 'urn:ietf:params:oauth:grant-type:jwt-bearer', assertion: body + '.' + sig})});
   const j = await r.json(); if (!j.access_token) throw new Error('Google sign-in failed: ' + (j.error_description || j.error || r.status)); return j.access_token;
@@ -44,14 +45,14 @@ async function readMaster(token){
   const rows = ((j.sheets || [])[0] || {}).data[0].rowData || [];
   if (!rows.length) throw new Error('Books Data sheet looks empty'); const head = (rows[0].values || []).map(c => norm(cellText(c)));
   const col = (...names) => { for (const n of names) { const i = head.findIndex(h => h === n || h.startsWith(n)); if (i >= 0) return i; } return -1; };
-  const C = {name: col('book name'), cat: col('category'), year: col('year'), sheet: col('artists data for graphics'), cover: col('cover artist'), coverIg: col('cover artist instagram'), landing: col('landing page'), shopify: col('shopify link'), amazon: col('amazon link'), bn: col('barnes'), designer: col('book designer'), published: col('no of published artists'), pages: col('no of pages'), status: col('status'), isbn: col('isbn'), discount: col('artist disc'), opens: col('call opens'), closes: col('call closes'), juror: col('juror'), selected: col('selected announced'), preorder: col('pre order opens'), print: col('to print'), ships: col('ships'), ff: col('friends and family'), live: col('codes live')};
+  const C = {name: col('book name'), cat: col('category'), year: col('year'), sheet: col('artists data for graphics'), cover: col('cover artist'), coverIg: col('cover artist instagram'), landing: col('landing page'), shopify: col('shopify link'), amazon: col('amazon link'), bn: col('barnes'), designer: col('book designer'), published: col('no of published artists'), pages: col('no of pages'), status: col('status'), isbn: col('isbn'), discount: col('artist disc'), opens: col('call opens'), closes: col('call closes'), juror: col('juror'), selected: col('selected announced'), preorder: col('pre order opens'), print: col('to print'), ships: col('ships'), ff: col('friends and family'), live: col('codes live'), pdf: col('final review pdf')};
   readMaster.cols = C;
   return rows.slice(1).map((r, ri) => { const v = r.values || []; const t = k => C[k] >= 0 ? cellText(v[C[k]]) : ''; const l = k => C[k] >= 0 ? (cellLink(v[C[k]]) || url(cellText(v[C[k]]))) : '';
     const name = t('name'); if (!name) return null;
     return {name, row: ri + 2, codesLive: /^true$/i.test(t('live')), category: t('cat'), year: t('year'), status: t('status'), pages: t('pages'), published: t('published'), designer: t('designer'), isbn: t('isbn'), juror: t('juror'), codes: {artist: t('discount'), friends: t('ff')},
       dates: {callOpens: t('opens'), callCloses: t('closes'), selected: t('selected'), preorder: t('preorder'), print: t('print'), ships: t('ships')},
       coverArtist: t('cover') ? {name: t('cover'), handle: handleOf(t('coverIg'))} : null,
-      links: {landing: l('landing'), shopify: l('shopify'), amazon: l('amazon'), bn: l('bn')}, sheet: idGid(l('sheet'))};
+      links: {landing: l('landing'), shopify: l('shopify'), amazon: l('amazon'), bn: l('bn'), pdf: l('pdf')}, sheet: idGid(l('sheet'))};
   }).filter(Boolean);
 }
 
@@ -82,6 +83,34 @@ async function fillCodes(token, books){
   const r = await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${MASTER}/values:batchUpdate`, {method: 'POST', headers: {Authorization: 'Bearer ' + token, 'Content-Type': 'application/json'}, body: JSON.stringify({valueInputOption: 'RAW', data})});
   if (!r.ok) return [{sheet: 'Books Data', error: r.status === 403 ? 'To fill discount codes automatically, give the studio robot Editor access on Books Data' : 'Could not write codes: ' + r.status}];
   return [];
+}
+
+
+// ---------- what's inside: each book's final review PDF, read once (cached until the file changes) ----------
+const driveId = u => (String(u).match(/\/d\/([A-Za-z0-9_-]{20,})/) || String(u).match(/[?&]id=([A-Za-z0-9_-]{20,})/) || [])[1];
+async function readInsides(token, books, deadline){
+  const todo = books.filter(b => b.links && b.links.pdf); if (!todo.length) return [];
+  const { blobs } = await list({ prefix: 'books/inside/', limit: 1000 }); const cache = Object.fromEntries(blobs.map(x => [x.pathname.replace(/^books\/inside\/|\.json$/g, ''), x]));
+  const problems = []; let fresh = 0;
+  for (const b of todo) {
+    const id = driveId(b.links.pdf); if (!id) { b.insideError = 'Final Review PDF must be a Google Drive link'; continue; }
+    try {
+      const mr = await fetch(`https://www.googleapis.com/drive/v3/files/${id}?fields=id,name,modifiedTime,size&supportsAllDrives=true`, {headers: {Authorization: 'Bearer ' + token}});
+      if (!mr.ok) { b.insideError = mr.status === 404 || mr.status === 403 ? 'Share the Final Review PDF with the studio robot' : 'Drive ' + mr.status; continue; }
+      const meta = await mr.json(); const c = cache[id];
+      if (c) { const j = await (await fetch(c.url, {cache: 'no-store'})).json(); if (j.modified === meta.modifiedTime) { b.inside = j.inside; continue; } }
+      if (fresh >= 1 || Date.now() > deadline) { b.insideError = 'Waiting to be read (next sync)'; continue; }
+      const { pdfPages } = await import('./_pdf.js');
+      const fr = await fetch(`https://www.googleapis.com/drive/v3/files/${id}?alt=media&supportsAllDrives=true`, {headers: {Authorization: 'Bearer ' + token}});
+      if (!fr.ok) { b.insideError = 'Could not download the PDF (' + fr.status + ')'; continue; }
+      const pages = await pdfPages(await fr.arrayBuffer()); fresh++;
+      const inside = readInside(pages); inside.file = meta.name;
+      if (!inside.interviews.length && !inside.cover && pages.join('').replace(/\s/g, '').length < 2000) { b.insideError = 'This PDF has no readable text (use the review PDF, not the print file)'; continue; }
+      b.inside = inside;
+      await put(`books/inside/${id}.json`, JSON.stringify({modified: meta.modifiedTime, inside}), {access: 'public', addRandomSuffix: false, allowOverwrite: true, contentType: 'application/json'});
+    } catch (e) { b.insideError = 'Could not read the PDF: ' + String(e.message || e).slice(0, 120); problems.push({sheet: b.name, error: b.insideError}); }
+  }
+  return problems;
 }
 
 // ---------- each book's artist tab ----------
@@ -134,11 +163,13 @@ function matchShop(book, shop){
 async function versions(){ const { blobs } = await list({ prefix: PREFIX, limit: 1000 }); return blobs.sort((a, b) => new Date(b.uploadedAt) - new Date(a.uploadedAt)); }
 async function readLib(){ const v = await versions(); if (!v.length) return {synced: null, books: []}; const r = await fetch(v[0].url, {cache: 'no-store'}); return r.ok ? r.json() : {synced: null, books: []}; }
 async function sync(){
+  const T0 = Date.now();
   const token = await googleToken();
   const [books, shop] = await Promise.all([readMaster(token), readShopify().catch(() => [])]);
   const problems = await readArtistSheets(token, books);
   problems.push(...await fillCodes(token, books).catch(e => [{sheet: 'Books Data', error: String(e.message || e)}]));
   books.forEach(b => { const p = matchShop(b, shop); if (p) b.shop = p; b.count = (b.artists || []).length; });
+  problems.push(...await readInsides(token, books, T0 + 70000).catch(e => [{sheet: 'PDFs', error: String(e.message || e)}]));
   const lib = {synced: new Date().toISOString(), books, shopCount: shop.length, problems};
   await put(PREFIX + Date.now() + '.json', JSON.stringify(lib), { access: 'public', addRandomSuffix: true, contentType: 'application/json' });
   const old = (await versions()).slice(3).map(b => b.url); if (old.length) await del(old).catch(() => {});

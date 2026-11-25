@@ -1,1 +1,1 @@
-{"cleanUrls": true, "headers": [{"source": "/(.*)", "headers": [{"key": "X-Robots-Tag", "value": "noindex"}]}], "functions": {"api/article.js": {"maxDuration": 90}, "api/books.js": {"maxDuration": 60}}, "crons": [{"path": "/api/books?sync=1", "schedule": "17 3 * * *"}]}
+{"cleanUrls": true, "headers": [{"source": "/(.*)", "headers": [{"key": "X-Robots-Tag", "value": "noindex"}]}], "functions": {"api/article.js": {"maxDuration": 90}, "api/books.js": {"maxDuration": 180, "memory": 2048}}, "crons": [{"path": "/api/books?sync=1", "schedule": "17 3 * * *"}]}

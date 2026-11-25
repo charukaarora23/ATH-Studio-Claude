@@ -19,7 +19,7 @@ function bookDetail(b){
   const arts = (b.artists || []).map(a => { const w = (a.works || [])[0]; return `<div class="bk-a">${w ? `<div class="bk-w" style="background-image:url('${bkEsc(w.img)}')"></div>` : '<div class="bk-w bk-none">No artwork</div>'}<b>${bkEsc(a.name)}</b><span>${bkEsc(a.handle || '')}</span>${w && w.details ? `<i>${bkEsc(w.details)}</i>` : ''}</div>`; }).join('');
   const d = b.dates || {}; const dates = [['Call opens', d.callOpens], ['Call closes', d.callCloses], ['Selected announced', d.selected], ['Pre-order opens', d.preorder], ['To print', d.print], ['Ships', d.ships]].filter(x => x[1]).map(([l, v]) => l + ' ' + bkEsc(v)).join(' · ');
   return `<section class="bk-detail"><h2>${bkEsc(b.name)}</h2><p class="meta">${facts}</p>${dates ? `<p class="meta">${dates}</p>` : ''}${links ? `<p class="meta">${links}</p>` : ''}
-    ${bookPostsBar(b)}
+    ${bookInside(b)}
     ${b.loading ? '<p class="meta">Loading the artists…</p>' : arts ? `<div class="bk-arts">${arts}</div>` : `<p class="meta">${b.artistsError ? bkEsc(b.artistsError) + '.' : 'No artists in the sheet yet.'}</p>`}</section>`;
 }
 function booksRender(){
@@ -144,4 +144,19 @@ function bookShowPosts(i, kind, part){
   if (kind === 'close') { BOOKVIEW = null; document.body.classList.remove('bkposts'); booksRender(); return; }
   BOOKVIEW = {book: i, kind, part: part || 1}; document.body.classList.add('bkposts'); booksRender(); render();
   const o = document.getElementById('out'); if (o) o.scrollIntoView({behavior: 'smooth'});
+}
+
+// what's inside the book, read from its Final Review PDF
+function bookInside(b){
+  if (!b.links || !b.links.pdf) return '<p class="meta">Add the Final Review PDF link in Books Data to see what\'s inside.</p>';
+  if (!b.inside) return `<p class="bk-warn">${bkEsc(b.insideError || 'The Final Review PDF will be read on the next sync.')}</p>`;
+  const i = b.inside; const row = (k, v) => v ? `<div class="bk-in"><b>${k}</b><div>${v}</div></div>` : '';
+  const ivs = (i.interviews || []).filter(x => x.intro || x.quotes && x.quotes.length).map(x => `<div class="bk-iv"><p><b>${bkEsc(x.name)}</b> ${bkEsc(x.handle || '')} · <i>${bkEsc(x.role || '')}</i>${x.page ? ' · page ' + x.page : ''}</p><p class="meta">${bkEsc(x.title ? x.title.charAt(0) + x.title.slice(1).toLowerCase() : '')}</p>${x.quotes && x.quotes[0] ? `<blockquote>“${bkEsc(x.quotes[0])}”</blockquote>` : ''}</div>`).join('');
+  return `<section class="bk-inside"><h3>Inside the book</h3>
+    ${row('Cover', i.cover ? bkEsc(i.cover.title ? `${i.cover.title}${i.cover.year ? ' (' + i.cover.year + ')' : ''} by ${i.cover.artist}` : i.cover.credit) : '')}
+    ${row('Theme', i.theme ? `<b>${bkEsc(i.theme.title)}</b><br>${bkEsc((i.theme.text || '').slice(0, 280))}${(i.theme.text || '').length > 280 ? '…' : ''}` : '')}
+    ${row("Editor's note", i.editor && i.editor.text ? bkEsc(i.editor.text.slice(0, 280)) + '…' : '')}
+    ${row('Articles', (i.articles || []).map(a => bkEsc(`${a.title.charAt(0) + a.title.slice(1).toLowerCase()} by ${a.by}`)).join('<br>'))}
+    ${row('Featured artists', i.artists && i.artists.length ? `${i.artists.length} artists, with page numbers` : '')}
+    ${ivs ? `<div class="bk-ivs">${ivs}</div>` : ''}</section>`;
 }
