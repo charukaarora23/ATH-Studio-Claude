@@ -385,7 +385,7 @@ function bkSelection(D){
   return {rows: rows.slice(0, 4), countries: [...C], n: W.length, painters, mixed, she, known};
 }
 // names that must never break across lines
-const bkKeep = t => String(t || '').replace(/-\s*\n\s*/g, '-').replace(/(\w)\(/g, '$1 (').replace(/\s+/g, ' ').trim().replace(/Arts to Hearts/g, 'Arts to Hearts').replace(/United (States|Kingdom)/g, 'United $1').replace(/Magazine, Issue (\d+)/g, 'Magazine, Issue $1').replace(/Issue (\d+)/g, 'Issue $1');
+const bkKeep = t => String(t || '').replace(/-\s*\n\s*/g, '-').replace(/(\w)\(/g, '$1 (').replace(/\s+/g, ' ').trim().replace(/Arts to Hearts/g, 'Arts to Hearts').replace(/United (States|Kingdom)/g, 'United $1').replace(/Magazine, Issue (\d+)/g, 'Magazine, Issue $1').replace(/Issue (\d+)/g, 'Issue $1').replace(/ to (the )?(?=[A-Z])/g, (m, t) => ' to\u00a0' + (t ? 'the\u00a0' : ''));
 const bkWhole = h => h.replace(/([\p{L}\d]+(?:[-‑][\p{L}\d]+)+)/gu, '<span style="white-space:nowrap">$1</span>');   // hyphenated words never split across lines
 const bkFirst = t => { const m = String(t || '').match(/^[^.!?]+[.!?]+/); return m ? m[0].trim() : String(t || '').trim(); };
 
@@ -491,7 +491,7 @@ function bkSelectedPost(b, D){
   const the = c => /^(United|Netherlands|Philippines)/.test(c) ? 'the ' + c : c;
   const story = [
     sel.painters >= sel.n * .5 ? `Most of the work in ${ed} is **painted**: ${over(sel.painters)} painters, in oil, acrylic and watercolour.` : '',
-    sel.countries.length >= 5 ? `The artists live and work in **${over(sel.countries.length)} countries**, from ${the(sel.countries[0])} to\u00a0${the(sel.countries[sel.countries.length - 1])}.` : '',
+    sel.countries.length >= 5 ? `The artists live and work in **${over(sel.countries.length)} countries**, from ${the(sel.countries[0])} to ${the(sel.countries[sel.countries.length - 1])}.` : '',
     sel.known >= sel.n * .6 && sel.she / sel.known >= .5 ? `And **${words(Math.floor(sel.she / sel.known * 10))} in ten** of them are women.` : ''].filter(Boolean);
   // each featured artist, as the agreed unit: the work with their face, their portrait with the name, their words over it, a page about them
   const feature = (w, k) => { if (!w) return []; const bs = bkKeep(w.bio).split(/(?<=[.!?])\s+/).filter(Boolean); let about = ''; for (const x of bs) { if ((about + ' ' + x).length > 330 && about) break; about = (about + ' ' + x).trim(); } if (!good(w)) about = w.line;
