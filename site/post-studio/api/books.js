@@ -19,7 +19,7 @@ async function googleToken(){
   if (!sa.client_email || !/BEGIN PRIVATE KEY/.test(sa.private_key || '')) throw new Error('GOOGLE_SERVICE_ACCOUNT in Vercel is not the full JSON file. Paste the whole file again.');
   const now = Math.floor(Date.now() / 1000);
   const b64 = o => Buffer.from(JSON.stringify(o)).toString('base64url');
-  const body = b64({alg: 'RS256', typ: 'JWT'}) + '.' + b64({iss: sa.client_email, scope: 'https://www.googleapis.com/auth/spreadsheets.readonly', aud: sa.token_uri || 'https://oauth2.googleapis.com/token', iat: now, exp: now + 3600});
+  const body = b64({alg: 'RS256', typ: 'JWT'}) + '.' + b64({iss: sa.client_email, scope: 'https://www.googleapis.com/auth/spreadsheets', aud: sa.token_uri || 'https://oauth2.googleapis.com/token', iat: now, exp: now + 3600});
   const sig = crypto.createSign('RSA-SHA256').update(body).sign(sa.private_key).toString('base64url');
   const r = await fetch(sa.token_uri || 'https://oauth2.googleapis.com/token', {method: 'POST', headers: {'Content-Type': 'application/x-www-form-urlencoded'}, body: new URLSearchParams({grant_type: 'urn:ietf:params:oauth:grant-type:jwt-bearer', assertion: body + '.' + sig})});
   const j = await r.json(); if (!j.access_token) throw new Error('Google sign-in failed: ' + (j.error_description || j.error || r.status)); return j.access_token;
@@ -44,14 +44,44 @@ async function readMaster(token){
   const rows = ((j.sheets || [])[0] || {}).data[0].rowData || [];
   if (!rows.length) throw new Error('Books Data sheet looks empty'); const head = (rows[0].values || []).map(c => norm(cellText(c)));
   const col = (...names) => { for (const n of names) { const i = head.findIndex(h => h === n || h.startsWith(n)); if (i >= 0) return i; } return -1; };
-  const C = {name: col('book name'), cat: col('category'), year: col('year'), sheet: col('artists data for graphics'), cover: col('cover artist'), coverIg: col('cover artist instagram'), landing: col('landing page'), shopify: col('shopify link'), amazon: col('amazon link'), bn: col('barnes'), designer: col('book designer'), published: col('no of published artists'), pages: col('no of pages'), status: col('status'), isbn: col('isbn'), discount: col('artist disc'), opens: col('call opens'), closes: col('call closes'), juror: col('juror'), selected: col('selected announced'), preorder: col('pre order opens'), print: col('to print'), ships: col('ships'), ff: col('friends and family')};
-  return rows.slice(1).map(r => { const v = r.values || []; const t = k => C[k] >= 0 ? cellText(v[C[k]]) : ''; const l = k => C[k] >= 0 ? (cellLink(v[C[k]]) || url(cellText(v[C[k]]))) : '';
+  const C = {name: col('book name'), cat: col('category'), year: col('year'), sheet: col('artists data for graphics'), cover: col('cover artist'), coverIg: col('cover artist instagram'), landing: col('landing page'), shopify: col('shopify link'), amazon: col('amazon link'), bn: col('barnes'), designer: col('book designer'), published: col('no of published artists'), pages: col('no of pages'), status: col('status'), isbn: col('isbn'), discount: col('artist disc'), opens: col('call opens'), closes: col('call closes'), juror: col('juror'), selected: col('selected announced'), preorder: col('pre order opens'), print: col('to print'), ships: col('ships'), ff: col('friends and family'), live: col('codes live')};
+  readMaster.cols = C;
+  return rows.slice(1).map((r, ri) => { const v = r.values || []; const t = k => C[k] >= 0 ? cellText(v[C[k]]) : ''; const l = k => C[k] >= 0 ? (cellLink(v[C[k]]) || url(cellText(v[C[k]]))) : '';
     const name = t('name'); if (!name) return null;
-    return {name, category: t('cat'), year: t('year'), status: t('status'), pages: t('pages'), published: t('published'), designer: t('designer'), isbn: t('isbn'), juror: t('juror'), codes: {artist: t('discount'), friends: t('ff')},
+    return {name, row: ri + 2, codesLive: /^true$/i.test(t('live')), category: t('cat'), year: t('year'), status: t('status'), pages: t('pages'), published: t('published'), designer: t('designer'), isbn: t('isbn'), juror: t('juror'), codes: {artist: t('discount'), friends: t('ff')},
       dates: {callOpens: t('opens'), callCloses: t('closes'), selected: t('selected'), preorder: t('preorder'), print: t('print'), ships: t('ships')},
       coverArtist: t('cover') ? {name: t('cover'), handle: handleOf(t('coverIg'))} : null,
       links: {landing: l('landing'), shopify: l('shopify'), amazon: l('amazon'), bn: l('bn')}, sheet: idGid(l('sheet'))};
   }).filter(Boolean);
+}
+
+
+// ---------- discount codes: same style as the team's (COLLAGE25, MAG11, SVB7, TINY2) ----------
+const SERIES = [[/\bmagazine\b/, 'MAG'], [/studio visit/, 'SVB'], [/wom[ae]n artists? on the rise/, 'WAR'], [/tiny creatives/, 'TINY'], [/art makers/, 'ARTMAKERS'], [/emerging artworks/, 'ARTWORKS'], [/emerging artists/, 'ARTISTS'], [/art and woman/, 'ARTWOMAN'], [/artists to watch/, 'ATW'], [/catalog/, 'CATALOG']];
+const STOP = new Set(['the', 'a', 'of', 'and', 'book', 'books', 'artbook', 'edition', 'ed', 'ath', 'vol', 'big', 'great', 'artists', 'artist']);
+function codeFor(b, taken){
+  const n = norm(b.name); const num = (n.match(/\b(20\d\d)\b/) || [])[1]; const ed = (n.match(/\b(?:edition|ed|vol|magazine|book|catalog|creatives)\s+(\d{1,3})\b|\b(\d{1,2})$/) || []).slice(1).find(Boolean);
+  const yy = num ? num.slice(2) : String(b.year || '').slice(2);
+  const ser = SERIES.find(([re]) => re.test(n));
+  let base = ser ? ser[1] + (ed || (ser[1] === 'MAG' || ser[1] === 'SVB' || ser[1] === 'TINY' ? '' : yy)) : n.replace(/\b(19|20)\d\d\b|\b\d+\b/g, ' ').split(' ').filter(w => w && !STOP.has(w)).slice(0, 2).join('').toUpperCase().slice(0, 12) + yy;
+  base = base.toUpperCase().replace(/[^A-Z0-9]/g, '') || 'BOOK' + yy;
+  let code = base, i = 2; while (taken.has(code)) code = base + (i++);
+  taken.add(code); return code;
+}
+const colA1 = i => { let s = ''; i++; while (i) { const m = (i - 1) % 26; s = String.fromCharCode(65 + m) + s; i = Math.floor((i - 1) / 26); } return s; };
+async function fillCodes(token, books){
+  const C = readMaster.cols || {}; if (C.discount < 0 || C.ff < 0) return [];
+  const taken = new Set(books.flatMap(b => [b.codes.artist, b.codes.friends]).filter(Boolean).map(x => x.toUpperCase()));
+  const active = b => Object.values(b.dates || {}).some(Boolean);
+  const data = [];
+  books.filter(active).forEach(b => {
+    if (!b.codes.artist) { b.codes.artist = codeFor(b, taken); data.push({range: `'Main '!${colA1(C.discount)}${b.row}`, values: [[b.codes.artist]]}); }
+    if (!b.codes.friends) { let f = b.codes.artist.toUpperCase() + 'FAM', i = 2; while (taken.has(f)) f = b.codes.artist.toUpperCase() + 'FAM' + (i++); taken.add(f); b.codes.friends = f; data.push({range: `'Main '!${colA1(C.ff)}${b.row}`, values: [[f]]}); }
+  });
+  if (!data.length) return [];
+  const r = await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${MASTER}/values:batchUpdate`, {method: 'POST', headers: {Authorization: 'Bearer ' + token, 'Content-Type': 'application/json'}, body: JSON.stringify({valueInputOption: 'RAW', data})});
+  if (!r.ok) return [{sheet: 'Books Data', error: r.status === 403 ? 'To fill discount codes automatically, give the studio robot Editor access on Books Data' : 'Could not write codes: ' + r.status}];
+  return [];
 }
 
 // ---------- each book's artist tab ----------
@@ -107,6 +137,7 @@ async function sync(){
   const token = await googleToken();
   const [books, shop] = await Promise.all([readMaster(token), readShopify().catch(() => [])]);
   const problems = await readArtistSheets(token, books);
+  problems.push(...await fillCodes(token, books).catch(e => [{sheet: 'Books Data', error: String(e.message || e)}]));
   books.forEach(b => { const p = matchShop(b, shop); if (p) b.shop = p; b.count = (b.artists || []).length; });
   const lib = {synced: new Date().toISOString(), books, shopCount: shop.length, problems};
   await put(PREFIX + Date.now() + '.json', JSON.stringify(lib), { access: 'public', addRandomSuffix: true, contentType: 'application/json' });

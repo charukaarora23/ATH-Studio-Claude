@@ -51,7 +51,7 @@ Goal: elevate the artists AND sell the book, professionally, with no fluff or ov
 5. **Print (~25 days + QC + shipping).** Pre-order push: why buy, who it's for, artists' subsidised rate, friends & family discount, newsletter.
 6. **Arrival + 1–2 months.** Keep promoting; artists keep promoting (share kits).
 7. **Backlist.** Taper, focus on the next pre-launch, keep rotating older editions.
-Books Data columns added Nov 2026 (AH–AO, read by the Sync): Call Opens, Call Closes, Juror / Curator, Selected Announced, Pre-order Opens, To Print, Ships, Friends & Family Code (dates as d mmm yyyy). Already useful: Status, Artist Disc. Code, Mockups, Page by Page Graphics, Photoshoot Link, Cover Artist, Landing Page, Shopify/Amazon/B&N links.
+Books Data columns added Nov 2026 (AH–AO, read by the Sync): Call Opens, Call Closes, Juror / Curator, Selected Announced, Pre-order Opens, To Print, Ships, Friends & Family Code (dates as d mmm yyyy), AP Codes Live in Shopify (checkbox). Discount codes: the Sync fills empty Artist Disc. Code (T) + Friends & Family Code for any book with a date, in the team's style (TEXTURE26 / TEXTURE26FAM, MAG15, SVB7); never overwrites; tech team recreates in Shopify and ticks AP; posts/kits show codes only when ticked. Needs the robot as Editor on Books Data. Already useful: Status, Artist Disc. Code, Mockups, Page by Page Graphics, Photoshoot Link, Cover Artist, Landing Page, Shopify/Amazon/B&N links.
 
 ### Original plan
 Goal: sell the books and promote the ~100 artists per book without one post per artist.
