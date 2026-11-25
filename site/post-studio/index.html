@@ -627,10 +627,10 @@ async function slideCanvas(s, transparent){ return renderSlide(s, transparent); 
 function freezeLines(root){
   const walk = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, {acceptNode: n => n.parentElement.closest('svg,style') || /pre|nowrap/.test(getComputedStyle(n.parentElement).whiteSpace) ? 2 : 1});
   const nodes = []; while (walk.nextNode()) nodes.push(walk.currentNode);
-  nodes.forEach(n => { n.nodeValue = n.nodeValue.replace(/\s+/g, ' '); });   // same layout, no stray source line breaks
+  nodes.forEach(n => { n.nodeValue = n.nodeValue.replace(/[ \t\n\r\f\v]+/g, ' '); });   // same layout, no stray source line breaks; no-break spaces stay (they keep names and phrases together)
   const blockOf = n => { let e = n.parentElement; while (e && e !== root && getComputedStyle(e).display.startsWith('inline')) e = e.parentElement; return e; };
   const cuts = [], last = new Map();
-  for (const n of nodes) { const blk = blockOf(n), t = n.nodeValue, re = /\S+/g; let m;
+  for (const n of nodes) { const blk = blockOf(n), t = n.nodeValue, re = /[^ \t\n\r\f\v]+/g; let m;
     while ((m = re.exec(t))) { const r = document.createRange(); r.setStart(n, m.index); r.setEnd(n, m.index + m[0].length); const box = r.getClientRects()[0]; if (!box) continue;
       const prev = last.get(blk); if (prev && prev.gap && box.top > prev.top + box.height * .5) cuts.push(prev.gap);
       const end = m.index + m[0].length; last.set(blk, {top: box.top, gap: t[end] === ' ' ? {node: n, at: end} : null}); } }

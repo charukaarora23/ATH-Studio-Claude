@@ -385,7 +385,7 @@ function bkSelection(D){
   return {rows: rows.slice(0, 4), countries: [...C]};
 }
 // names that must never break across lines
-const bkKeep = t => String(t || '').replace(/-\s*\n\s*/g, '-').replace(/\s+/g, ' ').trim().replace(/Arts to Hearts/g, 'Arts to Hearts').replace(/Magazine, Issue (\d+)/g, 'Magazine, Issue $1').replace(/Issue (\d+)/g, 'Issue $1');
+const bkKeep = t => String(t || '').replace(/-\s*\n\s*/g, '-').replace(/\s+/g, ' ').trim().replace(/Arts to Hearts/g, 'Arts to Hearts').replace(/United (States|Kingdom)/g, 'United $1').replace(/Magazine, Issue (\d+)/g, 'Magazine, Issue $1').replace(/Issue (\d+)/g, 'Issue $1');
 const bkWhole = h => h.replace(/([\p{L}\d]+(?:[-‑][\p{L}\d]+)+)/gu, '<span style="white-space:nowrap">$1</span>');   // hyphenated words never split across lines
 const bkFirst = t => { const m = String(t || '').match(/^[^.!?]+[.!?]+/); return m ? m[0].trim() : String(t || '').trim(); };
 
@@ -431,7 +431,7 @@ const BK_CH = ['The call', 'In numbers', 'The artists', "What's next"];
 const bkTabRow = on => BK_CH.map((t, i) => { const act = t === on;
   return `<div class="a" style="left:870px;top:${210 + i * 232}px;width:66px;height:216px;border-radius:0 14px 14px 0;background:${act ? HL.white : i % 2 ? HL.rose : HL.pink};display:flex;align-items:center;justify-content:center">
     <p style="${act ? T_MED : T_REG};font-size:19px;letter-spacing:.16em;text-transform:uppercase;color:${HL.burg};writing-mode:vertical-rl;white-space:nowrap">${esc(t)}</p></div>`; }).join('');
-const bkB = t => bkWhole(esc(bkKeep(t))).replace(/\*\*(.+?)\*\*/g, `<span style="${T_MED}">$1</span>`);   // **words** set heavier, as in the Highlights card
+const bkB = t => bkWhole(esc(bkKeep(t))).replace(/\*\*(.+?)\*\*/g, (m, x) => `<span style="${T_MED}${x.length < 30 ? ';white-space:nowrap' : ''}">${x}</span>`);   // **words** set heavier, as in the Highlights card
 Object.assign(BKT, {
   tabcard(o){ const u = bkPic(o.slot || 'bkbg', o.bg);
     return {bg: HL.burg, html: `${u ? `<div class="a img" data-slot="${o.slot || 'bkbg'}" style="inset:0;background-image:url(${u});background-size:cover;background-position:center"></div><div class="a" style="inset:0;background:rgba(28,19,16,.32)"></div>` : ''}
