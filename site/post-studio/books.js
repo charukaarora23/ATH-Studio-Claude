@@ -351,41 +351,74 @@ Object.assign(BKT, {
       <p style="${T_MED};font-size:${fs}px;line-height:.9;letter-spacing:-.045em;margin-top:22px">${lines.map(esc).join('<br>')}</p>
       ${o.handle ? `<p style="${T_REG};font-size:28px;margin-top:22px;color:rgba(255,255,255,.85)">${esc(o.handle)}</p>` : ''}</div>`}; },
   // credits page: every name, quiet, three columns
-  credits(o){ const per = Math.ceil(o.list.length / 3); const cols = [0, 1, 2].map(k => o.list.slice(k * per, (k + 1) * per));
+  credits(o){ const n = o.list.length, nc = n > 24 ? 3 : 2; const per = Math.ceil(n / nc); const cols = Array.from({length: nc}, (_, k) => o.list.slice(k * per, (k + 1) * per));
+    const fs = n > 54 ? 21 : n > 40 ? 23 : n > 24 ? 25 : n > 12 ? 30 : 34, lh = n > 54 ? 1.62 : n > 40 ? 1.78 : 2;
     return {bg: HL.white, html: `<p class="a cn" style="left:52px;top:48px;color:${HL.ink}">Arts to Hearts Project</p>
     <p class="a" style="left:96px;top:150px;${BASK};font-style:italic;font-size:64px;color:${HL.ink}">${esc(o.head)}</p>
-    <div class="a" style="left:96px;right:96px;top:262px;border-top:1px solid rgba(28,19,16,.25)"></div>
-    <div class="a" style="left:96px;right:96px;top:300px;display:grid;grid-template-columns:repeat(3,1fr);gap:0 30px">${cols.map(c => `<div>${c.map(n => `<p style="${T_REG};font-size:${o.list.length > 45 ? 24 : 26}px;line-height:${o.list.length > 45 ? 1.9 : 2.05};color:${HL.ink};white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(n)}</p>`).join('')}</div>`).join('')}</div>
+    ${o.intro ? `<p class="a" style="left:96px;right:150px;top:252px;${BASK};font-size:28px;line-height:1.5;color:${BKG1}">${esc(o.intro)}</p>` : ''}
+    <div class="a" style="left:96px;right:96px;top:${o.intro ? 380 : 262}px;border-top:1px solid rgba(28,19,16,.25)"></div>
+    <div class="a" style="left:96px;right:96px;top:${o.intro ? 418 : 300}px;display:grid;grid-template-columns:repeat(${nc},1fr);gap:0 30px">${cols.map(c => `<div>${c.map(x => `<p style="${T_REG};font-size:${fs}px;line-height:${lh};color:${HL.ink};white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(x)}</p>`).join('')}</div>`).join('')}</div>
     <p class="a" style="left:96px;bottom:84px;${T_MED};font-size:16px;letter-spacing:.22em;text-transform:uppercase;color:${BKG2}">${esc(o.foot)}</p>`}; },
 });
 
 // The selected artists, announced with care: the call, the jury, the artists, a kind word to everyone who applied, what comes next.
 // No book imagery (the book doesn't exist yet), no numbers.
+// ---------- selected artists: a calm cover, the call, then the artists in chapters (by where they're from, by what they make) ----------
+const BK_GROUPS = [
+  ['Painters', /oil|acrylic|watercolou?r|gouache|tempera|paint/i, t => t ? `How do you paint ${t}? These painters answered in oil, acrylic and watercolour.` : 'Oil, acrylic and watercolour: the painters of this edition.'],
+  ['Mixed media and collage', /mixed|collage|assemblage|found/i, () => 'Paper, fabric, found things, layer on layer. These artists build their pictures from many materials.'],
+  ['Drawing and print', /charcoal|pastel|graphite|pencil|ink\b|print|etching|linocut/i, () => 'Pencil, ink, charcoal and the print press. Work made by hand, one line at a time.'],
+  ['Photography and digital', /photo|digital|film|video/i, () => 'Seen through a lens and a screen: the photographers and digital artists of this edition.'],
+  ['Sculpture and objects', /sculpt|ceramic|bronze|clay|resin|glass|wood|textile|fib(er|re)|embroider|install/i, () => 'Work you could walk around: sculpture, ceramics, textile and objects.'],
+];
+function bkChapters(works, theme){
+  const used = new Set(), out = [];
+  BK_GROUPS.forEach(([name, re, line]) => { const l = works.filter(w => !used.has(w) && re.test(w.medium || '')); if (l.length >= 4) { l.forEach(w => used.add(w)); out.push({name, line: line(theme), list: l}); } });
+  const rest = works.filter(w => !used.has(w)); if (rest.length) out.push({name: out.length ? 'Also in this edition' : 'The artists', line: out.length ? 'And the artists whose work sits between every category.' : '', list: rest});
+  while (out.length > 4) { const a = out.pop(), b = out[out.length - 1]; b.list = b.list.concat(a.list); b.name = 'Also in this edition'; b.line = 'And the artists whose work sits between every category.'; }
+  return out;
+}
+Object.assign(BKT, {
+  // a calm cover: the wordmark, the issue, one artwork whole, the line
+  coverCalm(o){ const u = bkPic(o.slot, o.img); const b = bkFitBox(bkNat(u), 720, 700); const left = Math.round((1080 - b.w) / 2), top = Math.round(300 + (700 - b.h) / 2);
+    return {bg: HL.white, html: `<div class="a" style="left:330px;width:420px;top:82px;height:132px;background:url(brand/logo-burgundy.svg) center/contain no-repeat"></div>
+    <p class="a" style="left:0;right:0;top:232px;text-align:center;${T_MED};font-size:18px;letter-spacing:.24em;text-transform:uppercase;color:${BKG2}">${esc(o.line)}</p>
+    ${ivArt(u, `left:${left}px;top:${top}px;width:${b.w}px;height:${b.h}px`, o.slot)}
+    <p class="a" style="left:0;right:0;top:1076px;text-align:center;${BASK};font-style:italic;font-size:70px;line-height:1.1;color:${HL.ink}">${esc(o.title)}</p>
+    ${o.sub ? `<p class="a" style="left:0;right:0;top:1186px;text-align:center;${BASK};font-size:26px;color:${BKG1}">${esc(o.sub)}</p>` : ''}`}; },
+  // closing: one composed block, centred, the monogram above the words
+  closeCalm(o){ return {bg: HL.burg, html: `<div class="a" style="left:110px;right:110px;top:0;bottom:120px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center">
+      <div style="width:190px;height:107px;background:url(${MONO('peony')}) center/contain no-repeat"></div>
+      <p style="${BASK};font-size:60px;line-height:1.24;color:${HL.white};margin-top:64px">${esc(o.head)}</p>
+      <div style="width:90px;border-top:2px solid ${HL.rose};margin-top:48px"></div>
+      <p style="${T_REG};font-size:32px;line-height:1.5;color:${HL.pink};margin-top:40px;max-width:760px">${esc(o.sub)}</p></div>
+    <p class="a c" style="left:0;right:0;bottom:84px;${T_REG};font-size:24px;letter-spacing:.06em;color:${HL.pink}">artstoheartsproject.com</p>`}; },
+});
 function bkSelectedPost(b, D){
   const I = bkIssue(b), proper = bkProper(b), th = (b.inside && b.inside.theme) || {}; const theme = bkTitleCase(th.title || '');
-  const W = D.works.filter(w => w.img), F = D.works.filter(w => w.face && w.img);
   const sentences = (th.text || '').match(/[^.!?]+[.!?]+/g) || []; const lines = sentences.filter(x => x.trim().split(' ').length > 4).slice(0, 2).join(' ').trim();
-  const faces = [F[Math.floor(F.length * .2)], F[Math.floor(F.length * .6)]].filter(Boolean);
-  const plates = W.filter(w => !faces.includes(w)); const at = k => plates[Math.floor(plates.length * k)] || plates[0];
-  const names = D.works.map(w => w.artist); const half = Math.ceil(names.length / 2);
-  const foot = I.issue ? `${I.title} · ${I.issue}` : proper;
-  const S = [
-    BKT.masthead({slot: 'bkmast', img: (at(.05) || {}).img, line: [I.issue ? 'Magazine · ' + I.issue : proper, theme].filter(Boolean).join(' · '), kicker: 'Introducing', big: ['The Selected', 'Artists']}),
+  const W = D.works.filter(w => w.img); const F = D.works.filter(w => w.face);
+  const edition = I.issue ? 'this issue' : 'this book';
+  const chapters = bkChapters(D.works, theme ? theme.toLowerCase().replace(/^the /, 'the ') : '');
+  const foot = I.issue ? `${I.title} · ${I.issue}` : proper; const used = new Set();
+  const pickWork = l => { const c = l.filter(w => w.img && !used.has(w)); const w = c[Math.floor(c.length / 3)] || c[0]; if (w) used.add(w); return w; };
+  const coverW = pickWork(W.slice(0, 12));
+  const places = [...new Set(D.works.map(w => (w.place || '').trim()).filter(Boolean))];
+  const S = [BKT.coverCalm({slot: 'bkcv', img: coverW && coverW.img, line: I.issue ? `Arts to Hearts Magazine · ${I.issue}` : proper, title: 'The Selected Artists', sub: theme || ''}),
     BKT.read({label: 'The open call', body: `${theme ? `For ${I.issue || 'this book'}, we asked artists for “${theme}”. ` : `For ${proper}, we opened our call to artists everywhere. `}${lines ? lines + ' ' : ''}Work arrived from around the world, and our jury looked closely at every piece.`}),
-    at(.1) && BKT.plate({w: at(.1), slot: 'bkpl1'}),
-    BKT.read({burg: true, body: `Today, we're proud to introduce the artists selected for ${proper}.`}),
-    faces[0] && BKT.face({slot: 'bkfa1', face: faces[0].face, label: `Selected artist · ${I.issue || proper}`, name: faces[0].artist, handle: faces[0].handle}),
-    at(.3) && BKT.plate({w: at(.3), slot: 'bkpl2'}),
-    at(.45) && BKT.framed({w: at(.45), slot: 'bkfr1'}),
-    BKT.credits({list: names.slice(0, half), head: 'With work by', foot}),
-    at(.55) && BKT.plate({w: at(.55), slot: 'bkpl3'}),
-    faces[1] && BKT.face({slot: 'bkfa2', face: faces[1].face, label: `Selected artist · ${I.issue || proper}`, name: faces[1].artist, handle: faces[1].handle}),
-    BKT.credits({list: names.slice(half), head: 'With work by', foot}),
-    at(.75) && BKT.plate({w: at(.75), slot: 'bkpl4'}),
-    BKT.read({label: 'To every artist who applied', body: 'Thank you for trusting us with your work. Choosing was not easy, and being considered by our jury is something to be proud of. If your name isn\'t here this time, we hope to see your work in our next call.'}),
-    BKT.read({label: 'What happens next', body: `Over the coming weeks, every selected artist will be featured here, one by one. ${proper} is being made now, and we'll share the first look with you soon.`}),
-    BKT.close({head: 'Congratulations to every artist selected.', sub: 'Cheer them on in the comments, and tag an artist you\'re proud of.'})].filter(Boolean);
-  const cap = `Introducing the artists of ${proper}${theme ? ': ' + theme : ''}.\n\n${theme ? `For this issue we asked artists for “${theme}”, and work arrived from around the world. ` : 'Work arrived from around the world. '}Our jury looked closely at every submission, and today we're proud to share the artists selected.\n\nCongratulations to each of you. Your feature is coming in the weeks ahead.\n\nTo everyone who applied: thank you for trusting us with your work. Being considered is something to be proud of, and we hope to see you in our next call.\n\nCheer them on in the comments and tag an artist you're proud of.`;
+    BKT.read({burg: true, body: `Today, we're proud to introduce the artists selected for ${proper}.`})];
+  if (places.length >= 5) S.push(BKT.read({label: 'From around the world', body: `The artists of ${edition} live and work in ${places.slice(0, -1).join(', ')} and ${places[places.length - 1]}.`}));
+  chapters.forEach((c, k) => {
+    const w = pickWork(c.list); if (w) S.push(k % 2 ? BKT.framed({w, slot: 'bkcf' + k}) : BKT.plate({w, slot: 'bkcp' + k}));
+    const names = c.list.map(x => x.artist); const pages = Math.ceil(names.length / 45), per = Math.ceil(names.length / pages);   // long chapters split evenly, the introduction on the first page
+    for (let i = 0, p = 0; i < names.length; i += per, p++) S.push(BKT.credits({list: names.slice(i, i + per), head: c.name, intro: p ? '' : c.line, foot}));
+    const f = F.filter(x => c.list.includes(x) && !used.has(x))[0]; if (f && k < 2) { used.add(f); S.push(BKT.face({slot: 'bkcfa' + k, face: f.face, label: `${c.name.replace(/ and .*/, '')} · ${I.issue || proper}`, name: f.artist, handle: f.handle})); }
+  });
+  S.push(BKT.read({label: 'To every artist who applied', body: 'Thank you for trusting us with your work. Choosing was not easy, and being considered by our jury is something to be proud of. If your name isn\'t here this time, we hope to see your work in our next call.'}));
+  S.push(BKT.read({label: 'What happens next', body: `Over the coming weeks, every selected artist will be featured here, one by one. ${proper} is being made now, and we'll share the first look with you soon.`}));
+  S.push(BKT.closeCalm({head: 'Congratulations to every artist selected.', sub: 'Cheer them on in the comments, and tag an artist you\'re proud of.'}));
+  const cap = `Introducing the artists of ${proper}${theme ? ': ' + theme : ''}.\n\n${theme ? `For this issue we asked artists for “${theme}”, and work arrived from around the world. ` : 'Work arrived from around the world. '}Our jury looked closely at every submission, and today we're proud to share the artists selected: ${chapters.map(c => c.name.toLowerCase()).join(', ').replace(/, ([^,]*)$/, ' and $1')}.\n\nCongratulations to each of you. Your feature is coming in the weeks ahead.\n\nTo everyone who applied: thank you for trusting us with your work. Being considered is something to be proud of, and we hope to see you in our next call.\n\nCheer them on in the comments and tag an artist you're proud of.`;
+  if (S.length > 20) S.splice(19, S.length - 20);   // Instagram's limit: the close always stays
   return {S, cap};
 }
 
