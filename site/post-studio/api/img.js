@@ -1,6 +1,6 @@
 // Same-origin pass-through for artwork pictures, so downloads never come out blank (the image renderer needs CORS).
 // GET /api/img?u=<url>  — only our own media host and Shopify's CDN; cached at the edge for a week.
-const ALLOW = /^https:\/\/(media\.artstoheartsproject\.com|cdn\.shopify\.com|shop\.artstoheartsproject\.com)\//i;
+const ALLOW = /^https:\/\/(media\.artstoheartsproject\.com|cdn\.shopify\.com|shop\.artstoheartsproject\.com|[a-z0-9]+\.public\.blob\.vercel-storage\.com)\//i;
 export default async function handler(req, res){
   const u = String((req.query && req.query.u) || '');
   if (!ALLOW.test(u)) return res.status(400).send('host not allowed');
