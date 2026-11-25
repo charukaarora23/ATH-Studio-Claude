@@ -566,6 +566,30 @@ function bkSelectedPost(b, D, coverKind){
   return {S, cap};
 }
 
+// Cover reveal (v1, same ecosystem as Selected artists): the cover, the work, the artist and their own words, the book card, one action.
+// Quotes are taken only when they stand on their own (no "his/her" pointing at someone the reader has not met yet).
+const bkStandalone = q => { const t = String(q || ''); const pro = t.search(/\b(he|him|his|she|her|they|them|their)\b/i); const name = t.search(/\b[A-Z][a-z]+ [A-Z][a-z]+|\b[A-Z][a-z]{2,}\b(?<!^I)/); return pro < 0 || (name >= 0 && name < pro); };
+function bkCoverPost(b, D, front, kind){
+  const c = D.cover, p = D.coverP || {quotes: []}, w = D.find(c.artist) || {}; const I = bkIssue(b), proper = bkProper(b), short = bkShort(b.name); const KW = bkKeyword(b), sale = bkSale(b);
+  const big = I.issue ? `Arts to Hearts\nMagazine, ${I.issue}` : short, handle = D.coverHandle || p.handle || '';
+  const art = w.img || front || '', face = w.face || '';
+  const qs = (p.quotes || []).filter(bkStandalone).map(q => bkCut(q, 230)).slice(0, 2);
+  const work = {artist: c.artist, handle, img: bkPic('bkcvw', art), face, title: c.title || '', medium: c.year ? String(c.year) : ''};
+  const cover = kind === 'book' ? BKT.card({faces: null, mono: true, tab: 'Cover', serif: 'The cover of', big, bigMax: 76, img: front || '', slot: 'bkcvb', imgW: 520, imgH: 600, ph: 'Click or drop the cover here', sub: `Art by ${c.artist}`})
+    : BKT.acover({img: art, slot: 'bkcva', serif: 'The cover of', big, sub: `Art by ${c.artist}`});
+  const S = [
+    cover,
+    BKT.feature({w: work, slot: 'bkcvw', line: ''}),
+    p.intro && BKT.card({tab: 'Cover', label: p.title ? bkCase(p.title) : 'The cover artist', body: bkCut(p.intro, 420)}),
+    BKT.portrait({slot: 'bkcvf', face, label: 'The cover artist', name: c.artist, sub: handle}),
+    qs[0] && BKT.say({slot: face ? 'bkcvf' : 'bkcva2', face: face || art, q: qs[0], name: c.artist, handle}),   /* over his photo, else over the cover work */
+    qs[1] && BKT.say({slot: 'bkcva2', face: art, q: qs[1], name: c.artist, handle}),
+    BKT.card({tab: 'Inside', big, sub: `${c.artist}'s full interview is inside, alongside ${(n => n > 10 ? 'more than ' + ({20: 'twenty', 30: 'thirty', 40: 'forty', 50: 'fifty', 60: 'sixty', 70: 'seventy', 80: 'eighty', 90: 'ninety'}[Math.floor((n - 1) / 10) * 10] || Math.floor((n - 1) / 10) * 10) : 'our')(D.works.length)} selected artists.`, pill: sale.open ? sale.verb + ' · link in bio' : 'Pre-order opens soon'}),
+    BKT.keyEnd({head: `Meet the cover of ${I.issue || short}.`, key: KW, offer: `Comment ${KW} and we'll send you a look inside.`})].filter(Boolean);
+  const cap = `The cover of ${proper}${c.title ? `: ${c.title}${c.year ? ' (' + c.year + ')' : ''}` : ''}, by ${c.artist}${handle ? ' ' + handle : ''}.\n\n${p.intro ? bkCut(p.intro, 300) + '\n\n' : ''}${qs[0] ? `"${qs[0]}"\n\n` : ''}Read ${c.artist.split(' ')[0]}'s full interview inside ${proper}. Comment ${KW} and we'll send you a look inside.`;
+  return {S, cap};
+}
+
 // ---------- the posts themselves (open in the normal preview: edit, replace images, download) ----------
 function bookGroups(){
   const v = BOOKVIEW; const b = v && BOOKS && BOOKS.books[v.book]; if (!b) return [];
@@ -609,15 +633,7 @@ function bookGroups(){
     post('A first look inside', [photos.length ? photo(2, {mono: true, label: name, head: "We can't show you every page. Here are a few."}) : BKT.card({faces: faces(4, 30), mono: true, tab: 'Inside', serif: 'A first look inside', big: name}),
       ...list, ask('Hundreds more pages are inside.')],
       `A first look inside ${name}.\n\nComment ${KW} and we'll send you a few more pages.`, 'Real spreads from the Mockups folder'); }
-  else if (id === 'cover' && D.cover) { const c = D.cover, p = D.coverP || {quotes: []}; const w = D.find(c.artist) || {};
-    post('Cover reveal', [BKT.card({tab: 'Cover', mono: true, img: front || '', slot: 'bkcvr', serif: 'The cover', big: name, bigMax: 72, sub: `Art by ${c.artist}`}),
-      photos.length ? photo(3, {label: 'The cover', head: c.title ? `${c.title}${c.year ? ', ' + c.year : ''}` : `Art by ${c.artist}`}) : null,
-      BKT.portrait({slot: 'bkcvf', face: w.face, label: 'The cover artist', name: c.artist, sub: D.coverHandle}),
-      p.quotes[0] && BKT.say({slot: 'bkcvf', face: w.face, q: bkCut(p.quotes[0], 230), name: c.artist, handle: D.coverHandle}),
-      (p.intro) && BKT.card({tab: 'Cover', label: p.title ? bkCase(p.title) : '', body: bkCut(p.intro, 420)}),
-      spreadAt(p.page, `${c.artist}'s story`, p.page ? `Pages ${p.page} and ${p.page + 1}.` : '', 'bkcvs'),
-      p.quotes[1] && BKT.quote({q: bkCut(p.quotes[1], 330), name: c.artist, handle: D.coverHandle, face: w.face}), ask(`Read ${c.artist.split(' ')[0]}'s story in ${name}.`)],
-      `${p.title ? bkCase(p.title) + '.' : 'The cover of ' + name + '.'}\n\n${p.quotes[0] ? '“' + bkCut(p.quotes[0], 220) + '”\n\n' : ''}${c.title ? c.title + ' by ' : 'Art by '}${c.artist}${D.coverHandle ? ' ' + D.coverHandle : ''}, on the cover of ${name}. Comment ${KW} for a look inside.`, D.coverHandle ? `Collab post: invite ${D.coverHandle}` : 'Cover reveal'); }
+  else if (id === 'cover' && D.cover) { const r = bkCoverPost(b, D, front, v.cover); out.push({book: true, credits, covers: [['artwork', 'Artwork'], ['book', 'Book']], cover: v.cover || 'artwork', title: `${bkProper(b)} · Cover reveal`, meta: `Post when the cover is revealed${D.coverHandle ? ' · Collab post with ' + D.coverHandle : ''} · keyword ${KW}`, cap: r.cap + '\n\n' + tags, pin: `Comment ${KW} and we'll send you a look inside.`, slides: r.S.map((s, j) => ({...s, title: 'cover-' + (j + 1)}))}); }
   else if (id === 'open') { const inside = [D.curator && `Curated by ${D.curator.name}.`, D.cover && `On the cover, ${D.cover.artist}.`, D.voices.length && `Conversations with ${D.voices.slice(0, 3).map(p => p.name).join(', ')}${D.voices.length > 3 ? ' and more' : ''}.`, `Work by ${many}, each with their own page.`].filter(Boolean).join(' ');
     post('Pre-order is open', [photos.length ? photo(4, {mono: true, label: 'Pre-order is open', head: name}) : BKT.card({faces: faces(0, 30), mono: true, tab: 'Inside', serif: 'Pre-order is open', big: name}),
       BKT.card({tab: 'Inside', label: 'Inside the book', body: inside}), ...spreads.slice(0, 3).map((u, i) => BKT.photo({img: u, slot: 'bkos' + i})),
