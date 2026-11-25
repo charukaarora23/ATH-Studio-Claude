@@ -427,32 +427,40 @@ Object.assign(BKT, {
 const bkCap = w => { const d = String(((w.works || [])[0] || {}).details || w.details || '').split(/\s*,\s*/); const size = d.find(x => /\d\s*(x|×)\s*\d/.test(x)) || ''; return [w.title, w.year || '', size, w.medium || '']; };
 
 // ---------- the tabbed card (from the "Wrapped" reference): the carousel's own chapters as tabs on a white page ----------
-const BK_CH = ['The call', 'The artists', 'The selection', "What's next"];
+const BK_CH = ['The call', 'The artists', "What's next"];
 const bkTabRow = on => BK_CH.map((t, i) => { const act = t === on;
-  return `<div class="a" style="left:870px;top:${210 + i * 232}px;width:66px;height:216px;border-radius:0 14px 14px 0;background:${act ? HL.white : i % 2 ? HL.rose : HL.pink};display:flex;align-items:center;justify-content:center">
+  return `<div class="a" style="left:870px;top:${150 + (1060 - (BK_CH.length * 232 - 16)) / 2 + i * 232}px;width:66px;height:216px;border-radius:0 14px 14px 0;background:${act ? HL.white : i % 2 ? HL.rose : HL.pink};display:flex;align-items:center;justify-content:center">
     <p style="${act ? T_MED : T_REG};font-size:19px;letter-spacing:.16em;text-transform:uppercase;color:${HL.burg};writing-mode:vertical-rl;white-space:nowrap">${esc(t)}</p></div>`; }).join('');
 const bkB = t => bkWhole(esc(bkKeep(t))).replace(/\*\*(.+?)\*\*/g, (m, x) => x.length < 30 ? `<span style="white-space:nowrap">${mark(x)}</span>` : mark(x));   /* emphasis is the house Pink highlight */   // **words** set heavier, as in the Highlights card
 Object.assign(BKT, {
   tabcard(o){ const u = bkPic(o.slot || 'bkbg', o.bg);
     return {bg: HL.burg, html: `${u ? `<div class="a img" data-slot="${o.slot || 'bkbg'}" style="inset:0;background-image:url(${u});background-size:cover;background-position:center"></div><div class="a" style="inset:0;background:rgba(28,19,16,.32)"></div>` : ''}
     <p class="a cn" style="left:52px;top:48px;color:${HL.white}">Arts to Hearts Project</p>${o.mono ? ivMono('white', 'right:52px;top:40px;width:96px;height:54px') : ''}
+    <p class="a" style="left:72px;bottom:60px;${T_REG};font-size:24px;color:${HL.white};opacity:.85">@artstoheartsproject</p>
+    <div class="a" style="right:72px;bottom:46px;width:56px;height:56px;border-radius:50%;background:${HL.white};display:flex;align-items:center;justify-content:center;${T_MED};font-size:28px;color:${HL.burg}">&rarr;</div>
     ${bkTabRow(o.tab)}
     <div class="a" style="left:150px;top:150px;width:724px;height:1060px;background:${HL.white};border-radius:16px;box-shadow:0 24px 60px rgba(20,9,12,.28)"></div>
     <div class="a" style="left:196px;top:190px;width:632px;height:980px;display:flex;flex-direction:column;align-items:center;justify-content:${o.top ? 'flex-start' : 'center'};text-align:center">
       ${o.kicker ? `<p style="${T_MED};font-size:19px;letter-spacing:.22em;text-transform:uppercase;color:${HL.ink};margin-bottom:26px">${esc(bkKeep(o.kicker))}</p>` : ''}
       ${o.head ? `<p style="${BASK};font-style:italic;font-size:${Math.min(o.headSz || 104, bkFit(o.head.join('\n'), 600, 200, .52))}px;white-space:nowrap;line-height:1.05;letter-spacing:-.01em;color:${HL.ink}">${o.head.map(x => esc(x)).join('<br>')}</p>` : ''}
-      ${o.sub ? `<p style="${BASK};font-size:32px;line-height:1.45;color:${HL.ink};margin-top:30px;max-width:580px">${bkB(o.sub)}</p>` : ''}
+      ${o.sub ? `<p style="${BASK};font-size:${o.subSz || 32}px;line-height:1.45;color:${HL.ink};margin-top:30px;max-width:580px">${bkB(o.sub)}</p>` : ''}
       ${o.body ? `<div style="text-align:left;width:100%">${o.label ? `<p style="${T_REG};font-size:20px;letter-spacing:.14em;text-transform:uppercase;color:${HL.burg};margin-bottom:24px">${bkDot(HL.burg)}${esc(o.label)}</p>` : ''}<p style="${BASK};font-size:${o.body.length > 300 ? 36 : o.body.length > 200 ? 40 : 46}px;line-height:1.36;color:${HL.burg}">${(() => { const t = bkKeep(o.body), f = bkFirst(t), r = t.slice(f.length).trim(); return mark(bkWhole(esc(f))) + (r ? ' ' + bkWhole(esc(r)) : ''); })()}</p></div>` : ''}
       ${o.lines ? `<div style="margin-top:${o.head ? 44 : 0}px;display:flex;flex-direction:column;gap:${o.gap || 26}px">${o.lines.map(l => `<p style="${BASK};font-size:${o.lineSz || 30}px;line-height:1.38;color:${HL.ink}">${bkB(l)}</p>`).join('')}</div>` : ''}
       ${o.list ? `<div style="margin-top:34px;width:100%;display:grid;grid-template-columns:1fr 1fr;gap:${o.list.length > 30 ? 9 : 14}px 24px;text-align:left">${o.list.map(a => `<p style="font-size:${o.list.length > 30 ? 19 : 22}px;line-height:1.25;color:${HL.ink};white-space:nowrap;overflow:hidden;text-overflow:ellipsis"><span style="${T_MED}">${esc(a.name)}</span>${a.place ? ` <span style="${T_REG};color:${BKG2}">${esc(a.place)}</span>` : ''}</p>`).join('')}</div>` : ''}
-      ${o.foot ? `<p style="${T_REG};font-size:26px;line-height:1.45;color:${BKG1};margin-top:40px;max-width:560px">${bkB(o.foot)}</p>` : ''}</div>`}; },
+      ${o.foot ? `<p style="${T_REG};font-size:${o.footSz || 26}px;line-height:1.45;color:${BKG1};margin-top:40px;max-width:560px">${bkB(o.foot)}</p>` : ''}</div>`}; },
   // the project cover: the work full bleed (as the interview cover), the project set largest, so every announcement is told apart
   pcover(o){ const u = bkPic(o.slot, o.img); const t = o.title.map(x => bkKeep(x)); const sz = Math.min(150, bkFit(t.join('\n'), 940, 200, .5));
     return {bg: B.ink, html: `${ivArt(u, 'inset:0', o.slot, 'cover')}<div class="a" style="inset:0;background:rgba(20,9,12,.36)"></div>${ivCorners({mono: true}, '#FFFFFF', B.burg)}
       <div class="a" style="left:72px;right:72px;bottom:140px;display:flex;flex-direction:column;gap:18px">
         <p class="cn" style="color:#FFFFFF">${esc(o.label)}</p>
         ${o.serif ? `<p style="${BASK};font-style:italic;font-size:58px;line-height:1.1;color:#FFFFFF">${esc(o.serif)}</p>` : ''}
-        <p style="${T_MED};font-size:${sz}px;line-height:.95;letter-spacing:-.035em;color:#FFFFFF;white-space:nowrap">${t.map(esc).join('<br>')}</p></div>`}; },
+        <p style="${T_MED};font-size:${sz}px;line-height:.95;letter-spacing:-.035em;color:#FFFFFF;white-space:nowrap">${t.map(x => /^Issue\b/.test(x) ? `<span style="${BASK};font-style:italic;letter-spacing:-.02em">${esc(x)}</span>` : esc(x)).join('<br>')}</p>
+        ${o.sub ? `<p style="${T_REG};font-size:30px;line-height:1.35;color:#FFFFFF;margin-top:10px">${bkWhole(esc(bkKeep(o.sub)))}</p>` : ''}</div>`}; },
+  // the artists' own titles, set as lines: the selection told through the work, nobody singled out
+  titles(o){ return {bg: B.ground, html: `${ivCorners({})}
+    <p class="a cn" style="left:72px;top:170px;color:${B.burg}">${esc(o.label)}</p>
+    <div class="a" style="left:72px;right:72px;top:240px;bottom:330px;display:flex;flex-direction:column;justify-content:center;gap:${o.lines.length > 7 ? 18 : 24}px">${o.lines.map(l => `<p style="${BASK};font-style:italic;font-size:${o.lines.length > 7 ? 54 : 62}px;line-height:1.12;color:${B.burg}">${bkWhole(esc(l))}</p>`).join('')}</div>
+    <p class="a" style="left:72px;right:200px;top:1060px;${BASK};font-size:32px;line-height:1.4;color:${B.ink}">${bkB(o.foot)}</p>`}; },
   // the artist (from the Helen Job reference): full bleed, a label, the name large, a few lines about them
   meet(o){ const u = bkPic(o.slot, o.face); return {bg: HL.ink, html: `${u ? `<div class="a img" data-slot="${o.slot}" style="inset:0;background-image:url(${u});background-size:cover;background-position:center 25%"></div>` : `<div class="a ph" data-slot="${o.slot}" style="inset:0;color:${HL.pink};background:${HL.burg}">Drop their photo here</div>`}
     <div class="a" style="inset:0;background:rgba(20,9,12,.3)"></div>
@@ -472,46 +480,39 @@ Object.assign(BKT, {
 const bkPlaceOf = w => { const c = bkCountries(w.line + ' ' + (w.bio || '')); return c.length ? c[0] : ''; };
 const bkSay = w => { const s = String(w.line || ''); const m = s.match(/^\s*I(?:'m| am)\b[^.!?]{20,150}[.!?]?/); return m ? m[0].trim().replace(/\s+/g, ' ').replace(/\s*,\s*/g, ', ') : ''; };   // their own first-person words
 
+// a few of the artists' own titles that carry the book's theme (memory, summer, home, light ...), read from the work itself
+function bkThemeTitles(D, themeText, k = 7){
+  const stop = new Set('the and for with that this from your you was were have what when where which there their them they into about maybe more only just than then also every each some being been would could'.split(' '));
+  const root = w => w.toLowerCase().replace(/[^a-z]/g, '').replace(/(ies|es|s|ing|ed|y)$/, '');
+  const T = new Set(String(themeText || '').split(/\s+/).map(root).filter(w => w.length > 3 && !stop.has(w)));
+  'summer memory memories remember home light childhood evening afternoon sun beach sea harbour tender soft dream golden blue hour warm return carry'.split(' ').forEach(w => T.add(root(w)));
+  const core = new Set(String(themeText || '').split(/[.!?]/)[0].split(/\s+/).map(root).filter(w => w.length > 3 && !stop.has(w)).concat(['memor', 'summer']));   // the theme's own title words count double
+  const seen = new Set();
+  return D.works.map(w => String(w.title || '').trim()).filter(t => t.length >= 4 && t.length <= 34 && t !== t.toUpperCase() && !/\d|[_/(]/.test(t) && !/untitled/i.test(t))
+    .filter(t => { const key = t.toLowerCase(); if (seen.has(key)) return false; seen.add(key); return true; })
+    .map(t => ({t, n: t.split(/\s+/).reduce((n, w) => n + (core.has(root(w)) ? 2 : T.has(root(w)) ? 1 : 0), 0)})).filter(x => x.n > 0)
+    .sort((x, y) => y.n - x.n || x.t.length - y.t.length).slice(0, k).map(x => x.t);
+}
+
+// Selected artists: one post that honours every artist equally. Nobody is singled out; the work speaks through its own titles.
 function bkSelectedPost(b, D){
   const I = bkIssue(b), proper = bkProper(b), th = (b.inside && b.inside.theme) || {}; const theme = bkTitleCase(th.title || ''); const KW = bkKeyword(b);
-  const sel = bkSelection(D); const used = new Set();
-  const good = w => { const s = bkKeep(bkFirst(w.bio)); return s.length > 60 && s.length < 240 && !/^\s*(i|my|i'm|i’m)\b/i.test(s); };
-  const faces = D.works.filter(w => w.face && w.img && good(w) && bkSay(w)).concat(D.works.filter(w => w.face && w.img && (good(w) || bkSay(w)) && !(good(w) && bkSay(w))));   /* artists with a written bio and their own words first */
-  const pick = k => { const c = faces.filter(w => !used.has(w)); const w = c[Math.floor(c.length * k)]; if (w) used.add(w); return w; };
-  const bgW = D.works.filter(w => w.img)[3] || D.works[0]; const bg = bgW && bgW.img;
-  const ed = I.issue ? I.issue : 'this book';
+  const ed = I.issue || 'this book';
+  const titles = bkThemeTitles(D, (th.title || '') + ' ' + (th.text || ''));
+  const coverW = D.works.find(w => w.img && titles[0] && w.title === titles[0]) || D.works.find(w => w.img) || {}; const bg = coverW.img;   // the cover: the work whose title speaks the theme most clearly
   const people = D.works.map(w => ({name: w.artist, place: bkPlaceOf(w)})); const pages = Math.ceil(people.length / 50), per = Math.ceil(people.length / Math.max(1, pages));
-  const nums = sel.rows.map(([n, t]) => /^painters/.test(t) ? `**${n} painters**${t.slice(8)}` : /^countries/.test(t) ? `**${n} countries**${t.slice(9)}` : /women/.test(t) ? `**${n} of the artists** are women` : /^working in /.test(t) ? `**${n} artists** ${t.replace(/^working /, '')}` : `**${n} artists** ${t}`);
-  const artist = (w, k) => { if (!w) return []; const say = bkSay(w); const about = good(w) ? bkKeep(bkFirst(w.bio)) : w.line;
-    return [k % 2 && say ? BKT.words({slot: 'bkmw' + k, face: w.face, q: say, name: w.artist}) : BKT.meet({slot: 'bkmt' + k, face: w.face, label: `Selected artist · ${ed}`, name: w.artist, role: [bkPlaceOf(w), (w.medium || '').split(/\s+on\s+/)[0]].filter(Boolean).join(' · '), text: about}),
-      IV.work({img: bkPic('bkaw' + k, w.img), slot: 'bkaw' + k, name: w.artist, cap: bkCap(w)})]; };
-  // a short paragraph about the selection, written the way a person would say it
-  const words = n => ({1: 'one', 2: 'two', 3: 'three', 4: 'four', 5: 'five', 6: 'six', 7: 'seven', 8: 'eight', 9: 'nine', 20: 'twenty', 30: 'thirty', 40: 'forty', 50: 'fifty', 60: 'sixty', 70: 'seventy', 80: 'eighty', 90: 'ninety', 10: 'ten', 15: 'fifteen', 25: 'twenty-five'}[n] || String(n));
-  const over = n => n > 10 ? 'more than ' + words(n > 50 ? Math.floor((n - 1) / 10) * 10 : Math.floor((n - 1) / 5) * 5) : 'several';
-  const the = c => /^(United|Netherlands|Philippines)/.test(c) ? 'the ' + c : c;
-  const story = [
-    sel.painters >= sel.n * .5 ? `Most of the work in ${ed} is **painted**: ${over(sel.painters)} painters, in oil, acrylic and watercolour.` : '',
-    sel.countries.length >= 5 ? `The artists live and work in **${over(sel.countries.length)} countries**, from ${the(sel.countries[0])} to ${the(sel.countries[sel.countries.length - 1])}.` : '',
-    sel.known >= sel.n * .6 && sel.she / sel.known >= .5 ? `And **${words(Math.floor(sel.she / sel.known * 10))} in ten** of them are women.` : ''].filter(Boolean);
-  // each featured artist, as the agreed unit: the work with their face, their portrait with the name, their words over it, a page about them
-  const feature = (w, k) => { if (!w) return []; const bs = bkKeep(w.bio).split(/(?<=[.!?])\s+/).filter(Boolean); let about = ''; for (const x of bs) { if ((about + ' ' + x).length > 330 && about) break; about = (about + ' ' + x).trim(); } if (!good(w)) about = w.line;
-    const say = bkSay(w) || (bs[about.split(/(?<=[.!?])\s+/).length] && bs[about.split(/(?<=[.!?])\s+/).length].length < 200 ? bs[about.split(/(?<=[.!?])\s+/).length] : '');   /* their own words: a first-person line, or the next line of their own bio */
-    return [BKT.portrait({slot: 'bkp' + k, face: w.face, label: `Selected artist · ${ed}`, name: w.artist, sub: w.handle}),
-      BKT.feature({w: {...w, img: bkPic('bkf' + k, w.img)}, slot: 'bkf' + k, line: ''}),
-      say && BKT.say({slot: 'bkp' + k, face: w.face, q: say, name: w.artist, handle: w.handle, plain: !/^\s*(i|my|i'm|i’m)\b/i.test(say)}),   /* quote marks only for their own first-person words */
-      BKT.tabcard({bg, tab: 'The artists', label: [bkPlaceOf(w), (w.medium || '').split(/\s+on\s+/)[0]].filter(Boolean).join(' · ') || 'Selected artist', body: about})]; };
+  const brief = ((th.text || '').match(/[^.!?]+[.!?]+/g) || []).map(x => x.trim()).filter(x => x.split(' ').length > 4 && !/^the summer we remember\.?$/i.test(x)).slice(0, 2).join(' ');
   const S = [
-    BKT.pcover({slot: 'bkcov', img: bg, label: 'Selected artists', serif: theme, title: I.issue ? ['Arts to Hearts', 'Magazine', I.issue] : bkBalance(proper)}),
-    BKT.tabcard({bg, tab: 'The call', head: ['Congratulations'], headSz: 96, sub: `to every artist selected for **${proper}**.`, foot: 'Your work is going into print, and your feature is coming in the weeks ahead.'}),
-    BKT.htext({label: 'The open call', text: `${theme ? `For ${ed}, we asked artists for “${theme}”.` : `For ${proper}, we opened our call to artists everywhere.`} ${(((th.text || '').match(/[^.!?]+[.!?]+/g) || []).filter(x => x.trim().split(' ').length > 4).slice(0, 2).join(' ').trim())} Work arrived from around the world, and our jury looked closely at every piece.`}),
+    BKT.pcover({slot: 'bkcov', img: bg, label: 'Selected artists', title: I.issue ? ['Arts to Hearts', 'Magazine', I.issue] : bkBalance(proper), sub: theme ? `Introducing the artists of ${theme}` : 'Introducing the artists'}),
+    BKT.tabcard({bg, tab: 'The call', head: ['Congratulations'], headSz: 100, subSz: 42, footSz: 32, sub: `to every artist selected for **${proper}**.`, foot: 'Your work is going into print. This is a moment to be proud of, and we are celebrating it with you.'}),
+    theme && brief && BKT.htext({label: 'The theme', text: `We asked artists for ${theme}. ${brief}`}),
+    titles.length >= 5 && BKT.titles({label: theme ? 'You sent us your summers' : 'From the book', lines: titles, foot: theme ? `A few of the titles in ${ed}. Each one is **someone's memory**, now part of this issue.` : `A few of the titles in ${proper}.`}),
     ...Array.from({length: pages}, (_, p) => BKT.tabcard({bg, tab: 'The artists', top: true, head: [p ? 'The Artists' : 'Selected for ' + (I.issue || 'the book')], headSz: 64, list: people.slice(p * per, (p + 1) * per)})),
-    story.length >= 2 && BKT.tabcard({bg, tab: 'The selection', head: ['About the selection'], headSz: 70, lines: story, lineSz: 34, gap: 30}),
-    ...feature(pick(.2), 0), ...feature(pick(.6), 1),
-    BKT.htext({label: 'To everyone who applied', text: 'Thank you for trusting us with your work. Choosing was not easy, and being considered by our jury is something to be proud of. If your name isn\'t here this time, we hope to see your work in our next call.'}),
-    BKT.tabcard({bg, tab: "What's next", head: ["What's next"], headSz: 84, lines: [`Every selected artist will be **featured here**, one by one.`, `**${proper}** is being made now.`, 'We\'ll share **the first look** with you soon.']}),
-    BKT.keyEnd({head: `Congratulations to every artist selected for ${proper}.`, key: KW, offer: 'Comment the word and we\'ll send you the full list.', foot: 'Tag an artist you\'re proud of.'})].filter(Boolean);
-  if (S.length > 20) S.splice(19, S.length - 20);
-  const cap = `Introducing the artists of ${proper}${theme ? ': ' + theme : ''}.\n\nCongratulations to every artist selected. ${theme ? `For this issue we asked artists for “${theme}”, and work arrived from around the world. ` : 'Work arrived from around the world. '}Our jury looked closely at every submission. Every name is in the slides, and every artist will be featured here in the weeks ahead.\n\nComment ${KW} and we'll send you the full list.\n\nTo everyone who applied: thank you for trusting us with your work. Being considered is something to be proud of, and we hope to see you in our next call.`;
+    BKT.htext({label: 'What it means', text: 'Your work will be printed, bound and kept. It will sit on shelves and tables, and be opened by people who have never met you. That is what being in a book means, and it stays.'}),
+    BKT.tabcard({bg, tab: "What's next", head: ["What's next"], headSz: 84, lineSz: 36, gap: 34, lines: [`Over the coming weeks, **every artist** in ${ed} will be featured here, one by one.`, `The ${I.issue ? 'magazine' : 'book'} is being made now. **The first look** is coming soon.`, 'When your feature goes live, share it. **Your people** will want to see it.']}),
+    BKT.htext({label: 'To everyone who applied', text: `${theme ? 'To everyone who sent us a summer, thank you.' : 'To everyone who sent us their work, thank you.'} Choosing was hard, and many beautiful works could not fit in these pages. If your name is not here this time, please keep going. We would love to see your work in our next call.`}),
+    BKT.keyEnd({head: `Congratulations to every artist in ${theme || proper}.`, key: KW, offer: `Comment ${KW} and we'll send you the full list of artists.`, foot: 'Know someone on this list? Tag them and tell them you are proud.'})].filter(Boolean);
+  const cap = `Introducing the artists of ${proper}${theme ? ': ' + theme : ''}.\n\n${theme && brief ? `We asked artists for ${theme}. ${brief}\n\nWhat came back were memories: ${titles.slice(0, 3).join(', ')}, and so many more. ` : ''}Congratulations to every artist selected. Your work is going into print, and over the coming weeks each of you will be featured here.\n\nComment ${KW} and we'll send you the full list.\n\nTo everyone who applied: thank you for trusting us with your work. Please keep going, and we hope to see you in our next call.`;
   return {S, cap};
 }
 
