@@ -312,7 +312,7 @@ function bookTabInside(b){
 }
 function bookTabArtists(b){
   const D = bkData(b); if (b.loading) return '<p class="meta">Loading the artists…</p>'; if (!D.all.length) return `<p class="meta">${b.artistsError ? bkEsc(b.artistsError) : 'No artists in the sheet yet.'}</p>`;
-  const card = w => `<div class="bk-a">${w.img ? `<img loading="lazy" decoding="async" src="${bkEsc(w.img)}" alt="">` : '<div class="bk-w bk-none">No artwork in the sheet</div>'}<b>${bkEsc(w.artist)}</b><span>${bkEsc(w.handle)}</span>${w.title ? `<i>${bkEsc(w.title)}</i>` : ''}${w.page ? `<span class="bk-ok">Page ${w.page}</span>` : ''}${w.titleOk ? '' : '<span class="bk-warn">Title in the sheet differs from print</span>'}</div>`;
+  const card = w => `<div class="bk-a"><div class="bk-pic">${w.img ? `<img loading="lazy" decoding="async" src="${bkEsc(w.img)}" alt="">` : '<div class="bk-w bk-none">No artwork in the sheet</div>'}${w.face ? `<img class="bk-face" loading="lazy" decoding="async" src="${bkEsc(w.face)}" alt="">` : ''}</div><b>${bkEsc(w.artist)}</b><span>${bkEsc(w.handle)}</span>${w.title ? `<i>${bkEsc(w.title)}</i>` : ''}${w.page ? `<span class="bk-ok">Page ${w.page}</span>` : ''}${w.titleOk ? '' : '<span class="bk-warn">Title in the sheet differs from print</span>'}</div>`;
   return `<p class="meta">${D.works.length} artists${D.checked ? ' in the final PDF, in page order' : ' from the sheet (not checked against a PDF yet)'}.</p><div class="bk-arts">${D.works.map(card).join('')}</div>
     ${D.missing.length ? `<h3>In the sheet but not in the final PDF</h3><p class="meta">Replaced, dropped or spelled differently. Left out of every post.</p><p>${D.missing.map(a => bkEsc(a.name)).join(' · ')}</p>` : ''}`;
 }
