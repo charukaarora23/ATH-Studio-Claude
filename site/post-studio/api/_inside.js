@@ -8,6 +8,21 @@ const sentences = t => (String(t).match(/[^.!?]+[.!?]+["”’]?/g) || []).map(s
 const tidy = (t, name) => { t = String(t || '').replace(/\b((?:[A-Za-z] ){2,}[A-Za-z])\b/g, m => m.replace(/ /g, '')).replace(/ARTSTOHEARTS\w*\s*\|\s*\d+|\d+\s*\|\s*ARTSTOHEARTS\w*/gi, ' ').replace(/\b([A-Z][A-Z'’.-]+\s+){1,4}[A-Z][A-Z'’.-]+\b/g, ' ').replace(/\s+/g, ' ').trim();
   if (name) { const esc = name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); t = t.replace(new RegExp('^(?:.*?)(' + esc + '\\s+)(?=' + esc + ')'), '').replace(new RegExp('^.{0,60}?(?=' + esc + ')'), ''); }
   return t; };
+// questions and answers on an interview's pages: a sentence ending in "?" closes a question, the "you/your" lines just before it open it,
+// everything after it until the next question is the answer. Captions, page numbers and handles are left out.
+const FURN = /ARTSTOHEARTS|©|Original Approx|Medium\s*-|https?:|^@|^\|?\s*\d{1,3}\s*\|?$|^\|?\s*(COVER ARTIST|AWARD WINNER|INVITED ARTIST|INTERVIEW)\s*\|?$/i;
+function readQA(P, from, to){
+  const text = []; for (let k = from; k < to; k++) String(P[k] || '').split('\n').map(clean).forEach(l => { if (l && !FURN.test(l)) text.push(l); });
+  const S = sentences(text.join(' ').replace(/\b((?:[A-Za-z] ){2,}[A-Za-z])\b/g, m => m.replace(/ /g, '')).replace(/\b[A-Z]{3,}(?: [A-Z]{3,})*\s*\|\s*/g, '').replace(/\|\s*[A-Z]{3,}(?: [A-Z]{3,})*\b/g, '').replace(/\s+/g, ' '))   /* spaced-out headers and "COVER ARTIST |" markers removed */.map(x => x.replace(/^['‘’"“]+|['‘’"”]+$/g, '').trim()).filter(Boolean);
+  const isQ = x => /\?$/.test(x), you = x => /\b(you|your|this issue|our (magazine|issue)|the theme)\b/i.test(x) && !/\b(I|my|me)\b/.test(x);   /* the interviewer's lead-in to a question */
+  const qa = []; let cur = null;
+  for (let i = 0; i < S.length; i++) {
+    if (isQ(S[i])) { let k = i; while (k > 0 && i - k < 3 && you(S[k - 1]) && !isQ(S[k - 1])) k--;
+      if (cur) cur.a = cur.a.slice(0, cur.a.length - (i - k)); cur = {q: S.slice(k, i + 1).join(' '), a: []}; qa.push(cur); }
+    else if (cur) cur.a.push(S[i]);
+  }
+  return qa.map(x => ({q: x.q, a: x.a})).filter(x => x.a.join(' ').length > 40).slice(0, 12);
+}
 export function readInside(pages){
   const P = pages.map(p => String(p || ''));
   const lines = p => p.split('\n').map(clean).filter(Boolean).flatMap(l => { const m = l.match(/^(.*?[^\d\s|])(\d{1,3})$/); return m && !/^(ISSUE|EDITION|VOL)/i.test(m[1]) && /[A-Za-z]/.test(m[1]) ? [m[1].trim(), m[2]] : [l]; });
@@ -57,6 +72,8 @@ export function readInside(pages){
     const score = x => (/\b(always|believe|feel|want|love|hope|remember|never|every|light|memory|paint\w*)\b/gi.test(x) ? 2 : 0) + (x.split(/\s+/).length >= 14 ? 1 : 0) - (/^I (was|had|participated|initially)\b/.test(x) ? 1 : 0);
     const q = cand.map((x, i) => [x, score(x), i]).sort((a, b) => b[1] - a[1] || a[2] - b[2]).slice(0, 3).map(x => x[0]);
     iv.quotes = q; delete iv.award;
+    // the whole conversation, question by question, word for word (posts pick the answer that fits each slide)
+    iv.qa = readQA(P, at + 1, Math.min(P.length, at + 7, ...out.interviews.concat(out.articles).map(o => o.page ? pageOf(o.page) : 0).filter(x => x > at + 1)));   /* stop at the next interview or article */
   });
   return out;
 }

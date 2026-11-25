@@ -569,24 +569,43 @@ function bkSelectedPost(b, D, coverKind){
 // Cover reveal (v1, same ecosystem as Selected artists): the cover, the work, the artist and their own words, the book card, one action.
 // Quotes are taken only when they stand on their own (no "his/her" pointing at someone the reader has not met yet).
 const bkStandalone = q => { const t = String(q || ''); const pro = t.search(/\b(he|him|his|she|her|they|them|their)\b/i); const name = t.search(/\b[A-Z][a-z]+ [A-Z][a-z]+|\b[A-Z][a-z]{2,}\b(?<!^I)/); return pro < 0 || (name >= 0 && name < pro); };
+// their own answer to a question, word for word: the question that matches qRe, the sentence that matches sRe (and the one after, if it fits)
+function bkAns(p, qRe, sRe, max = 240){
+  if (Array.isArray(sRe)) { for (const r of sRe) { const t = bkAns(p, qRe, r, max); if (t) return t; } return ''; }   /* try the strongest match first */
+  for (const x of (p.qa || [])) { if (qRe && !qRe.test(x.q)) continue; const A = (x.a || []).map(t => String(t).trim());
+    for (let i = 0; i < A.length; i++) { if (sRe && !sRe.test(A[i])) continue; let t = A[i].replace(/^(So|Well|Yes|And),\s*/i, ''); t = t[0].toUpperCase() + t.slice(1);
+      if (A[i + 1] && (t + ' ' + A[i + 1]).length <= max && !/\?$/.test(A[i + 1]) && /\b(I|my|me)\b/.test(A[i + 1])) t += ' ' + A[i + 1];   /* only their own next sentence */
+      if (t.length <= max + 60) return t; } }
+  return ''; }
 function bkCoverPost(b, D, front, kind){
-  const c = D.cover, p = D.coverP || {quotes: []}, w = D.find(c.artist) || {}; const I = bkIssue(b), proper = bkProper(b), short = bkShort(b.name); const KW = bkKeyword(b), sale = bkSale(b);
-  const big = I.issue ? `Arts to Hearts\nMagazine, ${I.issue}` : short, handle = D.coverHandle || p.handle || '';
+  const c = D.cover, p = D.coverP || {quotes: [], qa: []}, w = D.find(c.artist) || {}; const I = bkIssue(b), proper = bkProper(b), short = bkShort(b.name); const KW = bkKeyword(b), sale = bkSale(b);
+  const th = (b.inside && b.inside.theme) || {}, theme = bkTitleCase(th.title || '');
+  const big = I.issue ? `Arts to Hearts\nMagazine, ${I.issue}` : short, handle = D.coverHandle || p.handle || '', first = c.artist.split(' ')[0];
   const art = w.img || front || '', face = w.face || '';
-  const qs = (p.quotes || []).filter(bkStandalone).map(q => bkCut(q, 230)).slice(0, 2);
+  // what the post says, all in their own words from the interview in the book
+  const hook = bkAns(p, /never left|particular summer|summer .* remember|remember/i, /cover artist/i) || bkAns(p, /summer|remember/i, null);              // the story that makes them the cover
+  const themeLine = bkAns(p, /summer|theme|memory|remember/i, /summer|memor|remember/i);                                          // how their work holds the theme
+  let different = bkAns(p, null, [/I like to tell|distinguish|different from|sets .* apart/i, /my own (voice|style)|what makes my/i, /I like to|I try to|I always/i]);   // what sets the work apart
+  const invite = bkAns(p, /cover|before a reader|communicate/i, [/invitation|imagination/i, /hope|want/i]);                            // what the cover should do for the reader
+  const why = bkAns(p, null, /preserv|motivat|why I paint/i);                                                                     // why they paint
+  const used = new Set(); const once = t => t && !used.has(t) && (used.add(t), t);
+  const say = (t, bg, slot) => (t = once(t)) && BKT.say({slot, face: bg, q: t, name: c.artist, handle});
   const work = {artist: c.artist, handle, img: bkPic('bkcvw', art), face, title: c.title || '', medium: c.year ? String(c.year) : ''};
-  const cover = kind === 'book' ? BKT.card({faces: null, mono: true, tab: 'Cover', serif: 'The cover of', big, bigMax: 76, img: front || '', slot: 'bkcvb', imgW: 520, imgH: 600, ph: 'Click or drop the cover here', sub: `Art by ${c.artist}`})
+  const cover = kind === 'book' ? BKT.card({mono: true, tab: 'Cover', serif: 'The cover of', big, bigMax: 76, img: front || '', slot: 'bkcvb', imgW: 520, imgH: 600, ph: 'Click or drop the cover here', sub: `Art by ${c.artist}`})
     : BKT.acover({img: art, slot: 'bkcva', serif: 'The cover of', big, sub: `Art by ${c.artist}`});
   const S = [
     cover,
+    say(hook, art, 'bkcva2'),
     BKT.feature({w: work, slot: 'bkcvw', line: ''}),
     p.intro && BKT.card({tab: 'Cover', label: p.title ? bkCase(p.title) : 'The cover artist', body: bkCut(p.intro, 420)}),
     BKT.portrait({slot: 'bkcvf', face, label: 'The cover artist', name: c.artist, sub: handle}),
-    qs[0] && BKT.say({slot: face ? 'bkcvf' : 'bkcva2', face: face || art, q: qs[0], name: c.artist, handle}),   /* over his photo, else over the cover work */
-    qs[1] && BKT.say({slot: 'bkcva2', face: art, q: qs[1], name: c.artist, handle}),
-    BKT.card({tab: 'Inside', big, sub: `${c.artist}'s full interview is inside, alongside ${(n => n > 10 ? 'more than ' + ({20: 'twenty', 30: 'thirty', 40: 'forty', 50: 'fifty', 60: 'sixty', 70: 'seventy', 80: 'eighty', 90: 'ninety'}[Math.floor((n - 1) / 10) * 10] || Math.floor((n - 1) / 10) * 10) : 'our')(D.works.length)} selected artists.`, pill: sale.open ? sale.verb + ' · link in bio' : 'Pre-order opens soon'}),
+    say(themeLine, face || art, face ? 'bkcvf' : 'bkcva2'),
+    (different = once(different)) && BKT.card({tab: 'Cover', body: `“${different}”`, by: c.artist}),
+    say(invite || why, art, 'bkcva2'),
+    BKT.card({tab: 'Inside', big, sub: `Read ${first}'s full interview in ${I.issue || 'the book'}${theme ? ', ' + theme : ''}.`, pill: sale.open ? sale.verb + ' · link in bio' : 'Pre-order opens soon'}),
     BKT.keyEnd({head: `Meet the cover of ${I.issue || short}.`, key: KW, offer: `Comment ${KW} and we'll send you a look inside.`})].filter(Boolean);
-  const cap = `The cover of ${proper}${c.title ? `: ${c.title}${c.year ? ' (' + c.year + ')' : ''}` : ''}, by ${c.artist}${handle ? ' ' + handle : ''}.\n\n${p.intro ? bkCut(p.intro, 300) + '\n\n' : ''}${qs[0] ? `"${qs[0]}"\n\n` : ''}Read ${c.artist.split(' ')[0]}'s full interview inside ${proper}. Comment ${KW} and we'll send you a look inside.`;
+  if (S.length < 7) S.splice(S.length - 2, 0, ...(p.quotes || []).filter(bkStandalone).map(q => bkCut(q, 230)).filter(q => !used.has(q)).slice(0, 2).map(q => say(q, art, 'bkcva2')).filter(Boolean));   /* older reads without the Q&A */
+  const cap = `The cover of ${proper}${c.title ? `: ${c.title}${c.year ? ' (' + c.year + ')' : ''}` : ''}, by ${c.artist}${handle ? ' ' + handle : ''}.\n\n${p.intro ? bkCut(p.intro, 300) + '\n\n' : ''}${themeLine ? `"${themeLine}"\n\n` : ''}Read ${first}'s full interview inside ${proper}. Comment ${KW} and we'll send you a look inside.`;
   return {S, cap};
 }
 
