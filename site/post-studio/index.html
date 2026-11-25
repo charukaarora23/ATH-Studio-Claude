@@ -372,7 +372,13 @@ const textNodes = root => { const w = document.createTreeWalker(root, NodeFilter
 function applyTexts(s, base){
   const keys = Object.keys(TXT()).filter(k => k.startsWith(base + '|')); if (!keys.length || !s.html) return s;
   const t = document.createElement('template'); t.innerHTML = s.html; const nodes = textNodes(t.content);
-  keys.forEach(k => { const n = nodes[+k.slice(base.length + 1)]; if (n) n.nodeValue = TXT()[k]; });
+  keys.forEach(k => { const n = nodes[+k.slice(base.length + 1)]; if (!n) return; n.nodeValue = TXT()[k];
+    // typing over or deleting a dashed placeholder (missing detail, photo box, sticker zone) drops its dashed outline
+    const box = n.parentElement && n.parentElement.closest('.gap, .ph, .zone'); if (!box) return;
+    const empty = !TXT()[k].replace(/[\u200b\s]/g, '');
+    if (box.classList.contains('gap')) box.classList.remove('gap');
+    else if (empty && ![...box.childNodes].some(c => c !== n && c.nodeType === 3 && c.nodeValue.replace(/[\u200b\s]/g, '') && !keys.some(k2 => nodes[+k2.slice(base.length + 1)] === c && !TXT()[k2].replace(/[\u200b\s]/g, '')))) box.style.visibility = 'hidden';
+    else box.style.border = 'none'; });
   return {...s, html: t.innerHTML};
 }
 function textAt(frame, x, y){
@@ -586,6 +592,8 @@ function loadImg(src){ return new Promise(res => { if (!src) return res(null); c
 // Draw a slide to a canvas with the browser's own renderer (an SVG of the live page), so a download looks exactly like the preview.
 // html2canvas re-draws text itself and drops words around highlighted phrases that wrap; it is kept only as a fallback.
 async function renderSlide(s, transparent){ await document.fonts.ready; const stage = $('stage'); stage.innerHTML = slideNode(transparent ? {...s, bg:'transparent'} : s); const el = stage.firstElementChild; const h = s.h || 1350;
+  // dashed guides are for the preview only: never in a download
+  el.querySelectorAll('.zone, .ph').forEach(x => { x.style.visibility = 'hidden'; }); el.querySelectorAll('.gap').forEach(x => { x.style.border = 'none'; x.style.padding = '0'; x.style.opacity = '1'; });
   await Promise.all([...el.querySelectorAll('[style*="background-image"]')].map(x => { const m = (x.style.backgroundImage || '').match(/url\(["']?(.*?)["']?\)/); return m ? loadImg(m[1]) : null; }));
   freezeLines(el);
   try { if (!window.htmlToImage) throw new Error('renderer missing');

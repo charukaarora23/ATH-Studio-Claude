@@ -764,7 +764,7 @@ function singlePosts(){ const name = GE(), sel = esc(state.selected); return [
 // ---------- stories (1080 x 1920) ----------
 function storyFrame(o){
   const g = o.ground ? G[o.ground]() : {bg:INK, fg:WHITE, acc:tint(state.colour)};
-  const zone = o.zone ? `<div class="a" style="left:140px;right:140px;top:${o.zoneTop||1260}px;height:${o.zoneH||200}px;border:3px dashed ${g.fg};border-radius:28px;opacity:.55;display:flex;align-items:center;justify-content:center;text-align:center;font-size:26px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:${g.fg}">${o.zone}</div>` : '';
+  const zone = o.zone ? `<div class="a zone" style="left:140px;right:140px;top:${o.zoneTop||1260}px;height:${o.zoneH||200}px;border:3px dashed ${g.fg};border-radius:28px;opacity:.55;display:flex;align-items:center;justify-content:center;text-align:center;font-size:26px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:${g.fg}">${o.zone}</div>` : '';
   return {h:1920, bg:g.bg, html:`
     ${o.img ? imgDiv(o.img,'inset:0',o.pos||'center 30%') + `<div class="a" style="inset:0;background:linear-gradient(180deg,rgba(20,9,12,.55) 0%,rgba(20,9,12,0) 22%,rgba(20,9,12,0) 45%,rgba(20,9,12,.85) 72%,rgba(20,9,12,.95) 100%)"></div>` : ''}
     <p class="a cn" style="left:64px;top:250px;color:${g.fg}">Arts to Hearts Project</p><p class="a cn" style="right:64px;top:250px;color:${g.fg}">${esc(o.tr||state.name)}</p>
@@ -907,7 +907,7 @@ function copyAlternatives(text){ const n = normT(text); if (!n) return null;
 const stImg = (k, fb) => state.images[k] || fb;
 const stDiv = (k, fb, style, pos) => `<div data-slot="${k}" class="a img" style="${style};background-image:url(${stImg(k, fb)});background-position:${pos || 'center'}"></div>`;
 const stPh = (k, label, style, col) => state.images[k] ? stDiv(k, '', style + ';border-radius:22px') : `<div data-slot="${k}" class="a ph" style="${style};color:${col}">${label}</div>`;
-const zoneAt = (label, top, h, col) => `<div class="a" style="left:140px;right:140px;top:${top}px;height:${h || 190}px;border:3px dashed ${col};border-radius:28px;opacity:.55;display:flex;align-items:center;justify-content:center;text-align:center;font-size:30px;font-weight:600;line-height:1.35;padding:0 30px;color:${col}">${label}</div>`;
+const zoneAt = (label, top, h, col) => `<div class="a zone" style="left:140px;right:140px;top:${top}px;height:${h || 190}px;border:3px dashed ${col};border-radius:28px;opacity:.55;display:flex;align-items:center;justify-content:center;text-align:center;font-size:30px;font-weight:600;line-height:1.35;padding:0 30px;color:${col}">${label}</div>`;
 const stTop = (fg, tr) => `<p class="a cn" style="left:64px;top:250px;color:${fg}">Arts to Hearts Project</p><p class="a cn" style="right:64px;top:250px;color:${fg}">${esc(tr || state.name)}</p>`;
 const LINK = 'Link sticker: Apply';
 const CHILLI = '#AA0003';

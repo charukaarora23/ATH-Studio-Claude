@@ -138,7 +138,7 @@ const IV = {
       <p style="${T_MED};font-size:28px;letter-spacing:.12em;text-transform:uppercase;line-height:1.4;color:${acc}">${esc(o.label)}</p>
       <p style="${o.serif ? BASK + `;font-size:${size}px;line-height:1.22` : T_MED + `;font-size:${size}px;line-height:.98;letter-spacing:-.035em`};color:${fg}">${o.text}</p>
       ${o.sub ? `<p style="${T_REG};font-size:36px;line-height:1.35;color:${fg};margin-top:6px">${o.sub}</p>` : ''}</div>
-    ${o.zone ? `<div class="a" style="left:150px;right:150px;top:1490px;height:86px;border:2px dashed ${fg};border-radius:24px;opacity:.5;display:flex;align-items:center;justify-content:center;${T_MED};font-size:24px;color:${fg}">${o.zone}</div>` : ''}`}; },
+    ${o.zone ? `<div class="a zone" style="left:150px;right:150px;top:1490px;height:86px;border:2px dashed ${fg};border-radius:24px;opacity:.5;display:flex;align-items:center;justify-content:center;${T_MED};font-size:24px;color:${fg}">${o.zone}</div>` : ''}`}; },
 };
 
 // ---------- copy helpers: work from the article when no one has written the copy ----------
