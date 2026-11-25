@@ -487,11 +487,11 @@ function bkSelectedPost(b, D){
       IV.work({img: bkPic('bkaw' + k, w.img), slot: 'bkaw' + k, name: w.artist, cap: bkCap(w)})]; };
   // a short paragraph about the selection, written the way a person would say it
   const words = n => ({1: 'one', 2: 'two', 3: 'three', 4: 'four', 5: 'five', 6: 'six', 7: 'seven', 8: 'eight', 9: 'nine', 20: 'twenty', 30: 'thirty', 40: 'forty', 50: 'fifty', 60: 'sixty', 70: 'seventy', 80: 'eighty', 90: 'ninety', 10: 'ten', 15: 'fifteen', 25: 'twenty-five'}[n] || String(n));
-  const over = n => n >= 10 ? 'more than ' + words(n >= 50 ? Math.floor(n / 10) * 10 : Math.floor(n / 5) * 5) : String(n);
+  const over = n => n > 10 ? 'more than ' + words(n > 50 ? Math.floor((n - 1) / 10) * 10 : Math.floor((n - 1) / 5) * 5) : 'several';
   const the = c => /^(United|Netherlands|Philippines)/.test(c) ? 'the ' + c : c;
   const story = [
     sel.painters >= sel.n * .5 ? `Most of the work in ${ed} is **painted**: ${over(sel.painters)} painters, in oil, acrylic and watercolour.` : '',
-    sel.countries.length >= 5 ? `The artists live and work in **${over(sel.countries.length)} countries**, from ${the(sel.countries[0])} to ${the(sel.countries[sel.countries.length - 1])}.` : '',
+    sel.countries.length >= 5 ? `The artists live and work in **${over(sel.countries.length)} countries**, from ${the(sel.countries[0])} to\u00a0${the(sel.countries[sel.countries.length - 1])}.` : '',
     sel.known >= sel.n * .6 && sel.she / sel.known >= .5 ? `And **${words(Math.floor(sel.she / sel.known * 10))} in ten** of them are women.` : ''].filter(Boolean);
   // each featured artist, as the agreed unit: the work with their face, their portrait with the name, their words over it, a page about them
   const feature = (w, k) => { if (!w) return []; const bs = bkKeep(w.bio).split(/(?<=[.!?])\s+/).filter(Boolean); let about = ''; for (const x of bs) { if ((about + ' ' + x).length > 330 && about) break; about = (about + ' ' + x).trim(); } if (!good(w)) about = w.line;
