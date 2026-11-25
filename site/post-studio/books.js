@@ -550,18 +550,16 @@ function bkSelectedPost(b, D, coverKind){
     : coverKind === 'burgundy' ? BKT.bcover({label: 'Selected artists', title: I.issue ? ['Arts to Hearts', 'Magazine', I.issue] : bkBalance(proper), serif: theme, sub: 'Introducing the artists'})
     : coverKind === 'artwork' ? BKT.acover({img: coverImg, slot: 'bkcovart', serif: 'Meet the artists of', big, sub: theme || ''})   /* the artwork full bleed (a cover may crop), the card below; click or drop to swap */
     : BKT.card({faces, mono: true, tab: 'Artists', serif: 'Meet the artists of', big, sub: theme || ''});
+  const names = p => BKT.card({faces, tab: 'Artists', serif: 'The selected artists', list: people.slice(p * per, (p + 1) * per)});
   const S = [
     cover,
     BKT.card({faces, tab: 'Artists', serif: 'Congratulations', big, sub: 'to every artist selected. Your work is going into print, and we are celebrating it with you.'}),
-    ...Array.from({length: pages}, (_, p) => BKT.card({faces, tab: 'Artists', serif: p ? 'The selected artists, continued' : 'The selected artists', list: people.slice(p * per, (p + 1) * per)})),
-    feat(0), said(0),
-    theme && brief && BKT.htext({label: 'The theme', text: `${proper} is ${theme}. ${brief}`}),
-    feat(1), said(1),
+    // each card of names is followed by an artist and their words, so the carousel never runs text after text
+    ...Array.from({length: pages}, (_, p) => [names(p), feat(p), said(p)]).flat(),
     BKT.card({faces, tab: 'Artists', label: 'The selection', body: `We received hundreds of submissions from artists all over the world. From them, we found ${sel.painters >= sel.n * .5 ? `${over(sel.painters)} talented painters, alongside artists in photography, collage and mixed media` : `${over(sel.n)} talented artists`}. We are so excited to welcome ${over(sel.n)} creators into ${ed}${sel.countries.length >= 5 ? `, from ${over(sel.countries.length)} countries` : ''}.`}),
-    feat(2), said(2),
-    feat(3), said(3),
+    feat(pages),
     BKT.card({tab: 'Inside', big, sub: `${(s => s[0].toUpperCase() + s.slice(1))(over(sel.n))} artists, one ${I.issue ? 'magazine' : 'book'}. Every one of them will be featured here, one by one.`, pill: sale.open ? sale.verb + ' · link in bio' : 'Pre-order opens soon'}),
-    feat(4), said(4), feat(5),
+    feat(pages + 1),
     BKT.keyEnd({head: `Congratulations to every artist in ${ed}.`, key: KW, offer: `Comment ${KW} and we'll send you the full list.`})].filter(Boolean);
   if (S.length > 20) S.splice(19, S.length - 20);
   const cap = `Introducing the artists of ${proper}${theme ? ': ' + theme : ''}.\n\nWe received hundreds of submissions from artists all over the world, and we are so excited to welcome ${over(sel.n)} creators into this ${I.issue ? 'issue' : 'book'}${sel.countries.length >= 5 ? `, from ${over(sel.countries.length)} countries` : ''}. Congratulations to every artist selected. Your work is going into print, and over the coming weeks each of you will be featured here.\n\nComment ${KW} and we'll send you the full list.\n\nTo everyone who applied: thank you for trusting us with your work. Please keep going, and we hope to see you in our next call.`;
@@ -597,7 +595,7 @@ function bookGroups(){
       q[2] && BKT.quote({q: bkCut(q[2], 330), name: p.name, handle: p.handle, face}),
       ask(`${p.name.split(' ')[0]}'s full interview is in ${name}.`)]; };
 
-  if (id === 'selected') { const r = bkSelectedPost(b, D, v.cover); out.push({book: true, credits, title: `${bkProper(b)} · Selected artists`, meta: 'Post the day the list goes live · tag the artists in the image', cap: r.cap + '\n\n' + tags, pin: 'Congratulations to every artist selected. Cheer them on below.', slides: r.S.filter(Boolean).map((s, j) => ({...s, title: 'selected-' + (j + 1)}))}); }
+  if (id === 'selected') { const r = bkSelectedPost(b, D, v.cover); out.push({book: true, credits, covers: [['faces', 'Faces'], ['artwork', 'Artwork'], ['photo', 'Photo'], ['burgundy', 'Burgundy']], cover: v.cover || 'faces', title: `${bkProper(b)} · Selected artists`, meta: 'Post the day the list goes live · tag the artists in the image', cap: r.cap + '\n\n' + tags, pin: 'Congratulations to every artist selected. Cheer them on below.', slides: r.S.filter(Boolean).map((s, j) => ({...s, title: 'selected-' + (j + 1)}))}); }
   else if (id === 'theme') { const th = (b.inside && b.inside.theme) || {}; const f = W.slice(0, 3);
     post('The theme', [photos.length ? photo(1, {mono: true, label: name, head: bkCase(th.title) || name}) : BKT.card({faces: faces(30, 30), mono: true, tab: 'Inside', serif: `The theme of ${name}`, big: bkCase(th.title) || name}),
       th.text && BKT.card({tab: 'Inside', body: bkCut(th.text, 480)}), ...f.map((w, i) => theirPage(w, i, 'bkt')),
