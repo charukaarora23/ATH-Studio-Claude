@@ -21,6 +21,8 @@ export default async function handler(req, res){
     if (!req.query.part) return res.status(200).json(media);
     const part = String(req.query.part || ''); const src = {pages: b.links.pages, mockups: b.links.mockups, shoot: b.links.shoot}[part];
     if (!src) return res.status(400).json({error: part ? `No ${part === 'pages' ? 'Page by Page Graphics' : part === 'mockups' ? 'Mockups' : 'Photoshoot'} link for this book in Books Data` : 'part?'});
+    const pageNo = name => { const m = name.split('/').pop().replace(/\.[a-z]+$/i, '').match(/(\d+)\s*$/); return m ? +m[1] : -1; };
+    const have = new Set(part === 'pages' && media.pages ? Object.keys(media.pages).map(Number) : []);
     const T0 = Date.now(), stop = () => Date.now() - T0 > 270000; const got = {}; let inflight = [], skipped = 0;
     const size = part === 'pages' ? 1100 : 1600; const cap = part === 'shoot' ? 40 : part === 'mockups' ? 200 : 1000; let n = 0;
     const handle = async (name, bytes) => { const base = name.split('/').pop().replace(/\.[a-z]+$/i, '');
@@ -31,10 +33,10 @@ export default async function handler(req, res){
     const files = await streamZipImages(dl(src), async (name, bytes) => {   // at most 3 pictures in hand at once, so memory stays small
       if (++n > cap) return; while (inflight.length >= 3) await Promise.race(inflight);
       const p = handle(name, bytes).catch(() => { skipped++; }).finally(() => { inflight = inflight.filter(x => x !== p); }); inflight.push(p);
-    }, {shouldStop: () => stop() || n >= cap});
+    }, {shouldStop: () => stop() || n >= cap, want: name => part !== 'pages' || !have.has(pageNo(name))});   // pages already taken stream past without work
     await Promise.all(inflight);
     const items = Object.values(got);
-    if (part === 'pages') { const pages = {}; items.forEach(x => { const m = x.base.match(/(\d+)\s*$/); if (m) pages[+m[1]] = x.url; }); media.pages = pages; media.pagesDone = !stop(); }
+    if (part === 'pages') { const pages = {...(media.pages || {})}; items.forEach(x => { const m = x.base.match(/(\d+)\s*$/); if (m) pages[+m[1]] = x.url; }); media.pages = pages; media.pagesDone = !stop(); }
     if (part === 'mockups') { media.spreads = items.filter(x => /spread/i.test(x.folder + x.base)).map(x => x.url);
       media.covers = {front: (items.find(x => /front/i.test(x.base)) || {}).url || '', back: (items.find(x => /back/i.test(x.base)) || {}).url || ''};
       media.scenes = items.filter(x => !/spread/i.test(x.folder + x.base) && !/shopify|front|back/i.test(x.folder + x.base)).map(x => x.url); }
