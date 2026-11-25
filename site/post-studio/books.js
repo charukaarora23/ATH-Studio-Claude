@@ -16,7 +16,7 @@ function bookCard(b, i){
 // ---------- posts for a book: the selected artists (announcement, features, share kits) ----------
 // Each artist is elevated AND the book is sold: every feature ends on the book and one clear action.
 let BOOKVIEW = null;   // {book: index, kind: 'announce' | 'features' | 'kits', part}
-const bkImg = u => u ? (/^https:\/\/(media\.artstoheartsproject\.com|cdn\.shopify\.com)\//.test(u) ? '/api/img?u=' + encodeURIComponent(u) : u) : '';
+const bkImg = u => u ? (/^https:\/\/(media\.artstoheartsproject\.com|cdn\.shopify\.com|[a-z0-9]+\.public\.blob\.vercel-storage\.com)\//.test(u) ? '/api/img?u=' + encodeURIComponent(u) : u) : '';
 const bkShort = n => String(n || '').replace(/^101 ArtBook\s*-\s*/i, '101 Art Book: ').replace(/\s+/g, ' ').trim();
 const bkTitle = d => String(d || '').split(/,\s*/)[0].trim();          // "I SEE You, 50x70 cm, oil…" → "I SEE You"
 const bkName = n => String(n || '').replace(/\s+/g, ' ').trim().split(' ').map(w => w.length > 2 && w === w.toUpperCase() && /\p{Lu}{2}/u.test(w) ? w.toLowerCase().replace(/(^|['’-])(\p{L})/gu, (m, a, c) => a + c.toUpperCase()) : w).join(' ');
@@ -107,6 +107,13 @@ const BKT = {
       <p style="${T_REG};font-size:34px;line-height:1.4;color:${HL.pink}">${esc(o.sub)}</p></div>
     <p class="a c" style="left:0;right:0;bottom:96px;${T_REG};font-size:28px;color:${HL.pink}">artstoheartsproject.com</p>`}; },
   // the artist's own story frame: their face and work, the book, the shop (code only once it works in Shopify)
+  // the artist's printed page as a story: the proof they show their family
+  kitPage(o){ const w = o.w, b = o.b; return {h: 1920, bg: HL.pink, html: `<p class="a cn" style="left:60px;top:120px;color:${HL.burg}">Arts to Hearts Project</p>
+      <div class="a img" data-slot="${o.slot}" style="left:110px;right:110px;top:220px;height:1220px;background-image:url(${bkPic(o.slot, o.img)});background-size:contain;background-repeat:no-repeat;background-position:center;filter:drop-shadow(0 24px 40px rgba(28,19,16,.25))"></div>
+      <div class="a" style="left:80px;right:80px;top:1490px;display:flex;flex-direction:column;align-items:center;text-align:center;gap:10px">
+        <p style="${BASK};font-style:italic;font-size:44px;color:${HL.burg}">My page in</p>
+        <p style="${T_MED};font-size:64px;line-height:1;letter-spacing:-.03em;color:${HL.ink}">${esc(bkShort(b.name))}</p></div>
+      <div class="a zone" style="left:240px;right:240px;top:1760px;height:80px;border:2px dashed ${HL.burg};border-radius:24px;opacity:.5;display:flex;align-items:center;justify-content:center;${T_MED};font-size:26px;color:${HL.burg}">Link sticker: the book</div>`}; },
   kit(o){ const w = o.w, b = o.b, sale = bkSale(b), code = b.codesLive && b.codes && b.codes.friends;
     return {h: 1920, bg: HL.burg, html: `<p class="a cn" style="left:60px;top:120px;color:${HL.white}">Arts to Hearts Project</p>
       <div class="a" style="left:60px;right:60px;top:200px;height:1300px;background:${HL.white};border-radius:24px"></div>
@@ -199,88 +206,147 @@ function bkPlan(b){
   return P;
 }
 
+// ---------- the book's keyword: one word people comment to get a look inside (set the same word in ManyChat) ----------
+const BK_STOP = /^(the|a|an|of|and|for|in|on|to|we|our|my|your|book|big|art|arts|artist|artists|edition|ed|magazine|mag|ath|vol|volume|issue|emerging|rise|top|best|new|\d+)$/i;
+function bkKeyword(b){ let o = ''; try { o = localStorage.getItem('bkkw:' + b.name) || ''; } catch {} if (o) return o.toUpperCase();
+  if (b.keyword) return String(b.keyword).toUpperCase().replace(/[^A-Z0-9]/g, '');
+  const th = (b.inside && b.inside.theme && b.inside.theme.title) || ''; const pick = t => String(t).split(/[^A-Za-z]+/).find(w => w.length > 3 && !BK_STOP.test(w));
+  return (pick(th) || pick(String(b.name).replace(/edition.*$/i, '')) || 'BOOK').toUpperCase(); }
+const bkMany = n => n >= 1000 ? 'thousands of artists' : 'hundreds of artists';   // never the exact number
+
+// ---------- frames made from the book's own pictures ----------
+Object.assign(BKT, {
+  // a photograph of the book (photoshoot, scene or spread mockup), full bleed, a short line over it
+  photo(o){ const u = bkPic(o.slot, o.img); return {bg: HL.ink, html: `${u ? `<div class="a img" data-slot="${o.slot}" style="inset:0;background-image:url(${u});background-size:cover;background-position:center"></div>` : `<div class="a ph" data-slot="${o.slot}" style="inset:0;color:${HL.pink};background:${HL.burg}">Drop a photoshoot or mockup picture here</div>`}
+    ${o.head || o.label ? `<div class="a" style="inset:0;background:rgba(28,19,16,.28)"></div>` : ''}
+    <p class="a cn" style="left:52px;top:48px;color:${HL.white}">Arts to Hearts Project</p>${o.mono ? ivMono('white', 'right:52px;top:40px;width:96px;height:54px') : ''}
+    ${o.head || o.label ? `<div class="a" style="left:64px;right:64px;bottom:84px;display:flex;flex-direction:column;gap:20px;color:${HL.white}">${bkLabel(o.label, HL.white)}
+      ${o.serif ? `<p style="${BASK};font-style:italic;font-size:54px;line-height:1.15">${esc(o.serif)}</p>` : ''}
+      ${o.head ? `<p style="${T_MED};font-size:${o.head.length > 40 ? 70 : 92}px;line-height:.98;letter-spacing:-.035em;max-width:900px">${esc(o.head)}</p>` : ''}
+      ${o.sub ? `<p style="${T_REG};font-size:32px;line-height:1.35;max-width:840px">${esc(o.sub)}</p>` : ''}</div>` : ''}`}; },
+  // a real page of the book, whole, as it was printed, with whose page it is
+  page(o){ const w = o.w || {}; const u = bkPic(o.slot, o.img); return {bg: o.bg || HL.pink, html: `${hlBrand(HL.burg)}
+    ${u ? `<div class="a img" data-slot="${o.slot}" style="left:150px;right:150px;top:110px;height:960px;background-image:url(${u});background-size:contain;background-repeat:no-repeat;background-position:center;filter:drop-shadow(0 18px 30px rgba(28,19,16,.22))"></div>` : `<div class="a ph" data-slot="${o.slot}" style="left:150px;right:150px;top:110px;height:960px;color:${HL.burg}">The printed page</div>`}
+    ${w.face ? `<div class="a" style="left:72px;top:1118px;width:120px;height:120px;border-radius:50%;background:url(${w.face}) center 28%/cover"></div>` : ''}
+    <div class="a" style="left:${w.face ? 216 : 72}px;right:72px;top:1122px;display:flex;flex-direction:column;gap:6px">
+      <p style="${T_MED};font-size:40px;line-height:1.1;color:${HL.ink}">${esc(o.title || w.artist || '')}</p>
+      <p style="${T_REG};font-size:28px;color:${HL.burg}">${esc(o.sub || [w.handle, o.pageNo ? 'Page ' + o.pageNo : ''].filter(Boolean).join(' · '))}</p></div>`}; },
+  // two facing pages, like the book lying open
+  spread(o){ const one = (u, x, k) => u ? `<div class="a img" data-slot="${o.slot}${k}" style="left:${x}px;top:250px;width:470px;height:660px;background-image:url(${bkPic(o.slot + k, u)});background-size:contain;background-repeat:no-repeat;background-position:${k === 'l' ? 'right' : 'left'} center"></div>` : '';
+    return {bg: HL.pink, html: `${hlBrand(HL.burg)}<div class="a" style="left:60px;right:60px;top:230px;height:700px;background:${HL.white};border-radius:6px;box-shadow:0 24px 50px rgba(28,19,16,.18)"></div>${one(o.l, 70, 'l')}${one(o.r, 540, 'r')}
+      <div class="a" style="left:540px;top:230px;width:1px;height:700px;background:rgba(28,19,16,.12)"></div>
+      <div class="a" style="left:80px;right:80px;top:1000px;display:flex;flex-direction:column;gap:10px">
+        ${o.head ? `<p style="${T_MED};font-size:48px;line-height:1.08;letter-spacing:-.02em;color:${HL.ink}">${esc(o.head)}</p>` : ''}
+        ${o.sub ? `<p style="${BASK};font-size:30px;line-height:1.4;color:${HL.ink}">${esc(o.sub)}</p>` : ''}</div>`}; },
+  // the comment ask: what they get for the keyword
+  ask(o){ return {bg: HL.burg, html: `${ivMono('peony', 'left:430px;width:220px;top:150px;height:124px')}
+    <div class="a" style="left:90px;right:90px;top:330px;bottom:200px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center">
+      <p style="${BASK};font-size:50px;line-height:1.26;color:${HL.white}">${esc(o.head)}</p>
+      <p style="${T_REG};font-size:32px;color:${HL.pink};margin-top:48px">Comment</p>
+      <p style="${T_MED};font-size:${o.key.length > 8 ? 120 : 150}px;line-height:1;letter-spacing:-.04em;color:${HL.rose};margin-top:12px">${esc(o.key)}</p>
+      <p style="${T_REG};font-size:32px;line-height:1.4;color:${HL.pink};margin-top:28px">${esc(o.sub)}</p></div>
+    <p class="a c" style="left:0;right:0;bottom:96px;${T_REG};font-size:28px;color:${HL.pink}">artstoheartsproject.com</p>`}; },
+});
+
 // ---------- the posts themselves (open in the normal preview: edit, replace images, download) ----------
 function bookGroups(){
   const v = BOOKVIEW; const b = v && BOOKS && BOOKS.books[v.book]; if (!b) return [];
   const D = bkData(b), name = bkShort(b.name), sale = bkSale(b), n = D.works.length, W = D.works.filter(w => w.img), F = D.works.filter(w => w.face);
+  const M = b.media || {}; const P = M.pages || {}; const pg = k => k && P[k] ? bkImg(P[k]) : ''; const KW = bkKeyword(b); const many = bkMany(n);
+  const spreads = (M.spreads || []).map(bkImg), scenes = (M.scenes || []).map(bkImg), shoot = (M.shoot || []).map(bkImg), photos = [...shoot, ...scenes];
+  const front = bkImg(M.covers && M.covers.front) || bkImg(b.shop && b.shop.image);
   const credits = {}; D.works.forEach(w => { if (w.img) credits[w.img] = {text: `${w.title ? w.title + ' by ' : ''}${w.artist}${w.handle ? ' ' + w.handle : ''}`, artist: w.artist, title: w.title}; });
   const tags = '#artstoheartsproject #artbook #contemporaryart #artcollectors';
-  const bookImg = bkImg(b.shop && b.shop.image); const out = []; const id = v.id;
-  const post = (title, slides, cap, meta) => out.push({book: true, credits, title: `${name} · ${title}`, meta, cap: cap + '\n\n' + tags, pin: sale.line, slides: slides.filter(Boolean).map((s, j) => ({...s, title: id + '-' + (j + 1)}))});
+  const out = []; const id = v.id;
+  const post = (title, slides, cap, meta) => out.push({book: true, credits, title: `${name} · ${title}`, meta: meta + ` · keyword ${KW}`, cap: cap + '\n\n' + tags, pin: `Comment ${KW} and we'll send you a look inside.`, slides: slides.filter(Boolean).map((s, j) => ({...s, title: id + '-' + (j + 1)}))});
   const faces = (from, k) => { const l = F.slice(from, from + k); return (l.length >= 6 ? l : F.slice(0, k)).map(w => w.face); };
-  const endSale = head => BKT.end({head: head || (sale.open ? sale.line.replace(' Link in bio.', '') : `${name} opens for pre-order soon.`), sub: sale.open ? 'Link in bio.' : 'Follow along to meet every artist in the book.'});
-  const bookCard = (tab, line) => BKT.card({tab, img: bookImg || bkPic('bkbook', '') || undefined, slot: 'bkbook', big: name, bigMax: 72, sub: line, pill: sale.open ? sale.verb + ' · link in bio' : 'Pre-order opens soon'});
+  const photo = (k, o) => BKT.photo({img: photos.length ? photos[k % photos.length] : '', slot: 'bkph' + k, ...o});
+  const ask = head => BKT.ask({head: head || `There is so much more inside ${name}.`, key: KW, sub: `and we'll send you a look inside${sale.open ? ', with the ' + sale.verb.toLowerCase() + ' link' : ''}.`});
+  const bookCard = (tab, line) => BKT.card({tab, img: front || bkPic('bkbook', '') || undefined, slot: 'bkbook', big: name, bigMax: 72, sub: line, pill: sale.open ? sale.verb + ' · link in bio' : 'Pre-order opens soon'});
   const feature = (w, i, slot) => BKT.feature({w, slot: (slot || 'bkw') + i, line: bkCut(w.line, 120)});
-  // a voice from inside the book: their face, their words over it, who they are, more words, their work, the book
-  const voice = (p, label, tab, slot) => { const w = D.find(p.name) || {}; const face = w.face || ''; const q = p.quotes.slice(0, 3);
-    return [BKT.portrait({slot: slot + 'f', face, label, name: p.name, sub: p.handle || '', mono: true}),
+  const theirPage = (w, i, slot) => pg(w.page) ? BKT.page({img: pg(w.page), slot: (slot || 'bkpg') + i, w, pageNo: w.page}) : feature(w, i, slot);
+  const spreadAt = (k, head, sub, slot) => pg(k) ? BKT.spread({l: pg(k), r: pg(k + 1), slot: slot || 'bksp' + k, head, sub}) : null;
+  // a voice from inside the book: their face, their words over it, the interview pages themselves, their work, the ask
+  const voice = (p, label, tab, slot, hook) => { const w = D.find(p.name) || {}; const face = w.face || ''; const q = p.quotes.slice(0, 3);
+    return [BKT.portrait({slot: slot + 'f', face, label, name: p.name, sub: hook || p.handle || '', mono: true}),
       q[0] && BKT.say({slot: slot + 'f', face, q: bkCut(q[0], 230), name: p.name, handle: p.handle}),
       p.intro && BKT.card({tab, label: p.title ? bkCase(p.title) : '', body: bkCut(p.intro, 460)}),
-      ...q.slice(1).map(x => BKT.quote({q: bkCut(x, 330), name: p.name, handle: p.handle, face})),
+      spreadAt(p.page, `${p.name}, in ${name}`, p.page ? `Pages ${p.page} and ${p.page + 1}.` : '', slot + 's'),
+      q[1] && BKT.quote({q: bkCut(q[1], 330), name: p.name, handle: p.handle, face}),
       w.img && feature(w, 0, slot + 'w'),
-      bookCard('Inside', `Read the full interview${p.page ? ' on page ' + p.page : ''}.`), endSale()]; };
+      q[2] && BKT.quote({q: bkCut(q[2], 330), name: p.name, handle: p.handle, face}),
+      ask(`${p.name.split(' ')[0]}'s full interview is in ${name}.`)]; };
 
   if (id === 'selected') { const pages = [], per = Math.ceil(n / Math.ceil(n / 12)); for (let i = 0; i < n; i += per) pages.push(D.works.slice(i, i + per).map(w => ({name: w.artist, handle: w.handle, face: w.face})));
-    const facts = bkFacts(D.works);
-    post('Selected artists', [BKT.card({faces: faces(0, 30), mono: true, tab: 'Artists', serif: 'The selected artists', big: name, sub: `${n} artists`}),
-      facts.length && BKT.numbers({n: String(n), what: `artists in ${name}`, rows: facts}),
+    const th = (b.inside && b.inside.theme && b.inside.theme.title) || '';
+    post('Selected artists', [BKT.card({faces: faces(0, 30), mono: true, tab: 'Artists', serif: 'The selected artists', big: name, sub: `Congratulations to ${many} from around the world`}),
+      photos.length ? photo(0, {serif: th ? bkCase(th) : '', head: 'Your work is going into print.'}) : null,
       ...pages.map((l, k) => BKT.faces({list: l, slot: 'bkfc' + k + '-'})),
+      spreads[0] ? BKT.photo({img: spreads[0], slot: 'bksel', head: 'Every artist gets their own page.'}) : spreadAt(D.works[0] && D.works[0].page, 'Every artist gets their own page.', ''),
       BKT.end({head: 'Find yourself? Share this post and tag a friend who is in the book.', sub: 'Every artist gets their own feature over the coming weeks.'})],
-      `Meet the ${n} artists selected for ${name}.\n\nSwipe to find every face in the book. If you're in it, share this post and tag a friend who is too. Each artist will have their own feature here in the coming weeks.`, 'Post the day the list goes live · tag every artist in the image'); }
-  else if (id === 'theme') { const th = (b.inside && b.inside.theme) || {}; const f = W.slice(0, 4);
-    post('The theme', [BKT.card({faces: faces(30, 30), mono: true, tab: 'Inside', serif: `The theme of ${name}`, big: bkCase(th.title) || name}),
-      th.text && BKT.card({tab: 'Inside', body: bkCut(th.text, 520)}), ...f.map((w, i) => feature(w, i, 'bkt')), endSale()],
-      `${th.title ? bkCase(th.title) + '. ' : ''}The theme of ${name}.\n\n${bkCut(th.text || '', 300)}\n\nArtworks: ${f.map(w => w.artist + (w.handle ? ' ' + w.handle : '')).join(', ')}.`, 'Tag the four artists'); }
+      `Congratulations to every artist selected for ${name}.\n\nSwipe to find your face. If you're in it, share this post and tag a friend who is too. Each artist will have their own feature here in the coming weeks.`, 'Post the day the list goes live · tag every artist in the image'); }
+  else if (id === 'theme') { const th = (b.inside && b.inside.theme) || {}; const f = W.slice(0, 3);
+    post('The theme', [photos.length ? photo(1, {mono: true, label: name, head: bkCase(th.title) || name}) : BKT.card({faces: faces(30, 30), mono: true, tab: 'Inside', serif: `The theme of ${name}`, big: bkCase(th.title) || name}),
+      th.text && BKT.card({tab: 'Inside', body: bkCut(th.text, 480)}), ...f.map((w, i) => theirPage(w, i, 'bkt')),
+      BKT.ask({head: th.title ? `Which ${bkCase(th.title).toLowerCase().replace(/^the /, '')} is yours? Tell us below.` : 'What does this theme mean to you?', key: KW, sub: 'for a look inside the book.'})],
+      `${th.title ? bkCase(th.title) + '.' : ''}\n\n${bkCut(th.text || '', 300)}\n\nComment ${KW} for a look inside.`, 'Ask a question people answer in the comments'); }
   else if (id === 'curator' && D.curator) { const p = D.curator;
-    post('The curator', voice(p, 'The curator', 'Curator', 'bkcur'), `${p.name}${p.handle ? ' ' + p.handle : ''} curated ${name}.\n\n${p.quotes[0] ? '“' + bkCut(p.quotes[0], 220) + '”' : ''}\n\nThe full conversation is in the book.`, p.handle ? `Collab post: invite ${p.handle}` : 'Add their photo'); }
-  else if (/^voice\d+$/.test(id)) { const p = D.voices[+id.slice(5)]; if (p) post(p.name, voice(p, p.kind === 'award' ? 'Award winner' : p.kind === 'invited' ? 'Invited artist' : 'In conversation', 'Inside', 'bkv'),
-      `${p.name}${p.handle ? ' ' + p.handle : ''} in ${name}.\n\n${p.quotes[0] ? '“' + bkCut(p.quotes[0], 220) + '”' : ''}\n\nRead the full interview in the book.`, p.handle ? `Collab post: invite ${p.handle}` : 'Interview from the book'); }
-  else if (id === 'peek') { const f = W.slice(4, 12);
-    post('A first look inside', [BKT.card({faces: f.map(w => w.face), mono: true, tab: 'Inside', serif: 'A first look inside', big: name}), ...f.map((w, i) => feature(w, i, 'bkp')), endSale()],
-      `A first look inside ${name}.\n\n${f.map(w => w.artist + (w.handle ? ' ' + w.handle : '')).join('\n')}\n\n${sale.open ? sale.line : 'Pre-order opens soon.'}`, 'Tag the eight artists'); }
+    post('The curator', voice(p, 'The curator', 'Curator', 'bkcur', `Chose every work in ${name}`), `${p.name}${p.handle ? ' ' + p.handle : ''} curated ${name}.\n\n${p.quotes[0] ? '“' + bkCut(p.quotes[0], 220) + '”' : ''}\n\nComment ${KW} for a look inside.`, p.handle ? `Collab post: invite ${p.handle}` : 'Add their photo'); }
+  else if (/^voice\d+$/.test(id)) { const p = D.voices[+id.slice(5)]; if (p) post(p.name, voice(p, p.kind === 'award' ? 'Award winner' : p.kind === 'invited' ? 'Invited artist' : 'In conversation', 'Inside', 'bkv', p.title ? bkCase(p.title) : ''),
+      `${p.title ? bkCase(p.title) + '.' : p.name}\n\n${p.quotes[0] ? '“' + bkCut(p.quotes[0], 220) + '”' : ''}\n\n${p.name}${p.handle ? ' ' + p.handle : ''}, in ${name}. Comment ${KW} to read a page of the interview.`, p.handle ? `Collab post: invite ${p.handle}` : 'Interview from the book'); }
+  else if (id === 'peek') { const list = spreads.length ? spreads.slice(0, 8).map((u, i) => BKT.photo({img: u, slot: 'bkpk' + i})) : D.works.slice(4, 12).filter(w => pg(w.page)).map((w, i) => theirPage(w, i, 'bkpk'));
+    post('A first look inside', [photos.length ? photo(2, {mono: true, label: name, head: "We can't show you every page. Here are a few."}) : BKT.card({faces: faces(4, 30), mono: true, tab: 'Inside', serif: 'A first look inside', big: name}),
+      ...list, ask('Hundreds more pages are inside.')],
+      `A first look inside ${name}.\n\nComment ${KW} and we'll send you a few more pages.`, 'Real spreads from the Mockups folder'); }
   else if (id === 'cover' && D.cover) { const c = D.cover, p = D.coverP || {quotes: []}; const w = D.find(c.artist) || {};
-    post('Cover reveal', [BKT.card({tab: 'Cover', mono: true, img: bookImg || '', slot: 'bkcvr', serif: 'The cover', big: name, bigMax: 72, sub: `Art by ${c.artist}`}),
+    post('Cover reveal', [BKT.card({tab: 'Cover', mono: true, img: front || '', slot: 'bkcvr', serif: 'The cover', big: name, bigMax: 72, sub: `Art by ${c.artist}`}),
+      photos.length ? photo(3, {label: 'The cover', head: c.title ? `${c.title}${c.year ? ', ' + c.year : ''}` : `Art by ${c.artist}`}) : null,
       BKT.portrait({slot: 'bkcvf', face: w.face, label: 'The cover artist', name: c.artist, sub: D.coverHandle}),
       p.quotes[0] && BKT.say({slot: 'bkcvf', face: w.face, q: bkCut(p.quotes[0], 230), name: c.artist, handle: D.coverHandle}),
-      (c.title || p.intro) && BKT.card({tab: 'Cover', label: c.title ? c.title + (c.year ? ` (${c.year})` : '') : '', body: p.intro ? bkCut(p.intro, 420) : `${c.artist}'s work is on the cover of ${name}.`}),
-      p.quotes[1] && BKT.quote({q: bkCut(p.quotes[1], 330), name: c.artist, handle: D.coverHandle, face: w.face}), endSale()],
-      `The cover of ${name}: ${c.title ? c.title + ' by ' : ''}${c.artist}${D.coverHandle ? ' ' + D.coverHandle : ''}.\n\n${p.quotes[0] ? '“' + bkCut(p.quotes[0], 220) + '”\n\n' : ''}${sale.open ? sale.line : 'Pre-order opens soon.'}`, D.coverHandle ? `Collab post: invite ${D.coverHandle}` : 'Cover reveal'); }
-  else if (id === 'open') { const inside = [D.curator && `Curated by ${D.curator.name}.`, D.cover && `On the cover, ${D.cover.artist}.`, D.voices.length && `Interviews with ${D.voices.slice(0, 3).map(p => p.name).join(', ')}${D.voices.length > 3 ? ' and more' : ''}.`, n && `${n} artists${b.pages ? ', ' + b.pages + ' pages' : ''}.`].filter(Boolean).join(' ');
-    post('Pre-order is open', [BKT.card({faces: faces(0, 30), mono: true, tab: 'Inside', serif: 'Pre-order is open', big: name}), BKT.card({tab: 'Inside', label: 'Inside the book', body: inside}),
-      BKT.faces({list: F.slice(0, 12).map(w => ({name: w.artist, handle: w.handle, face: w.face})), slot: 'bkof'}), bookCard('Inside', b.shop && b.shop.price ? `$${b.shop.price}. Ships when it's printed.` : "Ships when it's printed."), endSale()],
-      `${name} is open for pre-order.\n\n${inside}\n\n${sale.line}`, 'Pin to the grid'); }
+      (p.intro) && BKT.card({tab: 'Cover', label: p.title ? bkCase(p.title) : '', body: bkCut(p.intro, 420)}),
+      spreadAt(p.page, `${c.artist}'s story`, p.page ? `Pages ${p.page} and ${p.page + 1}.` : '', 'bkcvs'),
+      p.quotes[1] && BKT.quote({q: bkCut(p.quotes[1], 330), name: c.artist, handle: D.coverHandle, face: w.face}), ask(`Read ${c.artist.split(' ')[0]}'s story in ${name}.`)],
+      `${p.title ? bkCase(p.title) + '.' : 'The cover of ' + name + '.'}\n\n${p.quotes[0] ? '“' + bkCut(p.quotes[0], 220) + '”\n\n' : ''}${c.title ? c.title + ' by ' : 'Art by '}${c.artist}${D.coverHandle ? ' ' + D.coverHandle : ''}, on the cover of ${name}. Comment ${KW} for a look inside.`, D.coverHandle ? `Collab post: invite ${D.coverHandle}` : 'Cover reveal'); }
+  else if (id === 'open') { const inside = [D.curator && `Curated by ${D.curator.name}.`, D.cover && `On the cover, ${D.cover.artist}.`, D.voices.length && `Conversations with ${D.voices.slice(0, 3).map(p => p.name).join(', ')}${D.voices.length > 3 ? ' and more' : ''}.`, `Work by ${many}, each with their own page.`].filter(Boolean).join(' ');
+    post('Pre-order is open', [photos.length ? photo(4, {mono: true, label: 'Pre-order is open', head: name}) : BKT.card({faces: faces(0, 30), mono: true, tab: 'Inside', serif: 'Pre-order is open', big: name}),
+      BKT.card({tab: 'Inside', label: 'Inside the book', body: inside}), ...spreads.slice(0, 3).map((u, i) => BKT.photo({img: u, slot: 'bkos' + i})),
+      BKT.faces({list: F.slice(0, 12).map(w => ({name: w.artist, handle: w.handle, face: w.face})), slot: 'bkof'}), bookCard('Inside', b.shop && b.shop.price ? `$${b.shop.price}. Ships when it's printed.` : "Ships when it's printed."), ask()],
+      `${name} is open for pre-order.\n\n${inside}\n\nComment ${KW} for a look inside, or tap the link in bio.`, 'Pin to the grid'); }
   else if (id === 'editor') { const e = {...b.inside.editor, text: b.inside.editor.text.replace(/^ear Reader/, 'Dear Reader')}; const parts = (e.text.match(/[^.!?]+[.!?]+/g) || [e.text]); const a = [], cur = []; let len = 0;
     parts.forEach(x => { if (len + x.length > 460 && cur.length) { a.push(cur.join('').trim()); cur.length = 0; len = 0; } cur.push(x); len += x.length; }); if (cur.length) a.push(cur.join('').trim());
-    post("The editor's note", [BKT.card({faces: faces(20, 30), mono: true, tab: 'Inside', serif: "The editor's note", big: name}), ...a.slice(0, 3).map((t, i, l) => BKT.card({tab: 'Inside', body: t, by: i === l.length - 1 ? e.by || '' : ''})), endSale()],
-      `From the editor's note in ${name}.\n\n${bkCut(e.text, 260)}`, 'A short read from the book'); }
+    const first = (parts[0] || '').trim();
+    post("The editor's note", [photos.length ? photo(5, {mono: true, label: "From the editor's note", head: bkCut(first, 90)}) : BKT.card({faces: faces(20, 30), mono: true, tab: 'Inside', serif: "The editor's note", big: name}), ...a.slice(0, 3).map((t, i, l) => BKT.card({tab: 'Inside', body: t, by: i === l.length - 1 ? e.by || '' : ''})), ask(`The rest of the note opens ${name}.`)],
+      `From the editor's note in ${name}.\n\n${bkCut(e.text, 260)}\n\nComment ${KW} for a look inside.`, 'A short read from the book'); }
   else if (/^feat\d+$/.test(id)) { const k = +id.slice(4), parts = Math.ceil(n / BK_FEAT); const chunk = D.works.slice(k * BK_FEAT, (k + 1) * BK_FEAT);
-    post(`Artist features ${k + 1} of ${parts}`, [BKT.card({faces: chunk.map(w => w.face), mono: true, tab: 'Artists', serif: 'Meet the artists of', big: name, sub: chunk.map(w => w.artist).slice(0, 4).join(', ') + (chunk.length > 4 ? ` and ${chunk.length - 4} more` : '')}),
-      ...chunk.map((w, i) => feature(w, i)), bookCard('Artists', `${n} artists, one book${b.pages ? `, ${b.pages} pages` : ''}.`), endSale()],
-      `Meet ${chunk.length} of the ${n} artists in ${name}.\n\n${chunk.map(w => `${w.artist}${w.handle ? ' ' + w.handle : ''}${w.title ? `, ${w.title}` : ''}`).join('\n')}\n\nEvery one of them is in the book.\n${sale.line}`, `Tag the ${chunk.length} artists · then send each their share kit (Artist kits tab)`); }
-  else if (id === 'why') { const lines = [D.curator && `${D.curator.name} chose every work.`, D.voices.length && `${D.voices.length} conversations with the artists behind the work.`, n && `${n} artists, each with their own page.`, 'Printed to keep on the shelf, not scrolled past.'].filter(Boolean).join(' ');
-    const facts = bkFacts(D.works);
-    post('Why this book', [BKT.card({faces: faces(40, 30), mono: true, tab: 'Inside', serif: 'Why this book', big: name}), BKT.card({tab: 'Inside', body: lines}), facts.length && BKT.numbers({n: String(n), what: 'artists, each with their own page', rows: facts}),
-      feature(W[6] || W[0], 0, 'bky'), bookCard('Inside', 'For collectors, artists, and anyone who wants new art on their table.'), endSale()],
-      `Why ${name}?\n\n${lines}\n\n${sale.line}`, 'One action: pre-order'); }
+    post(`Artist features ${k + 1} of ${parts}`, [BKT.card({faces: chunk.map(w => w.face), mono: true, tab: 'Artists', serif: 'Meet the artists of', big: name, sub: chunk.map(w => w.artist).slice(0, 3).join(', ') + ' and more, on their own pages'}),
+      ...chunk.flatMap((w, i) => [feature(w, i), pg(w.page) ? BKT.page({img: pg(w.page), slot: 'bkpg' + i, w, pageNo: w.page}) : null]).filter(Boolean).slice(0, 18), ask(`Every one of them has a page in ${name}.`)],
+      `Meet some of the artists in ${name}.\n\n${chunk.map(w => `${w.artist}${w.handle ? ' ' + w.handle : ''}${w.title ? `, ${w.title}` : ''}`).join('\n')}\n\nEach has their own page in the book. Comment ${KW} for a look inside.`, `Tag every artist · send each their kit the same day (Artist kits tab)`); }
+  else if (id === 'why') { const lines = [D.curator && `${D.curator.name} chose every work.`, D.voices.length && `Conversations with the artists behind the work.`, `${many[0].toUpperCase() + many.slice(1)}, each with their own page.`, 'Printed to keep on the shelf, not scrolled past.'].filter(Boolean).join(' ');
+    post('Who it is for', [photos.length ? photo(6, {mono: true, head: 'For the person who keeps art books on the table.'}) : BKT.card({faces: faces(40, 30), mono: true, tab: 'Inside', serif: 'Who it is for', big: name}),
+      BKT.card({tab: 'Inside', body: lines}), photos[7] ? photo(7, {}) : null, spreads[3] ? BKT.photo({img: spreads[3], slot: 'bkys'}) : null, bookCard('Inside', 'For collectors, artists, and anyone who wants new art on their table.'), ask()],
+      `For the person who keeps art books on the table.\n\n${lines}\n\nComment ${KW} for a look inside.`, 'Gift angle'); }
   else if (id === 'family') post('Friends and family', [BKT.card({faces: faces(10, 30), mono: true, tab: 'Artists', serif: 'Know an artist in', big: name}),
-      BKT.card({tab: 'Artists', body: `Friends and family of our artists get their own code for the book: ${b.codesLive ? b.codes.friends : '[shows once ticked live in Shopify]'}. Use it at checkout.`}), feature(W[8] || W[0], 0, 'bkf'), bookCard('Artists', 'Pre-order with the friends and family code.'), endSale()],
-      `Know an artist in ${name}? Friends and family get their own code: ${b.codesLive ? b.codes.friends : '[code shows once ticked live in Shopify]'}.\n\n${sale.line}`, 'Only post once the code is live in Shopify');
-  else if (id === 'print') post('Going to print', [BKT.card({faces: faces(50, 30), mono: true, tab: 'Inside', serif: 'Going to print soon', big: name}), feature(W[12] || W[0], 0, 'bkg'), feature(W[13] || W[1], 1, 'bkg'), bookCard('Inside', "Pre-order now and it ships as soon as it's printed."), endSale()],
-      `${name} goes to print soon. Pre-order now and it ships as soon as it's printed.\n\n${sale.line}`, 'Plain date, no countdown');
-  else if (id === 'arrived') post("It's here", [BKT.card({photo: '', slot: 'bkshoot', mono: true, tab: 'Inside', serif: "It's here", big: name}), BKT.faces({list: F.slice(12, 24).map(w => ({name: w.artist, handle: w.handle, face: w.face})), slot: 'bkaf'}), feature(W[2] || W[0], 0, 'bka'), bookCard('Inside', 'In stock and shipping now.'), endSale()],
-      `${name} is here.\n\nThank you to every artist inside it.\n\n${sale.line}`, 'Drop a photoshoot picture behind the first slide');
-  else if (id === 'archive') { const f = W.slice(10, 13); post('From the archive', [BKT.card({faces: f.map(w => w.face), mono: true, tab: 'Inside', serif: 'From our shelf', big: name}), ...f.map((w, i) => feature(w, i, 'bkr')), bookCard('Inside', 'Still on the shelf.'), endSale()],
-      `From our shelf: ${name}.\n\n${f.map(w => w.artist + (w.handle ? ' ' + w.handle : '')).join(', ')} and ${Math.max(0, n - 3)} more artists.\n\n${sale.line}`, 'Backlist rotation'); }
-  else if (/^kits\d+$/.test(id)) { const k = +id.slice(4), chunk = D.works.slice(k * BK_FEAT, (k + 1) * BK_FEAT);
-    const K = chunk.map((w, i) => ({...BKT.kit({w: {...w, img: bkPic('bkkit' + i, w.img)}, b, slot: 'bkkit' + i}), label: w.artist})); const code = b.codes && b.codes.artist;
-    const dm = `Hi {first name}, your feature for ${name} is live on our page today. Here is a story frame made for you: share it and tag @artstoheartsproject, and we'll reshare it.${sale.open ? ` ${sale.line.replace('. Link in bio.', '')} at shop.artstoheartsproject.com.` : ''}${b.codesLive && code ? ` Your artist code for the book is ${code}${b.codes.friends ? `, and friends and family can use ${b.codes.friends}` : ''}.` : ''} Thank you for being part of the book.`;
-    out.push({book: true, credits, title: `${name} · Share kits ${k + 1} of ${Math.ceil(n / BK_FEAT)}`, meta: `${K.length} story frames, one per artist · send each artist theirs with the message below`, slides: K.map((s, j) => ({...s, title: 'share-kit-' + (k * BK_FEAT + j + 1)})), story: true, cap: dm, pin: ''}); }
+      BKT.card({tab: 'Artists', body: `Friends and family of our artists get their own code for the book: ${b.codesLive ? b.codes.friends : '[shows once ticked live in Shopify]'}. Use it at checkout.`}), spreads[4] ? BKT.photo({img: spreads[4], slot: 'bkfs'}) : feature(W[8] || W[0], 0, 'bkf'), bookCard('Artists', 'Pre-order with the friends and family code.'), ask()],
+      `Know an artist in ${name}? Friends and family get their own code: ${b.codesLive ? b.codes.friends : '[code shows once ticked live in Shopify]'}.\n\nComment ${KW} for a look inside.`, 'Only post once the code is live in Shopify');
+  else if (id === 'print') post('Going to print', [photos.length ? photo(8, {mono: true, label: 'Going to print soon', head: name}) : BKT.card({faces: faces(50, 30), mono: true, tab: 'Inside', serif: 'Going to print soon', big: name}),
+      ...spreads.slice(5, 8).map((u, i) => BKT.photo({img: u, slot: 'bkgs' + i})), bookCard('Inside', "Pre-order now and it ships as soon as it's printed."), ask()],
+      `${name} goes to print soon. Pre-order now and it ships as soon as it's printed.\n\nComment ${KW} for a look inside.`, 'Plain date, no countdown');
+  else if (id === 'arrived') post("It's here", [photo(0, {mono: true, label: "It's here", head: name}), ...[1, 2, 3].map(k => photos[k] ? photo(k, {}) : null),
+      BKT.faces({list: F.slice(12, 24).map(w => ({name: w.artist, handle: w.handle, face: w.face})), slot: 'bkaf'}), bookCard('Inside', 'In stock and shipping now.'), ask()],
+      `${name} is here.\n\nThank you to every artist inside it.\n\nComment ${KW} for a look inside.`, 'Use the photoshoot (Pictures tab)');
+  else if (id === 'archive') { const f = W.slice(10, 13); post('From the archive', [photos.length ? photo(9, {mono: true, label: 'From our shelf', head: name}) : BKT.card({faces: f.map(w => w.face), mono: true, tab: 'Inside', serif: 'From our shelf', big: name}), ...f.map((w, i) => theirPage(w, i, 'bkr')), bookCard('Inside', 'Still on the shelf.'), ask()],
+      `From our shelf: ${name}.\n\n${f.map(w => w.artist + (w.handle ? ' ' + w.handle : '')).join(', ')} and ${many} more.\n\nComment ${KW} for a look inside.`, 'Backlist rotation'); }
+  else if (/^kits\d+$/.test(id)) { const k = +id.slice(4), chunk = D.works.slice(k * BK_FEAT, (k + 1) * BK_FEAT); const code = b.codes && b.codes.artist;
+    const K = chunk.flatMap((w, i) => [{...BKT.kit({w: {...w, img: bkPic('bkkit' + i, w.img)}, b, slot: 'bkkit' + i}), label: w.artist + ': I\'m in it'},
+      pg(w.page) ? {...BKT.kitPage({w, b, img: pg(w.page), slot: 'bkkp' + i}), label: w.artist + ': my page'} : null]).filter(Boolean);
+    const dm = `Hi {first name}, your feature for ${name} is live on our page today. Here are two story frames made for you: "I'm in it" and your printed page. Share them and tag @artstoheartsproject, and we'll reshare.${sale.open ? ` ${sale.line.replace('. Link in bio.', '')} at shop.artstoheartsproject.com.` : ''}${b.codesLive && code ? ` Your artist code for the book is ${code}${b.codes.friends ? `, and friends and family can use ${b.codes.friends}` : ''}.` : ''} When your copy arrives, send us a photo of you with it. Thank you for being part of the book.`;
+    out.push({book: true, credits, title: `${name} · Artist kits ${k + 1} of ${Math.ceil(n / BK_FEAT)}`, meta: `Two story frames per artist ("I'm in it" and their printed page) · send each artist theirs with the message below`, slides: K.map((s, j) => ({...s, title: 'kit-' + (k * BK_FEAT + Math.floor(j / 2) + 1) + '-' + (j % 2 ? 'page' : 'in-it')})), story: true, cap: dm, pin: ''}); }
   return out;
 }
 
 // ---------- the Books tab: a list of books, then one book on its own page ----------
 let BOOKTAB = 'inside';
-const BK_TABS = [['inside', 'Inside the book'], ['artists', 'Artists'], ['pre', 'Pre-launch'], ['launch', 'Launch'], ['after', 'After launch'], ['kits', 'Artist kits']];
+const BK_TABS = [['inside', 'Inside the book'], ['artists', 'Artists'], ['pictures', 'Pictures'], ['pre', 'Pre-launch'], ['launch', 'Launch'], ['after', 'After launch'], ['kits', 'Artist kits']];
 function bookCard(b, i){
   const img = b.shop && b.shop.image ? `<img class="bk-cv" loading="lazy" src="${bkEsc(b.shop.image)}" alt="">` : `<div class="bk-cv bk-none">${bkEsc(b.name)}</div>`;
   const sale = b.shop ? `${b.shop.preorder ? 'Pre-order' : b.shop.available ? 'In stock' : 'Sold out'}${b.shop.price ? ' · $' + bkEsc(b.shop.price) : ''}` : 'Not in the shop yet';
@@ -294,6 +360,7 @@ function bookHead(b){
   const sale = b.shop ? `${b.shop.preorder ? 'Pre-order open' : b.shop.available ? 'In stock' : 'Sold out'}${b.shop.price ? ' · $' + bkEsc(b.shop.price) : ''}` : 'Not in the shop yet';
   return `<div class="bk-head">${b.shop && b.shop.image ? `<img src="${bkEsc(b.shop.image)}" alt="">` : ''}<div><button type="button" class="btn ghost" id="bkback">&larr; All books</button>
     <h2>${bkEsc(b.name)}</h2><p class="meta">${bkEsc([b.status, sale, b.pages && b.pages + ' pages', b.designer && 'Designed by ' + b.designer].filter(Boolean).join(' · '))}</p>
+    <p class="meta bk-kw">Keyword <input id="bkkw" value="${bkEsc(bkKeyword(b))}" maxlength="16" title="People comment this word to get a look inside. Set the same word in ManyChat."> · set the same word in ManyChat: it sends a look inside and the shop link</p>
     ${dl ? `<p class="bk-dates">${dl}</p>` : '<p class="meta">No dates in Books Data yet (columns AH to AN), so posts are listed in order without dates.</p>'}${ver}${links ? `<p class="meta">${links}</p>` : ''}</div></div>`;
 }
 function bkWho(p, label){ return `<div class="bk-iv"><p class="bk-role">${bkEsc(label)}</p><p><b>${bkEsc(p.name)}</b> ${bkEsc(p.handle || '')}${p.page ? ` · page ${p.page}` : ''}</p>${p.title ? `<p class="meta">${bkEsc(bkCase(p.title))}</p>` : ''}${p.intro ? `<p>${bkEsc(bkCut(p.intro, 360))}</p>` : ''}${(p.quotes || []).map(q => `<blockquote>“${bkEsc(q)}”</blockquote>`).join('')}</div>`; }
@@ -332,11 +399,13 @@ function booksRender(){
   if (!BOOKS && !BOOKBUSY) { booksLoad(false); return; }
   const lib = BOOKS || {books: []}; const b = BOOKSEL !== null && lib.books[BOOKSEL];
   if (b) {
-    const body = BOOKTAB === 'inside' ? bookTabInside(b) : BOOKTAB === 'artists' ? bookTabArtists(b) : BOOKTAB === 'kits' ? bookTabKits(b) : bookTabPhase(b, BOOKTAB);
+    const body = BOOKTAB === 'inside' ? bookTabInside(b) : BOOKTAB === 'artists' ? bookTabArtists(b) : BOOKTAB === 'pictures' ? bookTabPictures(b) : BOOKTAB === 'kits' ? bookTabKits(b) : bookTabPhase(b, BOOKTAB);
     el.innerHTML = `<section class="bk-detail">${bookHead(b)}<div class="bk-tabs">${BK_TABS.map(([k, l]) => `<button type="button" class="${BOOKTAB === k ? 'on' : ''}" data-bktab="${k}">${l}</button>`).join('')}</div><div class="bk-body">${body}</div>${BOOKVIEW ? '<p class="meta bk-close"><button type="button" class="btn ghost" id="bkclose">Close the post</button></p>' : ''}</section>`;
     el.querySelector('#bkback').onclick = () => { BOOKSEL = null; bookClosePost(); booksRender(); window.scrollTo({top: 0}); };
     el.querySelectorAll('[data-bktab]').forEach(x => x.onclick = () => { BOOKTAB = x.dataset.bktab; bookClosePost(); booksRender(); });
     el.querySelectorAll('[data-bkopen]').forEach(x => x.onclick = () => bookOpenPost(x.dataset.bkopen));
+    el.querySelectorAll('[data-bkget]').forEach(x => x.onclick = () => bookGetMedia(BOOKSEL, x.dataset.bkget));
+    const kw = el.querySelector('#bkkw'); if (kw) kw.onchange = () => { const v = kw.value.toUpperCase().replace(/[^A-Z0-9]/g, ''); try { v ? localStorage.setItem('bkkw:' + b.name, v) : localStorage.removeItem('bkkw:' + b.name); } catch {} booksRender(); if (BOOKVIEW) render(); };
     const c = el.querySelector('#bkclose'); if (c) c.onclick = () => { bookClosePost(); booksRender(); };
     return;
   }
@@ -351,6 +420,7 @@ function booksRender(){
 }
 async function bookOpen(i){
   BOOKSEL = i; BOOKTAB = 'inside'; bookClosePost(); window.scrollTo({top: 0}); const bk = BOOKS.books[i];
+  if (bk && !bk.media) fetch('/api/media?book=' + i).then(r => r.ok ? r.json() : {}).then(m => { bk.media = m || {}; if (BOOKSEL === i) { booksRender(); if (BOOKVIEW) render(); } }).catch(() => {});
   if (bk && !bk.artists && bk.count) { bk.loading = true; booksRender(); try { const r = await fetch('/api/books?book=' + i); const j = await r.json(); if (r.ok) bk.artists = j.artists || []; } catch {} bk.loading = false; }
   booksRender();
 }
@@ -358,4 +428,25 @@ function bookClosePost(){ if (BOOKVIEW) { BOOKVIEW = null; document.body.classLi
 function bookOpenPost(id){
   BOOKVIEW = {book: BOOKSEL, id}; document.body.classList.add('bkposts'); booksRender(); render();
   const o = document.getElementById('out'); if (o) o.scrollIntoView({behavior: 'smooth'});
+}
+
+// ---------- the book's own pictures: pages, mockups, photoshoot (taken once from the Dropbox links in Books Data) ----------
+const BKGET = {};
+async function bookGetMedia(i, part){
+  const bk = BOOKS.books[i]; BKGET[i + part] = 'busy'; booksRender();
+  try { const r = await fetch(`/api/media?book=${i}&part=${part}`, {method: 'POST'}); const j = await r.json(); if (!r.ok) throw new Error(j.error || r.status); const {read, ...m} = j; bk.media = m; BKGET[i + part] = read ? `${read.kept} pictures in ${read.seconds}s` : 'done'; }
+  catch (e) { BKGET[i + part] = 'error: ' + (e.message || e); }
+  if (BOOKSEL === i) { booksRender(); if (BOOKVIEW) render(); }
+}
+function bookTabPictures(b){
+  const m = b.media || {}, i = BOOKSEL; const pages = Object.entries(m.pages || {}).sort((x, y) => x[0] - y[0]);
+  const row = (part, label, link, has, note) => { const st = BKGET[i + part];
+    return `<div class="bk-row"><span class="bk-when">${label}</span><div><b>${has ? has : 'Not taken yet'}</b><p class="meta">${link ? note : 'No link in Books Data for this book.'}${st ? ' · ' + bkEsc(st === 'busy' ? 'Working… keep this tab open' : st) : ''}</p></div>${link ? `<button type="button" class="btn ghost" data-bkget="${part}"${st === 'busy' ? ' disabled' : ''}>${has ? 'Take again' : 'Take them'}</button>` : ''}</div>`; };
+  const grid = (list, cls) => list.length ? `<div class="bk-pics ${cls || ''}">${list.map(u => `<img loading="lazy" decoding="async" src="${bkEsc(u)}" alt="">`).join('')}</div>` : '';
+  return `<p class="meta">The book's own pictures, taken once from the Dropbox folders in Books Data and used across the posts and kits. Take the pages first: every artist's printed page comes from there.</p>
+    <div class="bk-plan">${row('pages', 'Pages', b.links.pages, pages.length && `${pages.length} pages`, 'Page by Page Graphics. Takes about 3 minutes.')}
+    ${row('mockups', 'Mockups', b.links.mockups, (m.spreads || m.scenes) && `${(m.spreads || []).length} spreads, ${(m.scenes || []).length} scenes${m.covers && m.covers.front ? ', the cover' : ''}`, 'Spread mockups, scene mockups, the shop covers. Under a minute.')}
+    ${row('shoot', 'Photoshoot', b.links.shoot, (m.shoot || []).length && `${m.shoot.length} photos`, 'Up to 40 photos from the photoshoot folder.')}</div>
+    ${(m.spreads || []).length ? '<h3>Spreads</h3>' + grid(m.spreads) : ''}${(m.scenes || []).length ? '<h3>Scenes</h3>' + grid(m.scenes) : ''}${(m.shoot || []).length ? '<h3>Photoshoot</h3>' + grid(m.shoot) : ''}
+    ${pages.length ? '<h3>Pages</h3>' + grid(pages.map(p => p[1]), 'pg') : ''}`;
 }
