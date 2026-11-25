@@ -40,7 +40,8 @@ Serve `site/post-studio` with `python3 -m http.server 8765`, drive it with Playw
 
 ## Books section (step 1 built: Sync + Books tab)
 - Built: `api/books.js` (service-account JWT, no packages; reads Books Data 'Main ' incl. smart-chip links in "Artists Data for Graphics" → each book's artist tab by gid; public Shopify products.json; saves `books/library-*.json` in Blob; no emails stored; nightly Vercel cron 03:17 UTC + "Sync now"). `books.js` = Books tab (list, search, book detail with artists). Env: `GOOGLE_SERVICE_ACCOUNT` (robot books-app@new-submit-468800.iam.gserviceaccount.com, needs Viewer on each artist sheet). `ANTHROPIC_API_KEY` not set yet.
-- Next: step 2 launch carousel, step 3 The Edit.
+- Built (selected artists): book detail → Posts bar: **Selected artists** (cover + names 20/slide + congratulations end), **Artist features** (8 artists per carousel → ~13 for 100: cover, HLT.work per artist with cleaned 1-liner, Pink book slide, end card with Pre-order/Order/coming-soon from Shopify), **Share kits** (1080×1920 per artist: artwork, Selected for <book>, shop line, friends & family code only when Codes Live). Renders through the normal pipeline (`bookGroups()` in books.js, `seg0==='books'` branch in render; body.bkposts shows #out). Images go through `api/img.js` (same-origin, CORS-safe downloads; media.artstoheartsproject.com + cdn.shopify.com only).
+- Next: phase engine + Today list, pre-order set (teasers, cover reveal, why buy), open-call reshape, arrival/backlist.
 
 ## The larger picture: one book's life (from the user, Nov 2026)
 Goal: elevate the artists AND sell the book, professionally, with no fluff or overcrowding. Every post has one clear action.

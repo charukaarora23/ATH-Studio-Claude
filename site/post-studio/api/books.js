@@ -33,7 +33,7 @@ async function gget(token, path){
 const norm = s => String(s || '').toLowerCase().replace(/&/g, 'and').replace(/[^a-z0-9]+/g, ' ').trim();
 const cellText = c => String((c && c.formattedValue) || '').trim();
 const cellLink = c => { if (!c) return ''; if (c.hyperlink) return c.hyperlink; for (const run of c.chipRuns || []) { const u = run.chip && run.chip.richLinkProperties && run.chip.richLinkProperties.uri; if (u) return u; } return ''; };
-const handleOf = s => { s = String(s || '').trim(); if (!s) return ''; const m = s.match(/instagram\.com\/(?:https?:\/\/(?:www\.)?instagram\.com\/)?@?([A-Za-z0-9._]+)/i); const h = m ? m[1] : s.replace(/^@/, '').split(/[\s/?]/)[0]; return /^[A-Za-z0-9._]{2,30}$/.test(h) ? '@' + h : ''; };
+const handleOf = s => { s = String(s || '').trim(); if (!s) return ''; const m = s.match(/instagram\.com\/(?:https?:\/\/(?:www\.)?instagram\.com\/)?@?([A-Za-z0-9._]+)/i); const h = m ? m[1] : s.replace(/^@/, '').split(/[\s/?]/)[0]; return /^[A-Za-z0-9._]{2,30}$/.test(h) && !/^(https?|www|instagram|com|n\/?a|none)$/i.test(h) ? '@' + h : ''; };
 const url = s => /^https?:\/\//i.test(String(s || '').trim()) ? String(s).trim() : '';
 const idGid = u => { const m = String(u).match(/spreadsheets\/d\/([A-Za-z0-9_-]+)/); const g = String(u).match(/gid=(\d+)/); return m ? {id: m[1], gid: g ? +g[1] : null} : null; };
 async function pool(items, n, fn){ const out = []; let i = 0; await Promise.all(Array.from({length: Math.min(n, items.length)}, async () => { while (i < items.length) { const k = i++; out[k] = await fn(items[k]).catch(e => ({error: String(e.message || e)})); } })); return out; }
