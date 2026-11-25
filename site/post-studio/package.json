@@ -5,6 +5,7 @@
   "dependencies": {
     "@anthropic-ai/sdk": "^1.8.0",
     "@vercel/blob": "^2.9.0",
+    "fflate": "^0.8.2",
     "pdfjs-dist": "^4.10.38"
   }
 }
