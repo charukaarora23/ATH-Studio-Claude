@@ -494,25 +494,40 @@ function bkThemeTitles(D, themeText, k = 7){
     .sort((x, y) => y.n - x.n || x.t.length - y.t.length).slice(0, k).map(x => x.t);
 }
 
-// Selected artists: one post that honours every artist equally. Nobody is singled out; the work speaks through its own titles.
+// Selected artists: a mix of the project, the selection in plain sentences (rounded numbers), several different artworks shown whole, and the full list.
 function bkSelectedPost(b, D){
   const I = bkIssue(b), proper = bkProper(b), th = (b.inside && b.inside.theme) || {}; const theme = bkTitleCase(th.title || ''); const KW = bkKeyword(b);
-  const ed = I.issue || 'this book';
-  const titles = bkThemeTitles(D, (th.title || '') + ' ' + (th.text || ''));
-  const coverW = D.works.find(w => w.img && titles[0] && w.title === titles[0]) || D.works.find(w => w.img) || {}; const bg = coverW.img;   // the cover: the work whose title speaks the theme most clearly
+  const ed = I.issue || 'this book', sel = bkSelection(D);
+  const words = n => ({10: 'ten', 15: 'fifteen', 20: 'twenty', 25: 'twenty-five', 30: 'thirty', 40: 'forty', 50: 'fifty', 60: 'sixty', 70: 'seventy', 80: 'eighty', 90: 'ninety', 100: 'a hundred'}[n] || String(n));
+  const over = n => n > 10 ? 'more than ' + words(n > 50 ? Math.floor((n - 1) / 10) * 10 : Math.floor((n - 1) / 5) * 5) : 'several';
+  const the = c => /^(United|Netherlands|Philippines)/.test(c) ? 'the ' + c : c;
+  const titles = bkThemeTitles(D, (th.title || '') + ' ' + (th.text || ''), 12);
+  // the artworks: different artists, the ones whose titles carry the theme first, then spread through the book (never random)
+  const W = D.works.filter(w => w.img), used = new Set(), arts = [];
+  titles.forEach(t => { const w = W.find(x => x.title === t && !used.has(x.artist)); if (w && arts.length < 6) { arts.push(w); used.add(w.artist); } });
+  for (let i = 0; arts.length < 6 && i < W.length; i += Math.max(1, Math.floor(W.length / 7))) { const w = W[i]; if (!used.has(w.artist)) { arts.push(w); used.add(w.artist); } }
+  const art = (w, k) => w && IV.work({img: bkPic('bkaw' + k, w.img), slot: 'bkaw' + k, name: w.artist, cap: bkCap(w)});
+  const coverW = arts[0] || W[0] || {}; const bg = coverW.img;
   const people = D.works.map(w => ({name: w.artist, place: bkPlaceOf(w)})); const pages = Math.ceil(people.length / 50), per = Math.ceil(people.length / Math.max(1, pages));
-  const brief = ((th.text || '').match(/[^.!?]+[.!?]+/g) || []).map(x => x.trim()).filter(x => x.split(' ').length > 4 && !/^the summer we remember\.?$/i.test(x)).slice(0, 2).join(' ');
+  const brief = ((th.text || '').match(/[^.!?]+[.!?]+/g) || []).map(x => x.trim()).filter(x => x.split(' ').length > 4).slice(0, 2).join(' ');
+  const numbers = [
+    `We received **hundreds of submissions** for ${theme || proper}, from artists all over the world.`,
+    `From them, we found ${sel.painters >= sel.n * .5 ? `**${over(sel.painters)} talented painters**, alongside artists in photography, collage and mixed media` : `**${over(sel.n)} talented artists**`}.`,
+    `We are so excited to welcome **${over(sel.n)} creators** into ${ed}${sel.countries.length >= 5 ? `, from **${over(sel.countries.length)} countries**` : ''}.`];
   const S = [
     BKT.pcover({slot: 'bkcov', img: bg, label: 'Selected artists', title: I.issue ? ['Arts to Hearts', 'Magazine', I.issue] : bkBalance(proper), sub: theme ? `Introducing the artists of ${theme}` : 'Introducing the artists'}),
     BKT.tabcard({bg, tab: 'The call', head: ['Congratulations'], headSz: 100, subSz: 42, footSz: 32, sub: `to every artist selected for **${proper}**.`, foot: 'Your work is going into print. This is a moment to be proud of, and we are celebrating it with you.'}),
-    theme && brief && BKT.htext({label: 'The theme', text: `We asked artists for ${theme}. ${brief}`}),
-    titles.length >= 5 && BKT.titles({label: theme ? 'You sent us your summers' : 'From the book', lines: titles, foot: theme ? `A few of the titles in ${ed}. Each one is **someone's memory**, now part of this issue.` : `A few of the titles in ${proper}.`}),
+    theme && brief && BKT.htext({label: 'The project', text: `${proper} is ${theme}. ${brief}`}),
+    art(arts[0], 0), art(arts[1], 1),
+    BKT.tabcard({bg, tab: 'The artists', head: ['The selection'], headSz: 84, lineSz: 36, gap: 34, lines: numbers}),
+    art(arts[2], 2), art(arts[3], 3),
     ...Array.from({length: pages}, (_, p) => BKT.tabcard({bg, tab: 'The artists', top: true, head: [p ? 'The Artists' : 'Selected for ' + (I.issue || 'the book')], headSz: 64, list: people.slice(p * per, (p + 1) * per)})),
-    BKT.htext({label: 'What it means', text: 'Your work will be printed, bound and kept. It will sit on shelves and tables, and be opened by people who have never met you. That is what being in a book means, and it stays.'}),
+    art(arts[4], 4), art(arts[5], 5),
     BKT.tabcard({bg, tab: "What's next", head: ["What's next"], headSz: 84, lineSz: 36, gap: 34, lines: [`Over the coming weeks, **every artist** in ${ed} will be featured here, one by one.`, `The ${I.issue ? 'magazine' : 'book'} is being made now. **The first look** is coming soon.`, 'When your feature goes live, share it. **Your people** will want to see it.']}),
-    BKT.htext({label: 'To everyone who applied', text: `${theme ? 'To everyone who sent us a summer, thank you.' : 'To everyone who sent us their work, thank you.'} Choosing was hard, and many beautiful works could not fit in these pages. If your name is not here this time, please keep going. We would love to see your work in our next call.`}),
-    BKT.keyEnd({head: `Congratulations to every artist in ${theme || proper}.`, key: KW, offer: `Comment ${KW} and we'll send you the full list of artists.`, foot: 'Know someone on this list? Tag them and tell them you are proud.'})].filter(Boolean);
-  const cap = `Introducing the artists of ${proper}${theme ? ': ' + theme : ''}.\n\n${theme && brief ? `We asked artists for ${theme}. ${brief}\n\nWhat came back were memories: ${titles.slice(0, 3).join(', ')}, and so many more. ` : ''}Congratulations to every artist selected. Your work is going into print, and over the coming weeks each of you will be featured here.\n\nComment ${KW} and we'll send you the full list.\n\nTo everyone who applied: thank you for trusting us with your work. Please keep going, and we hope to see you in our next call.`;
+    BKT.htext({label: 'To everyone who applied', text: `Thank you for trusting us with your work. Choosing was hard, and many beautiful works could not fit in these pages. If your name is not here this time, please keep going. We would love to see your work in our next call.`}),
+    BKT.keyEnd({head: `Congratulations to every artist in ${proper}.`, key: KW, offer: `Comment ${KW} and we'll send you the full list of artists.`, foot: 'Know someone on this list? Tag them and tell them you are proud.'})].filter(Boolean);
+  if (S.length > 20) S.splice(19, S.length - 20);
+  const cap = `Introducing the artists of ${proper}${theme ? ': ' + theme : ''}.\n\nWe received hundreds of submissions from artists all over the world, and we are so excited to welcome ${over(sel.n)} creators into this ${I.issue ? 'issue' : 'book'}${sel.countries.length >= 5 ? `, from ${over(sel.countries.length)} countries` : ''}. Congratulations to every artist selected. Your work is going into print, and over the coming weeks each of you will be featured here.\n\nComment ${KW} and we'll send you the full list.\n\nTo everyone who applied: thank you for trusting us with your work. Please keep going, and we hope to see you in our next call.`;
   return {S, cap};
 }
 
