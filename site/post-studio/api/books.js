@@ -44,10 +44,11 @@ async function readMaster(token){
   const rows = ((j.sheets || [])[0] || {}).data[0].rowData || [];
   if (!rows.length) throw new Error('Books Data sheet looks empty'); const head = (rows[0].values || []).map(c => norm(cellText(c)));
   const col = (...names) => { for (const n of names) { const i = head.findIndex(h => h === n || h.startsWith(n)); if (i >= 0) return i; } return -1; };
-  const C = {name: col('book name'), cat: col('category'), year: col('year'), sheet: col('artists data for graphics'), cover: col('cover artist'), coverIg: col('cover artist instagram'), landing: col('landing page'), shopify: col('shopify link'), amazon: col('amazon link'), bn: col('barnes'), designer: col('book designer'), published: col('no of published artists'), pages: col('no of pages'), status: col('status'), isbn: col('isbn'), launch: col('launch date')};
+  const C = {name: col('book name'), cat: col('category'), year: col('year'), sheet: col('artists data for graphics'), cover: col('cover artist'), coverIg: col('cover artist instagram'), landing: col('landing page'), shopify: col('shopify link'), amazon: col('amazon link'), bn: col('barnes'), designer: col('book designer'), published: col('no of published artists'), pages: col('no of pages'), status: col('status'), isbn: col('isbn'), discount: col('artist disc'), opens: col('call opens'), closes: col('call closes'), juror: col('juror'), selected: col('selected announced'), preorder: col('pre order opens'), print: col('to print'), ships: col('ships'), ff: col('friends and family')};
   return rows.slice(1).map(r => { const v = r.values || []; const t = k => C[k] >= 0 ? cellText(v[C[k]]) : ''; const l = k => C[k] >= 0 ? (cellLink(v[C[k]]) || url(cellText(v[C[k]]))) : '';
     const name = t('name'); if (!name) return null;
-    return {name, category: t('cat'), year: t('year'), status: t('status'), pages: t('pages'), published: t('published'), designer: t('designer'), isbn: t('isbn'), launch: t('launch'),
+    return {name, category: t('cat'), year: t('year'), status: t('status'), pages: t('pages'), published: t('published'), designer: t('designer'), isbn: t('isbn'), juror: t('juror'), codes: {artist: t('discount'), friends: t('ff')},
+      dates: {callOpens: t('opens'), callCloses: t('closes'), selected: t('selected'), preorder: t('preorder'), print: t('print'), ships: t('ships')},
       coverArtist: t('cover') ? {name: t('cover'), handle: handleOf(t('coverIg'))} : null,
       links: {landing: l('landing'), shopify: l('shopify'), amazon: l('amazon'), bn: l('bn')}, sheet: idGid(l('sheet'))};
   }).filter(Boolean);

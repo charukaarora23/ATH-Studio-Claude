@@ -15,9 +15,10 @@ function bookCard(b, i){
 }
 function bookDetail(b){
   const links = [['Shop', b.shop && b.shop.url], ['Landing page', b.links.landing], ['Amazon', b.links.amazon], ['Barnes & Noble', b.links.bn]].filter(x => x[1]).map(([l, u]) => `<a href="${bkEsc(u)}" target="_blank" rel="noopener">${l}</a>`).join(' · ');
-  const facts = [b.status && 'Status: ' + b.status, b.pages && b.pages + ' pages', b.published && b.published + ' published artists', b.designer && 'Designed by ' + b.designer, b.coverArtist && `Cover: ${b.coverArtist.name}${b.coverArtist.handle ? ' ' + b.coverArtist.handle : ''}`, b.tab && 'Sheet tab: ' + b.tab].filter(Boolean).map(bkEsc).join(' · ');
+  const facts = [b.status && 'Status: ' + b.status, b.pages && b.pages + ' pages', b.published && b.published + ' published artists', b.designer && 'Designed by ' + b.designer, b.coverArtist && `Cover: ${b.coverArtist.name}${b.coverArtist.handle ? ' ' + b.coverArtist.handle : ''}`, b.juror && 'Juror: ' + b.juror, b.tab && 'Sheet tab: ' + b.tab].filter(Boolean).map(bkEsc).join(' · ');
   const arts = (b.artists || []).map(a => { const w = (a.works || [])[0]; return `<div class="bk-a">${w ? `<div class="bk-w" style="background-image:url('${bkEsc(w.img)}')"></div>` : '<div class="bk-w bk-none">No artwork</div>'}<b>${bkEsc(a.name)}</b><span>${bkEsc(a.handle || '')}</span>${w && w.details ? `<i>${bkEsc(w.details)}</i>` : ''}</div>`; }).join('');
-  return `<section class="bk-detail"><h2>${bkEsc(b.name)}</h2><p class="meta">${facts}</p>${links ? `<p class="meta">${links}</p>` : ''}
+  const d = b.dates || {}; const dates = [['Call opens', d.callOpens], ['Call closes', d.callCloses], ['Selected announced', d.selected], ['Pre-order opens', d.preorder], ['To print', d.print], ['Ships', d.ships]].filter(x => x[1]).map(([l, v]) => l + ' ' + bkEsc(v)).join(' · ');
+  return `<section class="bk-detail"><h2>${bkEsc(b.name)}</h2><p class="meta">${facts}</p>${dates ? `<p class="meta">${dates}</p>` : ''}${links ? `<p class="meta">${links}</p>` : ''}
     ${b.loading ? '<p class="meta">Loading the artists…</p>' : arts ? `<div class="bk-arts">${arts}</div>` : `<p class="meta">${b.artistsError ? bkEsc(b.artistsError) + '.' : 'No artists in the sheet yet.'}</p>`}</section>`;
 }
 function booksRender(){
