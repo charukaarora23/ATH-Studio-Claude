@@ -91,9 +91,11 @@ async function readShopify(){
 }
 function matchShop(book, shop){
   const h = (String(book.links.shopify).match(/\/products\/([^/?#]+)/) || [])[1]; if (h) { const p = shop.find(x => x.handle === h); if (p) return p; }
-  const want = new Set(norm(book.name).split(' ').filter(w => w.length > 1 && !['the', 'of', 'edition', 'ed', 'artbook', 'book'].includes(w)));
+  const tok = t => norm(t).replace(/\bwomen\b/g, 'woman').split(' ').map(w => w.length > 3 ? w.replace(/s$/, '') : w);
+  const want = new Set(tok(book.name).filter(w => (w.length > 1 || /\d/.test(w)) && !['the', 'of', 'and', 'edition', 'ed', 'artbook', 'book'].includes(w)));
   let best = null, score = 0;
-  for (const p of shop) { const got = new Set(norm(p.title).split(' ')); let hit = 0; want.forEach(w => { if (got.has(w)) hit++; }); const s = want.size ? hit / want.size : 0; if (s > score) { score = s; best = p; } }
+  const nums = [...want].filter(w => /^\d+$/.test(w));
+  for (const p of shop) { const got = new Set(tok(p.title)); if (nums.length && !nums.some(n => got.has(n))) continue; let hit = 0; want.forEach(w => { if (got.has(w)) hit++; }); const s = want.size ? hit / want.size : 0; if (s > score) { score = s; best = p; } }
   return score >= .75 ? best : null;
 }
 
@@ -114,8 +116,11 @@ async function sync(){
 export default async function handler(req, res){
   res.setHeader('Cache-Control', 'no-store');
   try {
-    if (req.method === 'POST' || (req.method === 'GET' && req.query && req.query.sync)) return res.status(200).json(await sync());
-    if (req.method === 'GET') return res.status(200).json(await readLib());
+    // the list is sent without artists (the full library is several MB); one book's artists come with ?book=<index>
+    const slim = lib => ({...lib, books: lib.books.map(({artists, ...b}) => b)});
+    if (req.method === 'POST' || (req.method === 'GET' && req.query && req.query.sync)) return res.status(200).json(slim(await sync()));
+    if (req.method === 'GET' && req.query && req.query.book !== undefined) { const lib = await readLib(); const b = lib.books[+req.query.book]; return b ? res.status(200).json(b) : res.status(404).json({error: 'no such book'}); }
+    if (req.method === 'GET') return res.status(200).json(slim(await readLib()));
     res.setHeader('Allow', 'GET, POST'); return res.status(405).json({error: 'method not allowed'});
   } catch (e) { return res.status(500).json({error: String(e && e.message || e)}); }
 }
