@@ -313,22 +313,79 @@ Object.assign(BKT, {
     <p class="a c" style="left:0;right:0;bottom:96px;${T_REG};font-size:26px;letter-spacing:.04em;color:${HL.pink}">artstoheartsproject.com</p>`}; },
 });
 
+// ---------- the agreed look (Nov 2026): magazine cover, monograph plates, gallery frames, full-bleed portraits, a quiet credits page ----------
+// Premium rules: artworks whole on full white pages with generous space; credits in a scale of greys; no split half-image pages.
+const BKNAT = {};   // natural sizes of the pictures, so frames hug the work and credits sit right under it
+function bkNat(u){ if (!u) return null; if (BKNAT[u] !== undefined) return BKNAT[u]; BKNAT[u] = null; const im = new Image();
+  im.onload = () => { BKNAT[u] = {w: im.naturalWidth, h: im.naturalHeight}; clearTimeout(bkNat.t); bkNat.t = setTimeout(() => { if (typeof BOOKVIEW !== 'undefined' && BOOKVIEW) render(); }, 120); }; im.src = u; return null; }
+// fit a picture of size n into a box, keeping its shape
+const bkFitBox = (n, W, H) => { if (!n) return {w: W, h: H}; const r = Math.min(W / n.w, H / n.h); return {w: Math.round(n.w * r), h: Math.round(n.h * r)}; };
+const BKG1 = 'rgba(28,19,16,.56)', BKG2 = 'rgba(28,19,16,.4)';   // the credit greys: title, then medium
+const bkCredit = (w, align) => `<div style="display:flex;flex-direction:column;gap:6px;${align === 'c' ? 'align-items:center;text-align:center' : ''}">
+    <p style="${T_MED};font-size:27px;letter-spacing:-.005em;color:${HL.ink}">${esc(w.artist)}</p>
+    ${w.title ? `<p style="${BASK};font-style:italic;font-size:22px;color:${BKG1}">${esc(w.title)}</p>` : ''}
+    ${w.medium || w.year ? `<p style="${T_REG};font-size:17px;letter-spacing:.02em;color:${BKG2}">${esc([w.medium, w.year].filter(Boolean).join(', '))}</p>` : ''}</div>`;
+Object.assign(BKT, {
+  // cover: one artwork full bleed (the only crop allowed), the masthead, the issue, the line
+  masthead(o){ const u = bkPic(o.slot, o.img); return {bg: HL.ink, html: `${u ? `<div class="a img" data-slot="${o.slot}" style="inset:0;background-image:url(${u});background-size:cover;background-position:center"></div>` : `<div class="a" style="inset:0;background:${HL.burg}"></div>`}
+    <div class="a" style="inset:0;background:rgba(28,19,16,.2)"></div>
+    <p class="a" style="left:0;right:0;top:66px;text-align:center;${T_MED};font-size:112px;line-height:1;letter-spacing:-.035em;color:${HL.white}">ARTS TO HEARTS</p>
+    <p class="a" style="left:0;right:0;top:204px;text-align:center;${T_MED};font-size:19px;letter-spacing:.22em;text-transform:uppercase;color:${HL.white}">${esc(o.line)}</p>
+    <div class="a" style="left:72px;right:72px;bottom:96px;color:${HL.white}"><p style="${BASK};font-style:italic;font-size:52px;line-height:1">${esc(o.kicker)}</p><p style="${T_MED};font-size:128px;line-height:.92;letter-spacing:-.04em;margin-top:16px">${o.big.map(esc).join('<br>')}</p></div>`}; },
+  // a plate: the artwork whole, large, on a full white page; the credit beneath in greys
+  plate(o){ const w = o.w, u = bkPic(o.slot, w.img); const b = bkFitBox(bkNat(u), 860, 940); const left = Math.round((1080 - b.w) / 2), top = Math.round(150 + (940 - b.h) * .55);
+    return {bg: HL.white, html: `<p class="a cn" style="left:52px;top:48px;color:${HL.ink}">Arts to Hearts Project</p>
+    ${ivArt(u, `left:${left}px;top:${top}px;width:${b.w}px;height:${b.h}px`, o.slot)}
+    <div class="a" style="left:${left}px;width:${Math.max(b.w, 420)}px;top:${top + b.h + 34}px">${bkCredit(w)}</div>`}; },
+  // a framed work on a white wall with its wall label
+  framed(o){ const w = o.w, u = bkPic(o.slot, w.img); const b = bkFitBox(bkNat(u), 700, 820); const left = Math.round((1080 - b.w - 48) / 2), top = Math.round(150 + (820 - b.h) * .5);
+    return {bg: HL.white, html: `<p class="a cn" style="left:52px;top:48px;color:${HL.ink}">Arts to Hearts Project</p>
+    <div class="a" style="left:${left}px;top:${top}px;width:${b.w + 48}px;height:${b.h + 48}px;background:${HL.white};padding:24px;box-shadow:0 30px 60px rgba(28,19,16,.2),0 2px 6px rgba(28,19,16,.1);border:1px solid rgba(28,19,16,.07)">
+      <div class="img" data-slot="${o.slot}" style="width:100%;height:100%;background-image:url(${u});background-size:contain;background-repeat:no-repeat;background-position:center"></div></div>
+    <div class="a" style="right:${Math.max(96, 1080 - left - b.w - 48 - 40)}px;top:${Math.min(1100, top + b.h + 48 + 40)}px;width:420px;background:${HL.white};border:1px solid rgba(28,19,16,.12);padding:24px 28px">${bkCredit(w)}</div>`}; },
+  // the artist, full bleed, their name set large
+  face(o){ const nm = String(o.name || ''); const sp = nm.lastIndexOf(' '); const lines = sp > 0 ? [nm.slice(0, sp), nm.slice(sp + 1)] : [nm]; const fs = bkFit(lines.join('\n'), 940, 150, .52);
+    return {bg: HL.ink, html: `${bkPhoto(o.slot, o.face, 'inset:0', 'center 25%')}<div class="a" style="inset:0;background:rgba(28,19,16,.22)"></div>
+    <p class="a cn" style="left:52px;top:48px;color:${HL.white}">Arts to Hearts Project</p>
+    <div class="a" style="left:64px;right:64px;bottom:92px;color:${HL.white}">${bkCaps(o.label, HL.white, 19)}
+      <p style="${T_MED};font-size:${fs}px;line-height:.9;letter-spacing:-.045em;margin-top:22px">${lines.map(esc).join('<br>')}</p>
+      ${o.handle ? `<p style="${T_REG};font-size:28px;margin-top:22px;color:rgba(255,255,255,.85)">${esc(o.handle)}</p>` : ''}</div>`}; },
+  // credits page: every name, quiet, three columns
+  credits(o){ const per = Math.ceil(o.list.length / 3); const cols = [0, 1, 2].map(k => o.list.slice(k * per, (k + 1) * per));
+    return {bg: HL.white, html: `<p class="a cn" style="left:52px;top:48px;color:${HL.ink}">Arts to Hearts Project</p>
+    <p class="a" style="left:96px;top:150px;${BASK};font-style:italic;font-size:64px;color:${HL.ink}">${esc(o.head)}</p>
+    <div class="a" style="left:96px;right:96px;top:262px;border-top:1px solid rgba(28,19,16,.25)"></div>
+    <div class="a" style="left:96px;right:96px;top:300px;display:grid;grid-template-columns:repeat(3,1fr);gap:0 30px">${cols.map(c => `<div>${c.map(n => `<p style="${T_REG};font-size:${o.list.length > 45 ? 24 : 26}px;line-height:${o.list.length > 45 ? 1.9 : 2.05};color:${HL.ink};white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(n)}</p>`).join('')}</div>`).join('')}</div>
+    <p class="a" style="left:96px;bottom:84px;${T_MED};font-size:16px;letter-spacing:.22em;text-transform:uppercase;color:${BKG2}">${esc(o.foot)}</p>`}; },
+});
+
 // The selected artists, announced with care: the call, the jury, the artists, a kind word to everyone who applied, what comes next.
 // No book imagery (the book doesn't exist yet), no numbers.
 function bkSelectedPost(b, D){
   const I = bkIssue(b), proper = bkProper(b), th = (b.inside && b.inside.theme) || {}; const theme = bkTitleCase(th.title || '');
-  const people = D.works.map(w => ({name: w.artist, handle: w.handle})); const W = D.works.filter(w => w.img);
-  const rolls = Math.ceil(people.length / 20) || 1, per = Math.ceil(people.length / rolls); const R = []; for (let i = 0; i < people.length; i += per) R.push(people.slice(i, i + per));
+  const W = D.works.filter(w => w.img), F = D.works.filter(w => w.face && w.img);
   const sentences = (th.text || '').match(/[^.!?]+[.!?]+/g) || []; const lines = sentences.filter(x => x.trim().split(' ').length > 4).slice(0, 2).join(' ').trim();
-  const pick = W.filter((w, i) => i % Math.max(1, Math.floor(W.length / Math.max(1, R.length - 1))) === 0);   // works spread across the book
-  const S = [BKT.issueCover({kicker: 'The selected artists', title: I.title, no: I.no, theme: I.no ? theme : ''}),
+  const faces = [F[Math.floor(F.length * .2)], F[Math.floor(F.length * .6)]].filter(Boolean);
+  const plates = W.filter(w => !faces.includes(w)); const at = k => plates[Math.floor(plates.length * k)] || plates[0];
+  const names = D.works.map(w => w.artist); const half = Math.ceil(names.length / 2);
+  const foot = I.issue ? `${I.title} · ${I.issue}` : proper;
+  const S = [
+    BKT.masthead({slot: 'bkmast', img: (at(.05) || {}).img, line: [I.issue ? 'Magazine · ' + I.issue : proper, theme].filter(Boolean).join(' · '), kicker: 'Introducing', big: ['The Selected', 'Artists']}),
     BKT.read({label: 'The open call', body: `${theme ? `For ${I.issue || 'this book'}, we asked artists for “${theme}”. ` : `For ${proper}, we opened our call to artists everywhere. `}${lines ? lines + ' ' : ''}Work arrived from around the world, and our jury looked closely at every piece.`}),
-    BKT.read({burg: true, body: `Today, we're proud to introduce the artists selected for ${proper}.`})];
-  R.forEach((l, k) => { S.push(BKT.roll2({list: l, head: `Selected for ${I.issue ? I.title + ', ' + I.issue : proper}`})); if (k < R.length - 1 && pick[k]) S.push(BKT.single({w: pick[k], slot: 'bkss' + k})); });
-  S.push(BKT.read({label: 'To every artist who applied', body: 'Thank you for trusting us with your work. Choosing was not easy, and being considered by our jury is something to be proud of. If your name isn\'t here this time, we hope to see your work in our next call.'}));
-  S.push(BKT.read({label: 'What happens next', body: `Over the coming weeks, every selected artist will be featured here, one by one. ${proper} is being made now, and we'll share the first look with you soon.`}));
-  S.push(BKT.close({head: 'Congratulations to every artist selected.', sub: 'Cheer them on in the comments, and tag an artist you\'re proud of.'}));
-  const cap = `The artists of ${proper}${theme ? ': ' + theme : ''}.\n\n${theme ? `For this issue we asked artists for “${theme}”, and work arrived from around the world. ` : 'Work arrived from around the world. '}Our jury looked closely at every submission, and today we're proud to share the artists selected.\n\nCongratulations to each of you. Your feature is coming in the weeks ahead.\n\nTo everyone who applied: thank you for trusting us with your work. Being considered is something to be proud of, and we hope to see you in our next call.\n\nCheer them on in the comments and tag an artist you're proud of.`;
+    at(.1) && BKT.plate({w: at(.1), slot: 'bkpl1'}),
+    BKT.read({burg: true, body: `Today, we're proud to introduce the artists selected for ${proper}.`}),
+    faces[0] && BKT.face({slot: 'bkfa1', face: faces[0].face, label: `Selected artist · ${I.issue || proper}`, name: faces[0].artist, handle: faces[0].handle}),
+    at(.3) && BKT.plate({w: at(.3), slot: 'bkpl2'}),
+    at(.45) && BKT.framed({w: at(.45), slot: 'bkfr1'}),
+    BKT.credits({list: names.slice(0, half), head: 'With work by', foot}),
+    at(.55) && BKT.plate({w: at(.55), slot: 'bkpl3'}),
+    faces[1] && BKT.face({slot: 'bkfa2', face: faces[1].face, label: `Selected artist · ${I.issue || proper}`, name: faces[1].artist, handle: faces[1].handle}),
+    BKT.credits({list: names.slice(half), head: 'With work by', foot}),
+    at(.75) && BKT.plate({w: at(.75), slot: 'bkpl4'}),
+    BKT.read({label: 'To every artist who applied', body: 'Thank you for trusting us with your work. Choosing was not easy, and being considered by our jury is something to be proud of. If your name isn\'t here this time, we hope to see your work in our next call.'}),
+    BKT.read({label: 'What happens next', body: `Over the coming weeks, every selected artist will be featured here, one by one. ${proper} is being made now, and we'll share the first look with you soon.`}),
+    BKT.close({head: 'Congratulations to every artist selected.', sub: 'Cheer them on in the comments, and tag an artist you\'re proud of.'})].filter(Boolean);
+  const cap = `Introducing the artists of ${proper}${theme ? ': ' + theme : ''}.\n\n${theme ? `For this issue we asked artists for “${theme}”, and work arrived from around the world. ` : 'Work arrived from around the world. '}Our jury looked closely at every submission, and today we're proud to share the artists selected.\n\nCongratulations to each of you. Your feature is coming in the weeks ahead.\n\nTo everyone who applied: thank you for trusting us with your work. Being considered is something to be proud of, and we hope to see you in our next call.\n\nCheer them on in the comments and tag an artist you're proud of.`;
   return {S, cap};
 }
 
