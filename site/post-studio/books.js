@@ -385,7 +385,7 @@ function bkSelection(D){
   return {rows: rows.slice(0, 4), countries: [...C]};
 }
 // names that must never break across lines
-const bkKeep = t => String(t || '').replace(/-\s*\n\s*/g, '-').replace(/\s+/g, ' ').trim().replace(/Arts to Hearts/g, 'Arts to Hearts').replace(/United (States|Kingdom)/g, 'United $1').replace(/Magazine, Issue (\d+)/g, 'Magazine, Issue $1').replace(/Issue (\d+)/g, 'Issue $1');
+const bkKeep = t => String(t || '').replace(/-\s*\n\s*/g, '-').replace(/(\w)\(/g, '$1 (').replace(/\s+/g, ' ').trim().replace(/Arts to Hearts/g, 'Arts to Hearts').replace(/United (States|Kingdom)/g, 'United $1').replace(/Magazine, Issue (\d+)/g, 'Magazine, Issue $1').replace(/Issue (\d+)/g, 'Issue $1');
 const bkWhole = h => h.replace(/([\p{L}\d]+(?:[-‑][\p{L}\d]+)+)/gu, '<span style="white-space:nowrap">$1</span>');   // hyphenated words never split across lines
 const bkFirst = t => { const m = String(t || '').match(/^[^.!?]+[.!?]+/); return m ? m[0].trim() : String(t || '').trim(); };
 
@@ -431,7 +431,7 @@ const BK_CH = ['The call', 'In numbers', 'The artists', "What's next"];
 const bkTabRow = on => BK_CH.map((t, i) => { const act = t === on;
   return `<div class="a" style="left:870px;top:${210 + i * 232}px;width:66px;height:216px;border-radius:0 14px 14px 0;background:${act ? HL.white : i % 2 ? HL.rose : HL.pink};display:flex;align-items:center;justify-content:center">
     <p style="${act ? T_MED : T_REG};font-size:19px;letter-spacing:.16em;text-transform:uppercase;color:${HL.burg};writing-mode:vertical-rl;white-space:nowrap">${esc(t)}</p></div>`; }).join('');
-const bkB = t => bkWhole(esc(bkKeep(t))).replace(/\*\*(.+?)\*\*/g, (m, x) => `<span style="${T_MED}${x.length < 30 ? ';white-space:nowrap' : ''}">${x}</span>`);   // **words** set heavier, as in the Highlights card
+const bkB = t => bkWhole(esc(bkKeep(t))).replace(/\*\*(.+?)\*\*/g, (m, x) => x.length < 30 ? `<span style="white-space:nowrap">${mark(x)}</span>` : mark(x));   /* emphasis is the house Pink highlight */   // **words** set heavier, as in the Highlights card
 Object.assign(BKT, {
   tabcard(o){ const u = bkPic(o.slot || 'bkbg', o.bg);
     return {bg: HL.burg, html: `${u ? `<div class="a img" data-slot="${o.slot || 'bkbg'}" style="inset:0;background-image:url(${u});background-size:cover;background-position:center"></div><div class="a" style="inset:0;background:rgba(28,19,16,.32)"></div>` : ''}
@@ -440,11 +440,18 @@ Object.assign(BKT, {
     <div class="a" style="left:150px;top:150px;width:724px;height:1060px;background:${HL.white};border-radius:16px;box-shadow:0 24px 60px rgba(20,9,12,.28)"></div>
     <div class="a" style="left:196px;top:190px;width:632px;height:980px;display:flex;flex-direction:column;align-items:center;justify-content:${o.top ? 'flex-start' : 'center'};text-align:center">
       ${o.kicker ? `<p style="${T_MED};font-size:19px;letter-spacing:.22em;text-transform:uppercase;color:${HL.ink};margin-bottom:26px">${esc(bkKeep(o.kicker))}</p>` : ''}
-      ${o.head ? `<p style="${BASK};font-size:${Math.min(o.headSz || 104, bkFit(o.head.join('\n'), 600, 200, .56))}px;white-space:nowrap;line-height:1.02;letter-spacing:-.015em;color:${HL.ink}">${o.head.map(x => esc(x)).join('<br>')}</p>` : ''}
-      ${o.sub ? `<p style="${T_REG};font-size:32px;line-height:1.42;color:${HL.ink};margin-top:30px;max-width:580px">${bkB(o.sub)}</p>` : ''}
-      ${o.lines ? `<div style="margin-top:${o.head ? 44 : 0}px;display:flex;flex-direction:column;gap:${o.gap || 26}px">${o.lines.map(l => `<p style="${T_REG};font-size:${o.lineSz || 30}px;line-height:1.38;color:${HL.ink}">${bkB(l)}</p>`).join('')}</div>` : ''}
+      ${o.head ? `<p style="${BASK};font-style:italic;font-size:${Math.min(o.headSz || 104, bkFit(o.head.join('\n'), 600, 200, .52))}px;white-space:nowrap;line-height:1.05;letter-spacing:-.01em;color:${HL.ink}">${o.head.map(x => esc(x)).join('<br>')}</p>` : ''}
+      ${o.sub ? `<p style="${BASK};font-size:32px;line-height:1.45;color:${HL.ink};margin-top:30px;max-width:580px">${bkB(o.sub)}</p>` : ''}
+      ${o.lines ? `<div style="margin-top:${o.head ? 44 : 0}px;display:flex;flex-direction:column;gap:${o.gap || 26}px">${o.lines.map(l => `<p style="${BASK};font-size:${o.lineSz || 30}px;line-height:1.38;color:${HL.ink}">${bkB(l)}</p>`).join('')}</div>` : ''}
       ${o.list ? `<div style="margin-top:34px;width:100%;display:grid;grid-template-columns:1fr 1fr;gap:${o.list.length > 30 ? 9 : 14}px 24px;text-align:left">${o.list.map(a => `<p style="font-size:${o.list.length > 30 ? 19 : 22}px;line-height:1.25;color:${HL.ink};white-space:nowrap;overflow:hidden;text-overflow:ellipsis"><span style="${T_MED}">${esc(a.name)}</span>${a.place ? ` <span style="${T_REG};color:${BKG2}">${esc(a.place)}</span>` : ''}</p>`).join('')}</div>` : ''}
       ${o.foot ? `<p style="${T_REG};font-size:26px;line-height:1.45;color:${BKG1};margin-top:40px;max-width:560px">${bkB(o.foot)}</p>` : ''}</div>`}; },
+  // the project cover: the work full bleed (as the interview cover), the project set largest, so every announcement is told apart
+  pcover(o){ const u = bkPic(o.slot, o.img); const t = o.title.map(x => bkKeep(x)); const sz = Math.min(150, bkFit(t.join('\n'), 940, 200, .5));
+    return {bg: B.ink, html: `${ivArt(u, 'inset:0', o.slot, 'cover')}<div class="a" style="inset:0;background:rgba(20,9,12,.36)"></div>${ivCorners({mono: true}, '#FFFFFF', B.burg)}
+      <div class="a" style="left:72px;right:72px;bottom:140px;display:flex;flex-direction:column;gap:18px">
+        <p class="cn" style="color:#FFFFFF">${esc(o.label)}</p>
+        ${o.serif ? `<p style="${BASK};font-style:italic;font-size:58px;line-height:1.1;color:#FFFFFF">${esc(o.serif)}</p>` : ''}
+        <p style="${T_MED};font-size:${sz}px;line-height:.95;letter-spacing:-.035em;color:#FFFFFF;white-space:nowrap">${t.map(esc).join('<br>')}</p></div>`}; },
   // the artist (from the Helen Job reference): full bleed, a label, the name large, a few lines about them
   meet(o){ const u = bkPic(o.slot, o.face); return {bg: HL.ink, html: `${u ? `<div class="a img" data-slot="${o.slot}" style="inset:0;background-image:url(${u});background-size:cover;background-position:center 25%"></div>` : `<div class="a ph" data-slot="${o.slot}" style="inset:0;color:${HL.pink};background:${HL.burg}">Drop their photo here</div>`}
     <div class="a" style="inset:0;background:rgba(20,9,12,.3)"></div>
@@ -477,16 +484,17 @@ function bkSelectedPost(b, D){
   const artist = (w, k) => { if (!w) return []; const say = bkSay(w); const about = good(w) ? bkKeep(bkFirst(w.bio)) : w.line;
     return [k % 2 && say ? BKT.words({slot: 'bkmw' + k, face: w.face, q: say, name: w.artist}) : BKT.meet({slot: 'bkmt' + k, face: w.face, label: `Selected artist · ${ed}`, name: w.artist, role: [bkPlaceOf(w), (w.medium || '').split(/\s+on\s+/)[0]].filter(Boolean).join(' · '), text: about}),
       IV.work({img: bkPic('bkaw' + k, w.img), slot: 'bkaw' + k, name: w.artist, cap: bkCap(w)})]; };
+  const pair = (w, k) => w ? [IV.work({img: bkPic('bkaw' + k, w.img), slot: 'bkaw' + k, name: w.artist, cap: bkCap(w)}), BKT.htext({text: good(w) ? bkKeep(bkFirst(w.bio)) : w.line, by: w.artist, handle: w.handle})] : [];
   const S = [
-    BKT.tabcard({bg, mono: true, tab: 'The call', kicker: `Arts to Hearts Magazine · ${I.issue || ''}`.replace(/ · $/, ''), head: ['The Selected', 'Artists'], sub: theme ? `Congratulations to the artists of **${theme}**` : `Congratulations to the artists of **${proper}**`}),
+    BKT.pcover({slot: 'bkcov', img: bg, label: 'Selected artists', serif: theme, title: I.issue ? ['Arts to Hearts', 'Magazine', I.issue] : bkBalance(proper)}),
     BKT.tabcard({bg, tab: 'The call', head: ['Congratulations'], headSz: 96, sub: `to every artist selected for **${proper}**.`, foot: 'Your work is going into print, and your feature is coming in the weeks ahead.'}),
-    BKT.tabcard({bg, tab: 'The call', head: ['The open call'], headSz: 80, lines: [theme ? `For ${ed}, we asked artists for **“${theme}”**.` : `For ${proper}, we opened our call to artists everywhere.`, 'Maybe you don\'t remember the summer itself. Maybe you remember **the light in a room**, the road you took every evening, or **the person who was there**.', 'Work arrived **from around the world**, and our jury looked closely at **every piece**.'].filter((l, i) => i !== 1 || /summer/i.test(theme))}),
-    nums.length >= 2 && BKT.tabcard({bg, tab: 'In numbers', head: ['In numbers'], headSz: 80, lines: nums, lineSz: 34, gap: 34}),
-    BKT.faces({list: D.works.filter(w => w.face).slice(0, 12).map(w => ({name: w.artist, handle: w.handle, face: w.face})), slot: 'bkfw'}),
-    ...artist(pick(.15), 0), ...artist(pick(.5), 1), ...artist(pick(.8), 2),
+    BKT.htext({label: 'The open call', text: `${theme ? `For ${ed}, we asked artists for “${theme}”.` : `For ${proper}, we opened our call to artists everywhere.`} ${(((th.text || '').match(/[^.!?]+[.!?]+/g) || []).filter(x => x.trim().split(' ').length > 4).slice(0, 2).join(' ').trim())} Work arrived from around the world, and our jury looked closely at every piece.`}),
+    nums.length >= 2 && BKT.tabcard({bg, tab: 'In numbers', head: ['In numbers'], headSz: 84, lines: nums, lineSz: 34, gap: 34}),
+    BKT.htext({label: 'Meet some of the artists', text: `Over the coming weeks, every artist in ${proper} will have their own feature here. Here are three of them.`}),
+    ...pair(pick(.15), 0), ...pair(pick(.5), 1), ...pair(pick(.8), 2),
     ...Array.from({length: pages}, (_, p) => BKT.tabcard({bg, tab: 'The artists', top: true, head: ['The Artists'], headSz: 72, list: people.slice(p * per, (p + 1) * per)})),
-    BKT.tabcard({bg, tab: "What's next", head: ['To everyone', 'who applied'], headSz: 72, lines: ['**Thank you** for trusting us with your work.', 'Choosing was not easy, and being considered by our jury is **something to be proud of**.', 'If your name isn\'t here this time, we hope to see your work **in our next call**.']}),
-    BKT.tabcard({bg, tab: "What's next", head: ["What's next"], headSz: 80, lines: [`Every selected artist will be **featured here**, one by one.`, `**${proper}** is being made now.`, 'We\'ll share **the first look** with you soon.']}),
+    BKT.htext({label: 'To everyone who applied', text: 'Thank you for trusting us with your work. Choosing was not easy, and being considered by our jury is something to be proud of. If your name isn\'t here this time, we hope to see your work in our next call.'}),
+    BKT.tabcard({bg, tab: "What's next", head: ["What's next"], headSz: 84, lines: [`Every selected artist will be **featured here**, one by one.`, `**${proper}** is being made now.`, 'We\'ll share **the first look** with you soon.']}),
     BKT.keyEnd({head: `Congratulations to every artist selected for ${proper}.`, key: KW, offer: 'Comment the word and we\'ll send you the full list.', foot: 'Tag an artist you\'re proud of.'})].filter(Boolean);
   if (S.length > 20) S.splice(19, S.length - 20);
   const cap = `Introducing the artists of ${proper}${theme ? ': ' + theme : ''}.\n\nCongratulations to every artist selected. ${theme ? `For this issue we asked artists for “${theme}”, and work arrived from around the world. ` : 'Work arrived from around the world. '}Our jury looked closely at every submission. Every name is in the slides, and every artist will be featured here in the weeks ahead.\n\nComment ${KW} and we'll send you the full list.\n\nTo everyone who applied: thank you for trusting us with your work. Being considered is something to be proud of, and we hope to see you in our next call.`;
