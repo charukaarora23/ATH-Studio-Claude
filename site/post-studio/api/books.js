@@ -13,7 +13,11 @@ const PREFIX = 'books/library-';
 // ---------- Google auth (service account JWT, no extra packages) ----------
 async function googleToken(){
   const raw = process.env.GOOGLE_SERVICE_ACCOUNT; if (!raw) throw new Error('GOOGLE_SERVICE_ACCOUNT is not set in Vercel');
-  const sa = JSON.parse(raw); const now = Math.floor(Date.now() / 1000);
+  let sa; try { sa = JSON.parse(raw); } catch { // a paste that lost a comma or quote: take the two fields we need
+    const pick = k => { const m = raw.match(new RegExp('"' + k + '"\\s*:\\s*"((?:[^"\\\\]|\\\\.)*)"')); return m ? JSON.parse('"' + m[1] + '"') : ''; };
+    sa = {client_email: pick('client_email'), private_key: pick('private_key'), token_uri: pick('token_uri')}; }
+  if (!sa.client_email || !/BEGIN PRIVATE KEY/.test(sa.private_key || '')) throw new Error('GOOGLE_SERVICE_ACCOUNT in Vercel is not the full JSON file. Paste the whole file again.');
+  const now = Math.floor(Date.now() / 1000);
   const b64 = o => Buffer.from(JSON.stringify(o)).toString('base64url');
   const body = b64({alg: 'RS256', typ: 'JWT'}) + '.' + b64({iss: sa.client_email, scope: 'https://www.googleapis.com/auth/spreadsheets.readonly', aud: sa.token_uri || 'https://oauth2.googleapis.com/token', iat: now, exp: now + 3600});
   const sig = crypto.createSign('RSA-SHA256').update(body).sign(sa.private_key).toString('base64url');
