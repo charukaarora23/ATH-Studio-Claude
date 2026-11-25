@@ -56,7 +56,7 @@ const BKT = {
         ${o.label ? bkLabel(o.label, HL.burg) : ''}
         ${o.serif ? `<p style="${BASK};font-style:italic;font-size:${o.body ? 44 : 62}px;line-height:1.15;color:${HL.burg}">${esc(o.serif)}</p>` : ''}
         ${big ? `<p style="${T_MED};font-size:${bs}px;line-height:.96;letter-spacing:-.035em;color:${HL.ink};white-space:nowrap">${lines.map(esc).join('<br>')}</p>` : ''}
-        ${o.img !== undefined ? bkSlot(o.slot || 'bkin', o.img, 'position:relative;width:520px;height:560px;flex:none', 'Drop the book mockup here').replace('class="a ', 'class="') : ''}
+        ${o.img !== undefined ? bkSlot(o.slot || 'bkin', o.img, 'position:relative;width:' + (o.imgW || 520) + 'px;height:' + (o.imgH || 560) + 'px;flex:none', o.ph || 'Drop the book mockup here').replace('class="a ', 'class="') : ''}
         ${o.body ? `<p style="${BASK};font-size:${o.body.length > 520 ? 32 : o.body.length > 380 ? 36 : o.body.length > 220 ? 42 : 52}px;line-height:1.42;color:${HL.ink}">${bkMark(o.body)}</p>` : ''}
         ${o.sub ? `<p style="${T_REG};font-size:34px;line-height:1.4;color:${HL.soft}">${esc(o.sub)}</p>` : ''}
         ${o.by ? `<p style="${T_MED};font-size:30px;color:${HL.burg}">${esc(o.by)}</p>` : ''}
@@ -540,6 +540,7 @@ function bkSelectedPost(b, D, coverKind){
   const coverImg = picks[0] ? picks[0].w.img : (F[0] || {}).img;
   const cover = coverKind === 'photo' ? BKT.pcover({slot: 'bkcov', img: coverImg, label: 'Selected artists', title: I.issue ? ['Arts to Hearts', 'Magazine', I.issue] : bkBalance(proper), sub: theme ? `Introducing the artists of ${theme}` : 'Introducing the artists'})
     : coverKind === 'burgundy' ? BKT.bcover({label: 'Selected artists', title: I.issue ? ['Arts to Hearts', 'Magazine', I.issue] : bkBalance(proper), serif: theme, sub: 'Introducing the artists'})
+    : coverKind === 'artwork' ? BKT.card({faces, mono: true, tab: 'Artists', serif: 'Meet the artists of', big, bigMax: 76, img: coverImg, slot: 'bkcovart', imgW: 600, imgH: 600, ph: 'Click or drop an artwork here', sub: theme || ''})   /* the work whole inside the card; click or drop to swap it */
     : BKT.card({faces, mono: true, tab: 'Artists', serif: 'Meet the artists of', big, sub: theme || ''});
   const S = [
     cover,
@@ -691,7 +692,7 @@ function bookTabPhase(b, phase){
   const P = bkPlan(b).filter(p => p.phase === phase); const today = Date.now();
   const intro = {pre: 'While the book is being made: who is inside it, before anyone can buy it. Ends with the cover reveal.', launch: 'Pre-order is open until it goes to print: the book, the editor, every artist, one action each time.', after: 'The book is here, then it rotates in the backlist.'}[phase];
   if (!P.length) return `<p class="meta">${intro}</p><p class="meta">Nothing here yet for this book.</p>`;
-  return `<p class="meta">${intro} ${P.length} posts.</p><div class="bk-plan">${P.map(p => `<div class="bk-row${p.when && p.t < today - DAY ? ' past' : ''}${BOOKVIEW && BOOKVIEW.id === p.id ? ' on' : ''}"><span class="bk-when">${p.when ? bkFmt(p.when) : '—'}</span><div><b>${bkEsc(p.title)}</b>${p.collab ? ' <span class="bk-tag">Collab</span>' : ''}<p class="meta">${bkEsc(p.what)}</p></div><button type="button" class="btn ghost" data-bkopen="${p.id}">Open</button>${p.id === 'selected' && BOOKVIEW && BOOKVIEW.id === 'selected' ? `<div class="bk-covers">Cover: ${[['faces', 'Faces'], ['photo', 'Photo'], ['burgundy', 'Burgundy']].map(([k, l]) => `<button type="button" class="btn ghost${(BOOKVIEW.cover || 'faces') === k ? ' on' : ''}" data-bkcover="${k}">${l}</button>`).join(' ')}</div>` : ''}</div>`).join('')}</div>`;
+  return `<p class="meta">${intro} ${P.length} posts.</p><div class="bk-plan">${P.map(p => `<div class="bk-row${p.when && p.t < today - DAY ? ' past' : ''}${BOOKVIEW && BOOKVIEW.id === p.id ? ' on' : ''}"><span class="bk-when">${p.when ? bkFmt(p.when) : '—'}</span><div><b>${bkEsc(p.title)}</b>${p.collab ? ' <span class="bk-tag">Collab</span>' : ''}<p class="meta">${bkEsc(p.what)}</p></div><button type="button" class="btn ghost" data-bkopen="${p.id}">Open</button>${p.id === 'selected' && BOOKVIEW && BOOKVIEW.id === 'selected' ? `<div class="bk-covers">Cover: ${[['faces', 'Faces'], ['artwork', 'Faces + artwork'], ['photo', 'Photo'], ['burgundy', 'Burgundy']].map(([k, l]) => `<button type="button" class="btn ghost${(BOOKVIEW.cover || 'faces') === k ? ' on' : ''}" data-bkcover="${k}">${l}</button>`).join(' ')}</div>` : ''}</div>`).join('')}</div>`;
 }
 function bookTabKits(b){
   const D = bkData(b), parts = Math.ceil(D.works.length / BK_FEAT); if (!parts) return '<p class="meta">No artists yet.</p>';
