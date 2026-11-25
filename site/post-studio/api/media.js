@@ -22,7 +22,7 @@ export default async function handler(req, res){
     const part = String(req.query.part || ''); const src = {pages: b.links.pages, mockups: b.links.mockups, shoot: b.links.shoot}[part];
     if (!src) return res.status(400).json({error: part ? `No ${part === 'pages' ? 'Page by Page Graphics' : part === 'mockups' ? 'Mockups' : 'Photoshoot'} link for this book in Books Data` : 'part?'});
     const T0 = Date.now(), stop = () => Date.now() - T0 > 270000; const got = {}; let inflight = [], skipped = 0;
-    const size = part === 'pages' ? 1100 : 1600; const cap = part === 'shoot' ? 40 : part === 'mockups' ? 60 : 1000; let n = 0;
+    const size = part === 'pages' ? 1100 : 1600; const cap = part === 'shoot' ? 40 : part === 'mockups' ? 200 : 1000; let n = 0;
     const handle = async (name, bytes) => { const base = name.split('/').pop().replace(/\.[a-z]+$/i, '');
       const jpg = await sharp(bytes, {limitInputPixels: false}).rotate().resize({width: size, height: size, fit: 'inside', withoutEnlargement: true}).jpeg({quality: 80, mozjpeg: true}).toBuffer();
       const meta = await sharp(jpg).metadata();
