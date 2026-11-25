@@ -176,8 +176,11 @@ function matchShop(book, shop){
 async function versions(){ const { blobs } = await list({ prefix: PREFIX, limit: 1000 }); return blobs.sort((a, b) => new Date(b.uploadedAt) - new Date(a.uploadedAt)); }
 // the library is a few MB: kept in memory on a warm function and reused until a newer version is saved
 let MEMO = null;
-export async function readLib(){ const v = await versions(); if (!v.length) return {synced: null, books: []}; if (MEMO && MEMO.url === v[0].url) return MEMO.lib;
-  const r = await fetch(v[0].url, {cache: 'no-store'}); if (!r.ok) return {synced: null, books: []}; const lib = await r.json(); MEMO = {url: v[0].url, lib}; return lib; }
+// a warm function reuses the library for 10 minutes without listing the store (every list counts against the Blob plan)
+export async function readLib(){ if (MEMO && Date.now() - MEMO.at < 600000) return MEMO.lib;
+  const v = await versions(); if (!v.length) return {synced: null, books: []}; if (MEMO && MEMO.url === v[0].url) { MEMO.at = Date.now(); return MEMO.lib; }
+  const r = await fetch(v[0].url, {cache: 'no-store'}); if (!r.ok) throw new Error(`The saved library could not be read (storage answered ${r.status}). If Vercel Blob is over its plan limit, the store is paused until it is upgraded or the month resets.`);
+  const lib = await r.json(); MEMO = {url: v[0].url, lib, at: Date.now()}; return lib; }
 async function sync(){
   const T0 = Date.now();
   const token = await googleToken();
@@ -187,7 +190,7 @@ async function sync(){
   books.forEach(b => { const p = matchShop(b, shop); if (p) b.shop = p; b.count = (b.artists || []).length; });
   problems.push(...await readInsides(token, books, T0 + 120000).catch(e => [{sheet: 'PDFs', error: String(e.message || e)}]));
   const lib = {synced: new Date().toISOString(), books, shopCount: shop.length, problems};
-  await put(PREFIX + Date.now() + '.json', JSON.stringify(lib), { access: 'public', addRandomSuffix: true, contentType: 'application/json' });
+  const saved = await put(PREFIX + Date.now() + '.json', JSON.stringify(lib), { access: 'public', addRandomSuffix: true, contentType: 'application/json' }); MEMO = {url: saved.url, lib, at: Date.now()};
   const old = (await versions()).slice(3).map(b => b.url); if (old.length) await del(old).catch(() => {});
   return lib;
 }
