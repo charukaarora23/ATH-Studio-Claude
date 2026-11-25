@@ -6,6 +6,7 @@
 import { put, list, del } from '@vercel/blob';
 import crypto from 'node:crypto';
 import { readInside } from './_inside.js';
+import { verifyArtists, fold } from './_verify.js';
 
 const MASTER = '18YXSenrWqh70doiXHJYERqSooqBw3aN88BVIGikhppA';
 const SHOP = 'https://shop.artstoheartsproject.com';
@@ -106,7 +107,7 @@ async function readInsides(token, books, deadline){
       let version = '', url = '', headers = {};
       if (drive) { const mr = await fetch(`https://www.googleapis.com/drive/v3/files/${drive}?fields=modifiedTime&supportsAllDrives=true`, {headers: {Authorization: 'Bearer ' + token}}); if (!mr.ok) { b.insideError = 'Share this Drive PDF with the studio robot, or use the Dropbox link'; continue; } version = (await mr.json()).modifiedTime; url = `https://www.googleapis.com/drive/v3/files/${drive}?alt=media&supportsAllDrives=true`; headers = {Authorization: 'Bearer ' + token}; }
       else { url = dropDl(link); version = String(await sizeOf(url)); }
-      if (c) { const j = await (await fetch(c.url, {cache: 'no-store'})).json(); if (j.modified === version || (!version && j.inside)) { b.inside = j.inside; continue; } }
+      if (c) { const j = await (await fetch(c.url, {cache: 'no-store'})).json(); if (j.norm && (j.modified === version || (!version && j.inside))) { b.inside = j.inside; if (j.norm) b.verify = verifyArtists(b.artists, j.norm); continue; } }
       if (drop && +version > 0 && +version < 5000) { b.insideError = 'No PDF in this Dropbox folder yet'; continue; }
       if (drop && +version > 450e6) { b.insideError = 'This folder is too large to read (keep only the digital PDF in it)'; continue; }
       if (fresh >= 1 && Date.now() > deadline) { b.insideError = 'Will be read on the next sync'; continue; }
@@ -114,10 +115,12 @@ async function readInsides(token, books, deadline){
       let bytes = new Uint8Array(await fr.arrayBuffer());
       if (bytes[0] === 0x50 && bytes[1] === 0x4b) { const { unzipSync } = await import('fflate'); const files = unzipSync(bytes, {filter: f => /\.pdf$/i.test(f.name) && !/__MACOSX/.test(f.name)}); const names = Object.keys(files).sort((x, y) => files[y].length - files[x].length); if (!names.length) { b.insideError = 'No PDF in this Dropbox folder yet'; continue; } bytes = files[names[0]]; b.pdfName = names[0]; }
       const { pdfPages } = await import('./_pdf.js'); const pages = await pdfPages(bytes); fresh++; bytes = null;
-      const inside = readInside(pages); inside.file = b.pdfName || '';
+      const rules = readInside(pages); let inside = rules;
+      try { const { aiInside } = await import('./_ai.js'); const ai = await aiInside(pages); if (ai) inside = {...ai, artists: rules.artists, pages: rules.pages}; } catch (e) { rules.aiError = String(e.message || e).slice(0, 160); }
+      inside.file = b.pdfName || ''; const norm = pages.map(fold); b.verify = verifyArtists(b.artists, norm);
       if (pages.join('').replace(/\s/g, '').length < 2000) { b.insideError = 'This PDF has no readable text (it may be the print file)'; continue; }
       b.inside = inside;
-      await put(`books/inside/${key}.json`, JSON.stringify({modified: version, inside}), {access: 'public', addRandomSuffix: false, allowOverwrite: true, contentType: 'application/json'});
+      await put(`books/inside/${key}.json`, JSON.stringify({modified: version, inside, norm}), {access: 'public', addRandomSuffix: false, allowOverwrite: true, contentType: 'application/json'});
     } catch (e) { b.insideError = 'Could not read the PDF: ' + String(e.message || e).slice(0, 120); problems.push({sheet: b.name, error: b.insideError}); }
   }
   return problems;
