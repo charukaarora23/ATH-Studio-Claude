@@ -491,7 +491,7 @@ function bkSelectedPost(b, D){
   const the = c => /^(United|Netherlands|Philippines)/.test(c) ? 'the ' + c : c;
   const story = [
     sel.painters >= sel.n * .5 ? `Most of the work in ${ed} is **painted**: ${over(sel.painters)} painters, in oil, acrylic and watercolour.` : '',
-    sel.countries.length >= 5 ? `The artists live and work in **${over(sel.countries.length)} countries**, from ${sel.countries.slice(0, 3).map(the).join(', ')} to ${the(sel.countries[sel.countries.length - 1])}.` : '',
+    sel.countries.length >= 5 ? `The artists live and work in **${over(sel.countries.length)} countries**, from ${the(sel.countries[0])} to ${the(sel.countries[sel.countries.length - 1])}.` : '',
     sel.known >= sel.n * .6 && sel.she / sel.known >= .5 ? `And **${words(Math.floor(sel.she / sel.known * 10))} in ten** of them are women.` : ''].filter(Boolean);
   // each featured artist, as the agreed unit: the work with their face, their portrait with the name, their words over it, a page about them
   const feature = (w, k) => { if (!w) return []; const bs = bkKeep(w.bio).split(/(?<=[.!?])\s+/).filter(Boolean); let about = ''; for (const x of bs) { if ((about + ' ' + x).length > 330 && about) break; about = (about + ' ' + x).trim(); } if (!good(w)) about = w.line;
