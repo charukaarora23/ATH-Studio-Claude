@@ -517,11 +517,11 @@ function bkSelectedPost(b, D){
   const S = [
     BKT.pcover({slot: 'bkcov', img: bg, label: 'Selected artists', title: I.issue ? ['Arts to Hearts', 'Magazine', I.issue] : bkBalance(proper), sub: theme ? `Introducing the artists of ${theme}` : 'Introducing the artists'}),
     BKT.tabcard({bg, tab: 'The call', head: ['Congratulations'], headSz: 100, subSz: 42, footSz: 32, sub: `to every artist selected for **${proper}**.`, foot: 'Your work is going into print. This is a moment to be proud of, and we are celebrating it with you.'}),
+    ...Array.from({length: pages}, (_, p) => BKT.tabcard({bg, tab: 'The artists', top: true, head: [p ? 'The Artists' : 'Selected for ' + (I.issue || 'the book')], headSz: 64, list: people.slice(p * per, (p + 1) * per)})),
     theme && brief && BKT.htext({label: 'The project', text: `${proper} is ${theme}. ${brief}`}),
     art(arts[0], 0), art(arts[1], 1),
     BKT.tabcard({bg, tab: 'The artists', head: ['The selection'], headSz: 84, lineSz: 36, gap: 34, lines: numbers}),
     art(arts[2], 2), art(arts[3], 3),
-    ...Array.from({length: pages}, (_, p) => BKT.tabcard({bg, tab: 'The artists', top: true, head: [p ? 'The Artists' : 'Selected for ' + (I.issue || 'the book')], headSz: 64, list: people.slice(p * per, (p + 1) * per)})),
     art(arts[4], 4), art(arts[5], 5),
     BKT.tabcard({bg, tab: "What's next", head: ["What's next"], headSz: 84, lineSz: 36, gap: 34, lines: [`Over the coming weeks, **every artist** in ${ed} will be featured here, one by one.`, `The ${I.issue ? 'magazine' : 'book'} is being made now. **The first look** is coming soon.`, 'When your feature goes live, share it. **Your people** will want to see it.']}),
     BKT.htext({label: 'To everyone who applied', text: `Thank you for trusting us with your work. Choosing was hard, and many beautiful works could not fit in these pages. If your name is not here this time, please keep going. We would love to see your work in our next call.`}),
