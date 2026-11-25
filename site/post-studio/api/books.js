@@ -174,7 +174,10 @@ function matchShop(book, shop){
 
 // ---------- store ----------
 async function versions(){ const { blobs } = await list({ prefix: PREFIX, limit: 1000 }); return blobs.sort((a, b) => new Date(b.uploadedAt) - new Date(a.uploadedAt)); }
-async function readLib(){ const v = await versions(); if (!v.length) return {synced: null, books: []}; const r = await fetch(v[0].url, {cache: 'no-store'}); return r.ok ? r.json() : {synced: null, books: []}; }
+// the library is a few MB: kept in memory on a warm function and reused until a newer version is saved
+let MEMO = null;
+async function readLib(){ const v = await versions(); if (!v.length) return {synced: null, books: []}; if (MEMO && MEMO.url === v[0].url) return MEMO.lib;
+  const r = await fetch(v[0].url, {cache: 'no-store'}); if (!r.ok) return {synced: null, books: []}; const lib = await r.json(); MEMO = {url: v[0].url, lib}; return lib; }
 async function sync(){
   const T0 = Date.now();
   const token = await googleToken();
