@@ -42,6 +42,17 @@ Serve `site/post-studio` with `python3 -m http.server 8765`, drive it with Playw
 - Built: `api/books.js` (service-account JWT, no packages; reads Books Data 'Main ' incl. smart-chip links in "Artists Data for Graphics" → each book's artist tab by gid; public Shopify products.json; saves `books/library-*.json` in Blob; no emails stored; nightly Vercel cron 03:17 UTC + "Sync now"). `books.js` = Books tab (list, search, book detail with artists). Env: `GOOGLE_SERVICE_ACCOUNT` (robot books-app@new-submit-468800.iam.gserviceaccount.com, needs Viewer on each artist sheet). `ANTHROPIC_API_KEY` not set yet.
 - Next: step 2 launch carousel, step 3 The Edit.
 
+## The larger picture: one book's life (from the user, Nov 2026)
+Goal: elevate the artists AND sell the book, professionally, with no fluff or overcrowding. Every post has one clear action.
+1. **Open call (~30 days).** First half: what the book is, who the juror/curator is, what we look for, the value to an artist's life. Second half: urgency + clear action items. Valuable throughout.
+2. **Jury (~10–15 days after close).** No open-call urgency. ~500 applications → ~100 selected, rest declined (dashboard notifications).
+3. **Selected artists announced.** Dashboard + website + an official social post. Every selected artist is promised a carousel feature; each feature also sells the book.
+4. **Book being made (~30–40 days).** Book form filled by artists; team adds curator interview, invited galleries/curators/collectors/artists, brand mission, team editorials; some artists replaced. Content: teasers while it's made (not done today, wanted), cover artist reveal, artist features. Near finalisation → **pre-order opens on Shopify**.
+5. **Print (~25 days + QC + shipping).** Pre-order push: why buy, who it's for, artists' subsidised rate, friends & family discount, newsletter.
+6. **Arrival + 1–2 months.** Keep promoting; artists keep promoting (share kits).
+7. **Backlist.** Taper, focus on the next pre-launch, keep rotating older editions.
+Books Data columns already useful: Status, Artist Disc. Code, Mockups, Page by Page Graphics, Photoshoot Link, Cover Artist, Landing Page, Shopify/Amazon/B&N links.
+
 ### Original plan
 Goal: sell the books and promote the ~100 artists per book without one post per artist.
 - Data sources: Shopify (public `shop.artstoheartsproject.com/products.json`: cover, price, pre-order, link) + Google Sheets. Master index: "Books Data" sheet `18YXSenrWqh70doiXHJYERqSooqBw3aN88BVIGikhppA` (one row per book: Dropbox links, cover artist, designer, pages…). Per-book artist sheets exist, e.g. "Big Book" `1qL7DLn7xbrI8H_by5t-u7H0M6oK-RT8Uie9Ur5W9p3E` tab "Painters" (Name, Email, Website, Instagram, 1 Liner, Bio, Artist Image, Artwork 1/2 + details, reel/carousel status) and "Review – The Big Book of Painters 2026" `1E55IxXMMVrrn9yKAh1_Co1bQWYdxzfTb2GP1ZTk0d1c` (quote, country, interview answers, artwork title/medium/year). Artwork images are hosted on media.artstoheartsproject.com.
