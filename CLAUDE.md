@@ -38,7 +38,11 @@ Serve `site/post-studio` with `python3 -m http.server 8765`, drive it with Playw
 - Downloads render with `vendor/html-to-image.js` (html2canvas only as fallback); `freezeLines()` locks line breaks to the preview.
 - Edits (text, moves, hidden slides, image swaps) on article posts are saved on the post (`p.edits`), shared with the team.
 
-## Next big piece: Books section (planned, not built)
+## Books section (step 1 built: Sync + Books tab)
+- Built: `api/books.js` (service-account JWT, no packages; reads Books Data 'Main ' incl. smart-chip links in "Artists Data for Graphics" → each book's artist tab by gid; public Shopify products.json; saves `books/library-*.json` in Blob; no emails stored; nightly Vercel cron 03:17 UTC + "Sync now"). `books.js` = Books tab (list, search, book detail with artists). Env: `GOOGLE_SERVICE_ACCOUNT` (robot books-app@new-submit-468800.iam.gserviceaccount.com, needs Viewer on each artist sheet). `ANTHROPIC_API_KEY` not set yet.
+- Next: step 2 launch carousel, step 3 The Edit.
+
+### Original plan
 Goal: sell the books and promote the ~100 artists per book without one post per artist.
 - Data sources: Shopify (public `shop.artstoheartsproject.com/products.json`: cover, price, pre-order, link) + Google Sheets. Master index: "Books Data" sheet `18YXSenrWqh70doiXHJYERqSooqBw3aN88BVIGikhppA` (one row per book: Dropbox links, cover artist, designer, pages…). Per-book artist sheets exist, e.g. "Big Book" `1qL7DLn7xbrI8H_by5t-u7H0M6oK-RT8Uie9Ur5W9p3E` tab "Painters" (Name, Email, Website, Instagram, 1 Liner, Bio, Artist Image, Artwork 1/2 + details, reel/carousel status) and "Review – The Big Book of Painters 2026" `1E55IxXMMVrrn9yKAh1_Co1bQWYdxzfTb2GP1ZTk0d1c` (quote, country, interview answers, artwork title/medium/year). Artwork images are hosted on media.artstoheartsproject.com.
 - Print PDFs (e.g. Painters 910 MB) have text converted to outlines → not readable; images extract fine with `pdfimages`. Don't OCR (slow/expensive) — use the sheets.

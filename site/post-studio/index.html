@@ -115,10 +115,22 @@ summary{font:600 12px/1 var(--mono);letter-spacing:.1em;text-transform:uppercase
 /* gap = information still to be supplied; visible on purpose */
 .post .gap{display:inline-block;border:2px dashed currentColor;border-radius:8px;padding:0 .3em;opacity:.75}
 .post .ph{display:flex;align-items:center;justify-content:center;text-align:center;border:3px dashed currentColor;border-radius:18px;opacity:.6;font-size:24px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;line-height:1.5}
+body[data-seg=books] .app{display:none}body:not([data-seg=books]) #books{display:none}
+#books{max-width:1400px;margin:0 auto;padding:28px 24px 80px;font-family:var(--sans,sans-serif);color:#1C1310}
+#books h1{font-size:28px;margin:0 0 6px}#books .meta{color:#6b5a55;font-size:14px;margin:4px 0}#books a{color:#6A0620}
+.bk-top{display:flex;justify-content:space-between;gap:20px;align-items:flex-start;flex-wrap:wrap;margin-bottom:20px}.bk-act{display:flex;gap:8px}.bk-act input{padding:8px 12px;border:1px solid #d9c9c4;border-radius:8px;font:inherit;min-width:200px}
+.bk-warn{color:#6A0620;font-weight:600}
+.bk-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:16px}
+.bk-card{display:flex;flex-direction:column;gap:4px;text-align:left;background:#fff;border:1px solid #eadcd8;border-radius:12px;padding:10px;cursor:pointer;font:inherit;font-size:13px;color:#1C1310}.bk-card:hover,.bk-card.on{border-color:#6A0620}.bk-card b{font-size:14px;line-height:1.25}.bk-card span{color:#6b5a55}
+.bk-cv{aspect-ratio:4/5;border-radius:8px;background:#FAD2E1 center/contain no-repeat;margin-bottom:6px}.bk-none{display:flex;align-items:center;justify-content:center;text-align:center;padding:10px;color:#6A0620;font-weight:600;font-size:13px;background:#FAD2E1}
+.bk-detail{background:#fff;border:1px solid #eadcd8;border-radius:14px;padding:20px;margin-bottom:24px}.bk-detail h2{margin:0 0 6px;font-size:22px}
+.bk-arts{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:14px;margin-top:14px}.bk-a{display:flex;flex-direction:column;gap:2px;font-size:12px}.bk-a b{font-size:13px}.bk-a span{color:#6A0620}.bk-a i{color:#6b5a55;font-family:'ATH Serif',Georgia,serif}
+.bk-w{aspect-ratio:1;border-radius:8px;background:#f5ecea center/contain no-repeat;margin-bottom:4px}
 </style>
 </head><body>
 
-<header class="segbar"><b>ATH Studio</b><nav id="seg" aria-label="Sections"><button type="button" data-seg="calls">Open calls</button><button type="button" data-seg="interviews">Artist interviews</button><button type="button" data-seg="editorial">ATH Editorial</button><button type="button" data-seg="heartlist">The Heart List</button></nav></header>
+<header class="segbar"><b>ATH Studio</b><nav id="seg" aria-label="Sections"><button type="button" data-seg="calls">Open calls</button><button type="button" data-seg="interviews">Artist interviews</button><button type="button" data-seg="editorial">ATH Editorial</button><button type="button" data-seg="heartlist">The Heart List</button><button type="button" data-seg="books">Books</button></nav></header>
+<main id="books"></main>
 <div class="app">
 <aside>
   <h1>ATH Post Studio</h1>
@@ -1075,6 +1087,7 @@ function setSeg(seg){ document.body.dataset.seg = seg; document.querySelectorAll
   try { localStorage.setItem('athSeg', seg); } catch {}
   if (seg === 'interviews' || seg === 'editorial' || seg === 'heartlist') { IVK = seg === 'editorial' ? 'editorial' : seg === 'heartlist' ? 'heartlist' : 'interview'; IVSEL = selOf(IVK); $('ptype').value = 'interview'; renderIvSide(); }
   else if ($('ptype').value === 'interview') { let pt = null; try { pt = localStorage.getItem('athLastPtype'); } catch {} $('ptype').value = pt && pt !== 'interview' && [...$('ptype').options].some(o => o.value === pt) ? pt : 'calendar'; }
+  if (seg === 'books') { booksRender(); window.scrollTo({top: 0}); return; }
   render(); window.scrollTo({top: 0}); }
 document.querySelectorAll('#seg [data-seg]').forEach(b => b.onclick = () => setSeg(b.dataset.seg));
 function storyPlanHTML(){
@@ -1516,6 +1529,7 @@ $('ptype').onchange = () => { try { localStorage.setItem('athLastPtype', $('ptyp
   sizePreviews(); await document.fonts.ready; let seg = 'calls'; try { seg = localStorage.getItem('athSeg') || 'calls'; } catch {} setSeg(seg); if (had) status('Welcome back. Your edits are restored.'); })();
 </script>
 <script src="daily.js"></script>
+<script src="books.js"></script>
 <script src="interview.js"></script>
 <script src="editorial.js"></script>
 <script src="heartlist.js"></script>
