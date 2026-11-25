@@ -3,14 +3,15 @@
 // GET  /api/books?sync=1   -> run the sync (the nightly cron calls this), returns the new library
 // POST /api/books          -> run the sync (the "Sync now" button)
 // Needs GOOGLE_SERVICE_ACCOUNT (the service account JSON). No AI here: plain data, no tokens spent.
-import { put, list, del } from '@vercel/blob';
+import { put } from '@vercel/blob';
+import { readJSON, writeJSON, readOrMigrate } from './_store.js';
 import crypto from 'node:crypto';
 import { readInside } from './_inside.js';
 import { verifyArtists, fold } from './_verify.js';
 
 const MASTER = '18YXSenrWqh70doiXHJYERqSooqBw3aN88BVIGikhppA';
 const SHOP = 'https://shop.artstoheartsproject.com';
-const PREFIX = 'books/library-';
+const PATH = 'books/library.json';   // one fixed file, overwritten by each sync (reads cost no store operation)
 
 // ---------- Google auth (service account JWT, no extra packages) ----------
 async function googleToken(){
@@ -96,18 +97,17 @@ const dropDl = u => { const x = new URL(u); x.searchParams.set('dl', '1'); x.sea
 async function sizeOf(url){ try { const r = await fetch(url, {headers: {Range: 'bytes=0-0'}}); const n = +(r.headers.get('original-content-length') || (r.headers.get('content-range') || '').split('/')[1] || r.headers.get('content-length') || 0); try { await r.body.cancel(); } catch {} return n; } catch { return 0; } }
 async function readInsides(token, books, deadline){
   const todo = books.filter(b => b.links && b.links.pdf); if (!todo.length) return [];
-  const { blobs } = await list({ prefix: 'books/inside/', limit: 1000 }); const cache = Object.fromEntries(blobs.map(x => [x.pathname.replace(/^books\/inside\/|\.json$/g, ''), x]));
   const problems = []; let fresh = 0;
   // newest books first, so this month's books are read before the backlist
   for (const b of todo) {
     const link = b.links.pdf, drive = driveId(link), drop = /dropbox\.com/.test(link);
     if (!drive && !drop) { b.insideError = 'Pdf File must be a Dropbox or Google Drive link'; continue; }
     try {
-      const key = drive || keyOf(link); const c = cache[key];
+      const key = drive || keyOf(link); const j = await readJSON(`books/inside/${key}.json`).catch(() => null);
       let version = '', url = '', headers = {};
       if (drive) { const mr = await fetch(`https://www.googleapis.com/drive/v3/files/${drive}?fields=modifiedTime&supportsAllDrives=true`, {headers: {Authorization: 'Bearer ' + token}}); if (!mr.ok) { b.insideError = 'Share this Drive PDF with the studio robot, or use the Dropbox link'; continue; } version = (await mr.json()).modifiedTime; url = `https://www.googleapis.com/drive/v3/files/${drive}?alt=media&supportsAllDrives=true`; headers = {Authorization: 'Bearer ' + token}; }
       else { url = dropDl(link); version = String(await sizeOf(url)); }
-      if (c) { const j = await (await fetch(c.url, {cache: 'no-store'})).json(); if (j.norm && (j.modified === version || (!version && j.inside))) { b.inside = j.inside; if (j.norm) b.verify = verifyArtists(b.artists, j.norm); continue; } }
+      if (j) { if (j.norm && (j.modified === version || (!version && j.inside))) { b.inside = j.inside; if (j.norm) b.verify = verifyArtists(b.artists, j.norm); continue; } }
       if (drop && +version > 0 && +version < 5000) { b.insideError = 'No PDF in this Dropbox folder yet'; continue; }
       if (drop && +version > 450e6) { b.insideError = 'This folder is too large to read (keep only the digital PDF in it)'; continue; }
       if (fresh >= 1 && Date.now() > deadline) { b.insideError = 'Will be read on the next sync'; continue; }
@@ -173,14 +173,10 @@ function matchShop(book, shop){
 }
 
 // ---------- store ----------
-async function versions(){ const { blobs } = await list({ prefix: PREFIX, limit: 1000 }); return blobs.sort((a, b) => new Date(b.uploadedAt) - new Date(a.uploadedAt)); }
-// the library is a few MB: kept in memory on a warm function and reused until a newer version is saved
+// the library is a few MB: kept in memory on a warm function for 2 minutes (the Sync result goes straight to whoever pressed it)
 let MEMO = null;
-// a warm function reuses the library for 10 minutes without listing the store (every list counts against the Blob plan)
-export async function readLib(){ if (MEMO && Date.now() - MEMO.at < 600000) return MEMO.lib;
-  const v = await versions(); if (!v.length) return {synced: null, books: []}; if (MEMO && MEMO.url === v[0].url) { MEMO.at = Date.now(); return MEMO.lib; }
-  const r = await fetch(v[0].url, {cache: 'no-store'}); if (!r.ok) throw new Error(`The saved library could not be read (storage answered ${r.status}). If Vercel Blob is over its plan limit, the store is paused until it is upgraded or the month resets.`);
-  const lib = await r.json(); MEMO = {url: v[0].url, lib, at: Date.now()}; return lib; }
+export async function readLib(){ if (MEMO && Date.now() - MEMO.at < 120000) return MEMO.lib;
+  const lib = await readOrMigrate(PATH, 'books/library-', {synced: null, books: []}); MEMO = {lib, at: Date.now()}; return lib; }
 async function sync(){
   const T0 = Date.now();
   const token = await googleToken();
@@ -190,8 +186,7 @@ async function sync(){
   books.forEach(b => { const p = matchShop(b, shop); if (p) b.shop = p; b.count = (b.artists || []).length; });
   problems.push(...await readInsides(token, books, T0 + 120000).catch(e => [{sheet: 'PDFs', error: String(e.message || e)}]));
   const lib = {synced: new Date().toISOString(), books, shopCount: shop.length, problems};
-  const saved = await put(PREFIX + Date.now() + '.json', JSON.stringify(lib), { access: 'public', addRandomSuffix: true, contentType: 'application/json' }); MEMO = {url: saved.url, lib, at: Date.now()};
-  const old = (await versions()).slice(3).map(b => b.url); if (old.length) await del(old).catch(() => {});
+  await writeJSON(PATH, lib); MEMO = {lib, at: Date.now()};
   return lib;
 }
 

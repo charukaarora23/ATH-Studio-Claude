@@ -77,6 +77,9 @@ Goal: sell the books and promote the ~100 artists per book without one post per 
 - Open decisions (ask the user): Google access via **service account** (recommended) or "Publish to web → CSV" per sheet; add **Launch date** column to Books Data and **Page** + **Section** columns to artist sheets; which AI models.
 - AI in the studio (on the user's API key in Vercel, not chat usage): tagging artists with **Haiku 5.5** (+ Batch API for the ~70-book backfill, cache results so each artist is tagged once), copy with **Sonnet 5.5**, prompt caching for the brand voice. Est. $1–3/month.
 
+## Storage rule (Vercel Blob, after the Nov 2026 suspension)
+The store was suspended on Hobby for **Advanced Operations** (list/put/copy; 2k/month) — caused by `list()` on every page load and the calendar polling every 30 s. Now: all shared JSON goes through `api/_store.js` — one fixed path per file (`books/library.json`, `daily/posts.json`, `calendar/status.json`, `books/media/<slug>.json`, `books/inside/<key>.json`), read by fetching the public URL (no operation), saved with `put(..., allowOverwrite)` (one operation) + one dated backup per day for posts/status. **Never call `list()` or `head()` on a read path.** Media skips pictures already taken (pages by number, mockups/photoshoot by file name). Calendar refresh is every 2 min. Plan is Pro now.
+
 ## Working style with this user
 - Be concise; show a render; deploy; give the live link. Batch fixes. Don't over-explain.
 - Fix root causes and check every slide/style, not just the one in the screenshot.

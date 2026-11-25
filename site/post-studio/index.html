@@ -815,7 +815,7 @@ function wireCal(){
     if ($('preset').value !== o.preset) { $('preset').value = o.preset; await $('preset').onchange(); }
     $('ptype').value = o.ptype; try { localStorage.setItem('athLastPtype', o.ptype); } catch {} render();
     const hit = o.find && [...document.querySelectorAll('.group h2')].find(x => x.textContent.trim() === o.find); if (hit) { hit.scrollIntoView({block: 'start'}); hit.closest('.group').classList.add('flash'); } else window.scrollTo({top: 0}); });
-  clearInterval(calTimer); calTimer = setInterval(() => { if ($('ptype').value === 'calendar' && STATUS_MODE === 'shared' && !document.hidden) loadStatus(); else if ($('ptype').value !== 'calendar') clearInterval(calTimer); }, 30000);
+  clearInterval(calTimer); calTimer = setInterval(() => { if ($('ptype').value === 'calendar' && STATUS_MODE === 'shared' && !document.hidden) loadStatus(); else if ($('ptype').value !== 'calendar') clearInterval(calTimer); }, 120000);
 }
 // ---------- DAILY POSTS: shared queue, week planner, form → slides + caption ----------
 let DPOSTS = {}, DMODE = 'local', dLoaded = false, DSEL = null, dWeek = null, dSaveT = null;
