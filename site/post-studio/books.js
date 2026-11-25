@@ -420,8 +420,8 @@ Object.assign(BKT, {
       <p style="${BASK};font-size:48px;line-height:1.28;color:#FFFFFF">${esc(bkKeep(o.head))}</p>
       <p style="${T_MED};font-size:${o.key.length > 8 ? 120 : 150}px;line-height:1;letter-spacing:-.04em;color:${HL.rose};margin-top:48px;display:flex;align-items:center">${arrowDot(HL.rose, HL.burg, 112)}${esc(o.key)}</p>
       <p style="${T_REG};font-size:34px;line-height:1.38;color:${HL.pink};margin-top:40px">${esc(o.offer)}</p>
-      <div style="width:240px;border-top:2px solid rgba(250,210,225,.35);margin:52px 0 38px"></div>
-      <p style="${T_REG};font-size:30px;line-height:1.4;color:${HL.pink}">${esc(o.foot)}</p></div>
+      ${o.foot ? `<div style="width:240px;border-top:2px solid rgba(250,210,225,.35);margin:52px 0 38px"></div>
+      <p style="${T_REG};font-size:30px;line-height:1.4;color:${HL.pink}">${esc(o.foot)}</p>` : ''}</div>
     <p class="a c" style="left:0;right:0;bottom:96px;${T_REG};font-size:28px;color:${HL.pink}">artstoheartsproject.com</p>`}; },
 });
 const bkCap = w => { const d = String(((w.works || [])[0] || {}).details || w.details || '').split(/\s*,\s*/); const size = d.find(x => /\d\s*(x|×)\s*\d/.test(x)) || ''; return [w.title, w.year || '', size, w.medium || '']; };
@@ -445,6 +445,7 @@ Object.assign(BKT, {
       ${o.head ? `<p style="${BASK};font-style:italic;font-size:${Math.min(o.headSz || 104, bkFit(o.head.join('\n'), 600, 200, .52))}px;white-space:nowrap;line-height:1.05;letter-spacing:-.01em;color:${HL.ink}">${o.head.map(x => esc(x)).join('<br>')}</p>` : ''}
       ${o.sub ? `<p style="${BASK};font-size:${o.subSz || 32}px;line-height:1.45;color:${HL.ink};margin-top:30px;max-width:580px">${bkB(o.sub)}</p>` : ''}
       ${o.body ? `<div style="text-align:left;width:100%">${o.label ? `<p style="${T_REG};font-size:20px;letter-spacing:.14em;text-transform:uppercase;color:${HL.burg};margin-bottom:24px">${bkDot(HL.burg)}${esc(o.label)}</p>` : ''}<p style="${BASK};font-size:${o.body.length > 300 ? 36 : o.body.length > 200 ? 40 : 46}px;line-height:1.36;color:${HL.burg}">${(() => { const t = bkKeep(o.body), f = bkFirst(t), r = t.slice(f.length).trim(); return mark(bkWhole(esc(f))) + (r ? ' ' + bkWhole(esc(r)) : ''); })()}</p></div>` : ''}
+      ${o.prose ? `<div style="margin-top:${o.head ? 44 : 0}px;width:100%;text-align:left;display:flex;flex-direction:column;gap:${o.gap || 30}px">${o.prose.map(l => `<p style="${BASK};font-size:${o.lineSz || 38}px;line-height:1.36;color:${HL.burg}">${bkB(l)}</p>`).join('')}</div>` : ''}
       ${o.lines ? `<div style="margin-top:${o.head ? 44 : 0}px;display:flex;flex-direction:column;gap:${o.gap || 26}px">${o.lines.map(l => `<p style="${BASK};font-size:${o.lineSz || 30}px;line-height:1.38;color:${HL.ink}">${bkB(l)}</p>`).join('')}</div>` : ''}
       ${o.list ? `<div style="margin-top:34px;width:100%;display:grid;grid-template-columns:1fr 1fr;gap:${o.list.length > 30 ? 9 : 14}px 24px;text-align:left">${o.list.map(a => `<p style="font-size:${o.list.length > 30 ? 19 : 22}px;line-height:1.25;color:${HL.ink};white-space:nowrap;overflow:hidden;text-overflow:ellipsis"><span style="${T_MED}">${esc(a.name)}</span>${a.place ? ` <span style="${T_REG};color:${BKG2}">${esc(a.place)}</span>` : ''}</p>`).join('')}</div>` : ''}
       ${o.foot ? `<p style="${T_REG};font-size:${o.footSz || 26}px;line-height:1.45;color:${BKG1};margin-top:40px;max-width:560px">${bkB(o.foot)}</p>` : ''}</div>`}; },
@@ -456,6 +457,27 @@ Object.assign(BKT, {
         ${o.serif ? `<p style="${BASK};font-style:italic;font-size:58px;line-height:1.1;color:#FFFFFF">${esc(o.serif)}</p>` : ''}
         <p style="${T_MED};font-size:${sz}px;line-height:.95;letter-spacing:-.035em;color:#FFFFFF;white-space:nowrap">${t.map(x => /^Issue\b/.test(x) ? `<span style="${BASK};font-style:italic;letter-spacing:-.02em">${esc(x)}</span>` : esc(x)).join('<br>')}</p>
         ${o.sub ? `<p style="${T_REG};font-size:30px;line-height:1.35;color:#FFFFFF;margin-top:10px">${bkWhole(esc(bkKeep(o.sub)))}</p>` : ''}</div>`}; },
+  // cover B: the work whole on white (never cropped), the project under it, as the interview's framed cover
+  fcover(o){ const u = bkPic(o.slot, o.img); const t = o.title.map(x => bkKeep(x));
+    return {bg: B.ground, html: `${ivCorners({mono: true})}${ivArt(u, 'left:72px;right:72px;top:130px;height:600px', o.slot)}
+      <div class="a" style="left:72px;right:72px;top:790px;display:flex;flex-direction:column;gap:14px">
+        <p class="cn" style="color:${B.burg}">${esc(o.label)}</p>
+        <p style="${T_MED};font-size:92px;line-height:.98;letter-spacing:-.035em;color:${B.ink}">${t.map(x => /^Issue\b/.test(x) ? `<span style="${BASK};font-style:italic;letter-spacing:-.02em">${esc(x)}</span>` : esc(x)).join(' ')}</p>
+        ${o.sub ? `<p style="${T_REG};font-size:30px;line-height:1.35;color:${B.ink};opacity:.75">${bkWhole(esc(bkKeep(o.sub)))}</p>` : ''}</div>`}; },
+  // cover C: Burgundy, type only: the project large in white, the theme in Pink italic
+  bcover(o){ const t = o.title.map(x => bkKeep(x)); const sz = Math.min(150, bkFit(t.join('\n'), 936, 200, .5));
+    return {bg: HL.burg, html: `${ivMono('white', 'right:52px;top:36px;width:112px;height:63px')}
+      <p class="a" style="left:72px;bottom:60px;${T_REG};font-size:24px;color:${HL.pink};opacity:.9">@artstoheartsproject</p>
+      <div class="a" style="right:72px;bottom:46px;width:56px;height:56px;border-radius:50%;background:${HL.pink};display:flex;align-items:center;justify-content:center;${T_MED};font-size:28px;color:${HL.burg}">&rarr;</div>
+      <div class="a" style="left:72px;right:72px;top:0;bottom:150px;display:flex;flex-direction:column;justify-content:center;gap:24px">
+        <p class="cn" style="color:${HL.pink}">${esc(o.label)}</p>
+        <p style="${T_MED};font-size:${sz}px;line-height:.95;letter-spacing:-.035em;color:#FFFFFF;white-space:nowrap">${t.map(x => /^Issue\b/.test(x) ? `<span style="${BASK};font-style:italic;letter-spacing:-.02em">${esc(x)}</span>` : esc(x)).join('<br>')}</p>
+        ${o.serif ? `<p style="${BASK};font-style:italic;font-size:54px;line-height:1.15;color:${HL.rose};margin-top:12px">${esc(o.serif)}</p>` : ''}
+        ${o.sub ? `<p style="${T_REG};font-size:30px;line-height:1.35;color:#FFFFFF;opacity:.85">${bkWhole(esc(bkKeep(o.sub)))}</p>` : ''}</div>`}; },
+  // the names, on the house white page: two calm columns, the name in ink, the country in light grey
+  names(o){ return {bg: B.ground, html: `${ivCorners({})}
+    <p class="a cn" style="left:72px;top:170px;color:${B.burg}">${esc(o.label)}</p>
+    <div class="a" style="left:72px;right:72px;top:250px;display:grid;grid-template-columns:1fr 1fr;grid-auto-rows:68px;column-gap:40px">${o.list.map(a => `<div style="min-width:0"><p style="${T_MED};font-size:27px;line-height:1.15;color:${B.ink};white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(a.name)}</p>${a.place ? `<p style="${T_REG};font-size:18px;line-height:1.3;color:${BKG2};margin-top:4px">${esc(a.place)}</p>` : ''}</div>`).join('')}</div>`}; },
   // the artists' own titles, set as lines: the selection told through the work, nobody singled out
   titles(o){ return {bg: B.ground, html: `${ivCorners({})}
     <p class="a cn" style="left:72px;top:170px;color:${B.burg}">${esc(o.label)}</p>
@@ -495,7 +517,7 @@ function bkThemeTitles(D, themeText, k = 7){
 }
 
 // Selected artists: a mix of the project, the selection in plain sentences (rounded numbers), several different artworks shown whole, and the full list.
-function bkSelectedPost(b, D){
+function bkSelectedPost(b, D, coverKind){
   const I = bkIssue(b), proper = bkProper(b), th = (b.inside && b.inside.theme) || {}; const theme = bkTitleCase(th.title || ''); const KW = bkKeyword(b);
   const ed = I.issue || 'this book', sel = bkSelection(D);
   const words = n => ({10: 'ten', 15: 'fifteen', 20: 'twenty', 25: 'twenty-five', 30: 'thirty', 40: 'forty', 50: 'fifty', 60: 'sixty', 70: 'seventy', 80: 'eighty', 90: 'ninety', 100: 'a hundred'}[n] || String(n));
@@ -508,24 +530,29 @@ function bkSelectedPost(b, D){
   for (let i = 0; arts.length < 6 && i < W.length; i += Math.max(1, Math.floor(W.length / 7))) { const w = W[i]; if (!used.has(w.artist)) { arts.push(w); used.add(w.artist); } }
   const art = (w, k) => w && IV.work({img: bkPic('bkaw' + k, w.img), slot: 'bkaw' + k, name: w.artist, cap: bkCap(w)});
   const coverW = arts[0] || W[0] || {}; const bg = coverW.img;
-  const people = D.works.map(w => ({name: w.artist, place: bkPlaceOf(w)})); const pages = Math.ceil(people.length / 50), per = Math.ceil(people.length / Math.max(1, pages));
+  const people = D.works.map(w => ({name: w.artist, place: bkPlaceOf(w)})); const pages = Math.ceil(people.length / 26), per = Math.ceil(people.length / Math.max(1, pages));
   const brief = ((th.text || '').match(/[^.!?]+[.!?]+/g) || []).map(x => x.trim()).filter(x => x.split(' ').length > 4).slice(0, 2).join(' ');
   const numbers = [
     `We received **hundreds of submissions** for ${theme || proper}, from artists all over the world.`,
     `From them, we found ${sel.painters >= sel.n * .5 ? `**${over(sel.painters)} talented painters**, alongside artists in photography, collage and mixed media` : `**${over(sel.n)} talented artists**`}.`,
     `We are so excited to welcome **${over(sel.n)} creators** into ${ed}${sel.countries.length >= 5 ? `, from **${over(sel.countries.length)} countries**` : ''}.`];
+  const title = I.issue ? ['Arts to Hearts', 'Magazine', I.issue] : bkBalance(proper), coverSub = theme ? `Introducing the artists of ${theme}` : 'Introducing the artists';
+  const cover = coverKind === 'framed' ? BKT.fcover({slot: 'bkcov', img: bg, label: 'Selected artists', title, sub: coverSub})
+    : coverKind === 'burgundy' ? BKT.bcover({label: 'Selected artists', title, serif: theme, sub: 'Introducing the artists'})
+    : BKT.pcover({slot: 'bkcov', img: bg, label: 'Selected artists', title, sub: coverSub});
   const S = [
-    BKT.pcover({slot: 'bkcov', img: bg, label: 'Selected artists', title: I.issue ? ['Arts to Hearts', 'Magazine', I.issue] : bkBalance(proper), sub: theme ? `Introducing the artists of ${theme}` : 'Introducing the artists'}),
+    cover,
     BKT.tabcard({bg, tab: 'The call', head: ['Congratulations'], headSz: 100, subSz: 42, footSz: 32, sub: `to every artist selected for **${proper}**.`, foot: 'Your work is going into print. This is a moment to be proud of, and we are celebrating it with you.'}),
-    ...Array.from({length: pages}, (_, p) => BKT.tabcard({bg, tab: 'The artists', top: true, head: [p ? 'The Artists' : 'Selected for ' + (I.issue || 'the book')], headSz: 64, list: people.slice(p * per, (p + 1) * per)})),
+    ...Array.from({length: pages}, (_, p) => BKT.names({label: p ? 'The artists' : 'Selected for ' + (I.issue || 'the book'), list: people.slice(p * per, (p + 1) * per)})),
+    art(arts[0], 0),
     theme && brief && BKT.htext({label: 'The project', text: `${proper} is ${theme}. ${brief}`}),
-    art(arts[0], 0), art(arts[1], 1),
-    BKT.tabcard({bg, tab: 'The artists', head: ['The selection'], headSz: 84, lineSz: 36, gap: 34, lines: numbers}),
-    art(arts[2], 2), art(arts[3], 3),
-    art(arts[4], 4), art(arts[5], 5),
-    BKT.tabcard({bg, tab: "What's next", head: ["What's next"], headSz: 84, lineSz: 36, gap: 34, lines: [`Over the coming weeks, **every artist** in ${ed} will be featured here, one by one.`, `The ${I.issue ? 'magazine' : 'book'} is being made now. **The first look** is coming soon.`, 'When your feature goes live, share it. **Your people** will want to see it.']}),
-    BKT.htext({label: 'To everyone who applied', text: `Thank you for trusting us with your work. Choosing was hard, and many beautiful works could not fit in these pages. If your name is not here this time, please keep going. We would love to see your work in our next call.`}),
-    BKT.keyEnd({head: `Congratulations to every artist in ${proper}.`, key: KW, offer: `Comment ${KW} and we'll send you the full list of artists.`, foot: 'Know someone on this list? Tag them and tell them you are proud.'})].filter(Boolean);
+    art(arts[1], 1),
+    BKT.tabcard({bg, tab: 'The artists', head: ['The selection'], headSz: 84, lineSz: 38, gap: 30, prose: numbers}),
+    art(arts[2], 2),
+    BKT.tabcard({bg, tab: "What's next", head: ["What's next"], headSz: 84, lineSz: 38, gap: 30, prose: [`Over the coming weeks, **every artist** in ${ed} will be featured here, one by one.`, `The ${I.issue ? 'magazine' : 'book'} is being made now. **The first look** is coming soon.`, 'When your feature goes live, share it. **Your people** will want to see it.']}),
+    art(arts[3], 3),
+    BKT.htext({label: 'To everyone who applied', text: `Thank you for trusting us with your work. Choosing was hard, and many beautiful works could not fit in these pages. If your name is not here this time, please keep going.`}),
+    BKT.keyEnd({head: `Congratulations to every artist in ${ed}.`, key: KW, offer: `Comment ${KW} and we'll send you the full list.`})].filter(Boolean);
   if (S.length > 20) S.splice(19, S.length - 20);
   const cap = `Introducing the artists of ${proper}${theme ? ': ' + theme : ''}.\n\nWe received hundreds of submissions from artists all over the world, and we are so excited to welcome ${over(sel.n)} creators into this ${I.issue ? 'issue' : 'book'}${sel.countries.length >= 5 ? `, from ${over(sel.countries.length)} countries` : ''}. Congratulations to every artist selected. Your work is going into print, and over the coming weeks each of you will be featured here.\n\nComment ${KW} and we'll send you the full list.\n\nTo everyone who applied: thank you for trusting us with your work. Please keep going, and we hope to see you in our next call.`;
   return {S, cap};
@@ -560,7 +587,7 @@ function bookGroups(){
       q[2] && BKT.quote({q: bkCut(q[2], 330), name: p.name, handle: p.handle, face}),
       ask(`${p.name.split(' ')[0]}'s full interview is in ${name}.`)]; };
 
-  if (id === 'selected') { const r = bkSelectedPost(b, D); out.push({book: true, credits, title: `${bkProper(b)} · Selected artists`, meta: 'Post the day the list goes live · tag the artists in the image', cap: r.cap + '\n\n' + tags, pin: 'Congratulations to every artist selected. Cheer them on below.', slides: r.S.filter(Boolean).map((s, j) => ({...s, title: 'selected-' + (j + 1)}))}); }
+  if (id === 'selected') { const r = bkSelectedPost(b, D, v.cover); out.push({book: true, credits, title: `${bkProper(b)} · Selected artists`, meta: 'Post the day the list goes live · tag the artists in the image', cap: r.cap + '\n\n' + tags, pin: 'Congratulations to every artist selected. Cheer them on below.', slides: r.S.filter(Boolean).map((s, j) => ({...s, title: 'selected-' + (j + 1)}))}); }
   else if (id === 'theme') { const th = (b.inside && b.inside.theme) || {}; const f = W.slice(0, 3);
     post('The theme', [photos.length ? photo(1, {mono: true, label: name, head: bkCase(th.title) || name}) : BKT.card({faces: faces(30, 30), mono: true, tab: 'Inside', serif: `The theme of ${name}`, big: bkCase(th.title) || name}),
       th.text && BKT.card({tab: 'Inside', body: bkCut(th.text, 480)}), ...f.map((w, i) => theirPage(w, i, 'bkt')),
@@ -663,7 +690,7 @@ function bookTabPhase(b, phase){
   const P = bkPlan(b).filter(p => p.phase === phase); const today = Date.now();
   const intro = {pre: 'While the book is being made: who is inside it, before anyone can buy it. Ends with the cover reveal.', launch: 'Pre-order is open until it goes to print: the book, the editor, every artist, one action each time.', after: 'The book is here, then it rotates in the backlist.'}[phase];
   if (!P.length) return `<p class="meta">${intro}</p><p class="meta">Nothing here yet for this book.</p>`;
-  return `<p class="meta">${intro} ${P.length} posts.</p><div class="bk-plan">${P.map(p => `<div class="bk-row${p.when && p.t < today - DAY ? ' past' : ''}${BOOKVIEW && BOOKVIEW.id === p.id ? ' on' : ''}"><span class="bk-when">${p.when ? bkFmt(p.when) : '—'}</span><div><b>${bkEsc(p.title)}</b>${p.collab ? ' <span class="bk-tag">Collab</span>' : ''}<p class="meta">${bkEsc(p.what)}</p></div><button type="button" class="btn ghost" data-bkopen="${p.id}">Open</button></div>`).join('')}</div>`;
+  return `<p class="meta">${intro} ${P.length} posts.</p><div class="bk-plan">${P.map(p => `<div class="bk-row${p.when && p.t < today - DAY ? ' past' : ''}${BOOKVIEW && BOOKVIEW.id === p.id ? ' on' : ''}"><span class="bk-when">${p.when ? bkFmt(p.when) : '—'}</span><div><b>${bkEsc(p.title)}</b>${p.collab ? ' <span class="bk-tag">Collab</span>' : ''}<p class="meta">${bkEsc(p.what)}</p></div><button type="button" class="btn ghost" data-bkopen="${p.id}">Open</button>${p.id === 'selected' && BOOKVIEW && BOOKVIEW.id === 'selected' ? `<div class="bk-covers">Cover: ${[['photo', 'Photo'], ['framed', 'Framed'], ['burgundy', 'Burgundy']].map(([k, l]) => `<button type="button" class="btn ghost${(BOOKVIEW.cover || 'photo') === k ? ' on' : ''}" data-bkcover="${k}">${l}</button>`).join(' ')}</div>` : ''}</div>`).join('')}</div>`;
 }
 function bookTabKits(b){
   const D = bkData(b), parts = Math.ceil(D.works.length / BK_FEAT); if (!parts) return '<p class="meta">No artists yet.</p>';
@@ -680,6 +707,7 @@ function booksRender(){
     el.querySelector('#bkback').onclick = () => { BOOKSEL = null; bookClosePost(); booksRender(); window.scrollTo({top: 0}); };
     el.querySelectorAll('[data-bktab]').forEach(x => x.onclick = () => { BOOKTAB = x.dataset.bktab; bookClosePost(); booksRender(); });
     el.querySelectorAll('[data-bkopen]').forEach(x => x.onclick = () => bookOpenPost(x.dataset.bkopen));
+    el.querySelectorAll('[data-bkcover]').forEach(x => x.onclick = () => { if (BOOKVIEW) { BOOKVIEW.cover = x.dataset.bkcover; booksRender(); render(); } });
     el.querySelectorAll('[data-bkget]').forEach(x => x.onclick = () => bookGetMedia(BOOKSEL, x.dataset.bkget));
     const kw = el.querySelector('#bkkw'); if (kw) kw.onchange = () => { const v = kw.value.toUpperCase().replace(/[^A-Z0-9]/g, ''); try { v ? localStorage.setItem('bkkw:' + b.name, v) : localStorage.removeItem('bkkw:' + b.name); } catch {} booksRender(); if (BOOKVIEW) render(); };
     const c = el.querySelector('#bkclose'); if (c) c.onclick = () => { bookClosePost(); booksRender(); };
