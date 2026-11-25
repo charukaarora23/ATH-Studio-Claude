@@ -131,7 +131,7 @@ function parseArtists(values){
   const hi = values.findIndex(r => r.some(c => norm(c) === 'name') && r.some(c => /instagram/i.test(c)));
   if (hi < 0) return [];
   const head = values[hi].map(norm); const find = re => head.findIndex(h => re.test(h));
-  const C = {name: find(/^name$/), web: find(/^website/), ig: find(/^instagram/), line: find(/^1 liner|^one liner/), bio: find(/bio|statement/), place: find(/country/), head: find(/^artist image|headshot/)};
+  const C = {name: find(/^name$/), web: find(/^website/), ig: find(/^instagram/), line: find(/^1 liner|^one liner|^issue$/), bio: find(/bio|statement/), place: find(/country/), head: find(/^artist image|headshot/)};
   const works = head.map((h, i) => /^artwork \d+$/.test(h) ? i : -1).filter(i => i >= 0);
   return values.slice(hi + 1).map(r => { const g = i => i >= 0 ? String(r[i] || '').trim() : '';
     const name = g(C.name); if (!name || /^total /i.test(name)) return null;
