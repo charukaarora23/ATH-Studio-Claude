@@ -31,7 +31,7 @@ async function gget(token, path){
 
 // ---------- helpers ----------
 const norm = s => String(s || '').toLowerCase().replace(/&/g, 'and').replace(/[^a-z0-9]+/g, ' ').trim();
-const cellText = c => (c && (c.formattedValue || '')).trim();
+const cellText = c => String((c && c.formattedValue) || '').trim();
 const cellLink = c => { if (!c) return ''; if (c.hyperlink) return c.hyperlink; for (const run of c.chipRuns || []) { const u = run.chip && run.chip.richLinkProperties && run.chip.richLinkProperties.uri; if (u) return u; } return ''; };
 const handleOf = s => { s = String(s || '').trim(); if (!s) return ''; const m = s.match(/instagram\.com\/(?:https?:\/\/(?:www\.)?instagram\.com\/)?@?([A-Za-z0-9._]+)/i); const h = m ? m[1] : s.replace(/^@/, '').split(/[\s/?]/)[0]; return /^[A-Za-z0-9._]{2,30}$/.test(h) ? '@' + h : ''; };
 const url = s => /^https?:\/\//i.test(String(s || '').trim()) ? String(s).trim() : '';
@@ -42,7 +42,7 @@ async function pool(items, n, fn){ const out = []; let i = 0; await Promise.all(
 async function readMaster(token){
   const j = await gget(token, `${MASTER}?includeGridData=true&ranges=${encodeURIComponent("'Main '!A1:AZ400")}&fields=sheets.data.rowData.values(formattedValue,hyperlink,chipRuns)`);
   const rows = ((j.sheets || [])[0] || {}).data[0].rowData || [];
-  const head = (rows[0].values || []).map(c => norm(cellText(c)));
+  if (!rows.length) throw new Error('Books Data sheet looks empty'); const head = (rows[0].values || []).map(c => norm(cellText(c)));
   const col = (...names) => { for (const n of names) { const i = head.findIndex(h => h === n || h.startsWith(n)); if (i >= 0) return i; } return -1; };
   const C = {name: col('book name'), cat: col('category'), year: col('year'), sheet: col('artists data for graphics'), cover: col('cover artist'), coverIg: col('cover artist instagram'), landing: col('landing page'), shopify: col('shopify link'), amazon: col('amazon link'), bn: col('barnes'), designer: col('book designer'), published: col('no of published artists'), pages: col('no of pages'), status: col('status'), isbn: col('isbn'), launch: col('launch date')};
   return rows.slice(1).map(r => { const v = r.values || []; const t = k => C[k] >= 0 ? cellText(v[C[k]]) : ''; const l = k => C[k] >= 0 ? (cellLink(v[C[k]]) || url(cellText(v[C[k]]))) : '';
