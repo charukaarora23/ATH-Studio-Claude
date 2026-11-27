@@ -62,9 +62,9 @@ const fdBrand = (c = HL.burg) => `<p class="a cn" style="left:52px;top:48px;colo
 const fdFoot = (c = HL.burg, bg = HL.white, fg = HL.burg) => `<p class="a" style="left:52px;bottom:52px;${T_REG};font-size:24px;color:${c};opacity:.85">@artstoheartsproject</p><div class="a" style="right:52px;bottom:40px;width:56px;height:56px;border-radius:50%;background:${bg};display:flex;align-items:center;justify-content:center;${T_MED};font-size:28px;color:${fg}">&rarr;</div>`;
 const fdEm = (t, c) => esc(bkKeep(t)).replace(/\*\*(.+?)\*\*/g, `<span style="color:${c}">$1</span>`);
 /* a polaroid that hugs the work: the whole artwork, its credit on the white strip */
-function fdPol(x, o){ const u = x && bkPic(o.slot, x.art); const n = fdNat(u); const b = bkFitBox(n, o.w, o.h); const W = n ? b.w : o.w, H = n ? b.h : Math.round(o.w * 1.2);
-  return `<div class="a" style="left:${o.x - W / 2 - 14}px;top:${o.y - H / 2 - 14}px;padding:14px 14px 0;background:#FFFFFF;box-shadow:0 18px 40px rgba(28,19,16,.22);transform:rotate(${o.r || 0}deg);width:${W}px">
-    ${u ? `<div class="img" data-slot="${o.slot}" style="width:${W}px;height:${H}px;background-image:url(${u});background-size:contain;background-repeat:no-repeat;background-position:center"></div>` : `<div class="ph" data-slot="${o.slot}" style="width:${W}px;height:${H}px;background:${HL.pink};color:${HL.burg};font-size:18px">Artwork</div>`}
+function fdPol(x, o){ const u = x && bkPic(o.slot, x.art); const n = fdNat(u); const b = bkFitBox(n, o.w, o.h); const W = n ? b.w : o.w, H = n ? b.h : Math.round(o.w * 1.2); const FW = Math.max(W, o.minW || 0);
+  return `<div class="a" style="left:${o.x - FW / 2 - 14}px;top:${o.y - H / 2 - 14}px;padding:14px 14px 0;background:#FFFFFF;box-shadow:0 18px 40px rgba(28,19,16,.22);transform:rotate(${o.r || 0}deg);width:${FW}px">
+    ${u ? `<div class="img" data-slot="${o.slot}" style="width:${W}px;height:${H}px;margin:0 auto;background-image:url(${u});background-size:contain;background-repeat:no-repeat;background-position:center"></div>` : `<div class="ph" data-slot="${o.slot}" style="width:${W}px;height:${H}px;background:${HL.pink};color:${HL.burg};font-size:18px">Artwork</div>`}
     <p style="${T_REG};font-size:${o.fs || 15}px;line-height:1.2;color:${HL.ink};opacity:.7;padding:10px 2px 14px;white-space:normal;overflow-wrap:anywhere">${esc(fdCred(x))}</p></div>`; }
 const FDT = {
   /* cover A: the fund in focus. $500 large, the hook in Baskerville, the work pinned beside it */
@@ -150,16 +150,16 @@ const FDT = {
       ${fdFoot()}`}; },
   /* the cycle on a calendar: the days that matter marked, the work pinned on the others */
   cal(o){ const d = o.month, y = d.getFullYear(), m = d.getMonth(); const first = (new Date(y, m, 1).getDay() + 6) % 7, days = new Date(y, m + 1, 0).getDate(); const rows = Math.ceil((first + days) / 7);
-    const cw = 900 / 7, top = 520, rh = Math.min(140, 600 / rows); const marks = o.marks || {}; const cells = [];
+    const cw = 900 / 7, top = 520, rh = Math.min(104, 520 / rows); const cs = Math.round(Math.min(76, rh - 26)); const cardBot = top + rows * rh + 24; const marks = o.marks || {}; const cells = [];
     for (let k = 1; k <= days; k++) { const i = first + k - 1, cx = 90 + (i % 7) * cw + cw / 2, cy = top + Math.floor(i / 7) * rh + 40; const mk = marks[k];
-      cells.push(mk ? `<div class="a" style="left:${cx - 46}px;top:${cy - 46}px;width:92px;height:92px;border-radius:50%;background:${HL.burg};display:flex;align-items:center;justify-content:center;${T_MED};font-size:42px;color:${HL.white}">${k}</div><p class="a c" style="left:${cx - 100}px;width:200px;top:${cy + 50}px;${T_MED};font-size:22px;letter-spacing:.1em;text-transform:uppercase;color:${HL.burg}">${esc(mk)}</p>`
+      cells.push(mk ? `<div class="a" style="left:${cx - cs / 2}px;top:${cy - cs / 2 - 6}px;width:${cs}px;height:${cs}px;border-radius:50%;background:${HL.burg};display:flex;align-items:center;justify-content:center;${T_MED};font-size:${Math.round(cs * .46)}px;color:${HL.white}">${k}</div><p class="a c" style="left:${cx - 100}px;width:200px;top:${cy + cs / 2 - 2}px;${T_MED};font-size:17px;letter-spacing:.1em;text-transform:uppercase;color:${HL.burg}">${esc(mk)}</p>`
         : `<p class="a c" style="left:${cx - 40}px;width:80px;top:${cy - 24}px;${T_MED};font-size:38px;color:${(i % 7) > 4 ? 'rgba(28,19,16,.4)' : HL.ink}">${k}</p>`); }
     const free = []; for (let k = 1; k <= days; k++) if (!marks[k] && !Object.keys(marks).some(x => Math.abs(x - k) < 2 || Math.abs(x - k - 7) < 2)) free.push(k);   /* a polaroid hangs over the row below, so it never sits above a marked day */
-    const want = Math.min(3, (o.works || []).length), chosen = []; [[1, 5], [3, 1], [5, 4], [2, 3], [4, 6], [0, 2]].forEach(([rw, col]) => { if (chosen.length >= want) return; const k = rw * 7 + col - first + 1; if (k >= 1 && k <= days && free.includes(k) && rw < rows) chosen.push(k); });
-    for (const k of free) { if (chosen.length >= want) break; if (!chosen.some(q => Math.abs(q - k) < 4)) chosen.push(k); }
-    const pins = (o.works || []).slice(0, chosen.length).map((x, j) => { const k = chosen[j]; const i = first + k - 1; return fdPol(x, {x: Math.min(860, Math.max(220, 90 + (i % 7) * cw + cw / 2)), y: Math.min(1040, top + Math.floor(i / 7) * rh + 60), w: 200, h: 210, r: [-5, 4, -2, 6][j], slot: 'fdcal' + j, fs: 13}); });
+    /* the work sits in a tilted row along the calendar's lower edge: no date, label or other picture is covered */
+    const W3 = (o.works || []).filter(Boolean).slice(0, 3); const xs = W3.length === 1 ? [540] : W3.length === 2 ? [330, 750] : [220, 540, 860];
+    const pins = W3.map((x, j) => fdPol(x, {x: xs[j], y: cardBot + 60, w: 230, h: 150, minW: 190, r: [-4, 3, -2][j], slot: 'fdcal' + j, fs: 13}));
     return {bg: HL.pink, html: `${fdBrand()}
-      <div class="a" style="left:60px;right:60px;top:120px;bottom:120px;background:${HL.white};border-radius:30px;box-shadow:0 24px 60px rgba(106,6,32,.14)"></div>
+      <div class="a" style="left:60px;right:60px;top:120px;height:${cardBot - 120}px;background:${HL.white};border-radius:30px;box-shadow:0 24px 60px rgba(106,6,32,.14)"></div>
       <p class="a" style="left:100px;top:160px;${T_REG};font-size:30px;color:${HL.burg}">&lsaquo; ${esc(o.kicker || String(y))}</p>
       <p class="a" style="left:100px;top:220px;${T_MED};font-size:104px;line-height:1;letter-spacing:-.04em;color:${HL.ink}">${esc(o.title || MONTHS_FULL[m])}</p>
       ${o.sub ? `<p class="a" style="left:100px;right:100px;top:336px;${T_MED};font-size:34px;line-height:1.22;letter-spacing:-.01em;color:${HL.ink}">${fdEm(o.sub, HL.burg)}</p>` : ''}
