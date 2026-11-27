@@ -614,7 +614,7 @@ function setCredit(u, g, text){ const k = credKey(u); if (g && g.ekey && EDITS) 
   else if (u === state.images.imgCover) { state.credit = text || ''; if ($('credit')) $('credit').value = state.credit; }
   else { state.credits = state.credits || {}; if (text) state.credits[k] = text; else delete state.credits[k]; } }
 // placeholders (the studio's own "Artwork 23 · add it" cards) and brand marks are not artworks
-const isArtImg = (el, u) => u && !/^\s*$/.test(u) && !/^data:image\/svg/.test(u) && !/brand\/|monogram|logo/.test(u) && !el.closest('svg');
+const isArtImg = (el, u) => u && !el.hasAttribute('data-nolabel') && !/^\s*$/.test(u) && !/^data:image\/svg/.test(u) && !/brand\/|monogram|logo/.test(u) && !el.closest('svg');
 function withCredits(s, g){ if (!s.html) return s; const t = document.createElement('template'); t.innerHTML = s.html; const slideTxt = plainTxt(s.html).toLowerCase(); let changed = false;
   t.content.querySelectorAll('[style*="background-image"]').forEach(el => { const m = (el.getAttribute('style') || '').match(/background-image:\s*url\(["']?([^"')]*)["']?\)/); const u = m && m[1]; if (!isArtImg(el, u)) return;
     const c = creditFor(u, g); changed = true;
