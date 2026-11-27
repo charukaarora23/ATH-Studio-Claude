@@ -94,9 +94,8 @@ const FDT = {
   /* the announcement cover: the work full bleed (a cover may crop), the name set large, one line of who they are */
   hero(o){ const u = bkPic(o.slot, o.img); const nm = String(o.name || ''); const sp = nm.lastIndexOf(' '); const L = sp > 0 ? [nm.slice(0, sp), nm.slice(sp + 1)] : [nm]; const fs = Math.min(170, Math.floor(960 / (Math.max(...L.map(l => l.length)) * .52)));
     return {bg: HL.ink, html: `${u ? `<div class="a img" data-slot="${o.slot}" style="inset:0;background-image:url(${u});background-size:cover;background-position:center"></div>` : `<div class="a ph" data-slot="${o.slot}" style="inset:0;background:${HL.burg};color:${HL.pink}">Their artwork</div>`}
-      <div class="a" style="left:0;right:0;bottom:0;height:640px;background:rgba(20,9,12,.55)"></div>
       ${fdBrand(HL.white)}${o.mono === false ? '' : ivMono('white', 'right:52px;top:36px;width:112px;height:63px')}
-      <div class="a" style="left:64px;right:64px;bottom:96px;display:flex;flex-direction:column;gap:22px">
+      <div class="a" style="left:64px;right:64px;bottom:96px;display:flex;flex-direction:column;gap:22px;text-shadow:0 2px 18px rgba(20,9,12,.55),0 1px 3px rgba(20,9,12,.45)">
         <p style="${T_MED};font-size:24px;letter-spacing:.22em;text-transform:uppercase;color:${HL.rose}">${esc(o.label)}</p>
         <p style="${T_MED};font-size:${fs}px;line-height:.9;letter-spacing:-.045em;color:${HL.white}">${L.map(esc).join('<br>')}</p>
         ${o.sub ? `<p style="${BASK};font-style:italic;font-size:40px;line-height:1.25;color:${HL.white}">${esc(o.sub)}</p>` : ''}</div>`}; },
