@@ -65,6 +65,34 @@ function fdPol(x, o){ const u = x && bkPic(o.slot, x.art); const n = fdNat(u); c
     ${u ? `<div class="img" data-slot="${o.slot}" style="width:${W}px;height:${H}px;background-image:url(${u});background-size:contain;background-repeat:no-repeat;background-position:center"></div>` : `<div class="ph" data-slot="${o.slot}" style="width:${W}px;height:${H}px;background:${HL.pink};color:${HL.burg};font-size:18px">Artwork</div>`}
     <p style="${T_REG};font-size:${o.fs || 15}px;line-height:1.2;color:${HL.ink};opacity:.7;padding:10px 2px 14px;white-space:normal;overflow-wrap:anywhere">${esc(fdCred(x))}</p></div>`; }
 const FDT = {
+  /* the announcement cover: the work full bleed (a cover may crop), the name set large, one line of who they are */
+  hero(o){ const u = bkPic(o.slot, o.img); const nm = String(o.name || ''); const sp = nm.lastIndexOf(' '); const L = sp > 0 ? [nm.slice(0, sp), nm.slice(sp + 1)] : [nm]; const fs = Math.min(170, Math.floor(960 / (Math.max(...L.map(l => l.length)) * .52)));
+    return {bg: HL.ink, html: `${u ? `<div class="a img" data-slot="${o.slot}" style="inset:0;background-image:url(${u});background-size:cover;background-position:center"></div>` : `<div class="a ph" data-slot="${o.slot}" style="inset:0;background:${HL.burg};color:${HL.pink}">Their artwork</div>`}
+      <div class="a" style="left:0;right:0;bottom:0;height:640px;background:rgba(20,9,12,.55)"></div>
+      ${fdBrand(HL.white)}${o.mono === false ? '' : ivMono('white', 'right:52px;top:36px;width:112px;height:63px')}
+      <div class="a" style="left:64px;right:64px;bottom:96px;display:flex;flex-direction:column;gap:22px">
+        <p style="${T_MED};font-size:24px;letter-spacing:.22em;text-transform:uppercase;color:${HL.rose}">${esc(o.label)}</p>
+        <p style="${T_MED};font-size:${fs}px;line-height:.9;letter-spacing:-.045em;color:${HL.white}">${L.map(esc).join('<br>')}</p>
+        ${o.sub ? `<p style="${BASK};font-style:italic;font-size:40px;line-height:1.25;color:${HL.white}">${esc(o.sub)}</p>` : ''}</div>`}; },
+  /* the work whole and large on white, the credit right under it */
+  plate(o){ const x = o.x || {}; const u = bkPic(o.slot, x.art); const n = fdNat(u); const top = o.label ? (String(o.label).length > 34 ? 290 : 230) : 130; const b = bkFitBox(n, 940, 1350 - top - 250); const W = n ? b.w : 800, H = n ? b.h : 900;
+    return {bg: HL.white, html: `${fdBrand()}
+      ${o.label ? `<p class="a" style="left:70px;right:70px;top:120px;${BASK};font-size:44px;line-height:1.2;color:${HL.ink}">${fdEm(o.label, HL.burg)}</p>` : ''}
+      ${u ? `<div class="a img" data-slot="${o.slot}" style="left:${540 - W / 2}px;top:${top}px;width:${W}px;height:${H}px;background-image:url(${u});background-size:contain;background-repeat:no-repeat;background-position:center"></div>` : `<div class="a ph" data-slot="${o.slot}" style="left:140px;right:140px;top:${top}px;height:${H}px;background:${HL.pink};color:${HL.burg}">Their artwork</div>`}
+      <div class="a" style="left:${540 - W / 2}px;width:${Math.max(W, 520)}px;top:${top + H + 26}px;display:flex;flex-direction:column;gap:6px">
+        <p style="${T_MED};font-size:30px;color:${HL.ink}">${esc(x.name || '')}${x.handle ? ` <span style="${T_REG};color:${HL.burg}">${esc(x.handle)}</span>` : ''}</p>
+        ${x.title ? `<p style="${BASK};font-style:italic;font-size:26px;color:rgba(28,19,16,.56)">${esc(x.title)}${x.medium ? `<span style="font-style:normal">, ${esc(x.medium.toLowerCase())}</span>` : ''}</p>` : ''}</div>`}; },
+  /* story frames: the artist's own, and ours */
+  kit(o){ const x = o.x || {}; const u = bkPic(o.slot, x.art); const n = fdNat(u); const b = bkFitBox(n, 780, 900); const W = n ? b.w : 700, H = n ? b.h : 820; const mine = o.kind === 'artist';
+    return {h: 1920, bg: mine ? HL.burg : HL.pink, html: `<p class="a cn" style="left:60px;top:120px;color:${mine ? HL.white : HL.burg}">Arts to Hearts Project</p>
+      <div class="a" style="left:${540 - W / 2 - 24}px;top:240px;width:${W + 48}px;height:${H + 110}px;background:${HL.white};box-shadow:0 30px 60px rgba(20,9,12,.3)"></div>
+      ${u ? `<div class="a img" data-slot="${o.slot}" style="left:${540 - W / 2}px;top:264px;width:${W}px;height:${H}px;background-image:url(${u});background-size:contain;background-repeat:no-repeat;background-position:center"></div>` : ''}
+      <p class="a" style="left:${540 - W / 2}px;width:${W}px;top:${264 + H + 22}px;${T_REG};font-size:22px;color:rgba(28,19,16,.7)">${esc(fdCred(x))}</p>
+      <div class="a" style="left:70px;right:70px;top:${240 + H + 160}px;display:flex;flex-direction:column;align-items:center;text-align:center;gap:12px">
+        <p style="${BASK};font-style:italic;font-size:48px;color:${mine ? HL.rose : HL.burg}">${esc(o.kicker)}</p>
+        <p style="${T_MED};font-size:76px;line-height:.98;letter-spacing:-.035em;color:${mine ? HL.white : HL.ink}">${esc(o.head)}</p>
+        ${o.sub ? `<p style="${T_REG};font-size:30px;line-height:1.35;color:${mine ? HL.pink : HL.burg};margin-top:10px">${esc(o.sub)}</p>` : ''}</div>
+      <div class="a zone" style="left:240px;right:240px;top:1760px;height:80px;border:2px dashed ${mine ? HL.pink : HL.burg};border-radius:24px;opacity:.6;display:flex;align-items:center;justify-content:center;${T_MED};font-size:24px;color:${mine ? HL.pink : HL.burg}">${esc(o.zone)}</div>`}; },
   /* letters cut out of the paper, the work showing through (a cover may crop) */
   cut(o){ const u = bkPic(o.slot, o.img); const L = o.lines; const fs = o.fs || Math.min(520, Math.floor(1000 / (Math.max(...L.map(l => l.length)) * .55)));
     return {bg: HL.pink, html: `${fdBrand()}${ivMono('burgundy', 'right:52px;top:36px;width:112px;height:63px')}
@@ -187,19 +215,25 @@ function fundGroups(){
       FDT.wall({words: `About ten minutes could mean **${amt}** for your practice.`, works: pick(4, 3)}),
       end(`Applications close ${cl}.`, 'Both the post and the form.')];
     cap = `One week left to apply for the ATH Creative Fund.\n\nFive ticks and you're eligible: 18 or older, visual art, photography or writing, one original work sample, no fan art or logos, and a public Instagram account.\n\nAbout ten minutes could mean ${amt} for your practice. Applications close ${cl}, 11:59 PM. ${ask}`; }
-  else if (v.id === 'winner') { head = w.name ? `Meet ${w.name}` : 'Meet the recipient'; const W3 = ['The artist', 'The work', 'The grant'];
+  else if (v.id === 'winner') { const R = fdRecips(r); const isFirst = R.length && R[0].r.id === r.id; const W3 = ['The artist', 'The work', 'The grant'];
+    head = w.name ? (isFirst ? `Our first Creative Fund artist: ${w.name}` : `Meet ${w.name}`) : 'Meet the recipient';
     if (!w.name) S = [FDT.folder({tabs: W3, tab: 'The artist', head: ['Add the', 'recipient first'], body: 'Open the Recipient tab: name, handle, work, photo, why we chose them, their own words.'})];
-    else { const mine = [w, w.art2 && {...w, art: w.art2, title: w.title2 || ''}].filter(x => x && x.art); const R = fdRecips(r);
-      S = [FDT.cut({lines: [first], img: w.art, slot: 'fdwcut', top: 380, label: `ATH Creative Fund · ${cy} recipient`, sub: `Meet **${w.name}**${w.country ? `, ${w.country}` : ''}.`, credit: fdCred(w)}),
-        BKT.feature({w: fdW(w, 'fdww'), slot: 'fdww', line: ''}),
-        w.why && FDT.folder({tabs: W3, tab: 'The work', kicker: 'Why we chose them', body: w.why}),
-        w.about && FDT.folder({tabs: W3, tab: 'The artist', kicker: 'About ' + first, body: w.about}),
-        mine[1] && BKT.feature({w: {...fdW(w, 'fdw2'), img: bkPic('fdw2', w.art2), title: w.title2 || ''}, slot: 'fdw2', line: ''}),
-        (w.plan || w.q3) && BKT.say({slot: 'fdws', face: w.face, q: w.plan || w.q3, name: w.name, handle: w.handle}),
-        FDT.folder({tabs: W3, tab: 'The grant', kicker: `What ${first} receives`, rows: [[amt, 'unrestricted, for whatever the practice needs.'], ['A feature', 'a full interview, coming soon on artstoheartsproject.com.'], ['A title', 'ATH Creative Fund recipient, theirs to keep.']], rowW: 200}),
-        R.length > 1 ? FDT.ring({title: ['The fund', 'so far'], items: R.slice(-6).map(x => ({...x.w, label: x.w.name, sub: `${x.w.title} · ${fdName(x.r)}`})), fs: 84}) : null,
-        end(`Congratulations, ${first}. Thank you to every artist who applied.`, `Not selected? The fund reopens every month. The next cycle closes ${ncl}.`)]; }
-    cap = w.name ? `Meet ${w.name}${w.handle ? ' ' + w.handle : ''}, the ATH Creative Fund recipient for ${cy}.\n\n${w.why ? w.why + '\n\n' : ''}${w.plan || w.q3 ? `In ${first}'s words: "${w.plan || w.q3}"\n\n` : ''}${first} receives ${amt}, unrestricted, and a full feature interview on artstoheartsproject.com, coming soon.\n\nThank you to every artist who applied. Every application was read by people, not an algorithm. Not selected this time? The fund reopens every month: the next cycle closes ${ncl}. ${ask}` : ''; }
+    else { const art2 = w.art2 && {...w, art: w.art2, title: w.title2 || ''}; const F = fdRounds().filter(x => x.id <= r.id).flatMap(x => (x.found || []).filter(y => y.art)).slice(0, 3);
+      const aboutLine = bkFirst(w.about || ''); const nxo = fdDay(fdDate(nx.opens));
+      S = [FDT.hero({img: w.art, slot: 'fdhero', label: isFirst ? 'The first ATH Creative Fund artist' : `ATH Creative Fund · ${cy} artist`, name: w.name, sub: [cy, w.country].filter(Boolean).join(' · ')}),
+        F.length >= 2 ? FDT.wall({words: isFirst ? `In October, we opened the ATH Creative Fund. **Hundreds of artists answered.**` : `This cycle, **hundreds of artists** answered the call.`, works: F, pw: 330, ph: 380}) : null,
+        FDT.plate({x: w, slot: 'fdpl1', label: isFirst ? `One body of work stayed with us longer than any other.` : `One body of work stayed with us.`}),
+        w.face && FDT.hero({img: w.face, slot: 'fdpor', mono: false, label: 'Meet the artist', name: w.name, sub: aboutLine}),
+        w.why && FDT.folder({tabs: W3, tab: 'The work', kicker: `Why we chose ${first}`, body: w.why}),
+        art2 && FDT.plate({x: art2, slot: 'fdpl2'}),
+        (w.plan || w.q3) && BKT.say({slot: 'fdws', face: w.face || w.art, q: w.plan || w.q3, name: w.name, handle: w.handle}),
+        FDT.folder({tabs: W3, tab: 'The grant', kicker: `What ${first} receives`, rows: [[amt, 'unrestricted. No receipts, no reports.'], ['A feature', 'a full interview on artstoheartsproject.com, coming soon.'], ['A title', 'ATH Creative Fund artist, theirs to keep in their bio and CV.']], rowW: 200}),
+        isFirst ? FDT.folder({tabs: W3, tab: 'The grant', head: ['The first name.', '**Not the last.**'], body: `Every month, one more artist. ${fdName(nx)} opened on ${nxo}, and the next name could be yours.`})
+          : R.length > 1 ? FDT.ring({title: ['The fund', 'so far'], items: R.slice(-6).map(x => ({...x.w, label: x.w.name, sub: `${x.w.title} · ${fdName(x.r)}`})), fs: 84}) : null,
+        FDT.cal({month: fdDate(nx.closes), kicker: fdName(nx), title: MONTHS_FULL[fdDate(nx.closes).getMonth()], sub: `**${fdName(nx)} is open.** Applications close ${ncl} at 11:59 PM.`, marks: {[fdDate(nx.closes).getDate()]: 'Deadline', [fdDate(nx.announce).getDate()]: 'Announced'}, works: [w, art2, ...F].filter(Boolean).slice(0, 3)}),
+        end(`Congratulations, ${first}. The next one could be you.`, `Go and say hello to ${w.handle || first}.`)]; }
+    cap = w.name ? (isFirst ? `Meet ${w.name}${w.handle ? ' ' + w.handle : ''}, the first ever ATH Creative Fund artist.\n\nIn October, we opened the ATH Creative Fund: an unrestricted ${amt} grant for one artist, no receipts, no reports. Hundreds of artists answered. One body of work stayed with us longer than any other.` : `Meet ${w.name}${w.handle ? ' ' + w.handle : ''}, the ATH Creative Fund artist for ${cy}.`)
+      + `${w.why ? '\n\n' + w.why : ''}${w.plan || w.q3 ? `\n\nIn ${first}'s words: "${w.plan || w.q3}"` : ''}\n\n${first} receives ${amt}, unrestricted, and a full feature interview on artstoheartsproject.com, coming soon.\n\nThank you to every artist who applied. Every application was read by people, not an algorithm.\n\n${isFirst ? 'The first name. Not the last. ' : ''}${fdName(nx)} is open now and closes ${ncl}. ${ask}\n\nGo and congratulate ${w.handle || first} in the comments.` : ''; }
   else if (v.id === 'recap') { const F = (r.found || []).filter(x => x.name && x.art); head = cy + ' recap'; const RT = ['The recipient', 'Work we loved', "What's next"];
     S = [FDT.folder({tabs: RT, tab: 'Work we loved', photo: (F[0] || w).art, slot: 'fdrc', mono: true, center: true, head: [`The ${cy}`, 'Recap'], headSz: 104, credit: fdCred(F[0] || w)}),
       w.name && FDT.folder({tabs: RT, tab: 'The recipient', kicker: cy, head: [w.name + '.'], body: `${amt}, unrestricted, for whatever the practice needs.${w.plan ? ` In ${first}'s words: “${bkCut(w.plan, 160)}”` : ''}`}),
@@ -216,7 +250,13 @@ function fundGroups(){
       end(`Read ${first ? first + "'s" : 'the'} full feature on artstoheartsproject.com.`, `The next cycle closes ${ncl}.`)];
     cap = `In conversation with ${w.name || ''}${w.handle ? ' ' + w.handle : ''}, the ATH Creative Fund recipient for ${cy}.${w.q3 ? `\n\n"${bkCut(w.q3, 260)}"` : ''}\n\nRead the full feature on artstoheartsproject.com (link in bio).\n\nThe fund reopens every month. The next cycle closes ${ncl}. ${ask}`; }
   S = S.filter(Boolean);
-  return [{book: true, credits, title: `${cy} · ${head}`, meta: `ATH Creative Fund · ${S.length} slides · keyword ${KW} (set it in ManyChat to send ${r.link || FD_LINK})`, cap: cap + '\n\n' + tags, pin: `Comment ${KW} and we'll send you the link to apply.`, slides: S.map((s, j) => ({...s, title: 'fund-' + v.id + '-' + (j + 1)}))}];
+  const extra = [];
+  if (v.id === 'winner' && w.name && w.art) { const isFirst = fdRecips(r)[0] && fdRecips(r)[0].r.id === r.id;
+    extra.push({book: true, story: true, credits, title: `${cy} · Story frames for the announcement`, meta: `Post "Ours" on announcement day with a link sticker to the apply page and a mention sticker for ${w.handle || first}. Send "${first}'s" to ${first} to share and tag @artstoheartsproject. Post the carousel as an Instagram Collab with ${w.handle || 'the artist'} so it appears on both profiles.`,
+      cap: `Message to ${first}: Hi ${first}, the announcement is live on our page today. Here is a story frame made for you: share it, tag @artstoheartsproject and we'll reshare. We have also sent a Collab invite on the post, so it appears on your profile too. Congratulations again.`, pin: '',
+      slides: [{...FDT.kit({kind: 'artist', x: w, slot: 'fdk1', kicker: isFirst ? 'The first' : cy, head: 'ATH Creative Fund artist', sub: `${w.name} · ${amt} grant from Arts to Hearts Project`, zone: 'Mention sticker: @artstoheartsproject'}), title: 'fund-story-artist', label: `${first}'s story`},
+        {...FDT.kit({kind: 'ours', x: w, slot: 'fdk2', kicker: isFirst ? 'Our first Creative Fund artist' : `Our ${cy} artist`, head: w.name, sub: `${fdName(nx)} is open. Applications close ${ncl}.`, zone: 'Link sticker: apply for the fund'}), title: 'fund-story-ours', label: 'Our story'}]}); }
+  return [...[{book: true, credits, title: `${cy} · ${head}`, meta: `ATH Creative Fund · ${S.length} slides · keyword ${KW} (set it in ManyChat to send ${r.link || FD_LINK})`, cap: cap + '\n\n' + tags, pin: `Comment ${KW} and we'll send you the link to apply.`, slides: S.map((s, j) => ({...s, title: 'fund-' + v.id + '-' + (j + 1)}))}], ...extra];
 }
 function fdW(x, slot){ return {artist: x.name || '', handle: x.handle || '', title: x.title || '', medium: x.medium || '', img: bkPic(slot, x.art || ''), face: x.face || ''}; }
 
