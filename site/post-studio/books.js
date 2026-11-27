@@ -429,8 +429,8 @@ const bkCap = w => { const d = String(((w.works || [])[0] || {}).details || w.de
 
 // ---------- the tabbed card (from the "Wrapped" reference): the carousel's own chapters as tabs on a white page ----------
 const BK_CH = ['The call', 'The artists', "What's next"];
-const bkTabRow = on => BK_CH.map((t, i) => { const act = t === on;
-  return `<div class="a" style="left:870px;top:${150 + (1060 - (BK_CH.length * 232 - 16)) / 2 + i * 232}px;width:66px;height:216px;border-radius:0 14px 14px 0;background:${act ? HL.white : i % 2 ? HL.rose : HL.pink};display:flex;align-items:center;justify-content:center">
+const bkTabRow = (on, tabs = BK_CH) => tabs.map((t, i) => { const act = t === on;
+  return `<div class="a" style="left:870px;top:${150 + (1060 - (tabs.length * 232 - 16)) / 2 + i * 232}px;width:66px;height:216px;border-radius:0 14px 14px 0;background:${act ? HL.white : i % 2 ? HL.rose : HL.pink};display:flex;align-items:center;justify-content:center">
     <p style="${act ? T_MED : T_REG};font-size:19px;letter-spacing:.16em;text-transform:uppercase;color:${HL.burg};writing-mode:vertical-rl;white-space:nowrap">${esc(t)}</p></div>`; }).join('');
 const bkB = t => bkWhole(esc(bkKeep(t))).replace(/\*\*(.+?)\*\*/g, (m, x) => x.length < 30 ? `<span style="white-space:nowrap">${mark(x)}</span>` : mark(x));   /* emphasis is the house Pink highlight */   // **words** set heavier, as in the Highlights card
 Object.assign(BKT, {
@@ -439,7 +439,7 @@ Object.assign(BKT, {
     <p class="a cn" style="left:52px;top:48px;color:${HL.white}">Arts to Hearts Project</p>${o.mono ? ivMono('white', 'right:52px;top:40px;width:96px;height:54px') : ''}
     <p class="a" style="left:72px;bottom:60px;${T_REG};font-size:24px;color:${HL.white};opacity:.85">@artstoheartsproject</p>
     <div class="a" style="right:72px;bottom:46px;width:56px;height:56px;border-radius:50%;background:${HL.white};display:flex;align-items:center;justify-content:center;${T_MED};font-size:28px;color:${HL.burg}">&rarr;</div>
-    ${bkTabRow(o.tab)}
+    ${bkTabRow(o.tab, o.tabs)}
     <div class="a" style="left:150px;top:150px;width:724px;height:1060px;background:${HL.white};border-radius:16px;box-shadow:0 24px 60px rgba(20,9,12,.28)"></div>
     <div class="a" style="left:196px;top:190px;width:632px;height:980px;display:flex;flex-direction:column;align-items:center;justify-content:${o.top ? 'flex-start' : 'center'};text-align:center">
       ${o.kicker ? `<p style="${T_MED};font-size:19px;letter-spacing:.22em;text-transform:uppercase;color:${HL.ink};margin-bottom:26px">${esc(bkKeep(o.kicker))}</p>` : ''}

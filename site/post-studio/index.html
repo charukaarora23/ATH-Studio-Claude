@@ -116,6 +116,9 @@ summary{font:600 12px/1 var(--mono);letter-spacing:.1em;text-transform:uppercase
 .post .gap{display:inline-block;border:2px dashed currentColor;border-radius:8px;padding:0 .3em;opacity:.75}
 .post .ph{display:flex;align-items:center;justify-content:center;text-align:center;border:3px dashed currentColor;border-radius:18px;opacity:.6;font-size:24px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;line-height:1.5}
 body[data-seg=books]:not(.bkposts) .app{display:none}body[data-seg=books].bkposts .app{display:block}body[data-seg=books].bkposts .app>aside,body[data-seg=books].bkposts #ivside,body[data-seg=books].bkposts #tabs,body[data-seg=books].bkposts .app main>:not(#out):not(.top){display:none}body[data-seg=books].bkposts .top .f,body[data-seg=books].bkposts #go{display:none}
+body[data-seg=fund]:not(.fdposts) .app{display:none}body[data-seg=fund].fdposts .app{display:block}body[data-seg=fund].fdposts .app>aside,body[data-seg=fund].fdposts #ivside,body[data-seg=fund].fdposts #tabs,body[data-seg=fund].fdposts .app main>:not(#out):not(.top){display:none}body[data-seg=fund].fdposts .top .f,body[data-seg=fund].fdposts #go{display:none}
+body:not([data-seg=fund]) #fund{display:none}#fund{max-width:1400px;margin:0 auto;padding:28px 24px 80px;font-family:var(--sans,sans-serif);color:#1C1310}
+.fd-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:10px 0}.fd-f{display:flex;flex-direction:column;gap:4px;font-size:13px;color:#6b5a55;margin:8px 0}.fd-f input,.fd-f textarea{font:inherit;font-size:14px;color:#1C1310;padding:8px 10px;border:1px solid #d9c9c4;border-radius:8px;width:100%;box-sizing:border-box}.fd-f i{font-size:12px}.fd-chk{display:flex;gap:8px;align-items:center;font-size:14px;margin:6px 0}.fd-pics{display:flex;flex-wrap:wrap;gap:14px;margin:10px 0}.fd-pic{display:flex;flex-direction:column;gap:6px;font-size:13px;color:#6b5a55}.fd-pic img,.fd-none{width:160px;height:160px;object-fit:contain;background:#f6efed;border-radius:10px}.fd-none{display:flex;align-items:center;justify-content:center;font-size:12px}.fd-found{border:1px solid #eadcd8;border-radius:10px;padding:12px 14px;margin:10px 0}.fd-mail{border:1px solid #eadcd8;border-radius:10px;padding:12px 14px;margin:10px 0}.fd-mh{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}.fd-mh span{display:flex;gap:10px;align-items:center}.fd-mail pre{white-space:pre-wrap;font:14px/1.5 var(--sans,sans-serif);margin:10px 0 0;color:#1C1310}.fd-cols{display:grid;grid-template-columns:1fr 1fr;gap:24px}@media(max-width:640px){.fd-grid,.fd-cols{grid-template-columns:1fr}}
 .bk-inside{margin:16px 0;padding-top:12px;border-top:1px solid #eadcd8}.bk-inside h3{font-size:16px;margin:0 0 8px}.bk-in{display:grid;grid-template-columns:140px 1fr;gap:12px;font-size:14px;padding:6px 0}.bk-in b{color:#6A0620}.bk-ivs{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px;margin-top:10px}.bk-iv{background:#FAF5F3;border-radius:10px;padding:12px;font-size:14px}.bk-iv blockquote{margin:8px 0 0;font-family:'ATH Serif',Georgia,serif;font-style:italic;color:#1C1310}
 .bk-posts{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:14px 0 4px}.bk-posts b{margin-right:6px}.bk-pick{display:inline-flex;gap:4px;align-items:center}.bk-pick select{padding:6px;border:1px solid #d9c9c4;border-radius:8px}body:not([data-seg=books]) #books{display:none}
 #books{max-width:1400px;margin:0 auto;padding:28px 24px 80px;font-family:var(--sans,sans-serif);color:#1C1310}
@@ -138,8 +141,8 @@ img.bk-cv{width:100%;object-fit:contain;background:#FAD2E1}.bk-a img{width:100%;
 </style>
 </head><body>
 
-<header class="segbar"><b>ATH Studio</b><nav id="seg" aria-label="Sections"><button type="button" data-seg="calls">Open calls</button><button type="button" data-seg="interviews">Artist interviews</button><button type="button" data-seg="editorial">ATH Editorial</button><button type="button" data-seg="heartlist">The Heart List</button><button type="button" data-seg="books">Books</button></nav></header>
-<main id="books"></main>
+<header class="segbar"><b>ATH Studio</b><nav id="seg" aria-label="Sections"><button type="button" data-seg="calls">Open calls</button><button type="button" data-seg="interviews">Artist interviews</button><button type="button" data-seg="editorial">ATH Editorial</button><button type="button" data-seg="heartlist">The Heart List</button><button type="button" data-seg="books">Books</button><button type="button" data-seg="fund">Creative Fund</button></nav></header>
+<main id="books"></main><main id="fund"></main>
 <div class="app">
 <aside>
   <h1>ATH Post Studio</h1>
@@ -776,7 +779,7 @@ function dayItems(date, calls){ const posts = monthPosts(), postDays = new Set(p
   return out; }
 async function loadStatus(){ try { const r = await fetch('api/status', {cache: 'no-store'}); if (!r.ok) throw 0; STATUS = await r.json(); STATUS_MODE = 'shared'; }
   catch { try { STATUS = JSON.parse(localStorage.getItem('athCalStatus') || '{}'); } catch { STATUS = {}; } STATUS_MODE = 'local'; }
-  calLoaded = true; if ($('ptype').value === 'calendar' && document.body.dataset.seg !== 'books') { $('out').innerHTML = calHTML(); wireCal(); } }
+  calLoaded = true; if ($('ptype').value === 'calendar' && !['books', 'fund'].includes(document.body.dataset.seg)) { $('out').innerHTML = calHTML(); wireCal(); } }
 async function setPosted(id, val){ let who = ''; try { who = localStorage.getItem('athWho') || ''; } catch {}
   if (val && !who) { who = (prompt('Your name (shown next to what you post):') || '').trim(); try { localStorage.setItem('athWho', who); } catch {} }
   if (val) STATUS[id] = {posted: true, by: who, at: new Date().toISOString()}; else delete STATUS[id];
@@ -1096,6 +1099,7 @@ function setSeg(seg){ document.body.dataset.seg = seg; document.querySelectorAll
   try { localStorage.setItem('athSeg', seg); } catch {}
   if (seg === 'interviews' || seg === 'editorial' || seg === 'heartlist') { IVK = seg === 'editorial' ? 'editorial' : seg === 'heartlist' ? 'heartlist' : 'interview'; IVSEL = selOf(IVK); $('ptype').value = 'interview'; renderIvSide(); }
   else if ($('ptype').value === 'interview') { let pt = null; try { pt = localStorage.getItem('athLastPtype'); } catch {} $('ptype').value = pt && pt !== 'interview' && [...$('ptype').options].some(o => o.value === pt) ? pt : 'calendar'; }
+  if (seg === 'fund') { fundRender(); if (FUNDVIEW) render(); window.scrollTo({top: 0}); return; }
   if (seg === 'books') { booksRender(); if (typeof BOOKVIEW !== 'undefined' && BOOKVIEW) render(); window.scrollTo({top: 0}); return; }
   render(); window.scrollTo({top: 0}); }
 document.querySelectorAll('#seg [data-seg]').forEach(b => b.onclick = () => setSeg(b.dataset.seg));
@@ -1365,15 +1369,16 @@ function render(){
   const seg0 = document.body.dataset.seg || 'calls'; const base = (seg0 !== 'calls' && $('ptype').value === 'interview' && SECTIONS[IVK] ? 'ath-' + SECTIONS[IVK].title : (state.name || 'call')).toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g, '');
   const pick = $('ptype').value || '0';
   const groups = [];
-  if (seg0 === 'books') { if (typeof BOOKVIEW !== 'undefined' && BOOKVIEW) bookGroups().forEach(g => groups.push(g)); }
+  if (seg0 === 'fund') { if (typeof FUNDVIEW !== 'undefined' && FUNDVIEW) fundGroups().forEach(g => groups.push(g)); }
+  else if (seg0 === 'books') { if (typeof BOOKVIEW !== 'undefined' && BOOKVIEW) bookGroups().forEach(g => groups.push(g)); }
   else if (pick === 'daily') { if (!dLoaded) loadDaily(); const p = DPOSTS[DSEL]; const cat = p && DCAT[p.cat];
     if (p && cat && window.DPACK && DPACK[p.cat]) { DPACK[p.cat](p).forEach(g => groups.push({...g, daily: true, pid: p.id})); }
     else if (p && cat && DSLIDES[p.cat]) { const slides = DSLIDES[p.cat](p).map((s, j) => ({...s, title: p.cat + '-' + (j + 1)}));
       groups.push({title: `${p.date} · ${cat.name}`, meta: `${cat.marker || cat.name} · ${slides.length} slide${slides.length > 1 ? 's' : ''} · ${slotLabel(p.slot)}${cat.key || p.f.key ? ' · keyword “' + (p.f.key || cat.key) + '”' : ''}`, slides, cap: DCAPTION[p.cat](p), pin: (p.f.key || cat.key) ? `Comment '${p.f.key || cat.key}' and we'll send you the link.` : '', daily: true}); }
   } else if (pick === 'interview') { if (!dLoaded) loadDaily(); const p = ivCurrent(); if (p) DPACK[IVK](p).forEach(g => groups.push({...g, daily: true, pid: p.id}));
   } else if (pick === 'calendar') { renderPool(); RENDERED = []; $('out').innerHTML = calHTML(); wireCal(); if (!calLoaded) loadStatus(); if (!dLoaded) loadDaily(); return; }
-  if (seg0 !== 'books' && pick === 'storyplan') { renderPool(); RENDERED = []; $('out').innerHTML = storyPlanHTML(); status('Stories plan for every call. Pick "Stories: this call, every day" to get the frames.'); return; }
-  if (seg0 === 'books' || pick === 'daily' || pick === 'interview') {
+  if (seg0 !== 'books' && seg0 !== 'fund' && pick === 'storyplan') { renderPool(); RENDERED = []; $('out').innerHTML = storyPlanHTML(); status('Stories plan for every call. Pick "Stories: this call, every day" to get the frames.'); return; }
+  if (seg0 === 'books' || seg0 === 'fund' || pick === 'daily' || pick === 'interview') {
     /* daily slides were built above */
   } else if (pick === 'stories') {
     const phases = {}; Object.keys(STORY_T).forEach(id => { const t = STORY_T[id]; VERB = verbFor(id[0] === 'F' ? 3 : 20); (phases[t.phase] = phases[t.phase] || []).push({id, t, f: storyMake(id, 21)}); });
@@ -1541,6 +1546,7 @@ $('ptype').onchange = () => { try { localStorage.setItem('athLastPtype', $('ptyp
 </script>
 <script src="daily.js"></script>
 <script src="books.js"></script>
+<script src="fund.js"></script>
 <script src="interview.js"></script>
 <script src="editorial.js"></script>
 <script src="heartlist.js"></script>
