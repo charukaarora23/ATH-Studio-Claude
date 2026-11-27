@@ -30,7 +30,7 @@ async function fundLoad(){ FUNDBUSY = true;
   FUNDBUSY = false; if (FUNDSEL === null) { const now = fdIso(new Date()).slice(0, 7); const t = new Date(); const cur = fdIso(t.getDate() >= 15 ? t : new Date(t.getFullYear(), t.getMonth() - 1, 1)).slice(0, 7); FUNDSEL = FUND[cur] ? cur : (fdRounds().pop() || {}).id || null; }
   fundRender(); if (FUNDVIEW) render(); }
 let fdSaveT = null;
-function fundSave(id){ clearTimeout(fdSaveT); fdSaveT = setTimeout(async () => {
+function fundSave(id){ if (FUNDDEMO) { status('This is the example: changes show here but are not saved.'); return; } clearTimeout(fdSaveT); fdSaveT = setTimeout(async () => {
   if (!FUNDLOCAL) { try { const r = await fetch('api/fund', {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({id, round: FUND[id] || null})}); if (!r.ok) throw 0; status('Saved for the team.'); return; } catch { FUNDLOCAL = true; } }
   try { localStorage.setItem('athFund', JSON.stringify(FUND)); status('Saved in this browser (the shared store could not be reached).'); } catch {} }, 600); }
 async function fdUpload(file){ const url = await shrink(file);
@@ -74,7 +74,7 @@ const FDT = {
         ${o.sub ? `<p style="${BASK};font-size:44px;line-height:1.25;color:${HL.ink}">${fdEm(o.sub, HL.burg)}</p>` : ''}</div>
       ${o.credit ? `<p class="a" style="left:60px;bottom:60px;${T_REG};font-size:20px;color:${HL.ink};opacity:.6">Artwork: ${esc(o.credit)}</p>` : ''}`}; },
   /* the folder: tabs on top (the chapters), one idea inside */
-  folder(o){ const tabs = o.tabs || [], on = o.tab; const tw = (920 - (tabs.length - 1) * 14) / Math.max(1, tabs.length); const u = o.photo ? bkPic(o.slot, o.photo) : '';
+  folder(o){ const tabs = o.tabs || [], on = o.tab; const tw = Math.min(300, (920 - (tabs.length - 1) * 14) / Math.max(1, tabs.length)); const u = o.photo ? bkPic(o.slot, o.photo) : '';
     const top = o.photo ? 330 : 250, bot = o.photo ? 300 : 170;
     return {bg: HL.pink, html: `${u ? `<div class="a img" data-slot="${o.slot}" style="inset:0;background-image:url(${u});background-size:cover;background-position:center"></div><div class="a" style="inset:0;background:rgba(28,19,16,.18)"></div>` : ''}
       ${fdBrand(u ? HL.white : HL.burg)}${o.mono ? ivMono(u ? 'white' : 'burgundy', 'right:52px;top:36px;width:112px;height:63px') : ''}
@@ -100,8 +100,10 @@ const FDT = {
     for (let k = 1; k <= days; k++) { const i = first + k - 1, cx = 90 + (i % 7) * cw + cw / 2, cy = top + Math.floor(i / 7) * rh + 40; const mk = marks[k];
       cells.push(mk ? `<div class="a" style="left:${cx - 38}px;top:${cy - 38}px;width:76px;height:76px;border-radius:50%;background:${HL.burg};display:flex;align-items:center;justify-content:center;${T_MED};font-size:36px;color:${HL.white}">${k}</div><p class="a c" style="left:${cx - 90}px;width:180px;top:${cy + 44}px;${T_MED};font-size:17px;letter-spacing:.14em;text-transform:uppercase;color:${HL.burg}">${esc(mk)}</p>`
         : `<p class="a c" style="left:${cx - 40}px;width:80px;top:${cy - 24}px;${T_MED};font-size:38px;color:${(i % 7) > 4 ? 'rgba(28,19,16,.4)' : HL.ink}">${k}</p>`); }
-    const free = []; for (let k = 1; k <= days; k++) if (!marks[k] && !Object.keys(marks).some(x => Math.abs(x - k) < 2)) free.push(k);
-    const pins = (o.works || []).slice(0, 4).map((x, j) => { const k = free[Math.floor((j + .5) * free.length / 4)] || 1; const i = first + k - 1; return fdPol(x, {x: Math.min(860, Math.max(220, 90 + (i % 7) * cw + cw / 2)), y: Math.min(1040, top + Math.floor(i / 7) * rh + 60), w: 200, h: 210, r: [-5, 4, -2, 6][j], slot: 'fdcal' + j, fs: 13}); });
+    const free = []; for (let k = 1; k <= days; k++) if (!marks[k] && !Object.keys(marks).some(x => Math.abs(x - k) < 2 || Math.abs(x - k - 7) < 2)) free.push(k);   /* a polaroid hangs over the row below, so it never sits above a marked day */
+    const want = Math.min(4, (o.works || []).length), chosen = []; [[1, 5], [3, 1], [5, 4], [2, 3], [4, 6], [0, 2]].forEach(([rw, col]) => { if (chosen.length >= want) return; const k = rw * 7 + col - first + 1; if (k >= 1 && k <= days && free.includes(k) && rw < rows) chosen.push(k); });
+    for (const k of free) { if (chosen.length >= want) break; if (!chosen.some(q => Math.abs(q - k) < 4)) chosen.push(k); }
+    const pins = (o.works || []).slice(0, chosen.length).map((x, j) => { const k = chosen[j]; const i = first + k - 1; return fdPol(x, {x: Math.min(860, Math.max(220, 90 + (i % 7) * cw + cw / 2)), y: Math.min(1040, top + Math.floor(i / 7) * rh + 60), w: 200, h: 210, r: [-5, 4, -2, 6][j], slot: 'fdcal' + j, fs: 13}); });
     return {bg: HL.pink, html: `${fdBrand()}
       <div class="a" style="left:60px;right:60px;top:120px;bottom:120px;background:${HL.white};border-radius:30px;box-shadow:0 24px 60px rgba(106,6,32,.14)"></div>
       <p class="a" style="left:100px;top:160px;${T_REG};font-size:30px;color:${HL.burg}">&lsaquo; ${esc(o.kicker || String(y))}</p>
@@ -118,7 +120,7 @@ const FDT = {
     return {bg: HL.white, html: `${fdBrand()}${ivMono('burgundy', 'right:52px;top:36px;width:112px;height:63px')}
       ${items.map((x, i) => { const [px, py] = pos[i]; if (x.folder) return folderIc(px, py, x.folder); const u = bkPic('fdring' + i, x.art); const n = fdNat(u); const b = bkFitBox(n, i % 3 === 2 ? 230 : 300, 270); const W = n ? b.w : 240, H = n ? b.h : 270;
         return `<div class="a" style="left:${px - W / 2}px;top:${py - H / 2 - 20}px;width:${W}px">${u ? `<div class="img" data-slot="fdring${i}" style="width:${W}px;height:${H}px;background-image:url(${u});background-size:contain;background-repeat:no-repeat;background-position:center;box-shadow:0 10px 24px rgba(28,19,16,.16)"></div>` : `<div class="ph" data-slot="fdring${i}" style="width:${W}px;height:${H}px;background:${HL.pink};color:${HL.burg};font-size:16px">Artwork</div>`}
-          <p style="${T_REG};font-size:18px;line-height:1.25;color:${HL.ink};text-align:center;margin-top:12px;white-space:nowrap">${esc(x.label || fdCred(x))}</p>${x.sub ? `<p style="${T_REG};font-size:16px;color:${HL.burg};text-align:center;white-space:nowrap">${esc(x.sub)}</p>` : ''}</div>`; }).join('')}
+          <p style="${T_REG};font-size:18px;line-height:1.25;color:${HL.ink};text-align:center;margin-top:12px">${esc(x.label || fdCred(x))}</p>${x.sub ? `<p style="${T_REG};font-size:16px;line-height:1.25;color:${HL.burg};text-align:center;margin-top:2px">${esc(x.sub)}</p>` : ''}</div>`; }).join('')}
       <div class="a" style="left:330px;right:330px;top:590px;display:flex;flex-direction:column;align-items:center;text-align:center">
         <p style="${T_MED};font-size:${o.fs || 84}px;line-height:.98;letter-spacing:-.045em;color:${HL.ink};white-space:nowrap">${esc(o.title[0])}</p>
         <p style="${T_MED};font-size:${o.fs || 84}px;line-height:.98;letter-spacing:-.045em;color:${HL.ink};white-space:nowrap;outline:2px solid ${HL.burg};outline-offset:8px;position:relative">${esc(o.title[1] || '')}<svg style="position:absolute;right:-48px;bottom:-56px" width="40" height="52" viewBox="0 0 20 26"><path d="M2 1 L2 20 L7 15 L10.5 23 L13.5 21.6 L10 14 L17 14 Z" fill="${HL.white}" stroke="${HL.ink}" stroke-width="1.6" stroke-linejoin="round"/></svg></p>
@@ -172,7 +174,8 @@ function fundGroups(){
       end(`Applications close ${cl}, 11:59 PM.`)];
     cap = `Before you apply for the ATH Creative Fund, here is how we read every application.\n\nWe look for three things: a personal voice, care and intention, and lasting impact. Follower counts, likes and formal training play no part.\n\nYour work: one piece that best represents your practice.\nYour post: public, @artstoheartsproject tagged on the image, #ATHCreativeFund.\nYour words: a few honest lines about your practice. No artist statement needed.\n\nAnd remember: both the post and the form, not one.\n\nApplications close ${cl}. ${ask}`; }
   else if (v.id === 'record') { const R = fdRecips(r).filter(x => x.r.id !== r.id); head = 'The fund so far';
-    S = [FDT.ring({title: ['The fund', 'so far'], items: [...R.slice(-5).map(x => ({...x.w, label: x.w.name, sub: fdName(x.r)})), {folder: fdName(r).toLowerCase().replace(' ', '-')}], sub: `${R.length === 1 ? 'One artist' : R.length + ' artists'} funded. ${amt} each, no receipts, no reports.`}),
+    const RI = R.slice(-5).map(x => ({...x.w, label: x.w.name, sub: `${x.w.title} · ${fdName(x.r)}`})); const FI = fdRounds().filter(x => x.id < r.id).flatMap(x => (x.found || []).filter(y => y.art).map(y => ({...y, label: y.name, sub: y.title}))); const ringI = [...RI, ...FI].slice(0, 5); ringI.splice(Math.min(3, ringI.length), 0, {folder: fdName(r).toLowerCase().replace(' ', '-')});
+    S = [FDT.ring({title: ['The fund', 'so far'], items: ringI, sub: `${R.length === 1 ? 'One artist' : R.length + ' artists'} funded. ${amt} each, no receipts, no reports.`}),
       ...R.slice(-4).flatMap(x => [BKT.feature({w: fdW(x.w, 'fdrw' + x.r.id), slot: 'fdrw' + x.r.id, line: ''}),
         FDT.folder({tabs: R.slice(-3).map(y => fdName(y.r)), tab: fdName(x.r), kicker: x.w.name, head: x.w.q3 || x.w.plan ? null : ['Funded in', fdName(x.r) + '.'], body: x.w.q3 || x.w.plan ? `“${bkCut(x.w.q3 || x.w.plan, 260)}”` : (x.w.about || ''), foot: 'What the grant makes possible, in their words.'})]),
       calCycle(`${cy} closes **${cl}**. The next name on this list could be yours.`, pick(0, 3)),
@@ -194,7 +197,7 @@ function fundGroups(){
         mine[1] && BKT.feature({w: {...fdW(w, 'fdw2'), img: bkPic('fdw2', w.art2), title: w.title2 || ''}, slot: 'fdw2', line: ''}),
         (w.plan || w.q3) && BKT.say({slot: 'fdws', face: w.face, q: w.plan || w.q3, name: w.name, handle: w.handle}),
         FDT.folder({tabs: W3, tab: 'The grant', kicker: `What ${first} receives`, rows: [[amt, 'unrestricted, for whatever the practice needs.'], ['A feature', 'a full interview, coming soon on artstoheartsproject.com.'], ['A title', 'ATH Creative Fund recipient, theirs to keep.']], rowW: 200}),
-        R.length > 1 ? FDT.ring({title: ['The fund', 'so far'], items: R.slice(-6).map(x => ({...x.w, label: x.w.name, sub: fdName(x.r)})), fs: 96}) : null,
+        R.length > 1 ? FDT.ring({title: ['The fund', 'so far'], items: R.slice(-6).map(x => ({...x.w, label: x.w.name, sub: `${x.w.title} · ${fdName(x.r)}`})), fs: 84}) : null,
         end(`Congratulations, ${first}. Thank you to every artist who applied.`, `Not selected? The fund reopens every month. The next cycle closes ${ncl}.`)]; }
     cap = w.name ? `Meet ${w.name}${w.handle ? ' ' + w.handle : ''}, the ATH Creative Fund recipient for ${cy}.\n\n${w.why ? w.why + '\n\n' : ''}${w.plan || w.q3 ? `In ${first}'s words: "${w.plan || w.q3}"\n\n` : ''}${first} receives ${amt}, unrestricted, and a full feature interview on artstoheartsproject.com, coming soon.\n\nThank you to every artist who applied. Every application was read by people, not an algorithm. Not selected this time? The fund reopens every month: the next cycle closes ${ncl}. ${ask}` : ''; }
   else if (v.id === 'recap') { const F = (r.found || []).filter(x => x.name && x.art); head = cy + ' recap'; const RT = ['The recipient', 'Work we loved', "What's next"];
@@ -229,6 +232,34 @@ function fdEmails(r){ const w = r.winner || {}, amt = r.amount || '$500', an = f
 /* ---------- the website: the recipients, for the artstoheartsproject.com section ---------- */
 function fdWeb(r){ const amt = r.amount || '$500', past = fdRounds().filter(x => x.winner && x.winner.name && x.id <= r.id);
   return `ATH Creative Fund\n\nAn unrestricted ${amt} grant, awarded to one artist every month. Use it for whatever your practice needs. No receipts, no reports.\n\nArtists built this community. This is us giving back. For years, artists have trusted us with their work. The Creative Fund is how we give some of that back: ${amt} every month, straight to one artist, to spend on their practice.\n\nOpen to visual artists, photographers and writers, at every stage, anywhere in the world. Free to apply.\n\nApply: ${r.link || FD_LINK}\n${past.length ? `\nOur recipients\n${past.map(x => `${fdName(x)}: ${x.winner.name}${x.winner.handle ? ' ' + x.winner.handle : ''}${x.winner.country ? ', ' + x.winner.country : ''}`).join('\n')}\n` : ''}`; }
+
+
+/* ---------- the example: three full cycles with sample art and made-up artists, to review every post, email and tab. Never saved. ---------- */
+let FUNDDEMO = false, FUNDREAL = null;
+function fdDemo(){ const A = 'art/', E = 'art/examples/pqhaus/', H = 'art/examples/heartlist/';
+  const base = id => ({...fdNew(id), done: {}});
+  const c1 = {...base('2026-10'), winner: {name: 'Amara Okafor', handle: '@amara.paints', country: 'Nigeria', title: 'Night Bloom', medium: 'Oil on canvas', art: A + 'night-bloom.jpg', art2: A + 'ref-palms.jpg', title2: 'Palms After Rain', face: E + 'studio-1.jpg',
+      why: 'Her paintings feel unmistakably hers: patient, strange and full of care. We kept coming back to them long after the first look.',
+      about: 'Amara paints at night in a small studio in Lagos, after her day job. Her flowers bloom in the dark.',
+      plan: 'I will finally buy proper linen and stretch the big canvases I have been sketching for two years.',
+      q1: 'I paint gardens after dark. The colours change completely at night, and I want to hold on to that feeling before it goes.',
+      q2: 'I start with a thin wash and build slowly over weeks. Most of the painting is waiting for the right moment to stop.',
+      q3: 'Time. This grant means a month where I can paint instead of taking extra shifts. That is everything.'},
+    found: [{name: 'Lena Reid', handle: '@lenareid', title: 'Garden Call', art: A + 'call-garden.jpg', line: 'Collage built from old seed catalogues.'}, {name: 'Sora Kim', handle: '@sorakim.art', title: 'Dahlias', art: A + 'ref-dahlias.jpg', line: 'Small studies of the same flower over one summer.'}, {name: 'Jonah Pierce', handle: '@jonahpierce', title: '2903 Miles', art: E + 'art-2903-miles.jpg'}, {name: 'Ines Duarte', handle: '@inesduarte', title: 'Weave', art: H + 'weave.jpg'}],
+    stood: 'So many of you wrote about time: the hours you steal before work, the weekends you keep for the studio. That is exactly what this fund is for.'};
+  const c2 = {...base('2026-11'), winner: {name: 'Theo Marsh', handle: '@theo.marsh', country: 'United Kingdom', title: 'I Was the Elephant in the Room', medium: 'Acrylic on panel', art: E + 'art-i-was-the-elephant-in-the-room.jpg', art2: E + 'art-31-years-old.jpg', title2: '31 Years Old', face: E + 'studio-2.jpg',
+      why: 'Theo paints the things people do not say out loud, with humour and honesty. The work stays with you, and it is entirely his own.',
+      about: 'Theo is a self-taught painter from Leeds. He started painting at 29, on the kitchen table, and has not stopped since.',
+      plan: 'A proper easel and a month of studio rent, so I can work bigger than my kitchen table allows.',
+      q1: 'My paintings are about the small, awkward moments that stay with you for years.', q2: 'I write the title first. Then I paint until the picture deserves it.', q3: 'Space. For the first time I can step back from my work and see it whole.'},
+    found: [{name: 'Mira Holt', handle: '@mira.holt', title: 'No Help Is Coming', art: E + 'art-no-help-is-coming.jpg'}, {name: 'Priya Nair', handle: '@priyanair.studio', title: 'Peace', art: H + 'peace.jpg', line: 'Embroidery on found linen.'}, {name: 'Elena Voss', handle: '@elenavoss', title: 'Learning', art: H + 'learning.jpg'}, {name: 'Sam Okoye', handle: '@samokoye', title: 'I Am Not a Bad Person', art: E + 'art-i-am-not-a-bad-person.jpg'}, {name: 'Rosa Lind', handle: '@rosalind.art', title: 'Flower Portrait', art: A + 'flower-portrait.jpg'}],
+    stood: 'This cycle brought more writers than ever: poems photographed on kitchen tables, stories typed on phones. A poem has the same chance as a painting, and you showed us why.'};
+  const c3 = base('2026-12'); c3.done = {'post:launch': true, 'post:why': true, manychat: true, dates: true};
+  c1.done = Object.fromEntries(['launch', 'why', 'guide', 'week', 'winner', 'recap', 'feature'].map(k => ['post:' + k, true]).concat([['mail:0', true], ['mail:1', true], ['mail:2', true], ['mail:3', true], ['mail:4', true], ['reply', true], ['paid', true], ['feature', true], ['web', true], ['manychat', true], ['dates', true]]));
+  c2.done = {'post:launch': true, 'post:why': true, 'post:guide': true, 'post:record': true, 'post:week': true, 'post:winner': true, 'mail:0': true, 'mail:1': true, reply: true, paid: true, manychat: true, dates: true};
+  return {'2026-10': c1, '2026-11': c2, '2026-12': c3}; }
+function fdToggleDemo(){ fdClosePost(); if (FUNDDEMO) { FUND = FUNDREAL; FUNDDEMO = false; FUNDSEL = (fdRounds().pop() || {}).id || null; }
+  else { FUNDREAL = FUND; FUND = fdDemo(); FUNDDEMO = true; FUNDSEL = '2026-11'; } FUNDTAB = 'plan'; fundRender(); }
 
 /* ---------- the page ---------- */
 const fdIn = (k, label, val, o = {}) => `<label class="fd-f"><span>${label}</span>${o.area ? `<textarea data-fd="${k}" rows="${o.rows || 3}" placeholder="${fdE(o.ph || '')}">${fdE(val || '')}</textarea>` : `<input data-fd="${k}" type="${o.type || 'text'}" value="${fdE(val || '')}" placeholder="${fdE(o.ph || '')}">`}${o.note ? `<i>${o.note}</i>` : ''}</label>`;
@@ -270,11 +301,13 @@ function fundRender(){
   const body = !r ? '' : FUNDTAB === 'setup' ? fdTabSetup(r) : FUNDTAB === 'winner' ? fdTabWinner(r) : FUNDTAB === 'found' ? fdTabFound(r) : FUNDTAB === 'emails' ? fdTabEmails(r) : FUNDTAB === 'web' ? fdTabWeb(r) : FUNDTAB === 'track' ? fdTabTrack(r) : fdTabPlan(r);
   const w = r && r.winner || {};
   el.innerHTML = `<div class="bk-top"><div><h1>ATH Creative Fund</h1><p class="meta">${fdE((r && r.amount) || '$500')} to one artist, every month, no questions asked. A new cycle every month: the posts, the recipient, the emails, the checklist.${FUNDLOCAL ? ' <span class="bk-warn">Saving in this browser only: the shared store could not be reached.</span>' : ''}</p></div>
-    <div class="bk-act"><select id="fdsel">${R.map(x => `<option value="${x.id}"${x.id === FUNDSEL ? ' selected' : ''}>${fdE(fdMonth(x.id))}${x.winner && x.winner.name ? ' · ' + fdE(x.winner.name) : ''}</option>`).join('')}</select><button type="button" class="btn" id="fdnew">Start ${fdE(fdName({id: nextId}))}</button></div></div>
+    <div class="bk-act"><select id="fdsel">${R.map(x => `<option value="${x.id}"${x.id === FUNDSEL ? ' selected' : ''}>${fdE(fdMonth(x.id))}${x.winner && x.winner.name ? ' · ' + fdE(x.winner.name) : ''}</option>`).join('')}</select>${FUNDDEMO ? '' : `<button type="button" class="btn" id="fdnew">Start ${fdE(fdName({id: nextId}))}</button>`}<button type="button" class="btn ghost" id="fddemo">${FUNDDEMO ? 'Leave the example' : 'See an example'}</button></div></div>
+    ${FUNDDEMO ? '<p class="bk-warn" style="margin:0 0 14px">Example only: three made-up cycles with sample art and made-up artists, so you can review every post, email and tab. Nothing here is saved or shared. Open any cycle, any tab, any post.</p>' : ''}
     ${r ? `<section class="bk-detail"><h2>${fdE(fdMonth(r.id))}</h2><p class="bk-dates"><span>Opens <b>${fdE(bkFmt(fdDate(r.opens)))}</b></span><span>Closes <b>${fdE(bkFmt(fdDate(r.closes)))}</b></span><span>Recipient announced <b>${fdE(bkFmt(fdDate(r.announce)))}</b></span>${w.name ? `<span>Recipient <b>${fdE(w.name)}</b></span>` : ''}</p>
       <p class="meta">Apply link: <a href="${fdE(r.link || FD_LINK)}" target="_blank" rel="noopener">${fdE(r.link || FD_LINK)}</a></p>${tabsHtml}<div class="bk-body">${body}</div>${FUNDVIEW ? '<p class="meta bk-close"><button type="button" class="btn ghost" id="fdclose">Close the post</button></p>' : ''}</section>`
       : '<section class="bk-detail"><p>No cycles yet. Start one to get the posts, emails and checklist.</p></section>'}`;
-  el.querySelector('#fdnew').onclick = () => { const id = nextId; if (!FUND[id]) FUND[id] = fdNew(id); FUNDSEL = id; FUNDTAB = 'setup'; fdClosePost(); fundSave(id); fundRender(); };
+  el.querySelector('#fddemo').onclick = fdToggleDemo;
+  if (!FUNDDEMO) el.querySelector('#fdnew').onclick = () => { const id = nextId; if (!FUND[id]) FUND[id] = fdNew(id); FUNDSEL = id; FUNDTAB = 'setup'; fdClosePost(); fundSave(id); fundRender(); };
   const sel = el.querySelector('#fdsel'); if (sel) sel.onchange = () => { FUNDSEL = sel.value; fdClosePost(); fundRender(); };
   if (!r) return;
   el.querySelectorAll('[data-fdtab]').forEach(x => x.onclick = () => { FUNDTAB = x.dataset.fdtab; if (FUNDTAB !== 'plan') fdClosePost(); fundRender(); });
