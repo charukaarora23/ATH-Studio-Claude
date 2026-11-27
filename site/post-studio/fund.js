@@ -65,6 +65,30 @@ function fdPol(x, o){ const u = x && bkPic(o.slot, x.art); const n = fdNat(u); c
     ${u ? `<div class="img" data-slot="${o.slot}" style="width:${W}px;height:${H}px;background-image:url(${u});background-size:contain;background-repeat:no-repeat;background-position:center"></div>` : `<div class="ph" data-slot="${o.slot}" style="width:${W}px;height:${H}px;background:${HL.pink};color:${HL.burg};font-size:18px">Artwork</div>`}
     <p style="${T_REG};font-size:${o.fs || 15}px;line-height:1.2;color:${HL.ink};opacity:.7;padding:10px 2px 14px;white-space:normal;overflow-wrap:anywhere">${esc(fdCred(x))}</p></div>`; }
 const FDT = {
+  /* cover A: the fund in focus. $500 large, the hook in Baskerville, the work pinned beside it */
+  fundcover(o){ const x = o.x || {};
+    return {bg: HL.burg, html: `${fdBrand(HL.white)}${ivMono('white', 'right:52px;top:36px;width:112px;height:63px')}
+      <p class="a" style="left:64px;top:150px;${T_MED};font-size:24px;letter-spacing:.22em;text-transform:uppercase;color:${HL.rose}">${esc(o.label)}</p>
+      <p class="a" style="left:52px;top:190px;${T_MED};font-size:300px;line-height:1;letter-spacing:-.06em;color:${HL.white}">${esc(o.amt)}</p>
+      <p class="a" style="left:64px;width:520px;top:540px;${BASK};font-size:64px;line-height:1.14;color:${HL.white}">${fdEm(o.head, HL.rose)}</p>
+      <p class="a" style="left:64px;width:470px;top:${o.subTop || 800}px;${BASK};font-size:34px;line-height:1.4;color:${HL.pink}">${fdEm(o.sub || '', HL.white)}</p>
+      ${fdPol(x, {x: 800, y: 860, w: 360, h: 460, r: 4, slot: o.slot, fs: 17})}
+      <p class="a" style="left:64px;bottom:120px;${T_MED};font-size:36px;letter-spacing:-.01em;color:${HL.white}">${esc(o.meet)} <span style="color:${HL.rose}">&rarr;</span></p>
+      <p class="a" style="left:64px;bottom:56px;${T_REG};font-size:24px;color:${HL.pink};opacity:.85">@artstoheartsproject</p>`}; },
+  /* cover B: the fund's promise in a folder over the work (full bleed: a cover may crop) */
+  foldcover(o){ const u = bkPic(o.slot, o.img); const tabs = ['The fund', 'The artist', "What's next"];
+    return {bg: HL.ink, html: `${u ? `<div class="a img" data-slot="${o.slot}" style="inset:0;background-image:url(${u});background-size:cover;background-position:center"></div><div class="a" style="inset:0;background:rgba(20,9,12,.22)"></div>` : ''}
+      ${fdBrand(HL.white)}${ivMono('white', 'right:52px;top:36px;width:112px;height:63px')}
+      ${tabs.map((t, i) => `<div class="a" style="left:${80 + i * 314}px;top:236px;width:300px;height:84px;border-radius:22px 22px 0 0;background:${i ? '#8A2740' : HL.burg};display:flex;justify-content:center;padding-top:22px;box-sizing:border-box"><p style="${T_MED};font-size:21px;letter-spacing:.2em;text-transform:uppercase;color:${i ? HL.pink : HL.white}">${esc(t)}</p></div>`).join('')}
+      <div class="a" style="left:80px;right:80px;top:306px;bottom:330px;background:${HL.burg};border-radius:0 26px 26px 26px;box-shadow:0 30px 70px rgba(20,9,12,.4);padding:64px 72px;box-sizing:border-box;display:flex;flex-direction:column;gap:26px">
+        <p style="${T_MED};font-size:22px;letter-spacing:.22em;text-transform:uppercase;color:${HL.pink}">ATH Creative Fund</p>
+        <p style="${BASK};font-size:84px;line-height:1.06;letter-spacing:-.015em;color:${HL.white}">${fdEm(o.head, HL.rose)}</p>
+        <p style="${BASK};font-size:36px;line-height:1.38;color:${HL.pink}">${fdEm(o.sub, HL.white)}</p>
+        <div style="margin-top:auto;border-top:1px solid rgba(250,210,225,.3);padding-top:26px">
+          <p style="${T_MED};font-size:22px;letter-spacing:.22em;text-transform:uppercase;color:${HL.rose}">${esc(o.kicker)}</p>
+          <p style="${T_MED};font-size:76px;line-height:1;letter-spacing:-.04em;color:${HL.white};margin-top:14px">${esc(o.name)}</p></div></div>
+      <p class="a" style="left:80px;bottom:280px;${T_REG};font-size:20px;color:${HL.white};opacity:.9">Artwork: ${esc(o.credit || '')}</p>
+      ${fdFoot(HL.white, HL.white, HL.burg)}`}; },
   /* the announcement cover: the work full bleed (a cover may crop), the name set large, one line of who they are */
   hero(o){ const u = bkPic(o.slot, o.img); const nm = String(o.name || ''); const sp = nm.lastIndexOf(' '); const L = sp > 0 ? [nm.slice(0, sp), nm.slice(sp + 1)] : [nm]; const fs = Math.min(170, Math.floor(960 / (Math.max(...L.map(l => l.length)) * .52)));
     return {bg: HL.ink, html: `${u ? `<div class="a img" data-slot="${o.slot}" style="inset:0;background-image:url(${u});background-size:cover;background-position:center"></div>` : `<div class="a ph" data-slot="${o.slot}" style="inset:0;background:${HL.burg};color:${HL.pink}">Their artwork</div>`}
@@ -220,7 +244,12 @@ function fundGroups(){
     if (!w.name) S = [FDT.folder({tabs: W3, tab: 'The artist', head: ['Add the', 'recipient first'], body: 'Open the Recipient tab: name, handle, work, photo, why we chose them, their own words.'})];
     else { const art2 = w.art2 && {...w, art: w.art2, title: w.title2 || ''}; const F = fdRounds().filter(x => x.id <= r.id).flatMap(x => (x.found || []).filter(y => y.art)).slice(0, 3);
       const aboutLine = bkFirst(w.about || ''); const nxo = fdDay(fdDate(nx.opens));
-      S = [FDT.hero({img: w.art, slot: 'fdhero', label: isFirst ? 'The first ATH Creative Fund artist' : `ATH Creative Fund · ${cy} artist`, name: w.name, sub: [cy, w.country].filter(Boolean).join(' · ')}),
+      const ck = (v.cover || r.cover || 'fund'); const meet = `Meet ${isFirst ? 'our first artist' : 'the artist'}, ${w.name}`;
+      const cover = ck === 'folder' ? FDT.foldcover({img: w.art, slot: 'fdfold', head: isFirst ? `We gave **${amt}** to one artist.` : `**${amt}** to one artist. Again.`, sub: 'No receipts. No reports. Just room to make the work.', kicker: isFirst ? 'Our first artist' : `${cy} artist`, name: w.name, credit: fdCred(w)})
+        : ck === 'artwork' ? FDT.hero({img: w.art, slot: 'fdhero', label: isFirst ? 'The first ATH Creative Fund artist' : `ATH Creative Fund · ${cy} artist`, name: w.name, sub: [cy, w.country].filter(Boolean).join(' · ')})
+        : FDT.fundcover({amt, x: w, slot: 'fdfc', label: `ATH Creative Fund · ${cy}`, head: isFirst ? 'Our first grant has **found its artist.**' : 'This month\'s grant has **found its artist.**', sub: 'To one artist. No receipts, no reports.', meet});
+      S = [cover,
+        FDT.folder({tabs: ['The fund', 'The artist', "What's next"], tab: 'The fund', kicker: 'What is the ATH Creative Fund?', head: [`Every month, **${amt}**`, 'to one artist.'], headSz: 76, body: 'Paid straight to the artist, unrestricted: paint, film, studio rent, a course, or simply time to create. We don\'t ask for receipts or reports. We just want the work to happen.', foot: 'Judged on the work alone. Not followers, not degrees, not where you live.'}),
         F.length >= 2 ? FDT.wall({words: isFirst ? `In October, we opened the ATH Creative Fund. **Hundreds of artists answered.**` : `This cycle, **hundreds of artists** answered the call.`, works: F, pw: 330, ph: 380}) : null,
         FDT.plate({x: w, slot: 'fdpl1', label: isFirst ? `One body of work stayed with us longer than any other.` : `One body of work stayed with us.`}),
         w.face && FDT.hero({img: w.face, slot: 'fdpor', mono: false, label: 'Meet the artist', name: w.name, sub: aboutLine}),
@@ -256,7 +285,7 @@ function fundGroups(){
       cap: `Message to ${first}: Hi ${first}, the announcement is live on our page today. Here is a story frame made for you: share it, tag @artstoheartsproject and we'll reshare. We have also sent a Collab invite on the post, so it appears on your profile too. Congratulations again.`, pin: '',
       slides: [{...FDT.kit({kind: 'artist', x: w, slot: 'fdk1', kicker: isFirst ? 'The first' : cy, head: 'ATH Creative Fund artist', sub: `${w.name} · ${amt} grant from Arts to Hearts Project`, zone: 'Mention sticker: @artstoheartsproject'}), title: 'fund-story-artist', label: `${first}'s story`},
         {...FDT.kit({kind: 'ours', x: w, slot: 'fdk2', kicker: isFirst ? 'Our first Creative Fund artist' : `Our ${cy} artist`, head: w.name, sub: `${fdName(nx)} is open. Applications close ${ncl}.`, zone: 'Link sticker: apply for the fund'}), title: 'fund-story-ours', label: 'Our story'}]}); }
-  return [...[{book: true, credits, title: `${cy} · ${head}`, meta: `ATH Creative Fund · ${S.length} slides · keyword ${KW} (set it in ManyChat to send ${r.link || FD_LINK})`, cap: cap + '\n\n' + tags, pin: `Comment ${KW} and we'll send you the link to apply.`, slides: S.map((s, j) => ({...s, title: 'fund-' + v.id + '-' + (j + 1)}))}], ...extra];
+  return [...[{book: true, credits, ...(v.id === 'winner' && w.name ? {covers: [['fund', 'The $500'], ['folder', 'Folder'], ['artwork', 'Artwork']], cover: v.cover || r.cover || 'fund'} : {}), title: `${cy} · ${head}`, meta: `ATH Creative Fund · ${S.length} slides · keyword ${KW} (set it in ManyChat to send ${r.link || FD_LINK})`, cap: cap + '\n\n' + tags, pin: `Comment ${KW} and we'll send you the link to apply.`, slides: S.map((s, j) => ({...s, title: 'fund-' + v.id + '-' + (j + 1)}))}], ...extra];
 }
 function fdW(x, slot){ return {artist: x.name || '', handle: x.handle || '', title: x.title || '', medium: x.medium || '', img: bkPic(slot, x.art || ''), face: x.face || ''}; }
 
