@@ -439,13 +439,15 @@ function magLaunch(){
   const coverCap = i => { const [n, e] = ca[i] || []; return n ? `<b style="font-weight:600">${esc(n)}</b> · <i class="ser">${esc(e || '')}</i>` : `<span class="gap">Cover artist</span>`; };
   const cvBox = (i, style, pos) => cvImg(i) ? magArt('cv' + (i + 1), cvImg(i), style, pos) : `<div data-slot="cv${i + 1}" class="a ph" style="${style};font-size:18px">Magazine cover</div>`;
 
-  // 1 cover: artwork above, call-colour band, the anniversary across the seam
+  // 1 cover: artwork above, call-colour band, the anniversary across the seam.
+  // No credit shows on this cover. The hidden credit line keeps its place: text edits are saved by position, so removing it would move saved edits onto other lines
   S.push({bg:C, html:`
     <div data-slot="imgCover" data-nolabel class="a img" style="left:0;right:0;top:0;height:880px;background-image:url(${state.images.imgCover || ''});background-position:center 28%"></div>
     <div class="a" style="left:0;right:0;top:0;height:160px;background:linear-gradient(180deg,rgba(20,14,12,.42),rgba(20,14,12,0))"></div>
     <div class="a" style="left:0;right:0;top:880px;bottom:0;background:${C}"></div>
     <p class="a cn" style="left:52px;top:48px;color:${WHITE}">Arts to Hearts Project</p><p class="a cn" style="right:52px;top:48px;color:${WHITE}">Issue ${esc(state.edition)}</p>
     <p class="a cn" style="right:46px;top:150px;writing-mode:vertical-rl;white-space:nowrap;color:${WHITE};text-shadow:0 1px 8px rgba(0,0,0,.35)">${pick('Four years in print', 'Four years of artists', 'Four years in print')}</p>
+    ${state.credit ? `<p class="a" style="display:none">${esc(state.credit)}</p>` : ''}
     <p class="a" style="left:30px;top:690px;font-size:430px;font-weight:600;letter-spacing:-.07em;line-height:.8;color:${WHITE}">${bigHtml}</p>
     <p class="a scr" style="left:52px;top:1060px;width:470px;font-size:76px;line-height:.95;color:${Tn}">${esc(rest).replace(/ (\S+)$/, '<br>$1')}</p>
     <p class="a lab" style="left:560px;top:930px;color:${Tn}">Open call</p>
