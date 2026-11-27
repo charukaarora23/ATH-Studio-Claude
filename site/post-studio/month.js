@@ -431,6 +431,15 @@ const magWords = t => !isMag() || typeof t !== 'string' ? t : t.replace(/\b[Tt]h
 
 // details without Instagram handles: 'Title · @handle' -> 'Title'
 const noHandle = t => String(t || '').replace(/\s*[·|,]?\s*@[\w.]+/g, '').trim();
+// Issue 16 got an 11th slide (the theme, after Published artists). Edits are saved by slide number, so a call
+// saved with the 10-slide launch has its Launch edits from slide 5 on moved up by one, once.
+function magMigrate(){ if (state.style !== 'magazine' || (state.magSlides || 10) >= 11) return; const T0 = 'Launch', at = 4;
+  const shift = (obj, re) => { if (!obj) return; Object.keys(obj).map(k => [k, k.match(re)]).filter(([, m]) => m && +m[2] >= at).sort((a, b) => +b[1][2] - +a[1][2])
+    .forEach(([k, m]) => { const nk = m[1] + (+m[2] + 1) + m[3]; obj[nk] = obj[k]; delete obj[k]; }); };
+  shift(state.texts, /^(tx\|Launch\|)(\d+)(\|.*)$/); shift(state.moves, /^(mv\|Launch\|)(\d+)(\|.*)$/); shift(state.pos, /^(Launch\|)(\d+)(\|.*)$/);
+  shift(state.hidden, /^(h\|Launch\|)(\d+)()$/); shift(state.images, /^(ov\|Launch\|)(\d+)()$/); shift(state.bgs, /^(bg\|Launch\|)(\d+)()$/);
+  state.magSlides = 11; }
+
 function magLaunch(){
   const C = state.colour, Tn = tint(C), S = [];
   const label = String(state.editionLabel || '4th anniversary issue').trim(); const sp = label.indexOf(' ');
@@ -479,7 +488,21 @@ function magLaunch(){
         + (n ? `<p class="a" style="left:${x}px;width:304px;top:${y + 362}px;text-align:center;font-size:23px;font-weight:600;line-height:1.2;color:${WHITE}">${esc(n)}</p><p class="a" style="left:${x}px;width:304px;top:${y + 394}px;text-align:center;font-size:19px;line-height:1.3;opacity:.9;color:${WHITE}">${esc(noHandle(e))}</p>`
           : `<p class="a" style="left:${x}px;width:304px;top:${y + 362}px;font-size:19px;color:${WHITE}"><span class="gap">Artist name</span></p>`); }).join('')}`});
 
-  // 5 the theme
+  // 5 the theme in focus: the theme as the headline, what it means, four ways into it with an artwork each
+  const kinds = KINDS().slice(0, 4), ta = lines(state.themeArts).map(l => l.split('|').map(x => x.trim()));
+  const th = String(state.theme || '').trim(), tw = th.split(' '), cut = tw.length > 2 ? 2 : 1;
+  const thHead = tw.length > 2 ? `${esc(tw.slice(0, tw.length - cut).join(' '))}<br><span class="scr" style="font-size:1.32em;letter-spacing:-.01em;line-height:.9;color:${C}">${esc(tw.slice(-cut).join(' '))}</span>` : esc(th);
+  S.push({bg:CREAM, html:`${corners(INK, BURG, 'The theme')}
+    <p class="a lab" style="left:80px;top:150px;color:${C}">The theme of Issue ${esc(state.edition)}</p>
+    <p class="a R" style="left:76px;right:60px;top:196px;font-size:118px;line-height:.98;color:${INK}">${thHead}</p>
+    <p class="a sub" style="left:80px;right:110px;top:490px;font-size:31px;color:${INK}">${esc(state.themeIntro || state.themeLine || '')}</p>
+    ${[0, 1, 2, 3].map(i => { const x = 64 + i * 244, u = state.images['th' + (i + 1)], [tt, ar] = ta[i] || [];
+      return `<div class="a" style="left:${x}px;width:220px;top:680px;display:flex;flex-direction:column;color:${INK}">`
+        + (u ? `<div data-slot="th${i + 1}" data-nolabel class="img" style="position:relative;width:220px;height:380px;background-image:url(${u});background-size:contain;background-position:center bottom"></div>` : `<div data-slot="th${i + 1}" class="ph" style="width:220px;height:380px;font-size:16px">Artwork</div>`)
+        + `<p style="margin-top:16px;font-size:23px;font-weight:600;line-height:1.15">${esc((kinds[i] || [])[0] || '')}</p>`
+        + (tt ? `<p style="margin-top:6px;font-size:16px;line-height:1.3;opacity:.7"><i class="ser">${esc(tt)}</i> by ${esc(ar || '')}</p>` : '') + `</div>`; }).join('')}`});
+
+  // 6 the theme
   S.push({bg:C, html:`${corners(WHITE, WHITE, 'The theme')}
     <p class="a ser" style="left:52px;top:120px;width:600px;font-size:60px;line-height:1.08;letter-spacing:-.015em;color:${INK}">${esc(state.quote)}</p>
     ${magArt('imgTheme', state.images.imgTheme, 'left:240px;right:240px;top:330px;height:700px', 'center')}
@@ -543,7 +566,7 @@ function magLaunch(){
     <p class="a c" style="left:0;right:0;top:1050px;font-size:28px;opacity:.9;color:${WHITE}">${ctaSub()}</p>
     <p class="a c" style="left:0;right:0;top:1100px;font-size:26px;opacity:.75;color:${WHITE}">artstoheartsproject.com</p>`});
 
-  const titles = ['cover','four-years','cover-artists','published-artists','the-theme','what-you-receive','the-award','selection','who-can-apply','apply'];
+  const titles = ['cover','four-years','cover-artists','published-artists','theme-in-focus','the-theme','what-you-receive','the-award','selection','who-can-apply','apply'];
   return S.map((x, i) => ({...x, title: titles[i]}));
 }
 

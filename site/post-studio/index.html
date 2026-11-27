@@ -301,7 +301,7 @@ const DEFAULTS = {
   benefits:'Published in the book | Your work in print\nCertificate of Recognition | For your CV and grant applications\nSold worldwide | Amazon · Barnes & Noble · ATH Shop\nThe book’s campaign | 190K+ followers · 100K+ email subscribers\nIntroductions | To collectors, galleries and curators',
   prize:'$500', prizeExtra:'a 4-page feature, a trophy and an Artsy listing', runners:'A 2-page feature and a trophy.',
   jury:'', results:'', pub:'', fee:'', rights:'', multiArt:'', storyWork:'', storyAfter:'', ctaMode:'comment', commentFrom:'2026-12-08', elig:'No degree, gallery or exhibition history needed. Individual artists, 18+, worldwide.',
-  credit:'', themeCredit:'', poolCredits:'', artists:'', coverArtists:'',
+  credit:'', themeCredit:'', themeIntro:'', themeArts:'', poolCredits:'', artists:'', coverArtists:'',
   editionLabel:'Edition 16', seriesNoun:'editions', style:'gallery',
   theme:'Garden', themeWork:'garden work', themeLine:'flowers, plants, landscapes, people and nature, abstract or imagined growth',
   juryLooks:'Originality, a considered reading of the garden theme, and the quality of the work.',
@@ -362,12 +362,15 @@ const PRESETS = {
     prize:'$500', prizeExtra:'official recognition in the Issue 16 announcement and campaign', runners:'Recognised in the Issue 16 campaign too.',
     fee:'$21', results:'About 3 weeks after the deadline', commentFrom:'2026-12-20',
     poolCredits:'Viennese Pallawatsch by Anika Geldner @anikageldner\nPOLYMER – Residual Blue by Masaya Goino @noigoma_sui\nHanging On by Amy Ruben @amyruben.art\nSummer Memories: Childhood Nostalgia I by Vera Saiko @verasaikoart\nSilent Companions by Elisabeth Krenner @kunst_von_krenner\nEnter by Corry MacDonald @corrymacdonaldart\nThe Price of Being Seen by Volha Naruta-Johnson @volha_mixedmedia\nSelfcaremaxxing by Izzy Thomas @busyizzyart\nThe King by Matthew Morpheus @matthew_morpheus\nInner Horizon by Mirela Leu @mi_re_la_art\nMemory Remains by Yuhe Luo @yh_luo_artspace\nHand in Hand by Cher Pruys @cherpruys\nThe Big Unknown by Oskar Evers @oskarevers\nParallel Realms by Jinfei Wang @jinfeiwangart\nColour Poetry of a Memory Rich with Summer by Kristin Holm-Dybvig @kristinholmdybvig\nSentimental Reasons (Barbara and Pele) by Natalie Steigmann-Gall @natmaxedart\nShe Was Almost Made of Light by Nayirie Keuteklian @nayirie_keuteklian\nMi Casa, Su Casa by Rachela Nardella @rahkela\nMe and Geoff at Remington Hot Springs by Marshall Sharpe @marshall_sharpe\nMount Yushan by Holly Zandbergen @hollyzandbergen\nSisters by Oriana Loucaidou @orianalouc\nSelf Discovery by Samantha Paradise @samanthaparadiseart\nThe Fools by Ieva Trinkūnaitė @trinkute\nSmall Daisy #2 by Lingxue Hao @luna___hao\nThe Pulse of Light by Aria Artis @aria_artis\nTogetherNess by Angie Vanezi @nefiland',
+    themeIntro:'Issue 16 is about what comes after an ending. A new chapter, a place, a memory, a change in perspective: show us what starting again looks like in your work.',
+    themeArts:'Emergent | Jonathan Gillingham\nCanoe Pass | Shawna Koontz\nFragment of Memory No. 5 | Vita Mel\nThe Space Between | Mickey Hess', magSlides:11,
     credit:'Fiercely Fragile by Margarita Howis @margarita.howis', themeCredit:'Bloom, Anyway by Debbee Lotito @debbeelotito',
     artists:'Nancy Boisvert | A Quiet Companion · @nancyboisvert_artist\nMarjurye Furlan | Joy in Full Bloom · @marjuryefurlanart\nIsabella Al-Sharif | Carry Me · @art_by_isabella_alsharif\nAlyona Zavidina | Where We Sat · @zavidinaart\nSara Bailey | Crybaby · @sarabailey.artist\nZahra Amini | Waves Outside Home · @zahra.illustration\nJennifer Gulino | Person Kissing Cat · @jgulinostudio\nNat Prevo | Retreat · @natprevo\nTamara Rain Bell | The Miseducation of Mona · @tamarabell1969\nMei Chi Chen | Love Yourself · @yulinghui1111\nNupur Jain | Behind the Smile · @between.marks\nAlesia Kutsian | Trajectory of Disappearance · @pugmatik_art\nNahal Bahrman | Silent Revolution No 1 · @nahal_bahrman_art\nJesslyn Lettan | Dreamer · @jlynbeanart\nSherri Kruger-Kukowski | The Three Amigos · @windingrivermosaic\nRebecca Clark | Bee 17 (Prana) · @rebeccaclarkart\nMarion Grant | Texas Guinan Dancers · @mariongrantart\nMarialba Adames | Grace in the Withering · @drawn_to_us',
     coverArtists:'John Sloane | Issue 14\nTroy Brooks | Issue 13\nCelia Gallego | Issue 12\nRachel Deacon | Issue 11',
     images:{imgCover:'art/issue16/art-howis.jpg', imgTheme:'art/issue16/art-lotito.jpg',
       pa1:'art/issue16/art-boisvert.jpg', pa2:'art/issue16/art-furlan.jpg', pa3:'art/issue16/art-alsharif.jpg', pa4:'art/issue16/art-zavidina.jpg', pa5:'art/issue16/art-bailey.jpg', pa6:'art/issue16/art-amini.jpg',
       pa7:'art/issue16/pa07.jpg', pa8:'art/issue16/pa08.jpg', pa9:'art/issue16/pa09.jpg', pa10:'art/issue16/pa10.jpg', pa11:'art/issue16/pa11.jpg', pa12:'art/issue16/pa12.jpg', pa13:'art/issue16/pa13.jpg', pa14:'art/issue16/pa14.jpg', pa15:'art/issue16/pa15.jpg', pa16:'art/issue16/pa16.jpg', pa17:'art/issue16/pa17.jpg', pa18:'art/issue16/pa18.jpg',
+      th1:'art/issue16/th1.jpg', th2:'art/issue16/th2.jpg', th3:'art/issue16/th3.jpg', th4:'art/issue16/th4.jpg',
       cv1:'art/issue16/issue14.jpg', cv2:'art/issue16/issue13.jpg', cv3:'art/issue16/issue12.jpg', cv4:'art/issue16/issue11.jpg',
       pool1:'art/issue16/m01.jpg', pool2:'art/issue16/m02.jpg', pool3:'art/issue16/m03.jpg', pool4:'art/issue16/m04.jpg', pool5:'art/issue16/m05.jpg', pool6:'art/issue16/m06.jpg', pool7:'art/issue16/m07.jpg', pool8:'art/issue16/m08.jpg', pool9:'art/issue16/m09.jpg', pool10:'art/issue16/m10.jpg', pool11:'art/issue16/m11.jpg', pool12:'art/issue16/m12.jpg', pool13:'art/issue16/m13.jpg', pool14:'art/issue16/m14.jpg', pool15:'art/issue16/m15.jpg', pool16:'art/issue16/m16.jpg', pool17:'art/issue16/m17.jpg', pool18:'art/issue16/m18.jpg', pool19:'art/issue16/m19.jpg', pool20:'art/issue16/m20.jpg', pool21:'art/issue16/m21.jpg', pool22:'art/issue16/m22.jpg', pool23:'art/issue16/m23.jpg', pool24:'art/issue16/m24.jpg', pool25:'art/issue16/m25.jpg', pool26:'art/issue16/m26.jpg'},
   },
@@ -601,7 +604,7 @@ const CREDIT_OF = {
 };
 // Open calls: the cover credit field, and the names already listed for past artists and cover artists
 function callCredits(){ const o = {}; const put = (u, t, artist) => { if (u && t && t.trim()) o[u] = artist ? {text: t.trim(), artist} : {text: t.trim()}; };
-  put(state.images.imgCover, state.credit); put(state.images.imgTheme, state.themeCredit); lines(state.poolCredits).forEach((t, i) => put(state.images['pool' + (i + 1)], t));
+  put(state.images.imgCover, state.credit); put(state.images.imgTheme, state.themeCredit); lines(state.poolCredits).forEach((t, i) => put(state.images['pool' + (i + 1)], t)); lines(state.themeArts).forEach((l, i) => { const [t, a] = l.split('|').map(x => x.trim()); if (t && a) put(state.images['th' + (i + 1)], t + ' by ' + a, a); });
   PAST_ARTISTS().forEach((a, i) => put(paImg(i), [a[0], a[1]].filter(Boolean).join(' · '), a[0]));   // no label where the name is already on the slide
   COVER_ARTISTS().forEach((a, i) => put(cvImg(i), [a[0], a[1]].filter(Boolean).join(' · '), a[0]));
   return o; }
@@ -1584,6 +1587,7 @@ async function saveDraft(){ const n = $('preset').value; const files = {}, paths
 async function loadCall(n){ const p = PRESETS[n] || {}; let d = null; try { d = JSON.parse(localStorage.getItem(DKEY(n)) || 'null'); } catch {}
   let files = {}; if (d) { try { files = await idbGet('draft:' + n) || {}; } catch {} }
   state = d ? {...DEFAULTS, ...p, ...d, images: {...(d.images || {}), ...files}} : {...DEFAULTS, ...p, images: {...(p.images || DEFAULT_IMAGES)}};
+  if (d && typeof magMigrate === 'function') { if (!d.magSlides) state.magSlides = 10; magMigrate(); Object.entries(p.images || {}).forEach(([k, v]) => { if (/^th\d$/.test(k) && !state.images[k]) state.images[k] = v; }); }   // calls saved before the theme slide: shift edits, add its artworks
   await restoreVideos(n); return !!d; }
 $('preset').onchange = async () => { restoring = true; const had = await loadCall($('preset').value); restoring = false; try { localStorage.setItem('athLastPreset', $('preset').value); } catch {}
   fillForm(); buildPtype(); render(); if (had) status('Your edits to this call are back.'); };
