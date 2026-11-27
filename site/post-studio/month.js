@@ -427,7 +427,7 @@ const MG = {
 };
 { const H0 = T.hook, C0 = T.count; T.hook = o => isMag() ? MG.hook(o) : H0(o); T.count = o => isMag() ? MG.count(o) : C0(o); }
 // magazine wording for the shared month copy (written for books)
-const magWords = t => !isMag() || typeof t !== 'string' ? t : t.replace(/\b[Tt]he(\s+|<br>)(?:(<span class="scr"[^>]*>Issue \d+<\/span>)|(Issue \d+)(?=\s*(?:[.,!?:;)]|$|<)))/g, (m, sep, sp, pl) => (sep === '<br>' ? '<br>' : '') + (sp || pl)).replace(/\bthe Issue (\d+)/g, 'Issue $1').replace(/juried hardcover book/g, 'juried magazine issue').replace(/hardcover book/g, 'magazine').replace(/\b([Tt])he book\b/g, '$1he magazine').replace(/juried book/g, 'juried magazine').replace(/our last books/g, 'our past issues').replace(/([Pp])ast editions/g, '$1ast issues').replace(/([Pp])ast edition\b/g, '$1ast issue').replace(/#101ArtBook/g, '#ArtsToHeartsMagazine').replace(/\bEdition (\d+) of a series\b/g, 'Issue $1 of a magazine');
+const magWords = t => !(isMag() || /magazine/i.test(state.series || '')) || typeof t !== 'string' ? t : t.replace(/\b[Tt]he(\s+|<br>)(?:(<span class="scr"[^>]*>Issue \d+<\/span>)|(Issue \d+)(?=\s*(?:[.,!?:;)]|$|<)))/g, (m, sep, sp, pl) => (sep === '<br>' ? '<br>' : '') + (sp || pl)).replace(/juried hardcover edition/g, 'juried magazine issue').replace(/juried hardcover book/g, 'juried magazine issue').replace(/hardcover book/g, 'magazine').replace(/\b([Tt])he book\b/g, '$1he magazine').replace(/juried book/g, 'juried magazine').replace(/our last books/g, 'our past issues').replace(/([Pp])ast editions/g, '$1ast issues').replace(/([Pp])ast edition\b/g, '$1ast issue').replace(/#101ArtBook/g, '#ArtsToHeartsMagazine').replace(/\bEdition (\d+) of a series\b/g, 'Issue $1 of a magazine');
 
 // details without Instagram handles: 'Title · @handle' -> 'Title'
 const noHandle = t => String(t || '').replace(/\s*[·|,]?\s*@[\w.]+/g, '').trim();
@@ -1160,7 +1160,7 @@ function stories(){ const phases = {}; Object.entries(STORY_T).forEach(([id]) =>
 
 // magazine calls: the shared month copy, reworded for a magazine issue
 { const MP0 = monthPosts, SP0 = singlePosts;
-  const wrap = ps => !isMag() ? ps : ps.map(p => ({...p, title: magWords(p.title),
+  const wrap = ps => !(isMag() || /magazine/i.test(state.series || '')) ? ps : ps.map(p => ({...p, title: magWords(p.title),
     slides: () => p.slides().map(x => x && x.html ? {...x, html: magWords(x.html)} : x),
     ...(p.caption ? {caption: () => magWords(p.caption())} : {})}));
   monthPosts = function(){ return wrap(MP0()); };

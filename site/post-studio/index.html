@@ -374,8 +374,12 @@ const PRESETS = {
       cv1:'art/issue16/issue14.jpg', cv2:'art/issue16/issue13.jpg', cv3:'art/issue16/issue12.jpg', cv4:'art/issue16/issue11.jpg',
       pool1:'art/issue16/m01.jpg', pool2:'art/issue16/m02.jpg', pool3:'art/issue16/m03.jpg', pool4:'art/issue16/m04.jpg', pool5:'art/issue16/m05.jpg', pool6:'art/issue16/m06.jpg', pool7:'art/issue16/m07.jpg', pool8:'art/issue16/m08.jpg', pool9:'art/issue16/m09.jpg', pool10:'art/issue16/m10.jpg', pool11:'art/issue16/m11.jpg', pool12:'art/issue16/m12.jpg', pool13:'art/issue16/m13.jpg', pool14:'art/issue16/m14.jpg', pool15:'art/issue16/m15.jpg', pool16:'art/issue16/m16.jpg', pool17:'art/issue16/m17.jpg', pool18:'art/issue16/m18.jpg', pool19:'art/issue16/m19.jpg', pool20:'art/issue16/m20.jpg', pool21:'art/issue16/m21.jpg', pool22:'art/issue16/m22.jpg', pool23:'art/issue16/m23.jpg', pool24:'art/issue16/m24.jpg', pool25:'art/issue16/m25.jpg', pool26:'art/issue16/m26.jpg'},
   },
+  // the same call on the standard (Gallery) template, as a second version to compare
+  'Arts to Hearts Magazine Issue 16 · Gallery': null,
   'New call (blank)': { series:'', edition:'', editionLabel:'', name:'', keyword:'', selected:'', coverLine:'', quote:'', submit:'', theme:'', themeWork:'work', themeLine:'', juryLooks:'', kinds:'', pastEds:'', jury:'', images:{} },
 };
+PRESETS['Arts to Hearts Magazine Issue 16 · Gallery'] = {...PRESETS['Arts to Hearts Magazine Issue 16'], style:'gallery',
+  levels:'Emerging and established artists.', elig:'All genders, nationalities and backgrounds. No publication or gallery history needed. AI-generated work is not eligible.'};
 const IMGKEYS = ['imgCover','imgTheme','imgBooks','imgSpread'];
 const thumbOf = k => state.images[k] || '';
 const FIELDS = Object.keys(DEFAULTS).filter(k => k !== 'colour');
