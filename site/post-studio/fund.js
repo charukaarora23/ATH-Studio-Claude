@@ -150,14 +150,12 @@ const FDT = {
       ${fdFoot()}`}; },
   /* the cycle on a calendar: the days that matter marked, the work pinned on the others */
   cal(o){ const d = o.month, y = d.getFullYear(), m = d.getMonth(); const first = (new Date(y, m, 1).getDay() + 6) % 7, days = new Date(y, m + 1, 0).getDate(); const rows = Math.ceil((first + days) / 7);
-    const cw = 900 / 7, top = 520, rh = Math.min(104, 520 / rows); const cs = Math.round(Math.min(76, rh - 26)); const cardBot = top + rows * rh + 24; const marks = o.marks || {}; const cells = [];
+    const cw = 900 / 7, top = 520, rh = Math.min(108, 540 / rows); const cs = Math.round(Math.min(80, rh - 24)); const cardBot = top + rows * rh + 170; const dlDay = +Object.keys(o.marks || {}).find(k => /deadline/i.test(o.marks[k]) ) || 0; const marks = o.marks || {}; const cells = [];
     for (let k = 1; k <= days; k++) { const i = first + k - 1, cx = 90 + (i % 7) * cw + cw / 2, cy = top + Math.floor(i / 7) * rh + 40; const mk = marks[k];
-      cells.push(mk ? `<div class="a" style="left:${cx - cs / 2}px;top:${cy - cs / 2 - 6}px;width:${cs}px;height:${cs}px;border-radius:50%;background:${HL.burg};display:flex;align-items:center;justify-content:center;${T_MED};font-size:${Math.round(cs * .46)}px;color:${HL.white}">${k}</div><p class="a c" style="left:${cx - 100}px;width:200px;top:${cy + cs / 2 - 2}px;${T_MED};font-size:17px;letter-spacing:.1em;text-transform:uppercase;color:${HL.burg}">${esc(mk)}</p>`
+      cells.push(mk ? `<div class="a" style="left:${cx - cs / 2}px;top:${cy - cs / 2 - 6}px;width:${cs}px;height:${cs}px;border-radius:50%;${k === dlDay ? `background:${HL.burg};color:${HL.white};box-shadow:0 0 0 9px ${HL.rose}` : `background:${HL.white};color:${HL.burg};box-shadow:inset 0 0 0 3px ${HL.burg}`};display:flex;align-items:center;justify-content:center;${T_MED};font-size:${Math.round(cs * .46)}px">${k}</div><p class="a c" style="left:${cx - 100}px;width:200px;top:${cy + cs / 2 + (k === dlDay ? 6 : -2)}px;${T_MED};font-size:${k === dlDay ? 19 : 16}px;letter-spacing:.1em;text-transform:uppercase;color:${HL.burg}">${esc(mk)}</p>`
         : `<p class="a c" style="left:${cx - 40}px;width:80px;top:${cy - 24}px;${T_MED};font-size:38px;color:${(i % 7) > 4 ? 'rgba(28,19,16,.4)' : HL.ink}">${k}</p>`); }
     const free = []; for (let k = 1; k <= days; k++) if (!marks[k] && !Object.keys(marks).some(x => Math.abs(x - k) < 2 || Math.abs(x - k - 7) < 2)) free.push(k);   /* a polaroid hangs over the row below, so it never sits above a marked day */
-    /* the work sits in a tilted row along the calendar's lower edge: no date, label or other picture is covered */
-    const W3 = (o.works || []).filter(Boolean).slice(0, 3); const xs = W3.length === 1 ? [540] : W3.length === 2 ? [330, 750] : [220, 540, 860];
-    const pins = W3.map((x, j) => fdPol(x, {x: xs[j], y: cardBot + 60, w: 230, h: 150, minW: 190, r: [-4, 3, -2][j], slot: 'fdcal' + j, fs: 13}));
+    const dlLine = dlDay ? `Deadline: ${dlDay} ${MONTHS_FULL[m]}, 11:59 PM` : '';
     return {bg: HL.pink, html: `${fdBrand()}
       <div class="a" style="left:60px;right:60px;top:120px;height:${cardBot - 120}px;background:${HL.white};border-radius:30px;box-shadow:0 24px 60px rgba(106,6,32,.14)"></div>
       <p class="a" style="left:100px;top:160px;${T_REG};font-size:30px;color:${HL.burg}">&lsaquo; ${esc(o.kicker || String(y))}</p>
@@ -166,7 +164,8 @@ const FDT = {
       ${['M', 'T', 'W', 'T', 'F', 'S', 'S'].map((t, i) => `<p class="a c" style="left:${90 + i * cw}px;width:${cw}px;top:452px;${T_MED};font-size:22px;color:${i > 4 ? 'rgba(28,19,16,.4)' : HL.ink}">${t}</p>`).join('')}
       <div class="a" style="left:60px;right:60px;top:494px;border-top:1px solid rgba(28,19,16,.14)"></div>
       ${Array.from({length: rows - 1}, (_, r2) => `<div class="a" style="left:60px;right:60px;top:${top + (r2 + 1) * rh - 6}px;border-top:1px solid rgba(28,19,16,.08)"></div>`).join('')}
-      ${cells.join('')}${pins.join('')}
+      ${cells.join('')}
+      ${dlLine ? `<div class="a" style="left:100px;right:100px;top:${cardBot - 130}px;height:96px;border-radius:999px;background:${HL.pink};display:flex;align-items:center;justify-content:center"><p style="${T_MED};font-size:40px;letter-spacing:-.015em;color:${HL.burg}">${esc(dlLine)}</p></div>` : ''}
       ${fdFoot()}`}; },
   /* the recap circle: the work around a title, labelled like files; folders for what is still to come */
   ring(o){ const items = o.items.slice(0, 6); const pos = [[290, 300], [790, 290], [860, 700], [780, 1070], [290, 1080], [210, 700]];
