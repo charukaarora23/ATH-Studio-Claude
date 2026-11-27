@@ -395,6 +395,154 @@ T.num = o => { const s = T0.num(o); if (!isAward() || o.img !== undefined) retur
 // every slide in the award style sits inside the gold certificate frame
 const decorate = (s) => (isAward() && !s.html.includes('inset:26px;border:2px')) ? {...s, html: frame(gold()) + s.html} : s;
 
+// ---------- magazine style: a magazine cover. Artwork above, a solid call-colour band below ----------
+// Arts to Hearts Magazine calls. The launch is its own 10-slide carousel (magLaunch); hooks and countdowns
+// across the month use the same cover structure, so the whole month reads as one magazine.
+const isMag = () => state.style === 'magazine';
+// a contained artwork (never cropped) as a replaceable picture slot
+const magArt = (key, src, style, pos) => `<div data-slot="${key}" class="a img" style="${style};background-image:url(${src || ''});background-size:contain;background-position:${pos || 'center'}"></div>`;
+const MG = {
+  band(o){ const C = state.colour, Tn = tint(C);
+    return `${imgDiv(o.img || ART[0], 'left:0;right:0;top:0;height:860px', o.pos || 'center 28%')}
+      <div class="a" style="left:0;right:0;top:0;height:170px;background:linear-gradient(180deg,rgba(20,14,12,.42),rgba(20,14,12,0))"></div>
+      <div class="a" style="left:0;right:0;top:860px;bottom:0;background:${C}"></div>
+      ${corners(WHITE, WHITE, o.tr || ('Issue ' + esc(state.edition)))}`; },
+  hook(o){ const Tn = tint(state.colour);
+    return {bg:state.colour, html:`${MG.band(o)}
+      <div class="a" style="left:52px;right:52px;top:905px;display:flex;justify-content:space-between;align-items:center"><p class="lab" style="color:${Tn}">Open call · ${esc(state.editionLabel || '')}</p>${timer(false)}</div>
+      <p class="a H" style="left:50px;right:52px;top:975px;font-size:${Math.min(o.size || 72, 74)}px;color:${WHITE}">${o.head}</p>`};
+  },
+  count(o){ const Tn = tint(state.colour); const big = String(o.big); const info = o.info || `to get your work into ${esc(state.bookName || state.series)}, ${esc(state.name)}. ${esc(state.selected)} places.`;
+    // a short number sits on the right across the seam; a word ("One week") stays inside the band. The artwork credit keeps the bottom-left of the picture
+    if (big.length > 2) return {bg:state.colour, html:`${MG.band(o)}
+      <p class="a" style="left:48px;top:905px;font-size:150px;font-weight:600;letter-spacing:-.06em;line-height:.85;color:${WHITE}">${big}</p>
+      <p class="a scr" style="right:52px;top:930px;text-align:right;font-size:64px;line-height:1;color:${Tn}">${esc(o.unit)}</p>
+      <p class="a" style="left:52px;right:52px;top:1080px;font-size:32px;font-weight:500;line-height:1.3;letter-spacing:-.01em;color:${WHITE}">${info}</p>`};
+    return {bg:state.colour, html:`${MG.band(o)}
+      <p class="a" style="right:40px;top:650px;text-align:right;font-size:400px;font-weight:600;letter-spacing:-.07em;line-height:.8;color:${WHITE}">${big}</p>
+      <p class="a scr" style="right:52px;top:1110px;text-align:right;font-size:64px;line-height:1;color:${Tn}">${esc(o.unit)}</p>
+      <p class="a lab" style="left:52px;top:930px;color:${Tn}">Open call</p>
+      <p class="a" style="left:52px;width:520px;top:975px;font-size:34px;font-weight:500;line-height:1.3;letter-spacing:-.01em;color:${WHITE}">${info}</p>`};
+  },
+};
+{ const H0 = T.hook, C0 = T.count; T.hook = o => isMag() ? MG.hook(o) : H0(o); T.count = o => isMag() ? MG.count(o) : C0(o); }
+// magazine wording for the shared month copy (written for books)
+const magWords = t => !isMag() || typeof t !== 'string' ? t : t.replace(/\b[Tt]he(\s+|<br>)(?:(<span class="scr"[^>]*>Issue \d+<\/span>)|(Issue \d+)(?=\s*(?:[.,!?:;)]|$|<)))/g, (m, sep, sp, pl) => (sep === '<br>' ? '<br>' : '') + (sp || pl)).replace(/\bthe Issue (\d+)/g, 'Issue $1').replace(/juried hardcover book/g, 'juried magazine issue').replace(/hardcover book/g, 'magazine').replace(/\b([Tt])he book\b/g, '$1he magazine').replace(/juried book/g, 'juried magazine').replace(/our last books/g, 'our past issues').replace(/([Pp])ast editions/g, '$1ast issues').replace(/([Pp])ast edition\b/g, '$1ast issue').replace(/#101ArtBook/g, '#ArtsToHeartsMagazine').replace(/\bEdition (\d+) of a series\b/g, 'Issue $1 of a magazine');
+
+function magLaunch(){
+  const C = state.colour, Tn = tint(C), S = [];
+  const label = String(state.editionLabel || '4th anniversary issue').trim(); const sp = label.indexOf(' ');
+  const big = sp > 0 ? label.slice(0, sp) : label, rest = sp > 0 ? label.slice(sp + 1) : '';
+  const bm = big.match(/^(\d+)(st|nd|rd|th)$/i);
+  const bigHtml = bm ? `${bm[1]}<span style="font-size:150px;letter-spacing:-.04em;vertical-align:top;line-height:1;position:relative;top:10px;margin-left:12px">${bm[2]}</span>` : esc(big);
+  const pa = PAST_ARTISTS(), ca = COVER_ARTISTS();
+  const coverCap = i => { const [n, e] = ca[i] || []; return n ? `<b style="font-weight:600">${esc(n)}</b> · <i class="ser">${esc(e || '')}</i>` : `<span class="gap">Cover artist</span>`; };
+  const cvBox = (i, style, pos) => cvImg(i) ? magArt('cv' + (i + 1), cvImg(i), style, pos) : `<div data-slot="cv${i + 1}" class="a ph" style="${style};font-size:18px">Magazine cover</div>`;
+
+  // 1 cover: artwork above, call-colour band, the anniversary across the seam
+  S.push({bg:C, html:`
+    <div data-slot="imgCover" class="a img" style="left:0;right:0;top:0;height:880px;background-image:url(${state.images.imgCover || ''});background-position:center 28%"></div>
+    <div class="a" style="left:0;right:0;top:0;height:160px;background:linear-gradient(180deg,rgba(20,14,12,.42),rgba(20,14,12,0))"></div>
+    <div class="a" style="left:0;right:0;top:880px;bottom:0;background:${C}"></div>
+    <p class="a cn" style="left:52px;top:48px;color:${WHITE}">Arts to Hearts Project</p><p class="a cn" style="right:52px;top:48px;color:${WHITE}">Issue ${esc(state.edition)}</p>
+    <p class="a cn" style="right:46px;top:150px;writing-mode:vertical-rl;white-space:nowrap;color:${WHITE};text-shadow:0 1px 8px rgba(0,0,0,.35)">${pick('Four years in print', 'Four years of artists', 'Four years in print')}</p>
+    ${state.credit ? `<p class="a" style="right:52px;top:838px;max-width:620px;text-align:right;font-size:17px;font-weight:500;color:${WHITE};text-shadow:0 1px 6px rgba(0,0,0,.6)">${esc(state.credit)}</p>` : ''}
+    <p class="a" style="left:30px;top:690px;font-size:430px;font-weight:600;letter-spacing:-.07em;line-height:.8;color:${WHITE}">${bigHtml}</p>
+    <p class="a scr" style="left:52px;top:1060px;width:470px;font-size:76px;line-height:.95;color:${Tn}">${esc(rest).replace(/ (\S+)$/, '<br>$1')}</p>
+    <p class="a lab" style="left:560px;top:930px;color:${Tn}">Open call</p>
+    <p class="a" style="left:560px;right:52px;top:972px;font-size:96px;font-weight:700;letter-spacing:-.01em;line-height:.9;text-transform:uppercase;color:${WHITE}">${esc(state.headline || 'Call for artists').replace(/ (\S+)$/, '<br>$1')}</p>
+    <p class="a sub" style="left:560px;right:40px;top:1158px;font-size:28px;line-height:1.3;color:${WHITE}">${esc(state.coverLine)}</p>
+    <p class="a cn" style="left:52px;bottom:48px;color:${WHITE}">${CMODE() ? `Link in bio · comment “${KW()}”` : `${VERB} “${KW()}”`}</p><p class="a cn" style="right:52px;bottom:48px;color:${WHITE}">Closes ${short()}</p>`});
+
+  // 2 four years in print: the sixteenth is open
+  S.push({bg:CREAM, html:`${corners(INK, BURG, 'Four years')}
+    <p class="a R c" style="left:80px;right:80px;top:170px;font-size:84px;color:${INK}">Four years. ${esc(state.editions)} issues.<br>The <span style="color:${C};font-weight:600">${ordinal(state.edition)}</span> is open.</p>
+    ${[3, 1, 0].map((ci, j) => cvBox(ci, `left:${64 + j * 325}px;width:302px;top:440px;height:440px`, 'center bottom')).join('')}
+    ${[3, 1, 0].map((ci, j) => `<p class="a crd c" style="left:${64 + j * 325}px;width:302px;top:898px;font-size:19px;color:${INK}">${coverCap(ci)}</p>`).join('')}
+    <p class="a c sub" style="left:120px;right:120px;top:1040px;font-size:28px;opacity:.75;color:${INK}">${esc(state.published)} artists published in ${esc(state.bookName || state.series)}.</p>`});
+
+  // 3 past cover artists: four covers, two by two
+  S.push({bg:INK, html:`${corners(WHITE, PEONY, 'On the cover')}
+    <p class="a R c" style="left:80px;right:80px;top:130px;font-size:80px;color:${WHITE}">Past cover artists</p>
+    <p class="a c sub" style="left:140px;right:140px;top:236px;font-size:28px;opacity:.75;color:${WHITE}">${pick('Their work became the face of the magazine.', 'Their art was chosen for the cover.', 'The artists behind our covers.')}</p>
+    ${[0, 1, 2, 3].map(i => { const x = i % 2 ? 560 : 90, y = i < 2 ? 320 : 790; return cvBox(i, `left:${x}px;width:430px;top:${y}px;height:400px`, 'center') + `<p class="a c" style="left:${x}px;width:430px;top:${y + 410}px;font-size:22px;color:${WHITE}">${coverCap(i)}</p>`; }).join('')}`});
+
+  // 4 published artists: six from a past issue
+  S.push({bg:C, html:`${corners(WHITE, WHITE, 'From past issues')}
+    <p class="a R c" style="left:80px;right:80px;top:130px;font-size:80px;color:${WHITE}">Published artists</p>
+    <p class="a c sub" style="left:120px;right:120px;top:236px;font-size:28px;opacity:.85;color:${WHITE}">${pick('A few of the artists in our past issues.', 'Artists from our past issues.', 'Real artists. Real pages.')}</p>
+    ${[0, 1, 2, 3, 4, 5].map(i => { const [n, e] = pa[i] || []; const x = 56 + (i % 3) * 332, y = i < 3 ? 320 : 790; const u = paImg(i);
+      return (u ? magArt('pa' + (i + 1), u, `left:${x}px;width:304px;top:${y}px;height:350px`, 'center bottom') : `<div data-slot="pa${i + 1}" class="a ph" style="left:${x}px;width:304px;top:${y}px;height:350px;font-size:18px;color:${WHITE}">Their work</div>`)
+        + `<p class="a" style="left:${x}px;width:304px;top:${y + 362}px;font-size:19px;line-height:1.3;color:${WHITE}">${n ? `<b style="font-weight:600;font-size:23px">${esc(n)}</b> · ${esc(e || '')}` : '<span class="gap">Artist name · artwork · @handle</span>'}</p>`; }).join('')}`});
+
+  // 5 the theme
+  S.push({bg:C, html:`${corners(WHITE, WHITE, 'The theme')}
+    <p class="a ser" style="left:52px;top:120px;width:600px;font-size:60px;line-height:1.08;letter-spacing:-.015em;color:${INK}">${esc(state.quote)}</p>
+    ${magArt('imgTheme', state.images.imgTheme, 'left:240px;right:240px;top:330px;height:700px', 'center')}
+    ${state.themeCredit ? `<p class="a c" style="left:0;right:0;top:1046px;font-size:17px;font-weight:500;opacity:.85;color:${WHITE}">${esc(state.themeCredit)}</p>` : ''}
+    <p class="a lab" style="left:52px;top:1110px;color:${WHITE}">${esc(state.theme)}</p>
+    <p class="a sub" style="left:52px;right:52px;top:1150px;font-size:28px;color:${WHITE}">${esc(state.submit)}</p>`});
+
+  // 6 what you receive: one sentence, the gifts picked out
+  const k = t => `<span style="font-weight:600;color:${Tn}">${t}</span>`;
+  const ben = lines(state.benefits).slice(0, 4).map(l => l.split('|').map(x => x.trim()));
+  const said = ben.map(([t, d], i) => `${k(esc(i ? t : t.charAt(0).toLowerCase() + t.slice(1)).replace(/-/g, '&#8209;'))}${d ? ' ' + esc(d) : ''}.`).join(' ');
+  S.push({bg:C, html:`${corners(WHITE, WHITE, 'If selected')}
+    <p class="a R" style="left:52px;right:52px;top:140px;font-size:64px;line-height:1.08;color:${WHITE}">Every selected artist gets ${said}</p>
+    <div class="a" style="left:538px;top:860px;width:4px;height:150px;background:${WHITE}"></div>
+    <div class="a" style="left:525px;top:990px;width:30px;height:30px;border-right:4px solid ${WHITE};border-bottom:4px solid ${WHITE};transform:rotate(45deg)"></div>
+    <p class="a R c" style="left:52px;right:52px;top:1080px;font-size:56px;color:${WHITE}">${k('Apply now')}${state.fee ? ', from ' + esc(state.fee) : ''}.</p>`});
+
+  // 7 the award, on a framed page
+  S.push({bg:INK, html:`
+    <div class="a" style="left:52px;right:52px;top:52px;bottom:52px;background:${CREAM}"></div>
+    <p class="a cn" style="left:92px;top:88px;color:${INK}">Arts to Hearts Project</p>
+    <p class="a cn" style="right:80px;top:88px;writing-mode:vertical-rl;white-space:nowrap;color:${INK}">Issue ${esc(state.edition)} · ${esc(label)}</p>
+    ${cvBox(0, 'left:92px;top:150px;width:430px;height:570px', 'left top')}
+    <p class="a crd" style="left:92px;top:730px;width:430px;font-size:17px;color:${INK}">${coverCap(0)}</p>
+    <div class="a" style="left:570px;top:150px;right:140px;color:${INK}">
+      <p class="R" style="font-size:64px">${pick('Three artists receive more.', 'Three artists go further.', 'Three artists receive more.')}</p>
+      <p class="lab" style="margin-top:34px;color:${C}">Winner</p>
+      <p class="sub" style="font-size:28px;margin-top:8px">The cash award and ${esc(state.prizeExtra)}.</p>
+      <p class="lab" style="margin-top:28px;color:${C}">Two runners-up</p>
+      <p class="sub" style="font-size:28px;margin-top:8px">${esc(state.runners)}</p></div>
+    <p class="a" style="left:78px;top:800px;font-size:340px;font-weight:400;letter-spacing:-.07em;line-height:.85;color:${C}">${esc(state.prize)}</p>
+    <p class="a cn" style="left:92px;bottom:88px;color:${BURG}">${CMODE() ? `Link in bio · comment “${KW()}”` : `${VERB} “${KW()}”`}</p><p class="a cn" style="right:92px;bottom:88px;color:${INK}">Closes ${short()}</p>`});
+
+  // 8 the places and the dates
+  const n = Math.min(Math.max(parseInt(state.selected, 10) || 100, 20), 120);
+  S.push({bg:INK, html:`${corners(WHITE, PEONY, 'Selection')}
+    <p class="a R c" style="left:80px;right:80px;top:200px;font-size:80px;color:${WHITE}">${esc(state.selected)} places, chosen by ${state.jury ? esc(state.jury) : 'the jury'}.</p>
+    <div class="a" style="left:150px;right:150px;top:500px;display:grid;grid-template-columns:repeat(20,1fr);gap:10px">${Array.from({length: n}, (_, i) => `<span style="aspect-ratio:1;border-radius:50%;${i === n - 1 ? `background:${C}` : 'border:2px solid rgba(255,255,255,.35)'}"></span>`).join('')}</div>
+    <p class="a ser" style="right:150px;top:${500 + Math.ceil(n / 20) * 50}px;font-size:30px;color:${C}">← yours?</p>
+    <div class="a" style="left:80px;right:80px;top:900px;display:grid;grid-template-columns:repeat(3,1fr);border-top:2px solid rgba(255,255,255,.25);color:${WHITE}">
+      <div style="padding:30px 20px 0 0"><p class="R" style="font-size:64px">${short()}</p><p class="sub" style="font-size:26px;margin-top:8px;opacity:.8">Submissions close</p></div>
+      <div style="padding:30px 20px 0 28px;border-left:2px solid rgba(255,255,255,.25)"><p class="R" style="font-size:64px">3 weeks</p><p class="sub" style="font-size:26px;margin-top:8px;opacity:.8">Then results</p></div>
+      <div style="padding:30px 0 0 28px;border-left:2px solid rgba(255,255,255,.25)"><p class="R" style="font-size:64px">${esc(state.fee || '')}</p><p class="sub" style="font-size:26px;margin-top:8px;opacity:.8">To enter one artwork</p></div></div>`});
+
+  // 9 who can apply
+  S.push({bg:CREAM, html:`${corners(INK, BURG, 'Who can apply')}
+    <p class="a R c" style="left:80px;right:80px;top:370px;font-size:100px;line-height:1.12;color:${INK}">${pick('Your work deserves<br>the ', 'It is time for<br>your ', 'Step into<br>the ')}<span style="display:inline-block;background:${INK};color:${CREAM};border-radius:999px;padding:0 .28em .06em;line-height:1.05">spotlight.</span></p>
+    <p class="a c sub" style="left:130px;right:130px;top:720px;color:${INK}">${esc(state.levels)}</p>
+    <p class="a c sub" style="left:150px;right:150px;top:910px;font-size:26px;opacity:.75;color:${INK}">${esc(state.elig)}</p>`});
+
+  // 10 end card
+  const covers = [3, 2, 1, 0].map(i => cvImg(i)).filter(Boolean).map(u => `<img src="${u}" alt="" style="height:230px;display:block;box-shadow:0 18px 30px -16px rgba(0,0,0,.45)">`).join('');
+  S.push({bg:C, html:`${corners(WHITE, WHITE, 'Submissions open')}
+    <img class="a" src="brand/monogram-white.svg" alt="" style="left:508px;top:110px;width:64px">
+    <p class="a H c" style="left:60px;right:60px;top:220px;font-size:108px;color:${WHITE}">${pick('Take your place<br>in ', 'Be in<br>', 'Your page in<br>')}Issue ${esc(state.edition)}.</p>
+    <div class="a" style="left:60px;right:60px;top:480px;height:250px;display:flex;align-items:flex-end;justify-content:center;gap:16px">${covers}</div>
+    <p class="a c" style="left:0;right:0;top:746px;font-family:'ATH Serif',serif;font-style:italic;font-size:19px;opacity:.85;color:${WHITE}">Past issues of ${esc(state.bookName || state.series)}</p>
+    <div class="a" style="left:110px;right:110px;top:880px;height:124px;border-radius:999px;background:${CREAM};color:${BURG};display:flex;align-items:center;justify-content:space-between;padding:0 20px 0 56px">
+      <span style="font-size:44px;font-weight:700;letter-spacing:-.02em">${ctaBtn()}</span>
+      <span style="width:88px;height:88px;border-radius:50%;background:${BURG};color:${CREAM};display:inline-flex;align-items:center;justify-content:center"><svg width="36" height="16" viewBox="0 0 46 20"><path d="M2 10h40M33 2l9 8-9 8" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></span></div>
+    <p class="a c" style="left:0;right:0;top:1050px;font-size:28px;opacity:.9;color:${WHITE}">${ctaSub()}</p>
+    <p class="a c" style="left:0;right:0;top:1100px;font-size:26px;opacity:.75;color:${WHITE}">artstoheartsproject.com</p>`});
+
+  const titles = ['cover','four-years','cover-artists','published-artists','the-theme','what-you-receive','the-award','selection','who-can-apply','apply'];
+  return S.map((x, i) => ({...x, title: titles[i]}));
+}
+
 // ---------- countdown singles: a different idea at every milestone ----------
 const CD = {
   weeks(left){ const g = G.cream(); const n = left; const d0 = new Date(dl()); d0.setDate(d0.getDate() - left);
@@ -486,14 +634,14 @@ const N = () => state.name, S = () => state.series, SEL = () => state.selected;
 
 // ---------- versions: each call starts on its own wording (A, B or C) so calls never repeat; switch per post ----------
 let CURPOST = '';
-function postVer(title){ const v = state.ver && state.ver[title]; if (v !== undefined) return v; return ({gallery:0, award:1, editorial:2})[state.style] || 0; }
+function postVer(title){ const v = state.ver && state.ver[title]; if (v !== undefined) return v; return ({gallery:0, award:1, editorial:2, magazine:0})[state.style] || 0; }
 const pick = (...opts) => opts[postVer(CURPOST) % opts.length];
 // The feed schedule: every post is a carousel with enough slides to show what the call really offers.
 // Countdown numbers and one-slide reminders live in SINGLE_POSTS (optional, outside the schedule).
 const prepWork = () => state.themeWork === 'best work' ? 'best' : (state.theme || '').toLowerCase() + '-themed';
 const distrib = () => esc(state.distribution || 'Amazon, Barnes & Noble and the ATH Shop');
 function monthPosts(){ const name = GE(), sel = esc(state.selected); return [
- {left:30, title:'Launch', kind:'Carousel', slides:() => { const s = launch(); if (isAward() || isEd()) s[0] = {...(isEd() ? ED : AW).hook({img:state.images.imgCover, tr:esc(state.series), head: isEd() ? esc(state.headline || 'Call for artists') : `${esc(state.headline || 'Call for artists')}<br>${GE()}`, size: isEd() ? 112 : 120, sub:esc(state.coverLine)}), title:'cover'}; return s; }, caption:() => caption(), pin:() => pinned()},
+ {left:30, title:'Launch', kind:'Carousel', slides:() => { const s = launch(); if (isMag()) return s; if (isAward() || isEd()) s[0] = {...(isEd() ? ED : AW).hook({img:state.images.imgCover, tr:esc(state.series), head: isEd() ? esc(state.headline || 'Call for artists') : `${esc(state.headline || 'Call for artists')}<br>${GE()}`, size: isEd() ? 112 : 120, sub:esc(state.coverLine)}), title:'cover'}; return s; }, caption:() => caption(), pin:() => pinned()},
 
  {left:28, title:'What you can submit', kind:'Carousel · theme', slides:() => [
    T.hook({img:EX.bloom, tr:'The theme', head:pick(`What you can submit to the ${name}.`, `What the jury wants to see.`, `Five kinds of work we are looking for.`), sub:pick(`Any medium. ${sel} artists will be published.`, `Any medium, original work only. ${sel} places.`, `Any medium. ${sel} places in the book.`)}),
@@ -982,3 +1130,11 @@ const storyMake = (id, left) => { const t = STORY_T[id]; const f = t.make(left);
 function stories(){ const phases = {}; Object.entries(STORY_T).forEach(([id]) => { const t = STORY_T[id]; (phases[t.phase] = phases[t.phase] || []).push(storyMake(id, 21)); });
   return Object.entries(phases).map(([phase, frames]) => ({phase, frames})); }
 
+
+// magazine calls: the shared month copy, reworded for a magazine issue
+{ const MP0 = monthPosts, SP0 = singlePosts;
+  const wrap = ps => !isMag() ? ps : ps.map(p => ({...p, title: magWords(p.title),
+    slides: () => p.slides().map(x => x && x.html ? {...x, html: magWords(x.html)} : x),
+    ...(p.caption ? {caption: () => magWords(p.caption())} : {})}));
+  monthPosts = function(){ return wrap(MP0()); };
+  singlePosts = function(){ return wrap(SP0()); }; }
