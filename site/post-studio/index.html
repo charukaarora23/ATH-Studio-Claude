@@ -115,9 +115,9 @@ summary{font:600 12px/1 var(--mono);letter-spacing:.1em;text-transform:uppercase
 /* gap = information still to be supplied; visible on purpose */
 .post .gap{display:inline-block;border:2px dashed currentColor;border-radius:8px;padding:0 .3em;opacity:.75}
 .post .ph{display:flex;align-items:center;justify-content:center;text-align:center;border:3px dashed currentColor;border-radius:18px;opacity:.6;font-size:24px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;line-height:1.5}
-body[data-seg=books]:not(.bkposts) .app{display:none}body[data-seg=books].bkposts .app{display:block}body[data-seg=books].bkposts .app>aside,body[data-seg=books].bkposts #ivside,body[data-seg=books].bkposts #tabs,body[data-seg=books].bkposts .app main>:not(#out):not(.top){display:none}body[data-seg=books].bkposts .top .f,body[data-seg=books].bkposts #go{display:none}
-body[data-seg=fund]:not(.fdposts) .app{display:none}body[data-seg=fund].fdposts .app{display:block}body[data-seg=fund].fdposts .app>aside,body[data-seg=fund].fdposts #ivside,body[data-seg=fund].fdposts #tabs,body[data-seg=fund].fdposts .app main>:not(#out):not(.top){display:none}body[data-seg=fund].fdposts .top .f,body[data-seg=fund].fdposts #go{display:none}
-body:not([data-seg=fund]) #fund{display:none}#fund{max-width:1400px;margin:0 auto;padding:28px 24px 80px;font-family:var(--sans,sans-serif);color:#1C1310}
+body:is([data-seg=books],[data-seg=fund]) .app{grid-template-columns:480px minmax(0,1fr)}body:is([data-seg=books],[data-seg=fund]) :is(.app>aside:not(.drawer),#ivside,#tabs,.top .f,#go),body:is([data-seg=books],[data-seg=fund]) .app main>:not(#out):not(.top){display:none}
+.acts select[data-bg]{font:inherit;font-size:12px;padding:5px 4px;border:1px solid #d9c9c4;border-radius:8px;background:#fff;max-width:92px;color:#1C1310}body:not([data-seg=books]) #books,body:not([data-seg=fund]) #fund{display:none}.drawer{font-family:var(--sans,sans-serif);color:#1C1310}.drawer h1{font-size:22px;margin:0 0 6px}.drawer .bk-top{flex-direction:column;gap:10px}.drawer .bk-act{flex-wrap:wrap}.drawer .bk-act select,.drawer .bk-act input{min-width:0;flex:1}.drawer .bk-detail{padding:14px;border-radius:12px}.drawer .bk-row{grid-template-columns:1fr auto;gap:8px 10px}.drawer .bk-when{grid-column:1/-1}.drawer .fd-grid,.drawer .fd-cols{grid-template-columns:1fr 1fr}.drawer .fd-pic img,.drawer .fd-none{width:120px;height:120px}.drawer .bk-grid{grid-template-columns:1fr 1fr}.drawer .bk-head{flex-direction:column}.drawer .bk-tabs button{padding:8px 9px;font-size:13px}
+body:is([data-seg=books],[data-seg=fund]) #out:empty:before{content:'Open a post from the left and it appears here, ready to edit and download.';display:block;padding:60px 20px;text-align:center;color:#6b5a55;font-size:15px}
 .fd-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:10px 0}.fd-f{display:flex;flex-direction:column;gap:4px;font-size:13px;color:#6b5a55;margin:8px 0}.fd-f input,.fd-f textarea{font:inherit;font-size:14px;color:#1C1310;padding:8px 10px;border:1px solid #d9c9c4;border-radius:8px;width:100%;box-sizing:border-box}.fd-f i{font-size:12px}.fd-chk{display:flex;gap:8px;align-items:center;font-size:14px;margin:6px 0}.fd-pics{display:flex;flex-wrap:wrap;gap:14px;margin:10px 0}.fd-pic{display:flex;flex-direction:column;gap:6px;font-size:13px;color:#6b5a55}.fd-pic img,.fd-none{width:160px;height:160px;object-fit:contain;background:#f6efed;border-radius:10px}.fd-none{display:flex;align-items:center;justify-content:center;font-size:12px}.fd-found{border:1px solid #eadcd8;border-radius:10px;padding:12px 14px;margin:10px 0}.fd-mail{border:1px solid #eadcd8;border-radius:10px;padding:12px 14px;margin:10px 0}.fd-mh{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}.fd-mh span{display:flex;gap:10px;align-items:center}.fd-mail pre{white-space:pre-wrap;font:14px/1.5 var(--sans,sans-serif);margin:10px 0 0;color:#1C1310}.fd-cols{display:grid;grid-template-columns:1fr 1fr;gap:24px}@media(max-width:640px){.fd-grid,.fd-cols{grid-template-columns:1fr}}
 .bk-inside{margin:16px 0;padding-top:12px;border-top:1px solid #eadcd8}.bk-inside h3{font-size:16px;margin:0 0 8px}.bk-in{display:grid;grid-template-columns:140px 1fr;gap:12px;font-size:14px;padding:6px 0}.bk-in b{color:#6A0620}.bk-ivs{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px;margin-top:10px}.bk-iv{background:#FAF5F3;border-radius:10px;padding:12px;font-size:14px}.bk-iv blockquote{margin:8px 0 0;font-family:'ATH Serif',Georgia,serif;font-style:italic;color:#1C1310}
 .bk-posts{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:14px 0 4px}.bk-posts b{margin-right:6px}.bk-pick{display:inline-flex;gap:4px;align-items:center}.bk-pick select{padding:6px;border:1px solid #d9c9c4;border-radius:8px}body:not([data-seg=books]) #books{display:none}
@@ -142,8 +142,8 @@ img.bk-cv{width:100%;object-fit:contain;background:#FAD2E1}.bk-a img{width:100%;
 </head><body>
 
 <header class="segbar"><b>ATH Studio</b><nav id="seg" aria-label="Sections"><button type="button" data-seg="calls">Open calls</button><button type="button" data-seg="interviews">Artist interviews</button><button type="button" data-seg="editorial">ATH Editorial</button><button type="button" data-seg="heartlist">The Heart List</button><button type="button" data-seg="books">Books</button><button type="button" data-seg="fund">Creative Fund</button></nav></header>
-<main id="books"></main><main id="fund"></main>
 <div class="app">
+<aside id="books" class="drawer" aria-label="Books"></aside><aside id="fund" class="drawer" aria-label="Creative Fund"></aside>
 <aside>
   <h1>ATH Post Studio</h1>
   <p class="sub">Fill in one open call and the launch carousel renders on the right in ATH colours plus the call’s own colour. Dashed boxes mark details still to supply.</p>
@@ -437,7 +437,8 @@ function slotName(k){ k = String(k || ''); let m;
   return {imgCover:'cover artwork', imgTheme:'theme artwork', imgBooks:'the books together', imgSpread:'open spread', phSpread2:'a second spread', phShelf:'book on a shelf', phHolding:'artist holding their copy', phStoryWork:'the artwork they sent', phStoryPage:'their page in the book', phPast1:'past edition 1', phPast2:'past edition 2'}[k] || 'this slide'; }
 // A picture clicked or dropped on a slide goes where that slide reads it from: the post's own pictures for daily and article posts, the open call otherwise.
 async function placeImage(frame, key, file){
-  const pid = frame.dataset.pid; if (!pid) return putImage(key, file);
+  const pid = frame.dataset.pid; if (!pid && ['books', 'fund'].includes(document.body.dataset.seg)) { if (!file || !/^image\//.test(file.type)) { status('That is not an image.'); return; } status('Uploading image…'); state.images[key] = await upPic(await shrink(file)); render(); status('Image placed. Saved for the team.'); return; }
+  if (!pid) return putImage(key, file);
   if (!file || !/^image\//.test(file.type)) { status('That is not an image.'); return; }
   const p = DPOSTS[pid]; if (!p) { status('This is the example, so its pictures are locked. Press New, or “edit a copy of this one”, to change them.'); return; }
   status('Uploading image…'); const url = await dUpload(file); p.imgs = p.imgs || {}; const m = String(key || '').match(/^(.*?)(\d+)$/);
@@ -554,7 +555,7 @@ function setView(v){ $('ptype').value = v === 'feed' ? lastFeed : v; try { if (v
 document.querySelectorAll('#tabs [data-view]').forEach(b => b.onclick = () => setView(b.dataset.view));
 document.addEventListener('click', e => { const g = e.target.closest('[data-goto]'); if (g) setView(g.dataset.goto); });
 const HID = () => (state.hidden = state.hidden || {});
-const gid = g => (g.pid ? g.pid + '|' : '') + (g.story ? g.title : g.title.replace(/^[^·]*·\s*/, ''));   // a post's own id keeps edits on one week's list off every other week's
+const gid = g => g.ekey ? g.ekey : (g.pid ? g.pid + '|' : '') + (g.story ? g.title : g.title.replace(/^[^·]*·\s*/, ''));   // a post's own id keeps edits on one week's list off every other week's
 // ---------- Credits: every image on a slide carries one ----------
 // Known automatically for Heart List, interviews and editorial (the article names each work); typed once for anything else.
 // Stored by image, so a credit follows its picture onto every slide it appears on.
@@ -576,9 +577,11 @@ function callCredits(){ const o = {}; const put = (u, t) => { if (u && t && t.tr
   PAST_ARTISTS().forEach((a, i) => put(paImg(i), [a[0], a[1]].filter(Boolean).join(' · ')));
   COVER_ARTISTS().forEach((a, i) => put(cvImg(i), [a[0], a[1]].filter(Boolean).join(' · ')));
   return o; }
-function creditFor(u, g){ const auto = g && g.credits && g.credits[u]; if (auto) return auto; const k = credKey(u);
+function creditFor(u, g){ if (g && g.ekey && EDITS && EDITS[g.ekey] && EDITS[g.ekey].credits && credKey(u) in EDITS[g.ekey].credits) { const m = EDITS[g.ekey].credits[credKey(u)]; return m && m !== '-' ? {text: m} : null; }
+  const auto = g && g.credits && g.credits[u]; if (auto) return auto; const k = credKey(u);
   const p = g && g.pid && DPOSTS[g.pid]; const t = (p && (p.credits || {})[k]) || (state.credits || {})[k]; return t ? {text: t} : null; }
-function setCredit(u, g, text){ const k = credKey(u); const p = g && g.pid && DPOSTS[g.pid];
+function setCredit(u, g, text){ const k = credKey(u); if (g && g.ekey && EDITS) { const e = EDITS[g.ekey] = EDITS[g.ekey] || {}; e.credits = e.credits || {}; e.credits[k] = text; fetch('api/edits', {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({key: g.ekey, edits: e})}).catch(() => {}); return; }
+  const p = g && g.pid && DPOSTS[g.pid];
   if (p) { p.credits = p.credits || {}; if (text) p.credits[k] = text; else delete p.credits[k]; saveDaily(p.id); }
   else if (u === state.images.imgCover) { state.credit = text || ''; if ($('credit')) $('credit').value = state.credit; }
   else { state.credits = state.credits || {}; if (text) state.credits[k] = text; else delete state.credits[k]; } }
@@ -604,11 +607,24 @@ function withCredits(s, g){ if (!s.html) return s; const t = document.createElem
   return changed ? {...s, html: t.innerHTML} : s; }
 // Edits made on a daily or article post's slides (text, moved pictures, hidden slides, swapped photos) belong to that post and are shared with the team.
 const EDIT_MERGED = new Set();
-function postEdits(t){ const pick = (o, pre) => Object.fromEntries(Object.entries(o || {}).filter(([k]) => pre.some(x => k.startsWith(x))));
-  return {texts: pick(state.texts, ['tx|' + t + '|']), moves: pick(state.moves, ['mv|' + t + '|']), pos: pick(state.pos, [t + '|']), hidden: pick(state.hidden, ['h|' + t + '|', 'g|' + t]), images: pick(state.images, ['ov|' + t + '|'])}; }
-function mergePostEdits(groups){ groups.forEach(g => { const p = g.pid && DPOSTS[g.pid]; const key = g.pid + '|' + g.title; if (!p || EDIT_MERGED.has(key)) return; EDIT_MERGED.add(key);
+function postEdits(t, slots){ const pick = (o, pre) => Object.fromEntries(Object.entries(o || {}).filter(([k]) => pre.some(x => k.startsWith(x))));
+  const out = {texts: pick(state.texts, ['tx|' + t + '|']), moves: pick(state.moves, ['mv|' + t + '|']), pos: pick(state.pos, [t + '|']), hidden: pick(state.hidden, ['h|' + t + '|', 'g|' + t]), images: pick(state.images, ['ov|' + t + '|']), bgs: pick(state.bgs, ['bg|' + t + '|'])};
+  if (slots) Object.assign(out.images, Object.fromEntries(Object.entries(state.images || {}).filter(([k]) => /^(fd|bk)/.test(k)))); return out; }
+/* Books and Creative Fund posts: their edits live in the team store (api/edits), one entry per post. Picture slots (fd…, bk…) belong to the post on screen. */
+let EDITS = null, EDITS_VIEW = null, EDITS_T = {};
+fetch('api/edits').then(r => r.ok ? r.json() : {}).catch(() => ({})).then(j => { EDITS = j || {}; if (['books', 'fund'].includes(document.body.dataset.seg)) render(); });
+function viewEdits(groups){ const g0 = groups.find(g => g.ekey); if (!g0 || !EDITS) return; if (EDITS_VIEW === g0.view) return; EDITS_VIEW = g0.view;
+  Object.keys(state.images || {}).forEach(k => { if (/^(fd|bk)/.test(k)) delete state.images[k]; });
+  groups.filter(g => g.ekey).forEach(g => { const e = EDITS[g.ekey]; if (!e) return; state.texts = {...(state.texts || {}), ...e.texts}; state.moves = {...(state.moves || {}), ...(e.moves || {})}; state.pos = {...(state.pos || {}), ...e.pos}; state.hidden = {...(state.hidden || {}), ...e.hidden}; state.bgs = {...(state.bgs || {}), ...(e.bgs || {})}; Object.assign(state.images, e.images || {}); }); }
+async function upPic(url){ if (!/^data:/.test(url || '')) return url; try { const r = await fetch('api/upload', {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({data: url})}); if (!r.ok) throw 0; return (await r.json()).url; } catch { return url; } }
+function storeViewEdits(groups){ if (!EDITS) return; groups.filter(g => g.ekey && g.view === EDITS_VIEW).forEach(g => { const t = g.ekey; const now = postEdits(t, true); now.credits = (EDITS[t] || {}).credits || {};
+  const empty = !Object.values(now).some(o => Object.keys(o).length); const before = JSON.stringify(EDITS[t] || null), after = empty ? 'null' : JSON.stringify(now); if (before === after) return;
+  if (empty) delete EDITS[t]; else EDITS[t] = now; clearTimeout(EDITS_T[t]); EDITS_T[t] = setTimeout(async () => { const e = EDITS[t] || null;
+    if (e) for (const [k, v] of Object.entries(e.images || {})) if (/^data:/.test(v)) { const u = await upPic(v); e.images[k] = u; if (state.images[k] === v) state.images[k] = u; }
+    try { const r = await fetch('api/edits', {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({key: t, edits: e})}); if (!r.ok) throw 0; status('Edits saved for the team.'); } catch { status('Could not save the edits for the team right now. They are kept on this screen.'); } }, 900); }); }
+function mergePostEdits(groups){ viewEdits(groups); groups.forEach(g => { const p = g.pid && DPOSTS[g.pid]; const key = g.pid + '|' + g.title; if (!p || EDIT_MERGED.has(key)) return; EDIT_MERGED.add(key);
   const e = (p.edits || {})[gid(g)]; if (!e) return; state.texts = {...(state.texts || {}), ...e.texts}; state.moves = {...(state.moves || {}), ...(e.moves || {})}; state.pos = {...(state.pos || {}), ...e.pos}; state.hidden = {...(state.hidden || {}), ...e.hidden}; Object.assign(state.images, e.images || {}); }); }
-function storePostEdits(groups){ const touched = new Set(); groups.forEach(g => { const p = g.pid && DPOSTS[g.pid]; if (!p) return; const t = gid(g); const now = postEdits(t); const empty = !Object.values(now).some(o => Object.keys(o).length);
+function storePostEdits(groups){ storeViewEdits(groups); const touched = new Set(); groups.forEach(g => { const p = g.pid && DPOSTS[g.pid]; if (!p) return; const t = gid(g); const now = postEdits(t); const empty = !Object.values(now).some(o => Object.keys(o).length);
   p.edits = p.edits || {}; const before = JSON.stringify(p.edits[t] || null); const after = empty ? 'null' : JSON.stringify(now); if (before === after) return;
   if (empty) delete p.edits[t]; else p.edits[t] = now; touched.add(p.id); }); touched.forEach(id => saveDaily(id)); }
 // ---------- Make video: photo with a slow camera move, words fade in, soft cross-fades. Recorded in the browser ----------
@@ -1099,8 +1115,8 @@ function setSeg(seg){ document.body.dataset.seg = seg; document.querySelectorAll
   try { localStorage.setItem('athSeg', seg); } catch {}
   if (seg === 'interviews' || seg === 'editorial' || seg === 'heartlist') { IVK = seg === 'editorial' ? 'editorial' : seg === 'heartlist' ? 'heartlist' : 'interview'; IVSEL = selOf(IVK); $('ptype').value = 'interview'; renderIvSide(); }
   else if ($('ptype').value === 'interview') { let pt = null; try { pt = localStorage.getItem('athLastPtype'); } catch {} $('ptype').value = pt && pt !== 'interview' && [...$('ptype').options].some(o => o.value === pt) ? pt : 'calendar'; }
-  if (seg === 'fund') { fundRender(); if (FUNDVIEW) render(); window.scrollTo({top: 0}); return; }
-  if (seg === 'books') { booksRender(); if (typeof BOOKVIEW !== 'undefined' && BOOKVIEW) render(); window.scrollTo({top: 0}); return; }
+  if (seg === 'fund') { fundRender(); render(); window.scrollTo({top: 0}); return; }
+  if (seg === 'books') { booksRender(); render(); window.scrollTo({top: 0}); return; }
   render(); window.scrollTo({top: 0}); }
 document.querySelectorAll('#seg [data-seg]').forEach(b => b.onclick = () => setSeg(b.dataset.seg));
 function storyPlanHTML(){
@@ -1408,7 +1424,8 @@ function render(){
   groups.forEach(g => { const p = (g.pid && DPOSTS[g.pid]) || (g.pid === 'demo' ? ivCurrent() : null); if (p && CREDIT_OF[p.cat]) g.credits = CREDIT_OF[p.cat](p); else if (!g.pid && !g.book) g.credits = callCredits(); });
   groups.forEach(g => { const t = gid(g); g.slides = g.slides.map((s, j) => { const o = state.images['ov|' + t + '|' + j];
     const s2 = o && s.html ? {...s, html: s.html.replace(/background-image:url\([^)]*\)/, 'background-image:url(' + o + ')')} : s;
-    return withCredits(applyMoves(applyPos(applyTexts(s2, 'tx|' + t + '|' + j), t + '|' + j), 'mv|' + t + '|' + j), g); }); });
+    const bgv = (state.bgs || {})['bg|' + t + '|' + j];
+    return withCredits(applyMoves(applyPos(applyTexts(bgv ? {...s2, bg: bgv} : s2, 'tx|' + t + '|' + j), t + '|' + j), 'mv|' + t + '|' + j), g); }); });
   renderPool();
   RENDERED = [];
   $('out').innerHTML = groups.map((g,gi) => {
@@ -1421,11 +1438,11 @@ function render(){
       const reelCtl = g.reel ? `<div class="rlctl"><label>Length <input type="number" min="0.5" max="30" step="0.5" value="${s.dur}" data-dur="${esc(dkey)}"> s</label>${vmeta ? `<label>Start at <input type="number" min="0" step="0.5" value="${vmeta.start || 0}" data-vstart="${esc(s.photoKey)}"> s</label><label>Speed <select data-vspeed="${esc(s.photoKey)}">${[0.25, 0.5, 0.75, 1, 1.25, 1.5, 2, 3].map(x => `<option value="${x}" ${(vmeta.speed || 1) == x ? 'selected' : ''}>${x}×</option>`).join('')}</select></label><button type="button" class="trimbtn" data-trim="${esc(s.photoKey)}">Trim clip</button><span class="vtag">Video ${(vmeta.len || 0).toFixed(1)} s${(vmeta.speed || 1) !== 1 ? ` · ${vmeta.speed}×` : ''}</span><button type="button" data-vdel="${esc(s.photoKey)}">Remove clip</button>` : ''}${/^rx/.test(s.photoKey || '') ? `<button type="button" data-delclip="${esc(g.reel)}">Remove last added clip</button>` : ''}</div>` : '';
       const tpre = 'tx|' + gid(g) + '|' + j + '|'; const hasRm = Object.entries(TXT()).some(([k, v]) => k.startsWith(tpre) && v === '\u200b');
       const nCr = (s.html || '').split('data-nocredit').length - 1; const hasImg = /background-image:\s*url\(["']?[^"')\s]/.test(s.html || '') && /data-nocredit|class="crd"|background-image/.test(s.html || '');
-      const credBtn = nCr || /class="crd"/.test(s.html || '') ? `<button type="button" data-credit="${gi}|${j}" title="Add or change the artwork credit (optional)">Credit</button>` : '';
+      const credBtn = nCr || hasImg || /class="crd"/.test(s.html || '') ? `<button type="button" data-credit="${gi}|${j}" title="Add or change the artwork credit (optional)">Credit</button>` : '';
       const mpre = 'mv|' + gid(g) + '|' + j + '|'; const hasMv = Object.keys(MOVES()).some(k => k.startsWith(mpre));
       const ppre = gid(g) + '|' + j + '|'; const edited = Object.keys(TXT()).some(k => k.startsWith(tpre)) || hasMv || has || Object.keys(POS()).some(k => k.startsWith(ppre));
       const photoBtns = credBtn + `<button type="button" data-reset="${gi}|${j}"${edited ? '' : ' disabled'} title="Put this slide back as it was: words, positions and picture">Reset</button>`;
-      return `<div class="cell"><div class="frame${s.h ? ' tall' : ''}"${g.pid ? ` data-pid="${esc(g.pid)}"` : ''} data-okey="${esc(okey)}" data-tkey="${esc('tx|' + gid(g) + '|' + j)}">${slideNode(s)}</div>${reelCtl}<div class="act"><span>${s.label ? esc(s.label) : g.slides.length>1 ? 'Slide ' + (j+1) : 'Single'}</span><span class="acts"><button type="button" data-pv="${i}" title="See it large">Preview</button><button type="button" data-hide="${esc(hk)}" title="Hide this slide for now">Hide</button>${photoBtns}<button type="button" data-i="${i}">Save PNG</button></span></div></div>`; }).join('');
+      return `<div class="cell"><div class="frame${s.h ? ' tall' : ''}"${g.pid ? ` data-pid="${esc(g.pid)}"` : ''} data-okey="${esc(okey)}" data-tkey="${esc('tx|' + gid(g) + '|' + j)}">${slideNode(s)}</div>${reelCtl}<div class="act"><span>${s.label ? esc(s.label) : g.slides.length>1 ? 'Slide ' + (j+1) : 'Single'}</span><span class="acts"><button type="button" data-pv="${i}" title="See it large">Preview</button><button type="button" data-hide="${esc(hk)}" title="Hide this slide for now">Hide</button>${photoBtns}<select data-bg="${esc('bg|' + gid(g) + '|' + j)}" title="Slide colour" aria-label="Slide colour">${[['', 'Colour'], ['#FFFFFF', 'White'], ['#FAD2E1', 'Pink'], ['#FFA1C2', 'Rose'], ['#6A0620', 'Burgundy'], ['#1C1310', 'Ink']].map(([v, l]) => `<option value="${v}"${((state.bgs || {})['bg|' + gid(g) + '|' + j] || '') === v ? ' selected' : ''}>${l}</option>`).join('')}</select><button type="button" data-i="${i}">Save PNG</button></span></div></div>`; }).join('');
     const capBox = g.cap ? `<details class="capbox"><summary>Caption and pinned comment</summary><div class="f"><textarea id="cap${gi}" style="min-height:220px">${esc(g.cap)}</textarea></div><div class="f"><label>Pinned comment</label><input value="${esc(g.pin)}"></div><button class="btn ghost" type="button" data-cap="cap${gi}" style="margin-top:8px">Copy caption</button></details>` : '';
     const ckey = (state.name || '') + ' | ' + g.title.replace(/^[^·]*·\s*/, '');
     const clink = canvaLink(ckey);
@@ -1456,8 +1473,8 @@ function render(){
   $('out').querySelectorAll('[data-credit]').forEach(b => b.onclick = () => { const [gi, j] = b.dataset.credit.split('|').map(Number); const g = groups[gi]; const s = g.slides[j];
     const urls = [...new Set([...(s.html || '').matchAll(/background-image:\s*url\(["']?([^"')]*)["']?\)/g)].map(m => m[1]).filter(u => isArtImg(document.body, u)))];
     if (!urls.length) { status('No image on this slide yet.'); return; }
-    for (const [n, u] of urls.entries()) { const cur = creditFor(u, g); if (cur && g.credits && g.credits[u]) { status('This image is credited from the article: ' + cur.text); continue; }
-      const v = prompt(`Credit for image ${n + 1} of ${urls.length} on this slide.\nFor example: Title by Artist Name @handle`, cur ? cur.text : ''); if (v === null) return; setCredit(u, g, v.trim()); }
+    for (const [n, u] of urls.entries()) { const cur = creditFor(u, g); if (cur && g.credits && g.credits[u] && !g.ekey) { status('This image is credited from the article: ' + cur.text); continue; }
+      const v = prompt(`Credit for image ${n + 1} of ${urls.length} on this slide.\nFor example: Title by Artist Name @handle${g.ekey ? '\nType - to hide the credit label.' : ''}`, cur ? cur.text : ''); if (v === null) return; setCredit(u, g, v.trim()); }
     render(); status('Credit saved. It shows on every slide that uses this image.'); });
   $('out').querySelectorAll('[data-reset]').forEach(b => b.onclick = () => { const [gi, j] = b.dataset.reset.split('|').map(Number); const t = gid(groups[gi]);
     const tp = 'tx|' + t + '|' + j + '|', mp = 'mv|' + t + '|' + j + '|', pp = t + '|' + j + '|';
@@ -1467,6 +1484,7 @@ function render(){
   $('out').querySelectorAll('[data-mvr]').forEach(b => b.onclick = () => { Object.keys(MOVES()).forEach(k => { if (k.startsWith(b.dataset.mvr)) delete MOVES()[k]; }); render(); status('Text is back in its place.'); });
   $('out').querySelectorAll('[data-hide]').forEach(b => b.onclick = () => { HID()[b.dataset.hide] = 1; render(); status('Hidden for now. It is left out of Save all as ZIP. Restore it any time.'); });
   $('out').querySelectorAll('[data-txr]').forEach(b => b.onclick = () => { Object.keys(TXT()).forEach(k => { if (k.startsWith(b.dataset.txr) && TXT()[k] === '\u200b') delete TXT()[k]; }); render(); status('Removed text is back.'); });
+  $('out').querySelectorAll('[data-bg]').forEach(sel => sel.onchange = () => { state.bgs = state.bgs || {}; if (sel.value) state.bgs[sel.dataset.bg] = sel.value; else delete state.bgs[sel.dataset.bg]; render(); status(sel.value ? 'Slide colour changed. It shows wherever the slide has no picture of its own.' : 'Slide colour back to the template.'); });
   $('out').querySelectorAll('[data-unhide]').forEach(b => b.onclick = () => { delete HID()[b.dataset.unhide]; render(); status('Restored.'); });
   $('out').querySelectorAll('[data-ph]').forEach(b => b.onclick = () => { const inp = document.createElement('input'); inp.type = 'file'; inp.accept = 'image/*';
     inp.onchange = () => { const file = inp.files[0]; if (!file) return; shrink(file).then(url => { state.images[b.dataset.ph] = url; render(); status('Photo changed. Press "Save call" to keep it.'); }); }; inp.click(); });

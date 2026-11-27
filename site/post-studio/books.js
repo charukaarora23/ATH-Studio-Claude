@@ -687,7 +687,7 @@ function bookGroups(){
       pg(w.page) ? {...BKT.kitPage({w, b, img: pg(w.page), slot: 'bkkp' + i}), label: w.artist + ': my page'} : null]).filter(Boolean);
     const dm = `Hi {first name}, your feature for ${name} is live on our page today. Here are two story frames made for you: "I'm in it" and your printed page. Share them and tag @artstoheartsproject, and we'll reshare.${sale.open ? ` ${sale.line.replace('. Link in bio.', '')} at shop.artstoheartsproject.com.` : ''}${b.codesLive && code ? ` Your artist code for the book is ${code}${b.codes.friends ? `, and friends and family can use ${b.codes.friends}` : ''}.` : ''} When your copy arrives, send us a photo of you with it. Thank you for being part of the book.`;
     out.push({book: true, credits, title: `${name} · Artist kits ${k + 1} of ${Math.ceil(n / BK_FEAT)}`, meta: `Two story frames per artist ("I'm in it" and their printed page) · send each artist theirs with the message below`, slides: K.map((s, j) => ({...s, title: 'kit-' + (k * BK_FEAT + Math.floor(j / 2) + 1) + '-' + (j % 2 ? 'page' : 'in-it')})), story: true, cap: dm, pin: ''}); }
-  return out;
+  return out.map((g, k) => ({...g, view: 'book:' + b.name + ':' + id, ekey: 'book:' + b.name + ':' + id + (k ? ':' + k : '')}));
 }
 
 // ---------- the Books tab: a list of books, then one book on its own page ----------
