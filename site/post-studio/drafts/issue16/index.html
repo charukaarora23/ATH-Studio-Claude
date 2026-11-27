@@ -46,16 +46,18 @@ const COVERS = { 14:'John Sloane', 13:'Troy Brooks', 12:'Celia Gallego', 11:'Rac
 const arrow = `<svg width="36" height="16" viewBox="0 0 46 20"><path d="M2 10h40M33 2l9 8-9 8" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
 
 const S = [];
-// 1 · COVER: the full artwork, as on the dashboard covers
-{ const [src, t, a, h] = ART.howis; S.push({bg: INK, html: `
-  <div class="a img" style="inset:0;background-image:url(${src});background-position:center 20%"></div>
-  <div class="a" style="inset:0;background:linear-gradient(180deg,rgba(20,14,12,.38) 0%,rgba(20,14,12,0) 16%,rgba(20,14,12,0) 40%,rgba(20,14,12,.6) 62%,rgba(20,14,12,.82) 100%)"></div>
-  ${chrome('4th anniversary', W, W)}
-  <div class="a" style="left:0;right:0;top:640px;display:flex;justify-content:center"><span class="cn" style="display:inline-flex;align-items:center;height:46px;padding:0 26px;background:${T};color:${INK};border-radius:999px">Open call · Issue 16</span></div>
-  <p class="a c" style="left:0;right:0;top:710px;font-size:136px;font-weight:700;letter-spacing:-.01em;line-height:.9;text-transform:uppercase;color:${W}">Call for<br>artists</p>
-  <p class="a c scr" style="left:0;right:0;top:965px;font-size:88px;line-height:1;color:${T}">Arts to Hearts Magazine</p>
-  <p class="a c sub" style="left:150px;right:150px;top:1085px;color:${W}">Our 4th anniversary issue. 100 artists, one $500 award.</p>
-  <p class="a crd c" style="left:0;right:0;bottom:92px;color:${W}">${credit(t, a, h)}</p>`}); }
+// 1 · COVER: a magazine cover. Full artwork above, a solid call-colour band below, "16" across the seam
+{ const [src, t, a, h] = ART.howis; S.push({bg: C, html: `
+  <div class="a img" style="left:0;right:0;top:0;height:880px;background-image:url(${src});background-position:center 28%"></div>
+  <div class="a" style="left:0;right:0;top:0;height:160px;background:linear-gradient(180deg,rgba(20,14,12,.42),rgba(20,14,12,0))"></div>
+  <p class="a cn" style="left:52px;top:48px;color:${W}">Arts to Hearts Project</p><p class="a cn" style="right:52px;top:48px;color:${W}">Open call</p>
+  <p class="a cn" style="right:46px;top:150px;writing-mode:vertical-rl;color:${W};text-shadow:0 1px 8px rgba(0,0,0,.35)">4th anniversary issue</p>
+  <p class="a crd" style="right:52px;top:838px;text-align:right;color:${W};text-shadow:0 1px 6px rgba(0,0,0,.6)">${credit(t, a, h)}</p>
+  <p class="a" style="left:26px;top:700px;font-size:470px;font-weight:600;letter-spacing:-.07em;line-height:.8;color:${W}">16</p>
+  <p class="a lab" style="left:560px;top:930px;color:${T}">Issue 16 · Open call</p>
+  <p class="a" style="left:560px;right:52px;top:972px;font-size:96px;font-weight:700;letter-spacing:-.01em;line-height:.9;text-transform:uppercase;color:${W}">Call for<br>artists</p>
+  <p class="a scr" style="left:560px;right:40px;top:1160px;font-size:50px;line-height:1;white-space:nowrap;color:${T}">Arts to Hearts Magazine</p>
+  <p class="a cn" style="left:52px;bottom:48px;color:${W}">Link in bio · comment “${KEY}”</p><p class="a cn" style="right:52px;bottom:48px;color:${W}">${CLOSES}</p>`}); }
 
 // 2 · FOUR YEARS IN PRINT
 S.push({bg: CREAM, html: `${chrome('Four years', INK, MAROON)}
