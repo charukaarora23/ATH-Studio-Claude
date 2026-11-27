@@ -230,7 +230,7 @@ const T = {
   // four artworks with credits
   grid(o){
     const g = G[o.ground||'cream']();
-    if (o.from !== undefined) o.items = o.items.map((_, i) => { const a = PAST_ARTISTS()[o.from + i] || []; return {name: a[0] ? esc(a[0]) : '', meta: a[1] ? esc(a[1]) : '', img: paImg(o.from + i)}; });
+    if (o.from !== undefined) o.items = o.items.map((_, i) => { const a = PAST_ARTISTS()[o.from + i] || []; return {name: a[0] ? esc(a[0]) : '', meta: a[1] ? esc(isMag() ? noHandle(a[1]) : a[1]) : '', img: paImg(o.from + i)}; });
     const cell = (it,i) => { const x = i%2 ? 556 : 80, y = i<2 ? 260 : 760;
       return `${slot(it.img, 'Artwork', `left:${x}px;top:${y}px;width:444px;height:380px`, g.fg).replace('<div class="a', `<div data-slot="${o.from !== undefined ? 'pa' + (o.from + i + 1) : ''}" class="a`)}
         <p class="a" style="left:${x}px;top:${y+398}px;font-size:26px;font-weight:600;color:${g.fg}">${gap(it.name,'Artist name')}</p>
@@ -429,6 +429,8 @@ const MG = {
 // magazine wording for the shared month copy (written for books)
 const magWords = t => !isMag() || typeof t !== 'string' ? t : t.replace(/\b[Tt]he(\s+|<br>)(?:(<span class="scr"[^>]*>Issue \d+<\/span>)|(Issue \d+)(?=\s*(?:[.,!?:;)]|$|<)))/g, (m, sep, sp, pl) => (sep === '<br>' ? '<br>' : '') + (sp || pl)).replace(/\bthe Issue (\d+)/g, 'Issue $1').replace(/juried hardcover book/g, 'juried magazine issue').replace(/hardcover book/g, 'magazine').replace(/\b([Tt])he book\b/g, '$1he magazine').replace(/juried book/g, 'juried magazine').replace(/our last books/g, 'our past issues').replace(/([Pp])ast editions/g, '$1ast issues').replace(/([Pp])ast edition\b/g, '$1ast issue').replace(/#101ArtBook/g, '#ArtsToHeartsMagazine').replace(/\bEdition (\d+) of a series\b/g, 'Issue $1 of a magazine');
 
+// details without Instagram handles: 'Title · @handle' -> 'Title'
+const noHandle = t => String(t || '').replace(/\s*[·|,]?\s*@[\w.]+/g, '').trim();
 function magLaunch(){
   const C = state.colour, Tn = tint(C), S = [];
   const label = String(state.editionLabel || '4th anniversary issue').trim(); const sp = label.indexOf(' ');
@@ -474,7 +476,8 @@ function magLaunch(){
     <p class="a c sub" style="left:120px;right:120px;top:236px;font-size:28px;opacity:.85;color:${WHITE}">${pick('A few of the artists in our past issues.', 'Artists from our past issues.', 'Real artists. Real pages.')}</p>
     ${[0, 1, 2, 3, 4, 5].map(i => { const [n, e] = pa[i] || []; const x = 56 + (i % 3) * 332, y = i < 3 ? 320 : 790; const u = paImg(i);
       return (u ? magArt('pa' + (i + 1), u, `left:${x}px;width:304px;top:${y}px;height:350px`, 'center bottom') : `<div data-slot="pa${i + 1}" class="a ph" style="left:${x}px;width:304px;top:${y}px;height:350px;font-size:18px;color:${WHITE}">Their work</div>`)
-        + `<p class="a" style="left:${x}px;width:304px;top:${y + 362}px;font-size:19px;line-height:1.3;color:${WHITE}">${n ? `<b style="font-weight:600;font-size:23px">${esc(n)}</b> · ${esc(e || '')}` : '<span class="gap">Artist name · artwork · @handle</span>'}</p>`; }).join('')}`});
+        + (n ? `<p class="a" style="left:${x}px;width:304px;top:${y + 362}px;text-align:center;font-size:23px;font-weight:600;line-height:1.2;color:${WHITE}">${esc(n)}</p><p class="a" style="left:${x}px;width:304px;top:${y + 394}px;text-align:center;font-size:19px;line-height:1.3;opacity:.9;color:${WHITE}">${esc(noHandle(e))}</p>`
+          : `<p class="a" style="left:${x}px;width:304px;top:${y + 362}px;font-size:19px;color:${WHITE}"><span class="gap">Artist name</span></p>`); }).join('')}`});
 
   // 5 the theme
   S.push({bg:C, html:`${corners(WHITE, WHITE, 'The theme')}
