@@ -378,7 +378,7 @@ const PRESETS = {
   'Arts to Hearts Magazine Issue 16 · Gallery': null,
   'New call (blank)': { series:'', edition:'', editionLabel:'', name:'', keyword:'', selected:'', coverLine:'', quote:'', submit:'', theme:'', themeWork:'work', themeLine:'', juryLooks:'', kinds:'', pastEds:'', jury:'', images:{} },
 };
-PRESETS['Arts to Hearts Magazine Issue 16 · Gallery'] = {...PRESETS['Arts to Hearts Magazine Issue 16'], style:'gallery',
+PRESETS['Arts to Hearts Magazine Issue 16 · Gallery'] = {...PRESETS['Arts to Hearts Magazine Issue 16'], style:'gallery', coverStyle:'anniv', headline:'Open call for artists',
   levels:'Emerging and established artists.', elig:'All genders, nationalities and backgrounds. No publication or gallery history needed. AI-generated work is not eligible.'};
 const IMGKEYS = ['imgCover','imgTheme','imgBooks','imgSpread'];
 const thumbOf = k => state.images[k] || '';
@@ -1273,6 +1273,21 @@ function launch(){
   const headHtml = head.length > 2 ? head.slice(0, Math.ceil(head.length/2)).join(' ') + '<br>' + head.slice(Math.ceil(head.length/2)).join(' ') : head.join('<br>');
 
   // 1 cover
+  if (state.coverStyle === 'anniv') {
+    // anniversary cover: the artwork full bleed, a seal for the anniversary, the headline set left at the foot
+    const lab = String(state.editionLabel || '').trim(), sp = lab.indexOf(' ');
+    const big = sp > 0 ? lab.slice(0, sp) : lab, rest = sp > 0 ? lab.slice(sp + 1) : '';
+    const bm = big.match(/^(\d+)(st|nd|rd|th)$/i);
+    S.push({bg:INK, html:`
+    <div data-slot="imgCover" class="a img" style="inset:0;background-image:url(${state.images.imgCover || ''});background-position:center 18%"></div>
+    <div class="a" style="inset:0;background:linear-gradient(180deg,rgba(20,14,12,.38) 0%,rgba(20,14,12,0) 16%,rgba(20,14,12,0) 42%,rgba(20,14,12,.62) 62%,rgba(20,14,12,.88) 100%)"></div>
+    ${corners(WHITE, WHITE, state.series)}
+    <div class="a" style="right:64px;top:470px;width:300px;height:300px;border-radius:50%;background:${Tn};color:${INK};display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;box-shadow:0 0 0 10px ${rgba(Tn, .35)}">
+      <p style="font-size:128px;font-weight:600;letter-spacing:-.06em;line-height:.85">${bm ? `${bm[1]}<span style="font-size:52px;letter-spacing:-.02em;vertical-align:top;position:relative;top:8px">${bm[2]}</span>` : esc(big)}</p>
+      <p class="scr" style="font-size:44px;line-height:.95;margin-top:12px;color:${C}">${esc(rest).replace(/ (\S+)$/, '<br>$1')}</p></div>
+    <p class="a" style="left:66px;right:60px;top:826px;font-size:124px;font-weight:700;letter-spacing:-.01em;line-height:.9;text-transform:uppercase;color:${WHITE}">${esc(/^call for artists$/i.test(state.headline || '') || !state.headline ? 'Open call for artists' : state.headline).replace(/^(\S+ \S+) /, '$1<br>')}</p>
+    <p class="a sub" style="left:72px;right:200px;top:1080px;color:${WHITE}">${esc(state.coverLine)}</p>`});
+  } else
   S.push({bg:INK, html:`
     <div data-slot="imgCover" class="a img" style="inset:0;background-image:url(${state.images.imgCover || ''});background-position:center 6%"></div>
     <div class="a" style="inset:0;background:linear-gradient(180deg,rgba(20,14,12,.38) 0%,rgba(20,14,12,0) 16%,rgba(20,14,12,0) 40%,rgba(20,14,12,.6) 62%,rgba(20,14,12,.82) 100%)"></div>
