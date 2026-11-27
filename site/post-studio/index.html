@@ -378,7 +378,7 @@ const PRESETS = {
   'Arts to Hearts Magazine Issue 16 · Gallery': null,
   'New call (blank)': { series:'', edition:'', editionLabel:'', name:'', keyword:'', selected:'', coverLine:'', quote:'', submit:'', theme:'', themeWork:'work', themeLine:'', juryLooks:'', kinds:'', pastEds:'', jury:'', images:{} },
 };
-PRESETS['Arts to Hearts Magazine Issue 16 · Gallery'] = {...PRESETS['Arts to Hearts Magazine Issue 16'], style:'gallery', coverStyle:'anniv', headline:'Open call for artists',
+PRESETS['Arts to Hearts Magazine Issue 16 · Gallery'] = {...PRESETS['Arts to Hearts Magazine Issue 16'], style:'gallery', coverStyle:'anniv', noCredits:true, galTheme:1, headline:'Open call for artists',
   levels:'Emerging and established artists.', elig:'All genders, nationalities and backgrounds. No publication or gallery history needed. AI-generated work is not eligible.'};
 const IMGKEYS = ['imgCover','imgTheme','imgBooks','imgSpread'];
 const thumbOf = k => state.images[k] || '';
@@ -622,7 +622,7 @@ function setCredit(u, g, text){ const k = credKey(u); if (g && g.ekey && EDITS) 
   else { state.credits = state.credits || {}; if (text) state.credits[k] = text; else delete state.credits[k]; } }
 // placeholders (the studio's own "Artwork 23 · add it" cards) and brand marks are not artworks
 const isArtImg = (el, u) => u && !el.hasAttribute('data-nolabel') && !/^\s*$/.test(u) && !/^data:image\/svg/.test(u) && !/brand\/|monogram|logo/.test(u) && !el.closest('svg');
-function withCredits(s, g){ if (!s.html) return s; const t = document.createElement('template'); t.innerHTML = s.html; const slideTxt = plainTxt(s.html).toLowerCase(); let changed = false;
+function withCredits(s, g){ if (!s.html) return s; if (state.noCredits && g && !g.daily && !g.ekey && gid(g) === 'Launch' && (document.body.dataset.seg || 'calls') === 'calls') return s; const t = document.createElement('template'); t.innerHTML = s.html; const slideTxt = plainTxt(s.html).toLowerCase(); let changed = false;
   t.content.querySelectorAll('[style*="background-image"]').forEach(el => { const m = (el.getAttribute('style') || '').match(/background-image:\s*url\(["']?([^"')]*)["']?\)/); const u = m && m[1]; if (!isArtImg(el, u)) return;
     const c = creditFor(u, g); changed = true;
     // full-bleed pictures keep their credit clear of the corner labels; z-index lifts it above any darkening layer on the photo
@@ -1327,6 +1327,20 @@ function launch(){
     <p class="a lab c" style="left:0;right:0;top:1000px;color:${Tn}">What you can submit</p>
     <p class="a c sub" style="left:110px;right:110px;top:1044px;font-size:30px;color:${WHITE}">${esc(state.submit)}</p>`});
 
+  // 4b the theme in focus (anniversary call): the theme as the headline, what it means, four ways into it with an artwork each, no credits
+  if (state.coverStyle === 'anniv') {
+    const kinds = KINDS().slice(0, 4), th = String(state.theme || '').trim(), tw = th.split(' '), cut = tw.length > 2 ? 2 : 1;
+    const thHead = tw.length > 2 ? `${esc(tw.slice(0, tw.length - cut).join(' '))}<br><span class="scr" style="font-size:1.32em;letter-spacing:-.01em;line-height:.9;color:${C}">${esc(tw.slice(-cut).join(' '))}</span>` : esc(th);
+    S.push({bg:CREAM, html:`${corners(INK, BURG, 'The theme')}
+    <p class="a lab" style="left:80px;top:150px;color:${C}">The theme of ${esc(state.name)}</p>
+    <p class="a R" style="left:76px;right:60px;top:196px;font-size:118px;line-height:.98;color:${INK}">${thHead}</p>
+    <p class="a sub" style="left:80px;right:110px;top:490px;font-size:31px;color:${INK}">${esc(state.themeIntro || state.themeLine || '')}</p>
+    ${[0, 1, 2, 3].map(i => { const x = 64 + i * 244, u = state.images['th' + (i + 1)];
+      return `<div class="a" style="left:${x}px;width:220px;top:700px;display:flex;flex-direction:column;color:${INK}">`
+        + (u ? `<div data-slot="th${i + 1}" data-nolabel class="img" style="position:relative;width:220px;height:400px;background-image:url(${u});background-size:contain;background-position:center bottom"></div>` : `<div data-slot="th${i + 1}" class="ph" style="width:220px;height:400px;font-size:16px">Artwork</div>`)
+        + `<p style="margin-top:16px;font-size:23px;font-weight:600;line-height:1.15">${esc((kinds[i] || [])[0] || '')}</p></div>`; }).join('')}`, title:'theme-in-focus'});
+  }
+
   // 5 the book
   S.push({bg:CREAM, html:`${corners(INK, BURG, 'The book')}
     ${photo('imgSpread', 'An open spread of a past edition', 'left:80px;right:80px;top:150px;height:640px', INK)}
@@ -1380,7 +1394,7 @@ function launch(){
   const card = i => { const [n, e] = al[i] || []; const u = paImg(i);
     return `<div>${u ? `<div data-slot="pa${i + 1}" class="img" style="height:330px;border-radius:12px;background-image:url(${u});background-position:center"></div>` : `<div data-slot="pa${i + 1}" class="ph" style="height:330px;font-size:18px;color:${WHITE}">Their work</div>`}
       <p style="font-size:26px;font-weight:600;line-height:1.2;margin-top:16px">${gap(n, 'Artist name')}</p>
-      <p style="font-size:20px;opacity:.7;line-height:1.3;margin-top:6px">${gap(e, 'Edition · Country')}</p></div>`; };
+      <p style="font-size:20px;opacity:.7;line-height:1.3;margin-top:6px">${gap(/magazine/i.test(state.series || '') && e ? noHandle(e) : e, 'Edition · Country')}</p></div>`; };
   S.push({bg:INK, html:`${corners(WHITE, PEONY, 'From past editions')}
     <p class="a R c" style="left:80px;right:80px;top:150px;font-size:80px;color:${WHITE}">Published artists</p>
     <p class="a c sub" style="left:120px;right:120px;top:256px;font-size:28px;opacity:.75;color:${WHITE}">${pick('A few of the artists in our books.', 'Artists from our past editions.', 'Real artists. Real pages.')}</p>
@@ -1411,6 +1425,7 @@ function launch(){
     <p class="a c" style="left:0;right:0;top:1070px;font-size:26px;opacity:.7;color:${WHITE}">artstoheartsproject.com</p>`});
 
   const titles = ['cover','who-we-are','the-series','the-theme','the-book','what-you-receive','recognition','selection','who-can-apply','published-artists','cover-artists','apply'];
+  if (state.coverStyle === 'anniv') titles.splice(4, 0, 'theme-in-focus');
   return S.map((s,i) => ({...s, title: titles[i]}));
 }
 
@@ -1610,6 +1625,7 @@ async function saveDraft(){ const n = $('preset').value; const files = {}, paths
 async function loadCall(n){ const p = PRESETS[n] || {}; let d = null; try { d = JSON.parse(localStorage.getItem(DKEY(n)) || 'null'); } catch {}
   let files = {}; if (d) { try { files = await idbGet('draft:' + n) || {}; } catch {} }
   state = d ? {...DEFAULTS, ...p, ...d, images: {...(d.images || {}), ...files}} : {...DEFAULTS, ...p, images: {...(p.images || DEFAULT_IMAGES)}};
+  if (d && state.coverStyle === 'anniv' && !d.galTheme && typeof shiftLaunch === 'function') { shiftLaunch(4); state.galTheme = 1; }   // the theme slide went in at slide 5: saved edits move with their slides
   if (d && typeof magMigrate === 'function') { if (!d.magSlides) state.magSlides = 10; magMigrate(); Object.entries(p.images || {}).forEach(([k, v]) => { if (/^th\d$/.test(k) && !state.images[k]) state.images[k] = v; }); }   // calls saved before the theme slide: shift edits, add its artworks
   await restoreVideos(n); return !!d; }
 $('preset').onchange = async () => { restoring = true; const had = await loadCall($('preset').value); restoring = false; try { localStorage.setItem('athLastPreset', $('preset').value); } catch {}

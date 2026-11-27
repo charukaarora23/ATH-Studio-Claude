@@ -433,6 +433,12 @@ const magWords = t => !(isMag() || /magazine/i.test(state.series || '')) || type
 const noHandle = t => String(t || '').replace(/\s*[·|,]?\s*@[\w.]+/g, '').trim();
 // Issue 16 got an 11th slide (the theme, after Published artists). Edits are saved by slide number, so a call
 // saved with the 10-slide launch has its Launch edits from slide 5 on moved up by one, once.
+// move saved Launch edits from slide `at` onwards up by one (a slide was inserted there)
+function shiftLaunch(at){
+  const shift = (obj, re) => { if (!obj) return; Object.keys(obj).map(k => [k, k.match(re)]).filter(([, m]) => m && +m[2] >= at).sort((a, b) => +b[1][2] - +a[1][2])
+    .forEach(([k, m]) => { const nk = m[1] + (+m[2] + 1) + m[3]; obj[nk] = obj[k]; delete obj[k]; }); };
+  shift(state.texts, /^(tx\|Launch\|)(\d+)(\|.*)$/); shift(state.moves, /^(mv\|Launch\|)(\d+)(\|.*)$/); shift(state.pos, /^(Launch\|)(\d+)(\|.*)$/);
+  shift(state.hidden, /^(h\|Launch\|)(\d+)()$/); shift(state.images, /^(ov\|Launch\|)(\d+)()$/); shift(state.bgs, /^(bg\|Launch\|)(\d+)()$/); }
 function magMigrate(){ if (state.style !== 'magazine' || (state.magSlides || 10) >= 11) return; const T0 = 'Launch', at = 4;
   const shift = (obj, re) => { if (!obj) return; Object.keys(obj).map(k => [k, k.match(re)]).filter(([, m]) => m && +m[2] >= at).sort((a, b) => +b[1][2] - +a[1][2])
     .forEach(([k, m]) => { const nk = m[1] + (+m[2] + 1) + m[3]; obj[nk] = obj[k]; delete obj[k]; }); };
