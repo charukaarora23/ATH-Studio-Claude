@@ -504,9 +504,9 @@ function magLaunch(){
 
   // 6 the theme
   S.push({bg:C, html:`${corners(WHITE, WHITE, 'The theme')}
-    <p class="a ser" style="left:52px;top:120px;width:600px;font-size:60px;line-height:1.08;letter-spacing:-.015em;color:${INK}">${esc(state.quote)}</p>
-    ${magArt('imgTheme', state.images.imgTheme, 'left:240px;right:240px;top:330px;height:700px', 'center')}
-    ${state.themeCredit ? `<p class="a c" style="left:0;right:0;top:1046px;font-size:17px;font-weight:500;opacity:.85;color:${WHITE}">${esc(state.themeCredit)}</p>` : ''}
+    <p class="a ser" style="left:52px;top:120px;width:600px;font-size:60px;line-height:1.08;letter-spacing:-.015em;color:${WHITE}">${esc(state.quote)}</p>
+    ${magArt('imgTheme', state.images.imgTheme, 'left:240px;right:240px;top:330px;height:700px', 'center').replace('data-slot="imgTheme"', 'data-slot="imgTheme" data-nolabel')}
+    ${state.themeCredit ? `<p class="a" style="display:none">${esc(state.themeCredit)}</p>` : ''}
     <p class="a lab" style="left:52px;top:1110px;color:${WHITE}">${esc(state.theme)}</p>
     <p class="a sub" style="left:52px;right:52px;top:1150px;font-size:28px;color:${WHITE}">${esc(state.submit)}</p>`});
 
