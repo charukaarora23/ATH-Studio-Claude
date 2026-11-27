@@ -196,7 +196,7 @@ function fundGroups(){
   const end = (head, foot) => BKT.keyEnd({head, key: KW, offer: `Comment ${KW} and we'll send you the link to apply.`, foot});
   const ask = `Comment ${KW} and we'll send you the link to apply.`;
   const T3 = ['What it is', "Who it's for", 'How to apply'];
-  const calCycle = (sub, works) => FDT.cal({month: c, kicker: 'ATH Creative Fund', title: MONTHS_FULL[c.getMonth()], sub, marks: {[c.getDate()]: 'Deadline', [a.getDate()]: 'Announced'}, works});
+  const calCycle = (sub, works) => FDT.cal({month: c, kicker: 'ATH Creative Fund', title: MONTHS_FULL[c.getMonth()], sub, marks: {[c.getDate()]: 'Deadline'}, works});
   const tags = '#ATHCreativeFund #artstoheartsproject #artistgrant #supportartists #artistsoninstagram';
   let S = [], cap = '', head = '';
   if (v.id === 'launch') { head = 'The fund is open'; const cov = P[0];
@@ -205,7 +205,7 @@ function fundGroups(){
       FDT.wall({words: 'Paint & canvas. Paper & ink. Film. Camera gear. Studio rent. Courses. Framing. **Time to create.**', works: pick(1, 3)}),
       FDT.folder({tabs: T3, tab: "Who it's for", rows: [['Visual art', 'Painting, drawing, illustration, digital art, mixed media, collage and printmaking.'], ['Photography', 'Any subject, any style, any camera, including your phone.'], ['Creative writing', 'Poetry, short stories, flash fiction and personal essays.']], rowW: 250, foot: '18 or older, anywhere in the world, at any career stage. **Free to apply.**'}),
       FDT.folder({tabs: T3, tab: 'How to apply', rows: [['Your work', 'Choose one piece that you made, new or already shared.'], ['Your post', 'Share it publicly on Instagram. Tag **@artstoheartsproject** on the image and add **#ATHCreativeFund**.'], ['The form', 'Your post link, your work sample and a few lines about your practice.']], rowW: 200, foot: 'Three steps. About ten minutes.'}),
-      calCycle(`Applications close **${cl}** at 11:59 PM. We announce the recipient on **${an}**.`, pick(4, 3)),
+      calCycle(`Applications close **${cl}** at 11:59 PM.`, pick(4, 3)),
       end(`One artist. ${amt}. Every month.`)];
     cap = `$500 to one artist. No receipts, no reports.\n\nThe ATH Creative Fund is open: an unrestricted ${amt} grant, awarded to one artist every month. Paint, film, studio rent, a course, framing, or simply time to create. It's yours to spend on whatever your practice needs.\n\nFor visual artists, photographers and writers, 18 or older, anywhere in the world. Free to apply.\n\nHow to apply:\n1. Choose one piece you made.\n2. Post it publicly on Instagram, tag @artstoheartsproject on the image and add #ATHCreativeFund.\n3. Fill in the form with your post link.\n\nApplications close ${cl}, 11:59 PM. We announce the recipient on ${an}.\n\n${ask}`; }
   else if (v.id === 'why') { head = 'Why we started the fund';
@@ -263,7 +263,7 @@ function fundGroups(){
         ...F.slice(0, 2).map(plateTalk),
         isFirst ? FDT.folder({tabs: W3, tab: 'The grant', head: ['The first name.', '**Not the last.**'], body: `Every month, one more artist. The next round opened on ${nxo}, and the next name could be yours.`})
           : R.length > 1 ? FDT.ring({title: ['The fund', 'so far'], items: R.slice(-6).map(x => ({...x.w, label: x.w.name, sub: `${x.w.title} · ${G(x.r)}`})), fs: 84}) : null,
-        FDT.cal({month: fdDate(nx.closes), kicker: 'ATH Creative Fund', title: MONTHS_FULL[fdDate(nx.closes).getMonth()], sub: `**The fund is open again.** Applications close ${ncl} at 11:59 PM.`, marks: {[fdDate(nx.closes).getDate()]: 'Deadline', [fdDate(nx.announce).getDate()]: 'Announced'}, works: [w, ...F.slice(2)].filter(Boolean).slice(0, 3)}),
+        FDT.cal({month: fdDate(nx.closes), kicker: 'ATH Creative Fund', title: MONTHS_FULL[fdDate(nx.closes).getMonth()], sub: `**The fund is open again.** Applications close ${ncl} at 11:59 PM.`, marks: {[fdDate(nx.closes).getDate()]: 'Deadline'}, works: [w, ...F.slice(2)].filter(Boolean).slice(0, 3)}),
         end(`Congratulations, ${first}. The next one could be you.`, `Go and say hello to ${w.handle || first}.`)]; }
     cap = w.name ? (isFirst ? `Our first ATH Creative Fund artist is here: ${w.name}${w.handle ? ' ' + w.handle : ''}, ${who}.\n\nArtists built Arts to Hearts. The Creative Fund is how we invest back: every month, ${amt} goes straight into one artist's practice. No receipts, no reports. Behind every submission is someone making work around everything else, and we wanted to give one of those months a little more room.\n\nIn October we asked what ${amt} would change for your practice. Hundreds of you answered. One piece stayed with us longer than any other.` : `This month's ATH Creative Fund artist: ${w.name}${w.handle ? ' ' + w.handle : ''}, ${who}.`)
       + `${w.why ? '\n\n' + w.why : ''}${w.plan || w.q3 ? `\n\nIn ${first}'s words: "${w.plan || w.q3}"` : ''}\n\nChoosing one was the hardest part. These stayed with us too: ${F.slice(0, 5).map(x => `${x.name}${x.handle ? ' ' + x.handle : ''}`).join(', ')}. Go and follow them.\n\n${isFirst ? 'The first name. Not the last. ' : ''}${fdName(nx)} is open now and closes ${ncl}. ${ask}\n\nCongratulations, ${first}. Say hello to ${w.handle || first} in the comments.` : ''; }
@@ -273,7 +273,7 @@ function fundGroups(){
       F.length && FDT.ring({title: ['Work we', 'loved'], items: F.slice(0, 6).map(x => ({...x, label: x.name, sub: x.title}))}),
       r.stood && FDT.folder({tabs: RT, tab: 'Work we loved', kicker: 'What stood out this cycle', body: r.stood}),
       ...F.slice(0, 4).map((x, i) => BKT.feature({w: fdW(x, 'fdrf' + i), slot: 'fdrf' + i, line: bkCut(x.line || '', 120)})),
-      FDT.cal({month: fdDate(nx.closes), kicker: 'ATH Creative Fund', title: MONTHS_FULL[fdDate(nx.closes).getMonth()], sub: `**The fund is open again.** Applications close ${ncl}.`, marks: {[fdDate(nx.closes).getDate()]: 'Deadline', [fdDate(nx.announce).getDate()]: 'Announced'}, works: pick(1, 3)}),
+      FDT.cal({month: fdDate(nx.closes), kicker: 'ATH Creative Fund', title: MONTHS_FULL[fdDate(nx.closes).getMonth()], sub: `**The fund is open again.** Applications close ${ncl}.`, marks: {[fdDate(nx.closes).getDate()]: 'Deadline'}, works: pick(1, 3)}),
       end('Go and follow them. Then apply.')];
     cap = `${cy} of the ATH Creative Fund, in one folder.\n\n${w.name ? `The recipient: ${w.name}${w.handle ? ' ' + w.handle : ''}.\n\n` : ''}${r.stood ? r.stood + '\n\n' : ''}Work we loved this cycle:\n${F.map(x => `${x.title ? x.title + ' by ' : ''}${x.name}${x.handle ? ' ' + x.handle : ''}`).join('\n')}\n\nGo and follow them. ${fdName(nx)} is open now and closes ${ncl}. ${ask}`; }
   else if (v.id === 'feature') { head = 'In conversation'; const QA = [['Their work', w.q1], ['Their process', w.q2], ['What the grant makes possible', w.q3]].filter(x => x[1]); const I3 = ['Work', 'Process', 'The grant'];
