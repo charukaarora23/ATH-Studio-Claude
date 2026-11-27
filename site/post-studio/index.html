@@ -1343,7 +1343,7 @@ function launch(){
 
   // 5 the book
   S.push({bg:CREAM, html:`${corners(INK, BURG, 'The book')}
-    ${photo('imgSpread', 'An open spread of a past edition', 'left:80px;right:80px;top:150px;height:640px', INK)}
+    ${state.coverStyle === 'anniv' && state.images.imgSpread ? `<div data-slot="imgSpread" class="a img" style="left:60px;right:60px;top:120px;height:690px;background-image:url(${state.images.imgSpread});background-size:contain;background-repeat:no-repeat;background-position:center"></div>` : photo('imgSpread', 'An open spread of a past edition', 'left:80px;right:80px;top:150px;height:640px', INK)}
     <div class="a" style="left:80px;right:80px;top:830px;display:flex;flex-direction:column;gap:22px">
       <p class="R" style="font-size:72px;color:${INK}">${pick('A juried hardcover edition.', 'A real book, juried and printed.', 'Hardcover. Juried. Yours.')}</p>
       <p class="sub" style="margin-right:60px;color:${INK}">${esc(state.bookText)}</p></div>`});
