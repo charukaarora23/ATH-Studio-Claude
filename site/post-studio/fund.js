@@ -27,7 +27,8 @@ const fdNextR = r => { const n = fdNext(r); return (FUND && FUND[n.id]) || n; };
 async function fundLoad(){ FUNDBUSY = true;
   try { const r = await fetch('api/fund'); if (!r.ok) throw 0; FUND = await r.json(); FUNDLOCAL = false; }
   catch { try { FUND = JSON.parse(localStorage.getItem('athFund') || '{}'); } catch { FUND = {}; } FUNDLOCAL = true; }
-  FUNDBUSY = false; if (FUNDSEL === null) { const now = fdIso(new Date()).slice(0, 7); const t = new Date(); const cur = fdIso(t.getDate() >= 15 ? t : new Date(t.getFullYear(), t.getMonth() - 1, 1)).slice(0, 7); FUNDSEL = FUND[cur] ? cur : (fdRounds().pop() || {}).id || null; }
+  FUNDBUSY = false; let demoOn = false; try { demoOn = localStorage.getItem('athFundDemo') === '1'; } catch {} if (demoOn && !FUNDDEMO) { FUNDREAL = FUND; FUND = fdDemo(); FUNDDEMO = true; FUNDSEL = '2026-11'; fundRender(); if (FUNDVIEW) render(); return; }
+  if (FUNDSEL === null) { const now = fdIso(new Date()).slice(0, 7); const t = new Date(); const cur = fdIso(t.getDate() >= 15 ? t : new Date(t.getFullYear(), t.getMonth() - 1, 1)).slice(0, 7); FUNDSEL = FUND[cur] ? cur : (fdRounds().pop() || {}).id || null; }
   fundRender(); if (FUNDVIEW) render(); }
 let fdSaveT = null;
 function fundSave(id){ if (FUNDDEMO) { status('This is the example: changes show here but are not saved.'); return; } clearTimeout(fdSaveT); fdSaveT = setTimeout(async () => {
@@ -290,7 +291,7 @@ function fundGroups(){
       cap: `Message to ${first}: Hi ${first}, the announcement is live on our page today. Here is a story frame made for you: share it, tag @artstoheartsproject and we'll reshare. We have also sent a Collab invite on the post, so it appears on your profile too. Congratulations again.`, pin: '',
       slides: [{...FDT.kit({kind: 'artist', x: w, slot: 'fdk1', kicker: isFirst ? 'The first' : 'This month\'s', head: 'ATH Creative Fund artist', sub: `${w.name} · ${amt} grant from Arts to Hearts Project`, zone: 'Mention sticker: @artstoheartsproject'}), title: 'fund-story-artist', label: `${first}'s story`},
         {...FDT.kit({kind: 'ours', x: w, slot: 'fdk2', kicker: isFirst ? 'Our first Creative Fund artist' : 'This month\'s Creative Fund artist', head: w.name, sub: `The fund is open again. Applications close ${ncl}.`, zone: 'Link sticker: apply for the fund'}), title: 'fund-story-ours', label: 'Our story'}]}); }
-  const VK = 'fund:' + r.id + ':' + v.id;
+  const VK = (FUNDDEMO ? 'demo:' : '') + 'fund:' + r.id + ':' + v.id;
   return [...[{book: true, credits, ...(v.id === 'winner' && w.name ? {covers: [['cut', 'The first'], ['ring', 'Circle'], ['wall', 'Statement']], cover: ['cut', 'ring', 'wall'].includes(v.cover || r.cover) ? (v.cover || r.cover) : 'cut'} : {}), title: `${cy} · ${head}`, meta: `ATH Creative Fund · ${S.length} slides · keyword ${KW} (set it in ManyChat to send ${r.link || FD_LINK})`, cap: cap + '\n\n' + tags, pin: `Comment ${KW} and we'll send you the link to apply.`, slides: S.map((s, j) => ({...s, title: 'fund-' + v.id + '-' + (j + 1)}))}], ...extra].map((g, k) => ({...g, view: VK, ekey: VK + (k ? ':stories' : '')}));
 }
 function fdW(x, slot){ return {artist: x.name || '', handle: x.handle || '', title: x.title || '', medium: x.medium || '', img: bkPic(slot, x.art || ''), face: x.face || ''}; }
@@ -334,7 +335,7 @@ function fdDemo(){ const A = 'art/', E = 'art/examples/pqhaus/', H = 'art/exampl
   c2.done = {'post:launch': true, 'post:why': true, 'post:guide': true, 'post:record': true, 'post:week': true, 'post:winner': true, 'mail:0': true, 'mail:1': true, reply: true, paid: true, manychat: true, dates: true};
   return {'2026-10': c1, '2026-11': c2, '2026-12': c3}; }
 function fdToggleDemo(){ fdClosePost(); if (FUNDDEMO) { FUND = FUNDREAL; FUNDDEMO = false; FUNDSEL = (fdRounds().pop() || {}).id || null; }
-  else { FUNDREAL = FUND; FUND = fdDemo(); FUNDDEMO = true; FUNDSEL = '2026-11'; } FUNDTAB = 'plan'; fundRender(); }
+  else { FUNDREAL = FUND; FUND = fdDemo(); FUNDDEMO = true; FUNDSEL = '2026-11'; } FUNDTAB = 'plan'; try { FUNDDEMO ? localStorage.setItem('athFundDemo', '1') : localStorage.removeItem('athFundDemo'); } catch {} fundRender(); render(); }
 
 /* ---------- the page ---------- */
 const fdIn = (k, label, val, o = {}) => `<label class="fd-f"><span>${label}</span>${o.area ? `<textarea data-fd="${k}" rows="${o.rows || 3}" placeholder="${fdE(o.ph || '')}">${fdE(val || '')}</textarea>` : `<input data-fd="${k}" type="${o.type || 'text'}" value="${fdE(val || '')}" placeholder="${fdE(o.ph || '')}">`}${o.note ? `<i>${o.note}</i>` : ''}</label>`;

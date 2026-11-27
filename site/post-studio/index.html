@@ -580,7 +580,7 @@ function callCredits(){ const o = {}; const put = (u, t) => { if (u && t && t.tr
 function creditFor(u, g){ if (g && g.ekey && EDITS && EDITS[g.ekey] && EDITS[g.ekey].credits && credKey(u) in EDITS[g.ekey].credits) { const m = EDITS[g.ekey].credits[credKey(u)]; return m && m !== '-' ? {text: m} : null; }
   const auto = g && g.credits && g.credits[u]; if (auto) return auto; const k = credKey(u);
   const p = g && g.pid && DPOSTS[g.pid]; const t = (p && (p.credits || {})[k]) || (state.credits || {})[k]; return t ? {text: t} : null; }
-function setCredit(u, g, text){ const k = credKey(u); if (g && g.ekey && EDITS) { const e = EDITS[g.ekey] = EDITS[g.ekey] || {}; e.credits = e.credits || {}; e.credits[k] = text; fetch('api/edits', {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({key: g.ekey, edits: e})}).catch(() => {}); return; }
+function setCredit(u, g, text){ const k = credKey(u); if (g && g.ekey && EDITS) { const e = EDITS[g.ekey] = EDITS[g.ekey] || {}; e.credits = e.credits || {}; e.credits[k] = text; if (g.ekey.startsWith('demo:')) { try { const d = JSON.parse(localStorage.getItem('athDemoEdits') || '{}'); d[g.ekey] = e; localStorage.setItem('athDemoEdits', JSON.stringify(d)); } catch {} return; } fetch('api/edits', {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({key: g.ekey, edits: e})}).catch(() => {}); return; }
   const p = g && g.pid && DPOSTS[g.pid];
   if (p) { p.credits = p.credits || {}; if (text) p.credits[k] = text; else delete p.credits[k]; saveDaily(p.id); }
   else if (u === state.images.imgCover) { state.credit = text || ''; if ($('credit')) $('credit').value = state.credit; }
@@ -612,14 +612,21 @@ function postEdits(t, slots){ const pick = (o, pre) => Object.fromEntries(Object
   if (slots) Object.assign(out.images, Object.fromEntries(Object.entries(state.images || {}).filter(([k]) => /^(fd|bk)/.test(k)))); return out; }
 /* Books and Creative Fund posts: their edits live in the team store (api/edits), one entry per post. Picture slots (fd…, bk…) belong to the post on screen. */
 let EDITS = null, EDITS_VIEW = null, EDITS_T = {};
-fetch('api/edits').then(r => r.ok ? r.json() : {}).catch(() => ({})).then(j => { EDITS = j || {}; if (['books', 'fund'].includes(document.body.dataset.seg)) render(); });
+fetch('api/edits').then(r => r.ok ? r.json() : {}).catch(() => ({})).then(j => { EDITS = j || {}; let demo = {}; try { demo = JSON.parse(localStorage.getItem('athDemoEdits') || '{}'); } catch {}
+  /* once: edits made on the example before Nov 27 were saved under the real cycle's key; they belong to the example */
+  ['fund:2026-11:winner', 'fund:2026-11:winner:stories', 'fund:2026-10:winner', 'fund:2026-10:winner:stories'].forEach(k => { const e = EDITS[k]; if (!e || e.real) return; const id = k.split(':')[1];
+    fetch('api/fund').then(r => r.ok ? r.json() : {}).then(F => { if (F && F[id] && F[id].winner && F[id].winner.name) return; const moved = JSON.parse(JSON.stringify(e).split(k).join('demo:' + k)); demo['demo:' + k] = moved; EDITS['demo:' + k] = moved; delete EDITS[k]; EDITS_VIEW = null; if (document.body.dataset.seg === 'fund') render(); try { localStorage.setItem('athDemoEdits', JSON.stringify(demo)); } catch {}
+      fetch('api/edits', {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({key: k, edits: null})}).catch(() => {}); }).catch(() => {}); });
+  Object.assign(EDITS, demo); if (['books', 'fund'].includes(document.body.dataset.seg)) render(); });
 function viewEdits(groups){ const g0 = groups.find(g => g.ekey); if (!g0 || !EDITS) return; if (EDITS_VIEW === g0.view) return; EDITS_VIEW = g0.view;
   Object.keys(state.images || {}).forEach(k => { if (/^(fd|bk)/.test(k)) delete state.images[k]; });
   groups.filter(g => g.ekey).forEach(g => { const e = EDITS[g.ekey]; if (!e) return; state.texts = {...(state.texts || {}), ...e.texts}; state.moves = {...(state.moves || {}), ...(e.moves || {})}; state.pos = {...(state.pos || {}), ...e.pos}; state.hidden = {...(state.hidden || {}), ...e.hidden}; state.bgs = {...(state.bgs || {}), ...(e.bgs || {})}; Object.assign(state.images, e.images || {}); }); }
 async function upPic(url){ if (!/^data:/.test(url || '')) return url; try { const r = await fetch('api/upload', {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({data: url})}); if (!r.ok) throw 0; return (await r.json()).url; } catch { return url; } }
 function storeViewEdits(groups){ if (!EDITS) return; groups.filter(g => g.ekey && g.view === EDITS_VIEW).forEach(g => { const t = g.ekey; const now = postEdits(t, true); now.credits = (EDITS[t] || {}).credits || {};
   const empty = !Object.values(now).some(o => Object.keys(o).length); const before = JSON.stringify(EDITS[t] || null), after = empty ? 'null' : JSON.stringify(now); if (before === after) return;
-  if (empty) delete EDITS[t]; else EDITS[t] = now; clearTimeout(EDITS_T[t]); EDITS_T[t] = setTimeout(async () => { const e = EDITS[t] || null;
+  if (empty) delete EDITS[t]; else EDITS[t] = now;
+  if (t.startsWith('demo:')) { try { const d = JSON.parse(localStorage.getItem('athDemoEdits') || '{}'); if (empty) delete d[t]; else d[t] = now; localStorage.setItem('athDemoEdits', JSON.stringify(d)); status('Example edits kept in this browser (the example is never shared).'); } catch {} return; }
+  clearTimeout(EDITS_T[t]); EDITS_T[t] = setTimeout(async () => { const e = EDITS[t] || null;
     if (e) for (const [k, v] of Object.entries(e.images || {})) if (/^data:/.test(v)) { const u = await upPic(v); e.images[k] = u; if (state.images[k] === v) state.images[k] = u; }
     try { const r = await fetch('api/edits', {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({key: t, edits: e})}); if (!r.ok) throw 0; status('Edits saved for the team.'); } catch { status('Could not save the edits for the team right now. They are kept on this screen.'); } }, 900); }); }
 function mergePostEdits(groups){ viewEdits(groups); groups.forEach(g => { const p = g.pid && DPOSTS[g.pid]; const key = g.pid + '|' + g.title; if (!p || EDIT_MERGED.has(key)) return; EDIT_MERGED.add(key);
