@@ -138,7 +138,7 @@ const IV = {
       <p style="${T_MED};font-size:28px;letter-spacing:.12em;text-transform:uppercase;line-height:1.4;color:${acc}">${esc(o.label)}</p>
       <p style="${o.serif ? BASK + `;font-size:${size}px;line-height:1.22` : T_MED + `;font-size:${size}px;line-height:.98;letter-spacing:-.035em`};color:${fg}">${o.text}</p>
       ${o.sub ? `<p style="${T_REG};font-size:36px;line-height:1.35;color:${fg};margin-top:6px">${o.sub}</p>` : ''}</div>
-    ${o.zone ? `<div class="a" style="left:150px;right:150px;top:1490px;height:86px;border:2px dashed ${fg};border-radius:24px;opacity:.5;display:flex;align-items:center;justify-content:center;${T_MED};font-size:24px;color:${fg}">${o.zone}</div>` : ''}`}; },
+    ${o.zone ? `<div class="a zone" style="left:150px;right:150px;top:1490px;height:86px;border:2px dashed ${fg};border-radius:24px;opacity:.5;display:flex;align-items:center;justify-content:center;${T_MED};font-size:24px;color:${fg}">${o.zone}</div>` : ''}`}; },
 };
 
 // ---------- copy helpers: work from the article when no one has written the copy ----------
@@ -201,7 +201,7 @@ DPACK.interview = p => {
   const head = f.headline || 'Add a headline in the sidebar';
   const meta = [f.based].filter(Boolean).join('');
   const picks = String(f.pick || '').split(/[,\s]+/).map(Number).filter(n => n >= 1 && n <= qa.length);
-  const chosen = (picks.length ? picks : qa.map((x, i) => i + 1).filter(i => qa[i - 1].a.length > 180).slice(0, 1)).slice(0, 2);
+  const chosen = (picks.length ? picks : qa.map((x, i) => i + 1).filter(i => qa[i - 1].a.length > 180).slice(0, 2)).slice(0, 2);
   const kicks = dLines(f.kicks).map(x => x.join(' | '));
   const teases = chosen.map((n, i) => ({kick: kicks[i] || kickOf(qa[n - 1].q) || `In ${name.split(' ')[0]}’s words`, text: openLoop(qa[n - 1].a)}));
   const inside = dLines(f.inside).map(x => x.join(' | ')).filter(Boolean);
@@ -209,7 +209,7 @@ DPACK.interview = p => {
   const items = inside.length ? inside : qa.map((x, i) => ({x, i})).filter(o => !chosen.includes(o.i + 1)).sort((a, b) => b.x.a.length - a.x.a.length).slice(0, 3).sort((a, b) => a.i - b.i).map(o => shortQ(o.x.q));
   const at = k => ({img: arts[k] || '', slot: 'arts' + k});
   const coverFull = (f.cover || 'full') === 'full';
-  const extraN = f.extra === 'all' ? 99 : f.extra === undefined || f.extra === '' ? 2 : +f.extra;
+  const extraN = f.extra === 'all' ? 99 : f.extra === undefined || f.extra === '' ? 99 : +f.extra;
   const extras = arts.slice(3, 3 + extraN).map((u, i) => IV.plate({img: u, slot: 'arts' + (i + 3), cap: caps[i + 3], name}));
   const T = 7, S = [
     {...IV.cover({...at(0), head, name, meta, full: coverFull, mono: true}), label: 'Cover A (in use)'},
@@ -219,6 +219,7 @@ DPACK.interview = p => {
     IV.tease({...(teases[0] || {kick: 'From the interview', text: 'Pick an answer to cut off in the sidebar.'}), n: 4, t: T}),
     IV.work({...at(2), cap: caps[2], line: quotes[1], name, flip: true, n: 5, t: T}),
     ...extras,
+    ...(teases[1] ? [IV.tease({...teases[1], n: 6, t: T})] : []),
     IV.list({items, key, n: 6, t: T}),
     IV.end({line: f.ctahead || `The full interview with ${name} is on our website.`, mark: MARK_OK.v, invite: f.invite === undefined ? 'Want to be our next interview? Apply through the link in bio.' : f.invite, last: true}),
   ];

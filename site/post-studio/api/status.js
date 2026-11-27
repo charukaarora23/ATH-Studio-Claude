@@ -1,23 +1,10 @@
 // Shared "posted" status for the content calendar, kept in Vercel Blob.
-// Each save writes a new file (so nothing is served stale from cache); reads use the newest one.
+// One fixed file (calendar/status.json); reads cost no store operation, each save is one (see _store.js).
 // GET  /api/status                  -> { "<item id>": { posted: true, by: "Name", at: "ISO date" }, ... }
 // POST /api/status {id, posted, by} -> the updated map
-import { put, list, del } from '@vercel/blob';
-
-const PREFIX = 'calendar/status-';
-
-async function newest() {
-  const { blobs } = await list({ prefix: PREFIX, limit: 1000 });
-  blobs.sort((a, b) => new Date(b.uploadedAt) - new Date(a.uploadedAt));
-  return blobs;
-}
-async function readAll() {
-  const blobs = await newest();
-  if (!blobs.length) return {};
-  const r = await fetch(blobs[0].url, { cache: 'no-store' });
-  return r.ok ? r.json() : {};
-}
-
+import { writeJSON, readOrMigrate, backupDaily } from './_store.js';
+const PATH = 'calendar/status.json';
+const readAll = () => readOrMigrate(PATH, 'calendar/status-', {});
 export default async function handler(req, res) {
   res.setHeader('Cache-Control', 'no-store');
   try {
@@ -27,11 +14,10 @@ export default async function handler(req, res) {
       const id = String(body.id || '').slice(0, 300);
       if (!id) return res.status(400).json({ error: 'missing id' });
       const all = await readAll();
+      await backupDaily(PATH, all);
       if (body.posted) all[id] = { posted: true, by: String(body.by || '').slice(0, 60), at: new Date().toISOString() };
       else delete all[id];
-      await put(PREFIX + Date.now() + '.json', JSON.stringify(all), { access: 'public', addRandomSuffix: true, contentType: 'application/json' });
-      const old = (await newest()).slice(5).map(b => b.url);   // keep the last few versions
-      if (old.length) await del(old).catch(() => {});
+      await writeJSON(PATH, all);
       return res.status(200).json(all);
     }
     res.setHeader('Allow', 'GET, POST');

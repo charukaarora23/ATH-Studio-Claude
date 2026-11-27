@@ -1,1 +1,1 @@
-{"cleanUrls": true, "headers": [{"source": "/(.*)", "headers": [{"key": "X-Robots-Tag", "value": "noindex"}]}], "functions": {"api/article.js": {"maxDuration": 90}}}
+{"cleanUrls": true, "headers": [{"source": "/(.*)", "headers": [{"key": "X-Robots-Tag", "value": "noindex"}]}], "functions": {"api/article.js": {"maxDuration": 90}, "api/books.js": {"maxDuration": 180, "memory": 2048}, "api/media.js": {"maxDuration": 300, "memory": 2048}, "api/img.js": {"maxDuration": 30, "memory": 1024}}}

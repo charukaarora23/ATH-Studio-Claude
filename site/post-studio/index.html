@@ -115,11 +115,35 @@ summary{font:600 12px/1 var(--mono);letter-spacing:.1em;text-transform:uppercase
 /* gap = information still to be supplied; visible on purpose */
 .post .gap{display:inline-block;border:2px dashed currentColor;border-radius:8px;padding:0 .3em;opacity:.75}
 .post .ph{display:flex;align-items:center;justify-content:center;text-align:center;border:3px dashed currentColor;border-radius:18px;opacity:.6;font-size:24px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;line-height:1.5}
+body:is([data-seg=books],[data-seg=fund]) .app{grid-template-columns:480px minmax(0,1fr)}body:is([data-seg=books],[data-seg=fund]) :is(.app>aside:not(.drawer),#ivside,#tabs,.top .f,#go),body:is([data-seg=books],[data-seg=fund]) .app main>:not(#out):not(.top){display:none}
+.acts select[data-bg]{font:inherit;font-size:12px;padding:5px 4px;border:1px solid #d9c9c4;border-radius:8px;background:#fff;max-width:92px;color:#1C1310}body:not([data-seg=books]) #books,body:not([data-seg=fund]) #fund{display:none}.drawer{font-family:var(--sans,sans-serif);color:#1C1310}.drawer h1{font-size:22px;margin:0 0 6px}.drawer .bk-top{flex-direction:column;gap:10px}.drawer .bk-act{flex-wrap:wrap}.drawer .bk-act select,.drawer .bk-act input{min-width:0;flex:1}.drawer .bk-detail{padding:14px;border-radius:12px}.drawer .bk-row{grid-template-columns:1fr auto;gap:8px 10px}.drawer .bk-when{grid-column:1/-1}.drawer .fd-grid,.drawer .fd-cols{grid-template-columns:1fr 1fr}.drawer .fd-pic img,.drawer .fd-none{width:120px;height:120px}.drawer .bk-grid{grid-template-columns:1fr 1fr}.drawer .bk-head{flex-direction:column}.drawer .bk-tabs button{padding:8px 9px;font-size:13px}
+body:is([data-seg=books],[data-seg=fund]) #out:empty:before{content:'Open a post from the left and it appears here, ready to edit and download.';display:block;padding:60px 20px;text-align:center;color:#6b5a55;font-size:15px}
+.fd-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:10px 0}.fd-f{display:flex;flex-direction:column;gap:4px;font-size:13px;color:#6b5a55;margin:8px 0}.fd-f input,.fd-f textarea{font:inherit;font-size:14px;color:#1C1310;padding:8px 10px;border:1px solid #d9c9c4;border-radius:8px;width:100%;box-sizing:border-box}.fd-f i{font-size:12px}.fd-chk{display:flex;gap:8px;align-items:center;font-size:14px;margin:6px 0}.fd-pics{display:flex;flex-wrap:wrap;gap:14px;margin:10px 0}.fd-pic{display:flex;flex-direction:column;gap:6px;font-size:13px;color:#6b5a55}.fd-pic img,.fd-none{width:160px;height:160px;object-fit:contain;background:#f6efed;border-radius:10px}.fd-none{display:flex;align-items:center;justify-content:center;font-size:12px}.fd-found{border:1px solid #eadcd8;border-radius:10px;padding:12px 14px;margin:10px 0}.fd-mail{border:1px solid #eadcd8;border-radius:10px;padding:12px 14px;margin:10px 0}.fd-mh{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}.fd-mh span{display:flex;gap:10px;align-items:center}.fd-mail pre{white-space:pre-wrap;font:14px/1.5 var(--sans,sans-serif);margin:10px 0 0;color:#1C1310}.fd-cols{display:grid;grid-template-columns:1fr 1fr;gap:24px}@media(max-width:640px){.fd-grid,.fd-cols{grid-template-columns:1fr}}
+.bk-inside{margin:16px 0;padding-top:12px;border-top:1px solid #eadcd8}.bk-inside h3{font-size:16px;margin:0 0 8px}.bk-in{display:grid;grid-template-columns:140px 1fr;gap:12px;font-size:14px;padding:6px 0}.bk-in b{color:#6A0620}.bk-ivs{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px;margin-top:10px}.bk-iv{background:#FAF5F3;border-radius:10px;padding:12px;font-size:14px}.bk-iv blockquote{margin:8px 0 0;font-family:'ATH Serif',Georgia,serif;font-style:italic;color:#1C1310}
+.bk-posts{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:14px 0 4px}.bk-posts b{margin-right:6px}.bk-pick{display:inline-flex;gap:4px;align-items:center}.bk-pick select{padding:6px;border:1px solid #d9c9c4;border-radius:8px}body:not([data-seg=books]) #books{display:none}
+#books{max-width:1400px;margin:0 auto;padding:28px 24px 80px;font-family:var(--sans,sans-serif);color:#1C1310}
+#books h1{font-size:28px;margin:0 0 6px}#books .meta{color:#6b5a55;font-size:14px;margin:4px 0}#books a{color:#6A0620}
+.bk-top{display:flex;justify-content:space-between;gap:20px;align-items:flex-start;flex-wrap:wrap;margin-bottom:20px}.bk-act{display:flex;gap:8px}.bk-act input{padding:8px 12px;border:1px solid #d9c9c4;border-radius:8px;font:inherit;min-width:200px}
+.bk-warn{color:#6A0620;font-weight:600}.bk-ok{color:#1d6b43;font-weight:600}.bk-a .bk-ok,.bk-a .bk-warn{font-size:11px}
+.bk-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:16px}
+.bk-card{display:flex;flex-direction:column;gap:4px;text-align:left;background:#fff;border:1px solid #eadcd8;border-radius:12px;padding:10px;cursor:pointer;font:inherit;font-size:13px;color:#1C1310}.bk-card:hover,.bk-card.on{border-color:#6A0620}.bk-card b{font-size:14px;line-height:1.25}.bk-card span{color:#6b5a55}
+.bk-cv{aspect-ratio:4/5;border-radius:8px;background:#FAD2E1 center/contain no-repeat;margin-bottom:6px}.bk-none{display:flex;align-items:center;justify-content:center;text-align:center;padding:10px;color:#6A0620;font-weight:600;font-size:13px;background:#FAD2E1}
+.bk-detail{background:#fff;border:1px solid #eadcd8;border-radius:14px;padding:20px;margin-bottom:24px}.bk-detail h2{margin:0 0 6px;font-size:22px}
+.bk-arts{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:14px;margin-top:14px}.bk-a{display:flex;flex-direction:column;gap:2px;font-size:12px}.bk-a b{font-size:13px}.bk-a span{color:#6A0620}.bk-a i{color:#6b5a55;font-family:'ATH Serif',Georgia,serif}
+.bk-w{aspect-ratio:1;border-radius:8px;background:#f5ecea center/contain no-repeat;margin-bottom:4px}
+img.bk-cv{width:100%;object-fit:contain;background:#FAD2E1}.bk-a img{width:100%;aspect-ratio:1;object-fit:contain;background:#f5ecea;border-radius:8px;margin-bottom:4px}.bk-pics{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px;margin:8px 0 16px}.bk-pics.pg{grid-template-columns:repeat(auto-fill,minmax(120px,1fr))}.bk-pics img{width:100%;border-radius:6px;background:#f5ecea;display:block}.bk-kw input{font:inherit;font-weight:700;color:#6A0620;width:130px;padding:4px 8px;border:1px solid #d9c9c4;border-radius:6px;text-transform:uppercase}.bk-pic{position:relative}.bk-a img.bk-face{position:absolute;left:8px;bottom:12px;width:52px;height:52px;aspect-ratio:auto;object-fit:cover;border-radius:50%;border:3px solid #fff;background:#FAD2E1;margin:0}
+.bk-head{display:flex;gap:20px;align-items:flex-start}.bk-head>img{width:150px;border-radius:8px;flex:none}.bk-head #bkback{margin-bottom:10px}.bk-dates{display:flex;flex-wrap:wrap;gap:6px 18px;font-size:14px;margin:8px 0}.bk-dates i{color:#6b5a55}
+.bk-tabs{display:flex;flex-wrap:wrap;gap:4px;border-bottom:1px solid #eadcd8;margin:18px 0 14px}.bk-tabs button{font:inherit;font-size:14px;background:none;border:0;border-bottom:3px solid transparent;padding:10px 14px;cursor:pointer;color:#6b5a55}.bk-tabs button.on{color:#6A0620;border-bottom-color:#6A0620;font-weight:600}
+.bk-plan{display:flex;flex-direction:column;gap:8px}.bk-row{display:grid;grid-template-columns:130px 1fr auto;gap:14px;align-items:center;border:1px solid #eadcd8;border-radius:10px;padding:10px 14px}.bk-row.on{border-color:#6A0620;background:#FDF4F7}.bk-row.past{opacity:.55}.bk-row .meta{margin:2px 0 0}.bk-when{font-weight:600;font-size:14px;color:#6A0620}.bk-tag{font-size:11px;background:#FAD2E1;color:#6A0620;border-radius:99px;padding:2px 8px;font-weight:600}
+.bk-covers{grid-column:1/-1;display:flex;gap:6px;align-items:center;font-size:13px;font-weight:600;color:#6A0620}.bk-covers .btn.on{background:#6A0620;color:#fff}
+.bk-role{font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:#6A0620;font-weight:700;margin:0 0 4px}.bk-iv p{margin:4px 0}.bk-body h3{font-size:16px;margin:24px 0 4px}.bk-close{margin-top:16px}
+@media(max-width:640px){.bk-head{flex-direction:column}.bk-row{grid-template-columns:1fr}}
 </style>
 </head><body>
 
-<header class="segbar"><b>ATH Studio</b><nav id="seg" aria-label="Sections"><button type="button" data-seg="calls">Open calls</button><button type="button" data-seg="interviews">Artist interviews</button><button type="button" data-seg="editorial">ATH Editorial</button><button type="button" data-seg="heartlist">The Heart List</button></nav></header>
+<header class="segbar"><b>ATH Studio</b><nav id="seg" aria-label="Sections"><button type="button" data-seg="calls">Open calls</button><button type="button" data-seg="interviews">Artist interviews</button><button type="button" data-seg="editorial">ATH Editorial</button><button type="button" data-seg="heartlist">The Heart List</button><button type="button" data-seg="books">Books</button><button type="button" data-seg="fund">Creative Fund</button></nav></header>
 <div class="app">
+<aside id="books" class="drawer" aria-label="Books"></aside><aside id="fund" class="drawer" aria-label="Creative Fund"></aside>
 <aside>
   <h1>ATH Post Studio</h1>
   <p class="sub">Fill in one open call and the launch carousel renders on the right in ATH colours plus the call’s own colour. Dashed boxes mark details still to supply.</p>
@@ -372,7 +396,13 @@ const textNodes = root => { const w = document.createTreeWalker(root, NodeFilter
 function applyTexts(s, base){
   const keys = Object.keys(TXT()).filter(k => k.startsWith(base + '|')); if (!keys.length || !s.html) return s;
   const t = document.createElement('template'); t.innerHTML = s.html; const nodes = textNodes(t.content);
-  keys.forEach(k => { const n = nodes[+k.slice(base.length + 1)]; if (n) n.nodeValue = TXT()[k]; });
+  keys.forEach(k => { const n = nodes[+k.slice(base.length + 1)]; if (!n) return; n.nodeValue = TXT()[k];
+    // typing over or deleting a dashed placeholder (missing detail, photo box, sticker zone) drops its dashed outline
+    const box = n.parentElement && n.parentElement.closest('.gap, .ph, .zone'); if (!box) return;
+    const empty = !TXT()[k].replace(/[\u200b\s]/g, '');
+    if (box.classList.contains('gap')) box.classList.remove('gap');
+    else if (empty && ![...box.childNodes].some(c => c !== n && c.nodeType === 3 && c.nodeValue.replace(/[\u200b\s]/g, '') && !keys.some(k2 => nodes[+k2.slice(base.length + 1)] === c && !TXT()[k2].replace(/[\u200b\s]/g, '')))) box.style.visibility = 'hidden';
+    else box.style.border = 'none'; });
   return {...s, html: t.innerHTML};
 }
 function textAt(frame, x, y){
@@ -407,7 +437,8 @@ function slotName(k){ k = String(k || ''); let m;
   return {imgCover:'cover artwork', imgTheme:'theme artwork', imgBooks:'the books together', imgSpread:'open spread', phSpread2:'a second spread', phShelf:'book on a shelf', phHolding:'artist holding their copy', phStoryWork:'the artwork they sent', phStoryPage:'their page in the book', phPast1:'past edition 1', phPast2:'past edition 2'}[k] || 'this slide'; }
 // A picture clicked or dropped on a slide goes where that slide reads it from: the post's own pictures for daily and article posts, the open call otherwise.
 async function placeImage(frame, key, file){
-  const pid = frame.dataset.pid; if (!pid) return putImage(key, file);
+  const pid = frame.dataset.pid; if (!pid && ['books', 'fund'].includes(document.body.dataset.seg)) { if (!file || !/^image\//.test(file.type)) { status('That is not an image.'); return; } status('Uploading image…'); state.images[key] = await upPic(await shrink(file)); render(); status('Image placed. Saved for the team.'); return; }
+  if (!pid) return putImage(key, file);
   if (!file || !/^image\//.test(file.type)) { status('That is not an image.'); return; }
   const p = DPOSTS[pid]; if (!p) { status('This is the example, so its pictures are locked. Press New, or “edit a copy of this one”, to change them.'); return; }
   status('Uploading image…'); const url = await dUpload(file); p.imgs = p.imgs || {}; const m = String(key || '').match(/^(.*?)(\d+)$/);
@@ -524,7 +555,7 @@ function setView(v){ $('ptype').value = v === 'feed' ? lastFeed : v; try { if (v
 document.querySelectorAll('#tabs [data-view]').forEach(b => b.onclick = () => setView(b.dataset.view));
 document.addEventListener('click', e => { const g = e.target.closest('[data-goto]'); if (g) setView(g.dataset.goto); });
 const HID = () => (state.hidden = state.hidden || {});
-const gid = g => (g.pid ? g.pid + '|' : '') + (g.story ? g.title : g.title.replace(/^[^·]*·\s*/, ''));   // a post's own id keeps edits on one week's list off every other week's
+const gid = g => g.ekey ? g.ekey : (g.pid ? g.pid + '|' : '') + (g.story ? g.title : g.title.replace(/^[^·]*·\s*/, ''));   // a post's own id keeps edits on one week's list off every other week's
 // ---------- Credits: every image on a slide carries one ----------
 // Known automatically for Heart List, interviews and editorial (the article names each work); typed once for anything else.
 // Stored by image, so a credit follows its picture onto every slide it appears on.
@@ -546,9 +577,11 @@ function callCredits(){ const o = {}; const put = (u, t) => { if (u && t && t.tr
   PAST_ARTISTS().forEach((a, i) => put(paImg(i), [a[0], a[1]].filter(Boolean).join(' · ')));
   COVER_ARTISTS().forEach((a, i) => put(cvImg(i), [a[0], a[1]].filter(Boolean).join(' · ')));
   return o; }
-function creditFor(u, g){ const auto = g && g.credits && g.credits[u]; if (auto) return auto; const k = credKey(u);
+function creditFor(u, g){ if (g && g.ekey && EDITS && EDITS[g.ekey] && EDITS[g.ekey].credits && credKey(u) in EDITS[g.ekey].credits) { const m = EDITS[g.ekey].credits[credKey(u)]; return m && m !== '-' ? {text: m} : null; }
+  const auto = g && g.credits && g.credits[u]; if (auto) return auto; const k = credKey(u);
   const p = g && g.pid && DPOSTS[g.pid]; const t = (p && (p.credits || {})[k]) || (state.credits || {})[k]; return t ? {text: t} : null; }
-function setCredit(u, g, text){ const k = credKey(u); const p = g && g.pid && DPOSTS[g.pid];
+function setCredit(u, g, text){ const k = credKey(u); if (g && g.ekey && EDITS) { const e = EDITS[g.ekey] = EDITS[g.ekey] || {}; e.credits = e.credits || {}; e.credits[k] = text; if (g.ekey.startsWith('demo:')) { try { const d = JSON.parse(localStorage.getItem('athDemoEdits') || '{}'); d[g.ekey] = e; localStorage.setItem('athDemoEdits', JSON.stringify(d)); } catch {} return; } fetch('api/edits', {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({key: g.ekey, edits: e})}).catch(() => {}); return; }
+  const p = g && g.pid && DPOSTS[g.pid];
   if (p) { p.credits = p.credits || {}; if (text) p.credits[k] = text; else delete p.credits[k]; saveDaily(p.id); }
   else if (u === state.images.imgCover) { state.credit = text || ''; if ($('credit')) $('credit').value = state.credit; }
   else { state.credits = state.credits || {}; if (text) state.credits[k] = text; else delete state.credits[k]; } }
@@ -574,11 +607,31 @@ function withCredits(s, g){ if (!s.html) return s; const t = document.createElem
   return changed ? {...s, html: t.innerHTML} : s; }
 // Edits made on a daily or article post's slides (text, moved pictures, hidden slides, swapped photos) belong to that post and are shared with the team.
 const EDIT_MERGED = new Set();
-function postEdits(t){ const pick = (o, pre) => Object.fromEntries(Object.entries(o || {}).filter(([k]) => pre.some(x => k.startsWith(x))));
-  return {texts: pick(state.texts, ['tx|' + t + '|']), moves: pick(state.moves, ['mv|' + t + '|']), pos: pick(state.pos, [t + '|']), hidden: pick(state.hidden, ['h|' + t + '|', 'g|' + t]), images: pick(state.images, ['ov|' + t + '|'])}; }
-function mergePostEdits(groups){ groups.forEach(g => { const p = g.pid && DPOSTS[g.pid]; const key = g.pid + '|' + g.title; if (!p || EDIT_MERGED.has(key)) return; EDIT_MERGED.add(key);
+function postEdits(t, slots){ const pick = (o, pre) => Object.fromEntries(Object.entries(o || {}).filter(([k]) => pre.some(x => k.startsWith(x))));
+  const out = {texts: pick(state.texts, ['tx|' + t + '|']), moves: pick(state.moves, ['mv|' + t + '|']), pos: pick(state.pos, [t + '|']), hidden: pick(state.hidden, ['h|' + t + '|', 'g|' + t]), images: pick(state.images, ['ov|' + t + '|']), bgs: pick(state.bgs, ['bg|' + t + '|'])};
+  if (slots) Object.assign(out.images, Object.fromEntries(Object.entries(state.images || {}).filter(([k]) => /^(fd|bk)/.test(k)))); return out; }
+/* Books and Creative Fund posts: their edits live in the team store (api/edits), one entry per post. Picture slots (fd…, bk…) belong to the post on screen. */
+let EDITS = null, EDITS_VIEW = null, EDITS_T = {};
+fetch('api/edits').then(r => r.ok ? r.json() : {}).catch(() => ({})).then(j => { EDITS = j || {}; let demo = {}; try { demo = JSON.parse(localStorage.getItem('athDemoEdits') || '{}'); } catch {}
+  /* once: edits made on the example before Nov 27 were saved under the real cycle's key; they belong to the example */
+  ['fund:2026-11:winner', 'fund:2026-11:winner:stories', 'fund:2026-10:winner', 'fund:2026-10:winner:stories'].forEach(k => { const e = EDITS[k]; if (!e || e.real) return; const id = k.split(':')[1];
+    fetch('api/fund').then(r => r.ok ? r.json() : {}).then(F => { if (F && F[id] && F[id].winner && F[id].winner.name) return; const moved = JSON.parse(JSON.stringify(e).split(k).join('demo:' + k)); demo['demo:' + k] = moved; EDITS['demo:' + k] = moved; delete EDITS[k]; EDITS_VIEW = null; if (document.body.dataset.seg === 'fund') render(); try { localStorage.setItem('athDemoEdits', JSON.stringify(demo)); } catch {}
+      fetch('api/edits', {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({key: k, edits: null})}).catch(() => {}); }).catch(() => {}); });
+  Object.assign(EDITS, demo); if (['books', 'fund'].includes(document.body.dataset.seg)) render(); });
+function viewEdits(groups){ const g0 = groups.find(g => g.ekey); if (!g0 || !EDITS) return; if (EDITS_VIEW === g0.view) return; EDITS_VIEW = g0.view;
+  Object.keys(state.images || {}).forEach(k => { if (/^(fd|bk)/.test(k)) delete state.images[k]; });
+  groups.filter(g => g.ekey).forEach(g => { const e = EDITS[g.ekey]; if (!e) return; state.texts = {...(state.texts || {}), ...e.texts}; state.moves = {...(state.moves || {}), ...(e.moves || {})}; state.pos = {...(state.pos || {}), ...e.pos}; state.hidden = {...(state.hidden || {}), ...e.hidden}; state.bgs = {...(state.bgs || {}), ...(e.bgs || {})}; Object.assign(state.images, e.images || {}); }); }
+async function upPic(url){ if (!/^data:/.test(url || '')) return url; try { const r = await fetch('api/upload', {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({data: url})}); if (!r.ok) throw 0; return (await r.json()).url; } catch { return url; } }
+function storeViewEdits(groups){ if (!EDITS) return; groups.filter(g => g.ekey && g.view === EDITS_VIEW).forEach(g => { const t = g.ekey; const now = postEdits(t, true); now.credits = (EDITS[t] || {}).credits || {};
+  const empty = !Object.values(now).some(o => Object.keys(o).length); const before = JSON.stringify(EDITS[t] || null), after = empty ? 'null' : JSON.stringify(now); if (before === after) return;
+  if (empty) delete EDITS[t]; else EDITS[t] = now;
+  if (t.startsWith('demo:')) { try { const d = JSON.parse(localStorage.getItem('athDemoEdits') || '{}'); if (empty) delete d[t]; else d[t] = now; localStorage.setItem('athDemoEdits', JSON.stringify(d)); status('Example edits kept in this browser (the example is never shared).'); } catch {} return; }
+  clearTimeout(EDITS_T[t]); EDITS_T[t] = setTimeout(async () => { const e = EDITS[t] || null;
+    if (e) for (const [k, v] of Object.entries(e.images || {})) if (/^data:/.test(v)) { const u = await upPic(v); e.images[k] = u; if (state.images[k] === v) state.images[k] = u; }
+    try { const r = await fetch('api/edits', {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({key: t, edits: e})}); if (!r.ok) throw 0; status('Edits saved for the team.'); } catch { status('Could not save the edits for the team right now. They are kept on this screen.'); } }, 900); }); }
+function mergePostEdits(groups){ viewEdits(groups); groups.forEach(g => { const p = g.pid && DPOSTS[g.pid]; const key = g.pid + '|' + g.title; if (!p || EDIT_MERGED.has(key)) return; EDIT_MERGED.add(key);
   const e = (p.edits || {})[gid(g)]; if (!e) return; state.texts = {...(state.texts || {}), ...e.texts}; state.moves = {...(state.moves || {}), ...(e.moves || {})}; state.pos = {...(state.pos || {}), ...e.pos}; state.hidden = {...(state.hidden || {}), ...e.hidden}; Object.assign(state.images, e.images || {}); }); }
-function storePostEdits(groups){ const touched = new Set(); groups.forEach(g => { const p = g.pid && DPOSTS[g.pid]; if (!p) return; const t = gid(g); const now = postEdits(t); const empty = !Object.values(now).some(o => Object.keys(o).length);
+function storePostEdits(groups){ storeViewEdits(groups); const touched = new Set(); groups.forEach(g => { const p = g.pid && DPOSTS[g.pid]; if (!p) return; const t = gid(g); const now = postEdits(t); const empty = !Object.values(now).some(o => Object.keys(o).length);
   p.edits = p.edits || {}; const before = JSON.stringify(p.edits[t] || null); const after = empty ? 'null' : JSON.stringify(now); if (before === after) return;
   if (empty) delete p.edits[t]; else p.edits[t] = now; touched.add(p.id); }); touched.forEach(id => saveDaily(id)); }
 // ---------- Make video: photo with a slow camera move, words fade in, soft cross-fades. Recorded in the browser ----------
@@ -586,10 +639,12 @@ function loadImg(src){ return new Promise(res => { if (!src) return res(null); c
 // Draw a slide to a canvas with the browser's own renderer (an SVG of the live page), so a download looks exactly like the preview.
 // html2canvas re-draws text itself and drops words around highlighted phrases that wrap; it is kept only as a fallback.
 async function renderSlide(s, transparent){ await document.fonts.ready; const stage = $('stage'); stage.innerHTML = slideNode(transparent ? {...s, bg:'transparent'} : s); const el = stage.firstElementChild; const h = s.h || 1350;
+  // dashed guides are for the preview only: never in a download
+  el.querySelectorAll('.zone, .ph').forEach(x => { x.style.visibility = 'hidden'; }); el.querySelectorAll('.gap').forEach(x => { x.style.border = 'none'; x.style.padding = '0'; x.style.opacity = '1'; });
   await Promise.all([...el.querySelectorAll('[style*="background-image"]')].map(x => { const m = (x.style.backgroundImage || '').match(/url\(["']?(.*?)["']?\)/); return m ? loadImg(m[1]) : null; }));
   freezeLines(el);
   try { if (!window.htmlToImage) throw new Error('renderer missing');
-    const opt = {width: 1080, height: h, pixelRatio: 1, canvasWidth: 1080, canvasHeight: h, backgroundColor: transparent ? undefined : null, cacheBust: false};
+    const opt = {width: 1080, height: h, pixelRatio: 1, canvasWidth: 1080, canvasHeight: h, backgroundColor: transparent ? undefined : null, cacheBust: false, includeQueryParams: true};   // book pictures share one path (/api/img?u=…): without this every one would draw the first
     let c = await htmlToImage.toCanvas(el, opt);
     if (/Safari/.test(navigator.userAgent) && !/Chrome/.test(navigator.userAgent)) c = await htmlToImage.toCanvas(el, opt);   // Safari paints pictures on the second pass
     stage.innerHTML = ''; return c; }
@@ -599,10 +654,10 @@ async function slideCanvas(s, transparent){ return renderSlide(s, transparent); 
 function freezeLines(root){
   const walk = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, {acceptNode: n => n.parentElement.closest('svg,style') || /pre|nowrap/.test(getComputedStyle(n.parentElement).whiteSpace) ? 2 : 1});
   const nodes = []; while (walk.nextNode()) nodes.push(walk.currentNode);
-  nodes.forEach(n => { n.nodeValue = n.nodeValue.replace(/\s+/g, ' '); });   // same layout, no stray source line breaks
+  nodes.forEach(n => { n.nodeValue = n.nodeValue.replace(/[ \t\n\r\f\v]+/g, ' '); });   // same layout, no stray source line breaks; no-break spaces stay (they keep names and phrases together)
   const blockOf = n => { let e = n.parentElement; while (e && e !== root && getComputedStyle(e).display.startsWith('inline')) e = e.parentElement; return e; };
   const cuts = [], last = new Map();
-  for (const n of nodes) { const blk = blockOf(n), t = n.nodeValue, re = /\S+/g; let m;
+  for (const n of nodes) { const blk = blockOf(n), t = n.nodeValue, re = /[^ \t\n\r\f\v]+/g; let m;
     while ((m = re.exec(t))) { const r = document.createRange(); r.setStart(n, m.index); r.setEnd(n, m.index + m[0].length); const box = r.getClientRects()[0]; if (!box) continue;
       const prev = last.get(blk); if (prev && prev.gap && box.top > prev.top + box.height * .5) cuts.push(prev.gap);
       const end = m.index + m[0].length; last.set(blk, {top: box.top, gap: t[end] === ' ' ? {node: n, at: end} : null}); } }
@@ -747,7 +802,7 @@ function dayItems(date, calls){ const posts = monthPosts(), postDays = new Set(p
   return out; }
 async function loadStatus(){ try { const r = await fetch('api/status', {cache: 'no-store'}); if (!r.ok) throw 0; STATUS = await r.json(); STATUS_MODE = 'shared'; }
   catch { try { STATUS = JSON.parse(localStorage.getItem('athCalStatus') || '{}'); } catch { STATUS = {}; } STATUS_MODE = 'local'; }
-  calLoaded = true; if ($('ptype').value === 'calendar') { $('out').innerHTML = calHTML(); wireCal(); } }
+  calLoaded = true; if ($('ptype').value === 'calendar' && !['books', 'fund'].includes(document.body.dataset.seg)) { $('out').innerHTML = calHTML(); wireCal(); } }
 async function setPosted(id, val){ let who = ''; try { who = localStorage.getItem('athWho') || ''; } catch {}
   if (val && !who) { who = (prompt('Your name (shown next to what you post):') || '').trim(); try { localStorage.setItem('athWho', who); } catch {} }
   if (val) STATUS[id] = {posted: true, by: who, at: new Date().toISOString()}; else delete STATUS[id];
@@ -787,7 +842,7 @@ function wireCal(){
     if ($('preset').value !== o.preset) { $('preset').value = o.preset; await $('preset').onchange(); }
     $('ptype').value = o.ptype; try { localStorage.setItem('athLastPtype', o.ptype); } catch {} render();
     const hit = o.find && [...document.querySelectorAll('.group h2')].find(x => x.textContent.trim() === o.find); if (hit) { hit.scrollIntoView({block: 'start'}); hit.closest('.group').classList.add('flash'); } else window.scrollTo({top: 0}); });
-  clearInterval(calTimer); calTimer = setInterval(() => { if ($('ptype').value === 'calendar' && STATUS_MODE === 'shared' && !document.hidden) loadStatus(); else if ($('ptype').value !== 'calendar') clearInterval(calTimer); }, 30000);
+  clearInterval(calTimer); calTimer = setInterval(() => { if ($('ptype').value === 'calendar' && STATUS_MODE === 'shared' && !document.hidden) loadStatus(); else if ($('ptype').value !== 'calendar') clearInterval(calTimer); }, 120000);
 }
 // ---------- DAILY POSTS: shared queue, week planner, form → slides + caption ----------
 let DPOSTS = {}, DMODE = 'local', dLoaded = false, DSEL = null, dWeek = null, dSaveT = null;
@@ -1067,6 +1122,8 @@ function setSeg(seg){ document.body.dataset.seg = seg; document.querySelectorAll
   try { localStorage.setItem('athSeg', seg); } catch {}
   if (seg === 'interviews' || seg === 'editorial' || seg === 'heartlist') { IVK = seg === 'editorial' ? 'editorial' : seg === 'heartlist' ? 'heartlist' : 'interview'; IVSEL = selOf(IVK); $('ptype').value = 'interview'; renderIvSide(); }
   else if ($('ptype').value === 'interview') { let pt = null; try { pt = localStorage.getItem('athLastPtype'); } catch {} $('ptype').value = pt && pt !== 'interview' && [...$('ptype').options].some(o => o.value === pt) ? pt : 'calendar'; }
+  if (seg === 'fund') { fundRender(); render(); window.scrollTo({top: 0}); return; }
+  if (seg === 'books') { booksRender(); render(); window.scrollTo({top: 0}); return; }
   render(); window.scrollTo({top: 0}); }
 document.querySelectorAll('#seg [data-seg]').forEach(b => b.onclick = () => setSeg(b.dataset.seg));
 function storyPlanHTML(){
@@ -1328,21 +1385,23 @@ const slideNode = s => `<div class="post" style="background:${s.bg};height:${s.h
 function verbFor(left){ if ((state.ctaMode || 'comment') === 'comment') return 'COMMENT'; const d = new Date(dl()); d.setDate(d.getDate() - left); const [y,m,dd] = String(state.commentFrom||'').split('-').map(Number); return (y && d >= new Date(y, m-1, dd)) ? 'COMMENT' : 'DM'; }
 function postDate(left){ const d = new Date(dl()); d.setDate(d.getDate() - left); return d.getDate() + ' ' + MONTHS[d.getMonth()]; }
 function buildPtype(){ const sel = $('ptype'), cur = sel.value;
-  sel.innerHTML = `<option value="month">Whole month (${monthPosts().length} feed posts)</option>` + monthPosts().map((p,i) => `<option value="${i}">${postDate(p.left)} · ${esc(p.title)} (${p.kind.split(' ·')[0]})</option>`).join('') + '<optgroup label="Stories"><option value="storyplan">Stories plan: all calls, day by day</option><option value="storydays">Stories: this call, every day ready to post</option><option value="stories">Stories: template library</option></optgroup><option value="reels">Reels</option><option value="calendar">Calendar</option><option value="daily">Daily posts</option><option value="interview">Artist interviews</option>';
+  sel.innerHTML = `<option value="month">Whole month (${monthPosts().length} feed posts)</option>` + monthPosts().map((p,i) => `<option value="${i}">${postDate(p.left)} · ${esc(p.title)} (${p.kind.split(' ·')[0]})</option>`).join('') + `<optgroup label="Single graphics (optional, outside the schedule)">${singlePosts().map((p,i) => `<option value="s${i}">${esc(p.title)}</option>`).join('')}</optgroup>` + '<optgroup label="Stories"><option value="storyplan">Stories plan: all calls, day by day</option><option value="storydays">Stories: this call, every day ready to post</option><option value="stories">Stories: template library</option></optgroup><option value="reels">Reels</option><option value="calendar">Calendar</option><option value="daily">Daily posts</option><option value="interview">Artist interviews</option>';
   sel.value = cur || '0'; if (!sel.value) sel.value = '0'; }
 function render(){
   readForm(); scheduleDraft(); updateTabs();
   const seg0 = document.body.dataset.seg || 'calls'; const base = (seg0 !== 'calls' && $('ptype').value === 'interview' && SECTIONS[IVK] ? 'ath-' + SECTIONS[IVK].title : (state.name || 'call')).toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g, '');
   const pick = $('ptype').value || '0';
   const groups = [];
-  if (pick === 'daily') { if (!dLoaded) loadDaily(); const p = DPOSTS[DSEL]; const cat = p && DCAT[p.cat];
+  if (seg0 === 'fund') { if (typeof FUNDVIEW !== 'undefined' && FUNDVIEW) fundGroups().forEach(g => groups.push(g)); }
+  else if (seg0 === 'books') { if (typeof BOOKVIEW !== 'undefined' && BOOKVIEW) bookGroups().forEach(g => groups.push(g)); }
+  else if (pick === 'daily') { if (!dLoaded) loadDaily(); const p = DPOSTS[DSEL]; const cat = p && DCAT[p.cat];
     if (p && cat && window.DPACK && DPACK[p.cat]) { DPACK[p.cat](p).forEach(g => groups.push({...g, daily: true, pid: p.id})); }
     else if (p && cat && DSLIDES[p.cat]) { const slides = DSLIDES[p.cat](p).map((s, j) => ({...s, title: p.cat + '-' + (j + 1)}));
       groups.push({title: `${p.date} · ${cat.name}`, meta: `${cat.marker || cat.name} · ${slides.length} slide${slides.length > 1 ? 's' : ''} · ${slotLabel(p.slot)}${cat.key || p.f.key ? ' · keyword “' + (p.f.key || cat.key) + '”' : ''}`, slides, cap: DCAPTION[p.cat](p), pin: (p.f.key || cat.key) ? `Comment '${p.f.key || cat.key}' and we'll send you the link.` : '', daily: true}); }
   } else if (pick === 'interview') { if (!dLoaded) loadDaily(); const p = ivCurrent(); if (p) DPACK[IVK](p).forEach(g => groups.push({...g, daily: true, pid: p.id}));
   } else if (pick === 'calendar') { renderPool(); RENDERED = []; $('out').innerHTML = calHTML(); wireCal(); if (!calLoaded) loadStatus(); if (!dLoaded) loadDaily(); return; }
-  if (pick === 'storyplan') { renderPool(); RENDERED = []; $('out').innerHTML = storyPlanHTML(); status('Stories plan for every call. Pick "Stories: this call, every day" to get the frames.'); return; }
-  if (pick === 'daily' || pick === 'interview') {
+  if (seg0 !== 'books' && seg0 !== 'fund' && pick === 'storyplan') { renderPool(); RENDERED = []; $('out').innerHTML = storyPlanHTML(); status('Stories plan for every call. Pick "Stories: this call, every day" to get the frames.'); return; }
+  if (seg0 === 'books' || seg0 === 'fund' || pick === 'daily' || pick === 'interview') {
     /* daily slides were built above */
   } else if (pick === 'stories') {
     const phases = {}; Object.keys(STORY_T).forEach(id => { const t = STORY_T[id]; VERB = verbFor(id[0] === 'F' ? 3 : 20); (phases[t.phase] = phases[t.phase] || []).push({id, t, f: storyMake(id, 21)}); });
@@ -1362,17 +1421,18 @@ function render(){
       groups.push({title: `${postDate(left)} · Stories`, meta: `${ids.length} frame${ids.length > 1 ? 's' : ''} · ${label} · post in this order · ` + ids.map(id => `${id} ${STORY_T[id].name}: ${STORY_T[id].sticker}`).join('  ·  '), slides: ids.map(id => storyMake(id, left)), story:true}); }
     VERB = verbFor(99);
   } else {
-    artPlan(); const all = monthPosts(); const list = pick === 'month' ? all : [all[Number(pick)]];
+    artPlan(); const isS = /^s\d+$/.test(pick); const all = isS ? singlePosts() : monthPosts(); const list = pick === 'month' ? all : [all[Number(isS ? pick.slice(1) : pick)]].filter(Boolean);
     list.forEach((p,pi) => { VERB = verbFor(p.left); CURLEFT = p.left;
       const slides = artFill(p, artBuild(p)).map(decorate); const cap = p.caption(); const pin = p.pin ? p.pin() : CMODE() ? pinned() : `${VERB === 'COMMENT' ? 'Comment' : 'DM us'} "${(state.keyword||'').toUpperCase()}" for the brief and your link. Closes ${short()}.`;
-      groups.push({title: `${postDate(p.left)} · ${p.title}`, meta: `${p.kind} · ${slides.length} slide${slides.length>1?'s':''} · ${p.left === 0 ? 'deadline day' : p.left + ' days left'} · ${VERB} “${KW()}”`, slides: slides.map((s,j) => ({...s, title: s.title || (p.title.toLowerCase().replace(/[^a-z0-9]+/g,'-') + (slides.length>1 ? '-'+(j+1) : ''))})), cap, pin, left:p.left, idx:pi});
+      groups.push({title: isS ? `Single graphic · ${p.title}` : `${postDate(p.left)} · ${p.title}`, meta: `${p.kind} · ${slides.length} slide${slides.length>1?'s':''} · ${p.left === 0 ? 'deadline day' : p.left + ' days left'} · ${VERB} “${KW()}”`, slides: slides.map((s,j) => ({...s, title: s.title || (p.title.toLowerCase().replace(/[^a-z0-9]+/g,'-') + (slides.length>1 ? '-'+(j+1) : ''))})), cap, pin, left:p.left, idx:pi});
       VERB = verbFor(99); });
   }
   mergePostEdits(groups);
-  groups.forEach(g => { const p = (g.pid && DPOSTS[g.pid]) || (g.pid === 'demo' ? ivCurrent() : null); if (p && CREDIT_OF[p.cat]) g.credits = CREDIT_OF[p.cat](p); else if (!g.pid) g.credits = callCredits(); });
+  groups.forEach(g => { const p = (g.pid && DPOSTS[g.pid]) || (g.pid === 'demo' ? ivCurrent() : null); if (p && CREDIT_OF[p.cat]) g.credits = CREDIT_OF[p.cat](p); else if (!g.pid && !g.book) g.credits = callCredits(); });
   groups.forEach(g => { const t = gid(g); g.slides = g.slides.map((s, j) => { const o = state.images['ov|' + t + '|' + j];
     const s2 = o && s.html ? {...s, html: s.html.replace(/background-image:url\([^)]*\)/, 'background-image:url(' + o + ')')} : s;
-    return withCredits(applyMoves(applyPos(applyTexts(s2, 'tx|' + t + '|' + j), t + '|' + j), 'mv|' + t + '|' + j), g); }); });
+    const bgv = (state.bgs || {})['bg|' + t + '|' + j];
+    return withCredits(applyMoves(applyPos(applyTexts(bgv ? {...s2, bg: bgv} : s2, 'tx|' + t + '|' + j), t + '|' + j), 'mv|' + t + '|' + j), g); }); });
   renderPool();
   RENDERED = [];
   $('out').innerHTML = groups.map((g,gi) => {
@@ -1385,18 +1445,18 @@ function render(){
       const reelCtl = g.reel ? `<div class="rlctl"><label>Length <input type="number" min="0.5" max="30" step="0.5" value="${s.dur}" data-dur="${esc(dkey)}"> s</label>${vmeta ? `<label>Start at <input type="number" min="0" step="0.5" value="${vmeta.start || 0}" data-vstart="${esc(s.photoKey)}"> s</label><label>Speed <select data-vspeed="${esc(s.photoKey)}">${[0.25, 0.5, 0.75, 1, 1.25, 1.5, 2, 3].map(x => `<option value="${x}" ${(vmeta.speed || 1) == x ? 'selected' : ''}>${x}×</option>`).join('')}</select></label><button type="button" class="trimbtn" data-trim="${esc(s.photoKey)}">Trim clip</button><span class="vtag">Video ${(vmeta.len || 0).toFixed(1)} s${(vmeta.speed || 1) !== 1 ? ` · ${vmeta.speed}×` : ''}</span><button type="button" data-vdel="${esc(s.photoKey)}">Remove clip</button>` : ''}${/^rx/.test(s.photoKey || '') ? `<button type="button" data-delclip="${esc(g.reel)}">Remove last added clip</button>` : ''}</div>` : '';
       const tpre = 'tx|' + gid(g) + '|' + j + '|'; const hasRm = Object.entries(TXT()).some(([k, v]) => k.startsWith(tpre) && v === '\u200b');
       const nCr = (s.html || '').split('data-nocredit').length - 1; const hasImg = /background-image:\s*url\(["']?[^"')\s]/.test(s.html || '') && /data-nocredit|class="crd"|background-image/.test(s.html || '');
-      const credBtn = nCr || /class="crd"/.test(s.html || '') ? `<button type="button" data-credit="${gi}|${j}" title="Add or change the artwork credit (optional)">Credit</button>` : '';
+      const credBtn = nCr || hasImg || /class="crd"/.test(s.html || '') ? `<button type="button" data-credit="${gi}|${j}" title="Add or change the artwork credit (optional)">Credit</button>` : '';
       const mpre = 'mv|' + gid(g) + '|' + j + '|'; const hasMv = Object.keys(MOVES()).some(k => k.startsWith(mpre));
       const ppre = gid(g) + '|' + j + '|'; const edited = Object.keys(TXT()).some(k => k.startsWith(tpre)) || hasMv || has || Object.keys(POS()).some(k => k.startsWith(ppre));
       const photoBtns = credBtn + `<button type="button" data-reset="${gi}|${j}"${edited ? '' : ' disabled'} title="Put this slide back as it was: words, positions and picture">Reset</button>`;
-      return `<div class="cell"><div class="frame${s.h ? ' tall' : ''}"${g.pid ? ` data-pid="${esc(g.pid)}"` : ''} data-okey="${esc(okey)}" data-tkey="${esc('tx|' + gid(g) + '|' + j)}">${slideNode(s)}</div>${reelCtl}<div class="act"><span>${s.label ? esc(s.label) : g.slides.length>1 ? 'Slide ' + (j+1) : 'Single'}</span><span class="acts"><button type="button" data-pv="${i}" title="See it large">Preview</button><button type="button" data-hide="${esc(hk)}" title="Hide this slide for now">Hide</button>${photoBtns}<button type="button" data-i="${i}">Save PNG</button></span></div></div>`; }).join('');
+      return `<div class="cell"><div class="frame${s.h ? ' tall' : ''}"${g.pid ? ` data-pid="${esc(g.pid)}"` : ''} data-okey="${esc(okey)}" data-tkey="${esc('tx|' + gid(g) + '|' + j)}">${slideNode(s)}</div>${reelCtl}<div class="act"><span>${s.label ? esc(s.label) : g.slides.length>1 ? 'Slide ' + (j+1) : 'Single'}</span><span class="acts"><button type="button" data-pv="${i}" title="See it large">Preview</button><button type="button" data-hide="${esc(hk)}" title="Hide this slide for now">Hide</button>${photoBtns}<select data-bg="${esc('bg|' + gid(g) + '|' + j)}" title="Slide colour" aria-label="Slide colour">${[['', 'Colour'], ['#FFFFFF', 'White'], ['#FAD2E1', 'Pink'], ['#FFA1C2', 'Rose'], ['#6A0620', 'Burgundy'], ['#1C1310', 'Ink']].map(([v, l]) => `<option value="${v}"${((state.bgs || {})['bg|' + gid(g) + '|' + j] || '') === v ? ' selected' : ''}>${l}</option>`).join('')}</select><button type="button" data-i="${i}">Save PNG</button></span></div></div>`; }).join('');
     const capBox = g.cap ? `<details class="capbox"><summary>Caption and pinned comment</summary><div class="f"><textarea id="cap${gi}" style="min-height:220px">${esc(g.cap)}</textarea></div><div class="f"><label>Pinned comment</label><input value="${esc(g.pin)}"></div><button class="btn ghost" type="button" data-cap="cap${gi}" style="margin-top:8px">Copy caption</button></details>` : '';
     const ckey = (state.name || '') + ' | ' + g.title.replace(/^[^·]*·\s*/, '');
     const clink = canvaLink(ckey);
     const canvaRow = g.cap !== undefined ? `<div class="canva" data-ckey="${esc(ckey)}">${clink
       ? `<a class="btn" href="${esc(clink)}" target="_blank" rel="noopener">Edit in Canva &rarr;</a><button class="btn ghost" type="button" data-cedit>Change link</button>`
       : `<span class="cmiss">Canva source file: not linked yet</span><button class="btn ghost" type="button" data-cedit>Add Canva link</button>`}</div>` : '';
-    return `<section class="group"><div class="ghead"><h2>${esc(g.title)}</h2><span class="ghr">${g.reel ? `<label class="rlopt"><input type="checkbox" data-rlo="${g.reel}|sound" ${((state.rlopt || {})[g.reel] || {}).sound ? 'checked' : ''}> Clip sound</label><label class="rlopt"><input type="checkbox" data-rlo="${g.reel}|bar" ${((state.rlopt || {})[g.reel] || {}).bar ? 'checked' : ''}> Progress bar</label><button type="button" class="btn ghost" data-addclip="${g.reel}">+ Add clip</button><label class="btn ghost" style="cursor:pointer">Add photos or clips<input type="file" accept="image/*,video/*" multiple data-rlup="${g.reel}" hidden></label><button type="button" class="btn ghost" data-prev="${g.reel}">Preview</button><button type="button" class="btn" data-mkvid="${g.reel}">Make video</button>` : ''}${g.left !== undefined ? `<span class="vers" title="Each call starts on its own wording so the three calls never repeat">Wording ${[0,1,2].map(k => `<button type="button" data-ver="${esc(gid(g))}|${k}" aria-pressed="${postVer(gid(g)) % 3 === k}">${'ABC'[k]}</button>`).join('')}</span>` : ''}<button type="button" class="hidebtn" data-hide="${esc(gk)}">Hide this ${g.reel ? 'reel' : g.story ? 'day' : 'post'}</button></span></div><p class="meta">${esc(g.meta)}</p><div class="slides">${cells}</div>${canvaRow}${capBox}</section>`; }).join('');
+    return `<section class="group"><div class="ghead"><h2>${esc(g.title)}</h2><span class="ghr">${g.reel ? `<label class="rlopt"><input type="checkbox" data-rlo="${g.reel}|sound" ${((state.rlopt || {})[g.reel] || {}).sound ? 'checked' : ''}> Clip sound</label><label class="rlopt"><input type="checkbox" data-rlo="${g.reel}|bar" ${((state.rlopt || {})[g.reel] || {}).bar ? 'checked' : ''}> Progress bar</label><button type="button" class="btn ghost" data-addclip="${g.reel}">+ Add clip</button><label class="btn ghost" style="cursor:pointer">Add photos or clips<input type="file" accept="image/*,video/*" multiple data-rlup="${g.reel}" hidden></label><button type="button" class="btn ghost" data-prev="${g.reel}">Preview</button><button type="button" class="btn" data-mkvid="${g.reel}">Make video</button>` : ''}${g.left !== undefined ? `<span class="vers" title="Each call starts on its own wording so the three calls never repeat">Wording ${[0,1,2].map(k => `<button type="button" data-ver="${esc(gid(g))}|${k}" aria-pressed="${postVer(gid(g)) % 3 === k}">${'ABC'[k]}</button>`).join('')}</span>` : ''}${g.covers ? `<span class="vers">Cover ${g.covers.map(([k, l]) => `<button type="button" data-bkcov="${k}" aria-pressed="${g.cover === k}">${l}</button>`).join('')}</span>` : ''}<button type="button" class="hidebtn" data-hide="${esc(gk)}">Hide this ${g.reel ? 'reel' : g.story ? 'day' : 'post'}</button></span></div><p class="meta">${esc(g.meta)}</p><div class="slides">${cells}</div>${canvaRow}${capBox}</section>`; }).join('');
   $('out').querySelectorAll('[data-i]').forEach(b => b.onclick = () => saveOne(Number(b.dataset.i)));
   $('out').querySelectorAll('[data-mkvid]').forEach(b => b.onclick = () => makeReel(b.dataset.mkvid, b));
   $('out').querySelectorAll('[data-prev]').forEach(b => b.onclick = () => previewReel(b.dataset.prev, b));
@@ -1414,13 +1474,14 @@ function render(){
   $('out').querySelectorAll('[data-vspeed]').forEach(sl => sl.onchange = () => { const k = sl.dataset.vspeed; const m = state.vids[k]; m.speed = parseFloat(sl.value) || 1; if (state.durs) { const maxD = ((m.len || 0) - (m.start || 0)) / m.speed; if (state.durs[k] > maxD) state.durs[k] = +maxD.toFixed(2); } render(); status('Speed ' + m.speed + '×.'); });
   $('out').querySelectorAll('[data-vdel]').forEach(b => b.onclick = () => { const k = b.dataset.vdel; delete state.vids[k]; delete state.images[k]; if (state.durs) delete state.durs[k]; render(); });
   $('out').querySelectorAll('[data-rlo]').forEach(c => c.onchange = () => { const [id, k] = c.dataset.rlo.split('|'); state.rlopt = state.rlopt || {}; state.rlopt[id] = {...(state.rlopt[id] || {}), [k]: c.checked}; scheduleDraft(); });
+  $('out').querySelectorAll('[data-bkcov]').forEach(b => b.onclick = () => { if (document.body.dataset.seg === 'fund' && typeof FUNDVIEW !== 'undefined' && FUNDVIEW) { FUNDVIEW.cover = b.dataset.bkcov; const fr = FUND && FUND[FUNDVIEW.round]; if (fr) { fr.cover = b.dataset.bkcov; fundSave(fr.id); } render(); return; } if (typeof BOOKVIEW !== 'undefined' && BOOKVIEW) { BOOKVIEW.cover = b.dataset.bkcov; render(); booksRender(); } });
   $('out').querySelectorAll('[data-ver]').forEach(b => b.onclick = () => { const [t, k] = b.dataset.ver.split('|'); state.ver = state.ver || {}; state.ver[t] = +k; render(); status('Wording ' + 'ABC'[+k] + ' for ' + t + '.'); });
   storePostEdits(groups);
   $('out').querySelectorAll('[data-credit]').forEach(b => b.onclick = () => { const [gi, j] = b.dataset.credit.split('|').map(Number); const g = groups[gi]; const s = g.slides[j];
     const urls = [...new Set([...(s.html || '').matchAll(/background-image:\s*url\(["']?([^"')]*)["']?\)/g)].map(m => m[1]).filter(u => isArtImg(document.body, u)))];
     if (!urls.length) { status('No image on this slide yet.'); return; }
-    for (const [n, u] of urls.entries()) { const cur = creditFor(u, g); if (cur && g.credits && g.credits[u]) { status('This image is credited from the article: ' + cur.text); continue; }
-      const v = prompt(`Credit for image ${n + 1} of ${urls.length} on this slide.\nFor example: Title by Artist Name @handle`, cur ? cur.text : ''); if (v === null) return; setCredit(u, g, v.trim()); }
+    for (const [n, u] of urls.entries()) { const cur = creditFor(u, g); if (cur && g.credits && g.credits[u] && !g.ekey) { status('This image is credited from the article: ' + cur.text); continue; }
+      const v = prompt(`Credit for image ${n + 1} of ${urls.length} on this slide.\nFor example: Title by Artist Name @handle${g.ekey ? '\nType - to hide the credit label.' : ''}`, cur ? cur.text : ''); if (v === null) return; setCredit(u, g, v.trim()); }
     render(); status('Credit saved. It shows on every slide that uses this image.'); });
   $('out').querySelectorAll('[data-reset]').forEach(b => b.onclick = () => { const [gi, j] = b.dataset.reset.split('|').map(Number); const t = gid(groups[gi]);
     const tp = 'tx|' + t + '|' + j + '|', mp = 'mv|' + t + '|' + j + '|', pp = t + '|' + j + '|';
@@ -1430,6 +1491,7 @@ function render(){
   $('out').querySelectorAll('[data-mvr]').forEach(b => b.onclick = () => { Object.keys(MOVES()).forEach(k => { if (k.startsWith(b.dataset.mvr)) delete MOVES()[k]; }); render(); status('Text is back in its place.'); });
   $('out').querySelectorAll('[data-hide]').forEach(b => b.onclick = () => { HID()[b.dataset.hide] = 1; render(); status('Hidden for now. It is left out of Save all as ZIP. Restore it any time.'); });
   $('out').querySelectorAll('[data-txr]').forEach(b => b.onclick = () => { Object.keys(TXT()).forEach(k => { if (k.startsWith(b.dataset.txr) && TXT()[k] === '\u200b') delete TXT()[k]; }); render(); status('Removed text is back.'); });
+  $('out').querySelectorAll('[data-bg]').forEach(sel => sel.onchange = () => { state.bgs = state.bgs || {}; if (sel.value) state.bgs[sel.dataset.bg] = sel.value; else delete state.bgs[sel.dataset.bg]; render(); status(sel.value ? 'Slide colour changed. It shows wherever the slide has no picture of its own.' : 'Slide colour back to the template.'); });
   $('out').querySelectorAll('[data-unhide]').forEach(b => b.onclick = () => { delete HID()[b.dataset.unhide]; render(); status('Restored.'); });
   $('out').querySelectorAll('[data-ph]').forEach(b => b.onclick = () => { const inp = document.createElement('input'); inp.type = 'file'; inp.accept = 'image/*';
     inp.onchange = () => { const file = inp.files[0]; if (!file) return; shrink(file).then(url => { state.images[b.dataset.ph] = url; render(); status('Photo changed. Press "Save call" to keep it.'); }); }; inp.click(); });
@@ -1508,6 +1570,8 @@ $('ptype').onchange = () => { try { localStorage.setItem('athLastPtype', $('ptyp
   sizePreviews(); await document.fonts.ready; let seg = 'calls'; try { seg = localStorage.getItem('athSeg') || 'calls'; } catch {} setSeg(seg); if (had) status('Welcome back. Your edits are restored.'); })();
 </script>
 <script src="daily.js"></script>
+<script src="books.js"></script>
+<script src="fund.js"></script>
 <script src="interview.js"></script>
 <script src="editorial.js"></script>
 <script src="heartlist.js"></script>
