@@ -14,6 +14,7 @@ if (!window.JSZip) document.write('<script src="https://cdnjs.cloudflare.com/aja
 </script>
 <style>
 /* Post fonts ship with the page so previews and exported PNGs match exactly */
+@font-face{font-family:"IS";src:url(fonts/InstrumentSerif-Regular.ttf)}@font-face{font-family:"IS";font-style:italic;src:url(fonts/InstrumentSerif-Italic.ttf)}
 @font-face{font-family:"ATH Grotesk";src:url(fonts/ath/HankenGrotesk.woff2) format("woff2");font-weight:100 900}
 @font-face{font-family:"ATH Serif";src:url(fonts/ath/Newsreader-Italic.woff2) format("woff2");font-style:italic;font-weight:200 800}
 @font-face{font-family:"ATH Tight";src:url(fonts/ath/InterTight-Regular.woff2) format("woff2");font-weight:400}
@@ -217,7 +218,7 @@ img.bk-cv{width:100%;object-fit:contain;background:#FAD2E1}.bk-a img{width:100%;
       <div class="f"><label for="results">Results date</label><input id="results" placeholder="e.g. 10 Jan"></div>
       <div class="f"><label for="pub">Publication month</label><input id="pub" placeholder="e.g. March"></div>
     </div>
-    <div class="f"><label for="fee">Application fee wording</label><input id="fee" placeholder="e.g. applicable"></div>
+    <div class="f"><label for="fee">Application fee (for the team only, never shown in posts)</label><input id="fee" placeholder="e.g. applicable"></div>
     <div class="f"><label for="ctaMode">Call to action</label><select id="ctaMode"><option value="comment">Link in bio + comment the keyword (DM automation off)</option><option value="dm">DM the keyword, then comment from a date</option></select></div>
     <div class="f"><label for="commentFrom">If DM: switch to “COMMENT” on</label><input id="commentFrom" type="date"></div>
     <div class="f"><label for="elig">Eligibility line</label><input id="elig"></div>
@@ -263,6 +264,7 @@ img.bk-cv{width:100%;object-fit:contain;background:#FAD2E1}.bk-a img{width:100%;
 
 <main>
   <nav class="tabs" id="tabs" aria-label="Views">
+    <button type="button" data-view="callmgr">Call manager</button>
     <button type="button" data-view="calendar">Calendar</button>
     <button type="button" data-view="feed">Feed posts</button>
     <button type="button" data-view="storyplan">Stories plan</button>
@@ -313,7 +315,7 @@ const DEFAULTS = {
 const PRESETS = {
   'Garden Edition': {},
   'Artist of the Year 2026': {
-    style:'award', series:'Arts to Hearts', edition:'2026', editionLabel:'Hardcover collectible book', name:'Artist of the Year 2026', keyword:'NOMINATE', deadline:'2026-11-16', selected:'100',
+    style:'award', series:'Arts to Hearts', edition:'2026', editionLabel:'Hardcover collectible book', name:'Artist of the Year 2026', keyword:'NOMINATE', deadline:'2026-11-22', selected:'100',
     headline:'Call for artists', coverLine:'Get published in the Artist of the Year 2026 hardcover book. 100 artists.', colour:'#9A6A12',
     editions:'35+', seriesNoun:'books', published:'10,000+',
     quote:'No single subject, medium, or direction. The full range of what artists are making today.',
@@ -345,7 +347,7 @@ const PRESETS = {
     commentFrom:'2026-12-08', images:{imgCover:'art/flower-portrait.jpg', imgTheme:'art/ref-dahlias.jpg'},
   },
   'Arts to Hearts Magazine Issue 16': {
-    style:'magazine', series:'Arts to Hearts Magazine', edition:'16', editionLabel:'4th anniversary issue', name:'Issue 16', keyword:'ISSUE16', deadline:'2026-12-27', selected:'100',
+    style:'magazine', series:'Arts to Hearts Magazine', edition:'16', editionLabel:'4th anniversary issue', name:'Issue 16', keyword:'ISSUE16', link:'https://apply.artstoheartsproject.com/open-call/arts-to-hearts-magazine-issue-16', deadline:'2026-12-27', selected:'100',
     headline:'Call for artists', coverLine:'Arts to Hearts Magazine, Issue 16. 100 artists, one $500 award.', colour:'#E8432B',
     books:'35+', featured:'10K+', editions:'15', published:'1,500+', since:'2022', seriesNoun:'issues',
     shelf:'Issue 1, Issue 2, Issue 3, Issue 4, Issue 5, Issue 6, Issue 7, Issue 8, Issue 9, Issue 10, Issue 11, Issue 12, Issue 13, Issue 14, Issue 15',
@@ -581,11 +583,11 @@ function wireSlots(){
 }
 // ---------- view tabs ----------
 let lastFeed = 'month';
-function viewOf(v){ return ['calendar', 'daily', 'interview', 'storyplan', 'storydays', 'stories', 'reels'].includes(v) ? v : 'feed'; }
+function viewOf(v){ return ['callmgr', 'calendar', 'daily', 'interview', 'storyplan', 'storydays', 'stories', 'reels'].includes(v) ? v : 'feed'; }
 function updateTabs(){ const v = viewOf($('ptype').value); if (v === 'feed') lastFeed = $('ptype').value || 'month';
   document.querySelectorAll('#tabs [data-view]').forEach(b => b.setAttribute('aria-current', b.dataset.view === v ? 'page' : 'false'));
   $('ptype').closest('.f').style.display = v === 'feed' ? '' : 'none';
-  const noExport = v === 'calendar' || v === 'storyplan'; $('go').style.display = noExport ? 'none' : ''; $('zip').style.display = noExport ? 'none' : ''; }
+  const noExport = v === 'calendar' || v === 'storyplan' || v === 'callmgr'; $('go').style.display = noExport ? 'none' : ''; $('zip').style.display = noExport ? 'none' : ''; }
 function setView(v){ $('ptype').value = v === 'feed' ? lastFeed : v; try { if (v !== 'interview') localStorage.setItem('athLastPtype', $('ptype').value); } catch {} render(); window.scrollTo({top:0}); }
 document.querySelectorAll('#tabs [data-view]').forEach(b => b.onclick = () => setView(b.dataset.view));
 document.addEventListener('click', e => { const g = e.target.closest('[data-goto]'); if (g) setView(g.dataset.goto); });
@@ -823,13 +825,16 @@ const isoD = d => d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '
 const DAYMS = 864e5;
 function callStates(){ return Object.keys(PRESETS).filter(n => !/blank/i.test(n)).map(n => { let d = null; try { d = JSON.parse(localStorage.getItem(DKEY(n)) || 'null'); } catch {}
   const s = n === $('preset').value ? state : {...DEFAULTS, ...PRESETS[n], ...(d || {})};
-  return {preset: n, name: s.name, kw: (s.keyword || '').toUpperCase(), colour: s.colour, dl: new Date(s.deadline + 'T00:00:00'), hidden: s.hidden || {}}; }); }
+  const sh = typeof SHAREDC !== 'undefined' && SHAREDC[n]; if (sh && sh.f && s !== state) CORE.forEach(k => { if (sh.f[k] !== undefined && sh.f[k] !== '') s[k] = sh.f[k]; });
+  return {preset: n, name: s.name, kw: (s.keyword || '').toUpperCase(), colour: s.colour, dl: new Date(s.deadline + 'T00:00:00'), len: typeof cmLen === 'function' ? cmLen(s) : 30, archived: !!(sh && sh.archived), hidden: s.hidden || {}}; }).filter(c => !c.archived); }
 function dayItems(date, calls){ const posts = monthPosts(), postDays = new Set(posts.map(p => p.left)), iso = isoD(date), out = [];
   calls.forEach(c => { if (c.preset === 'ATH') { const plan = WEEK_PLAN[date.getDay()] || {};
       SLOTS.forEach(s => { const post = Object.values(DPOSTS).find(p => p.date === iso && p.slot === s.id); const cat = post ? post.cat : plan[s.id]; if (!cat || cat === 'opencall') return;
-        out.push({c, type: (DCAT[cat] || {}).name || cat, title: post ? (post.f.name || post.f.title || post.f.book || 'Draft') : 'Not created yet', detail: `${s.ist} IST · ${s.pt}`, id: `ath|${iso}|${s.id}`, open: {daily: post ? post.id : `${iso}|${s.id}|${cat}`}}); }); return; } const left = Math.round((c.dl - date) / DAYMS); if (left < -1 || left > 30) return;
-    posts.forEach((p, i) => { if (p.left !== left || c.hidden['g|' + p.title]) return;
-      out.push({c, type: 'Feed post', title: p.title, detail: p.kind, id: `${c.preset}|${iso}|feed|${p.title}`, open: {preset: c.preset, ptype: String(i)}}); });
+        out.push({c, type: (DCAT[cat] || {}).name || cat, title: post ? (post.f.name || post.f.title || post.f.book || 'Draft') : 'Not created yet', detail: `${s.ist} IST · ${s.pt}`, id: `ath|${iso}|${s.id}`, open: {daily: post ? post.id : `${iso}|${s.id}|${cat}`}}); }); return; } const left = Math.round((c.dl - date) / DAYMS), L = Math.max(7, c.len || 30); if (left < -1 || left > Math.max(30, L)) return;
+    const plan = typeof callPlan === 'function' ? callPlan(L) : posts.map((p, i) => ({left: p.left, i, title: p.title, kind: p.kind}));
+    plan.forEach(x => { if (x.left !== left || c.hidden['g|' + x.title]) return;
+      out.push({c, type: x.s !== undefined ? 'Single graphic' : 'Feed post', title: x.title, detail: x.kind, id: `${c.preset}|${iso}|feed|${x.title}${x.s !== undefined ? '|' + left : ''}`, open: {preset: c.preset, ptype: x.s !== undefined ? 's' + x.s : String(x.i)}}); });
+    if (left > 30) return;
     const ids = storyDay(left, postDays);
     if (ids.length && !c.hidden['g|' + `${postDate(left)} · Stories`]) out.push({c, type: 'Stories', title: `${ids.length} frame${ids.length > 1 ? 's' : ''}`, detail: ids.map(x => STORY_T[x].name).join(' · '), id: `${c.preset}|${iso}|stories`, open: {preset: c.preset, ptype: 'storydays', find: `${postDate(left)} · Stories`}});
     const r = REEL_DAYS[left] && REELS.find(x => x.id === REEL_DAYS[left]);
@@ -1380,8 +1385,8 @@ function launch(){
     <div class="a" style="left:80px;right:80px;top:820px;display:grid;grid-template-columns:repeat(3,1fr);border-top:2px solid rgba(255,255,255,.2);padding-top:30px;color:${WHITE}">
       <div><p class="lab" style="color:${Tn}">${short()}</p><p class="sub" style="font-size:28px;margin-top:8px">Submissions close</p></div>
       <div style="border-left:2px solid rgba(255,255,255,.16);padding-left:30px"><p class="lab" style="color:${Tn}">${gap(state.results,'Date')}</p><p class="sub" style="font-size:28px;margin-top:8px">Results announced</p></div>
-      <div style="border-left:2px solid rgba(255,255,255,.16);padding-left:30px"><p class="lab" style="color:${Tn}">${gap(state.pub,'Month')}</p><p class="sub" style="font-size:28px;margin-top:8px">Book published</p></div></div>
-    <p class="a c sub" style="left:0;right:0;top:1080px;font-size:26px;opacity:.75;color:${WHITE}">Application fee ${gap(state.fee,'amount, or “applicable”')}</p>`});
+      <div style="border-left:2px solid rgba(255,255,255,.16);padding-left:30px"><p class="lab" style="color:${Tn}">${state.pub ? esc(state.pub) : 'After the results'}</p><p class="sub" style="font-size:28px;margin-top:8px">Book published</p></div></div>
+    <p class="a c sub" style="display:none;left:0;right:0;top:1080px;font-size:26px;opacity:.75;color:${WHITE}">Application fee</p>`});
 
   // 9 who can apply
   S.push({bg:CREAM, html:`${corners(INK, BURG, 'Who can apply')}
@@ -1432,9 +1437,9 @@ function launch(){
 // ---------- caption ----------
 function caption(){
   const kw = (state.keyword || 'KEYWORD').toUpperCase();
-  return `What happens when ${state.selected} artists from around the world come together around a single idea?
+  return `Open call for artists: ${/^issue\s/i.test(state.name) ? `${state.series}, ${state.name}` : `${state.series}: ${state.name}`}. Submissions close ${dl().getDate()} ${MONTHS_L[dl().getMonth()]}.
 
-${state.series}: ${state.name} is now open for submissions. Edition ${state.edition} of a series that has published ${state.published} artists since ${state.since}.
+What happens when ${state.selected} artists from around the world come together around a single idea? ${/^issue\s/i.test(state.name) ? `${state.series}, ${state.name}` : `The ${state.name}`} is now open for submissions. ${/magazine/i.test(state.series || '') ? `The magazine has published` : state.edition ? `Edition ${state.edition} of a series that has published` : `Part of a series that has published`} ${state.published} artists since ${state.since}.
 
 ${state.selected} artists will be selected by ${state.jury || 'the jury'} and published in a juried hardcover book, distributed through Amazon, Barnes & Noble and the ATH Shop, and introduced to collectors, galleries and curators.
 
@@ -1443,9 +1448,9 @@ Open to individual artists 18+, worldwide, in any medium.
 ${kwLine()}
 Submissions close ${dl().getDate()} ${MONTHS_L[dl().getMonth()]}.
 
-Know an artist whose work belongs in this book? Send this to them.
+Know an artist whose work belongs in this ${/magazine/i.test(state.series || '') ? 'issue' : 'book'}? Send this to them.
 
-#ArtsToHeartsProject #OpenCall #CallForArtists #101ArtBook`;
+${tagsFor()}`;
 }
 const pinned = () => CMODE() ? `Apply via the link in bio, or comment "${(state.keyword || 'KEYWORD').toUpperCase()}" and we'll send you the link. Closes ${short()}.` : `DM "${(state.keyword || 'KEYWORD').toUpperCase()}" for the full brief and your submission link. Closes ${short()}.`;
 
@@ -1453,10 +1458,17 @@ const pinned = () => CMODE() ? `Apply via the link in bio, or comment "${(state.
 let RENDERED = [];
 const slideNode = s => `<div class="post" style="background:${s.bg};height:${s.h||1350}px">${s.html}</div>`;
 function verbFor(left){ if ((state.ctaMode || 'comment') === 'comment') return 'COMMENT'; const d = new Date(dl()); d.setDate(d.getDate() - left); const [y,m,dd] = String(state.commentFrom||'').split('-').map(Number); return (y && d >= new Date(y, m-1, dd)) ? 'COMMENT' : 'DM'; }
+// the day a month post goes out, on this call's real dates (Call manager: callPlan)
+function planLeft(i, p){ if (typeof callPlan !== 'function' || i < 0) return p.left; const x = callPlan(cmLen(state)).find(y => y.i === i); return x ? x.left : p.left; }
 function postDate(left){ const d = new Date(dl()); d.setDate(d.getDate() - left); return d.getDate() + ' ' + MONTHS[d.getMonth()]; }
 function buildPtype(){ const sel = $('ptype'), cur = sel.value;
-  sel.innerHTML = `<option value="month">Whole month (${monthPosts().length} feed posts)</option>` + monthPosts().map((p,i) => `<option value="${i}">${postDate(p.left)} · ${esc(p.title)} (${p.kind.split(' ·')[0]})</option>`).join('') + `<optgroup label="Single graphics (optional, outside the schedule)">${singlePosts().map((p,i) => `<option value="s${i}">${esc(p.title)}</option>`).join('')}</optgroup>` + '<optgroup label="Stories"><option value="storyplan">Stories plan: all calls, day by day</option><option value="storydays">Stories: this call, every day ready to post</option><option value="stories">Stories: template library</option></optgroup><option value="reels">Reels</option><option value="calendar">Calendar</option><option value="daily">Daily posts</option><option value="interview">Artist interviews</option>';
+  sel.innerHTML = `<option value="month">Whole month (${monthPosts().length} feed posts)</option>` + monthPosts().map((p,i) => `<option value="${i}">${postDate(planLeft(i, p))} · ${esc(p.title)} (${p.kind.split(' ·')[0]})</option>`).join('') + `<optgroup label="Single graphics (optional, outside the schedule)">${singlePosts().map((p,i) => `<option value="s${i}">${esc(p.title)}</option>`).join('')}</optgroup>` + '<optgroup label="Stories"><option value="storyplan">Stories plan: all calls, day by day</option><option value="storydays">Stories: this call, every day ready to post</option><option value="stories">Stories: template library</option></optgroup><option value="reels">Reels</option><option value="calendar">Calendar</option><option value="callmgr">Call manager</option><option value="daily">Daily posts</option><option value="interview">Artist interviews</option>';
   sel.value = cur || '0'; if (!sel.value) sel.value = '0'; }
+// open-call posts never go out with an empty photo box, a missing detail or a slide another post already has
+function autoWhyOf(g, s, j, seg0){ if (seg0 !== 'calls' || g.daily || g.story || g.reel) return '';
+  if (s.auto === 'dup') return 'Hidden: another post already has this slide';
+  if (s.auto === 'fee') return 'Hidden: the fee is never shown in posts';
+  return /class="(?:[^"]*\s)?(?:ph|gap)(?:\s[^"]*)?"/.test(s.html || '') && !state.images['ov|' + gid(g) + '|' + j] ? 'Hidden: needs a photo or a detail' : ''; }
 function render(){
   readForm(); scheduleDraft(); updateTabs();
   const seg0 = document.body.dataset.seg || 'calls'; const base = (seg0 !== 'calls' && $('ptype').value === 'interview' && SECTIONS[IVK] ? 'ath-' + SECTIONS[IVK].title : (state.name || 'call')).toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g, '');
@@ -1469,6 +1481,7 @@ function render(){
     else if (p && cat && DSLIDES[p.cat]) { const slides = DSLIDES[p.cat](p).map((s, j) => ({...s, title: p.cat + '-' + (j + 1)}));
       groups.push({title: `${p.date} · ${cat.name}`, meta: `${cat.marker || cat.name} · ${slides.length} slide${slides.length > 1 ? 's' : ''} · ${slotLabel(p.slot)}${cat.key || p.f.key ? ' · keyword “' + (p.f.key || cat.key) + '”' : ''}`, slides, cap: DCAPTION[p.cat](p), pin: (p.f.key || cat.key) ? `Comment '${p.f.key || cat.key}' and we'll send you the link.` : '', daily: true}); }
   } else if (pick === 'interview') { if (!dLoaded) loadDaily(); const p = ivCurrent(); if (p) DPACK[IVK](p).forEach(g => groups.push({...g, daily: true, pid: p.id}));
+  } else if (pick === 'callmgr') { renderPool(); RENDERED = []; $('out').innerHTML = callMgrHTML(); wireCallMgr(); return;
   } else if (pick === 'calendar') { renderPool(); RENDERED = []; $('out').innerHTML = calHTML(); wireCal(); if (!calLoaded) loadStatus(); if (!dLoaded) loadDaily(); return; }
   if (seg0 !== 'books' && seg0 !== 'fund' && pick === 'storyplan') { renderPool(); RENDERED = []; $('out').innerHTML = storyPlanHTML(); status('Stories plan for every call. Pick "Stories: this call, every day" to get the frames.'); return; }
   if (seg0 === 'books' || seg0 === 'fund' || pick === 'daily' || pick === 'interview') {
@@ -1493,8 +1506,8 @@ function render(){
   } else {
     artPlan(); const isS = /^s\d+$/.test(pick); const all = isS ? singlePosts() : monthPosts(); const list = pick === 'month' ? all : [all[Number(isS ? pick.slice(1) : pick)]].filter(Boolean);
     list.forEach((p,pi) => { VERB = verbFor(p.left); CURLEFT = p.left;
-      const slides = artFill(p, artBuild(p)).map(decorate); const cap = p.caption(); const pin = p.pin ? p.pin() : CMODE() ? pinned() : `${VERB === 'COMMENT' ? 'Comment' : 'DM us'} "${(state.keyword||'').toUpperCase()}" for the brief and your link. Closes ${short()}.`;
-      groups.push({title: isS ? `Single graphic · ${p.title}` : `${postDate(p.left)} · ${p.title}`, meta: `${p.kind} · ${slides.length} slide${slides.length>1?'s':''} · ${p.left === 0 ? 'deadline day' : p.left + ' days left'} · ${VERB} “${KW()}”`, slides: slides.map((s,j) => ({...s, title: s.title || (p.title.toLowerCase().replace(/[^a-z0-9]+/g,'-') + (slides.length>1 ? '-'+(j+1) : ''))})), cap, pin, left:p.left, idx:pi});
+      const slides = artFill(p, artBuild(p)).map(decorate); const cap = withCallLine(p.caption()); const pin = p.pin ? p.pin() : CMODE() ? pinned() : `${VERB === 'COMMENT' ? 'Comment' : 'DM us'} "${(state.keyword||'').toUpperCase()}" for the brief and your link. Closes ${short()}.`;
+      groups.push({title: isS ? `Single graphic · ${p.title}` : `${postDate(planLeft(monthPosts().findIndex(x => x.title === p.title), p))} · ${p.title}`, meta: `${p.kind} · ${slides.length} slide${slides.length>1?'s':''} · ${planLeft(monthPosts().findIndex(x => x.title === p.title), p) === 0 ? 'deadline day' : planLeft(monthPosts().findIndex(x => x.title === p.title), p) + ' days left'} · ${VERB} “${KW()}”`, slides: slides.map((s,j) => ({...s, title: s.title || (p.title.toLowerCase().replace(/[^a-z0-9]+/g,'-') + (slides.length>1 ? '-'+(j+1) : ''))})), cap, pin, left:p.left, idx:pi});
       VERB = verbFor(99); });
   }
   mergePostEdits(groups);
@@ -1506,9 +1519,15 @@ function render(){
   renderPool();
   RENDERED = [];
   $('out').innerHTML = groups.map((g,gi) => {
-    const gk = 'g|' + gid(g), gHidden = !!HID()[gk];
-    if (gHidden) return `<section class="group hiddenpost"><h2>${esc(g.title)}</h2><p class="meta">Hidden for now · not in Save all as ZIP</p><button type="button" class="btn ghost" data-unhide="${esc(gk)}">Restore this ${g.reel ? 'reel' : g.story ? 'day' : 'post'}</button></section>`;
-    const cells = g.slides.map((s,j) => { const hk = 'h|' + gid(g) + '|' + j; if (HID()[hk]) return `<div class="cell hiddencell"><div class="frame${s.h ? ' tall' : ''}">${slideNode(s)}<div class="hidmask">Hidden</div></div><div class="act"><span>${s.label ? esc(s.label) : 'Slide ' + (j+1)}</span><span class="acts"><button type="button" data-unhide="${esc(hk)}">Restore</button></span></div></div>`;
+    const gk = 'g|' + gid(g); let gHidden = !!HID()[gk], gWhy = '';
+    // a carousel left with fewer than 4 slides once empty boxes are held back is not ready to post
+    if (HID()[gk] === undefined && seg0 === 'calls' && !g.daily && !g.story && !g.reel && g.slides.length >= 4) { const out = g.slides.filter((s, j) => { const hv = HID()['h|' + gid(g) + '|' + j]; return hv === undefined ? !autoWhyOf(g, s, j, seg0) : !hv; }).length;
+      if (out < 4) { gHidden = true; gWhy = `Not ready to post: ${g.slides.length - out} of its ${g.slides.length} slides need real photos or details. Show the slides to drop photos on them.`; } }
+    if (gHidden) return `<section class="group hiddenpost"><h2>${esc(g.title)}</h2><p class="meta">${gWhy || 'Hidden for now · not in Save all as ZIP'}</p><button type="button" class="btn ghost" data-unhide="${esc(gk)}">${gWhy ? 'Show the slides' : `Restore this ${g.reel ? 'reel' : g.story ? 'day' : 'post'}`}</button></section>`;
+    const cells = g.slides.map((s,j) => { const hk = 'h|' + gid(g) + '|' + j;
+      // open-call posts never go out with an empty photo box, a missing detail or a slide another post already has: hidden until filled or restored
+      const autoWhy = autoWhyOf(g, s, j, seg0);
+      const hv = HID()[hk]; if (hv === undefined ? !!autoWhy : !!hv) return `<div class="cell hiddencell"><div class="frame${s.h ? ' tall' : ''}">${slideNode(s)}<div class="hidmask">${hv === undefined && autoWhy ? autoWhy : 'Hidden'}</div></div><div class="act"><span>${s.label ? esc(s.label) : 'Slide ' + (j+1)}</span><span class="acts"><button type="button" data-unhide="${esc(hk)}">Restore</button></span></div></div>`;
       const i = RENDERED.push({ s, name: `${base}-${g.left !== undefined ? String(g.idx+1).padStart(2,'0')+'-' : g.story ? 'story-' : ''}${String(j+1).padStart(2,'0')}-${s.title}.png` }) - 1;
        const okey = 'ov|' + gid(g) + '|' + j; const has = !!state.images[okey];
       const vmeta = s.photoKey && (state.vids || {})[s.photoKey]; const dkey = s.photoKey || 'end';
@@ -1562,7 +1581,7 @@ function render(){
   $('out').querySelectorAll('[data-hide]').forEach(b => b.onclick = () => { HID()[b.dataset.hide] = 1; render(); status('Hidden for now. It is left out of Save all as ZIP. Restore it any time.'); });
   $('out').querySelectorAll('[data-txr]').forEach(b => b.onclick = () => { Object.keys(TXT()).forEach(k => { if (k.startsWith(b.dataset.txr) && TXT()[k] === '\u200b') delete TXT()[k]; }); render(); status('Removed text is back.'); });
   $('out').querySelectorAll('[data-bg]').forEach(sel => sel.onchange = () => { state.bgs = state.bgs || {}; if (sel.value) state.bgs[sel.dataset.bg] = sel.value; else delete state.bgs[sel.dataset.bg]; render(); status(sel.value ? 'Slide colour changed. It shows wherever the slide has no picture of its own.' : 'Slide colour back to the template.'); });
-  $('out').querySelectorAll('[data-unhide]').forEach(b => b.onclick = () => { delete HID()[b.dataset.unhide]; render(); status('Restored.'); });
+  $('out').querySelectorAll('[data-unhide]').forEach(b => b.onclick = () => { HID()[b.dataset.unhide] = 0; render(); status('Restored.'); });   // 0, not deleted: a slide hidden automatically stays shown once restored
   $('out').querySelectorAll('[data-ph]').forEach(b => b.onclick = () => { const inp = document.createElement('input'); inp.type = 'file'; inp.accept = 'image/*';
     inp.onchange = () => { const file = inp.files[0]; if (!file) return; shrink(file).then(url => { state.images[b.dataset.ph] = url; render(); status('Photo changed. Press "Save call" to keep it.'); }); }; inp.click(); });
   wireSlots();
@@ -1625,11 +1644,13 @@ async function saveDraft(){ const n = $('preset').value; const files = {}, paths
 async function loadCall(n){ const p = PRESETS[n] || {}; let d = null; try { d = JSON.parse(localStorage.getItem(DKEY(n)) || 'null'); } catch {}
   let files = {}; if (d) { try { files = await idbGet('draft:' + n) || {}; } catch {} }
   state = d ? {...DEFAULTS, ...p, ...d, images: {...(d.images || {}), ...files}} : {...DEFAULTS, ...p, images: {...(p.images || DEFAULT_IMAGES)}};
+  if (typeof cmApply === 'function') cmApply(n);
+  if (typeof cvMigrate === 'function') cvMigrate();   // campaign covers: old cover text edits cleared once   // the team's keyword, dates and hashtags (Call manager) win over this browser's draft
   if (d && state.coverStyle === 'anniv' && !d.galTheme && typeof shiftLaunch === 'function') { shiftLaunch(4); state.galTheme = 1; }   // the theme slide went in at slide 5: saved edits move with their slides
   if (d && typeof magMigrate === 'function') { if (!d.magSlides) state.magSlides = 10; magMigrate(); Object.entries(p.images || {}).forEach(([k, v]) => { if (/^th\d$/.test(k) && !state.images[k]) state.images[k] = v; }); }   // calls saved before the theme slide: shift edits, add its artworks
   await restoreVideos(n); return !!d; }
 $('preset').onchange = async () => { restoring = true; const had = await loadCall($('preset').value); restoring = false; try { localStorage.setItem('athLastPreset', $('preset').value); } catch {}
-  fillForm(); buildPtype(); render(); if (had) status('Your edits to this call are back.'); };
+  fillForm(); if (typeof cmLockForm === 'function') cmLockForm(); buildPtype(); render(); if (had) status('Your edits to this call are back.'); };
 $('resetCall').onclick = async () => { const n = $('preset').value; if (!confirm('Start "' + n + '" fresh? Your edits, images and text changes for this call will be removed from this browser.')) return;
   try { localStorage.removeItem(DKEY(n)); await idbSet('draft:' + n, {}); } catch {} restoring = true; await loadCall(n); restoring = false; fillForm(); buildPtype(); render(); status('"' + n + '" is back to the original.'); };
 $('ptype').onchange = () => { try { localStorage.setItem('athLastPtype', $('ptype').value); } catch {} render(); };
@@ -1641,6 +1662,8 @@ $('ptype').onchange = () => { try { localStorage.setItem('athLastPtype', $('ptyp
   if (pt === 'interview') $('ptype').value = 'calendar';
   sizePreviews(); await document.fonts.ready; let seg = 'calls'; try { seg = localStorage.getItem('athSeg') || 'calls'; } catch {} setSeg(seg); if (had) status('Welcome back. Your edits are restored.'); })();
 </script>
+<script src="calls.js"></script>
+<script src="campaign.js"></script>
 <script src="daily.js"></script>
 <script src="books.js"></script>
 <script src="fund.js"></script>

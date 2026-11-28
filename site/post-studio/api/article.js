@@ -44,14 +44,14 @@ export function extract(html, base){
   return {title, text, images};
 }
 
-async function rehost(images){
+export async function rehost(images, prefix = 'interviews/img-'){
   const out = [];
   for (const im of images.slice(0, 16)) {
     try { const r = await fetch(im.url, {headers: {'User-Agent': UA}, signal: AbortSignal.timeout(8000)}); if (!r.ok) continue;
       const type = (r.headers.get('content-type') || '').split(';')[0]; if (!/^image\/(jpeg|png|webp|gif|avif)$/.test(type)) continue;
       const buf = Buffer.from(await r.arrayBuffer()); if (buf.length < 12000) continue;   // icons and spacers
       const ext = type.split('/')[1].replace('jpeg', 'jpg');
-      const saved = await put('interviews/img-' + Date.now() + '.' + ext, buf, {access: 'public', addRandomSuffix: true, contentType: type});
+      const saved = await put(prefix + Date.now() + '.' + ext, buf, {access: 'public', addRandomSuffix: true, contentType: type});
       out.push({...im, url: saved.url, src: im.url});
     } catch { /* skip images that fail */ }
   }

@@ -1,0 +1,231 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Style 01 · Specimen · Arts to Hearts Magazine, Issue 16 launch</title>
+<style>
+/* Built inside the ATH Social and Graphics guide v1 (design/guidelines/src/social.html):
+   Inter Tight + Libre Baskerville only · one surface (White) + one accent (Petrol) for the whole carousel ·
+   corners 24px at 72px from the sides / 56px from top and bottom · logo + monogram placed from files ·
+   monogram only on the cover (top right) and the end card (top centre) · nothing tilted, no stickers, no gradients ·
+   artworks whole and credited (no credit on the cover) · no fee, no applicant counts, no counters. */
+@font-face{font-family:"T";src:url(../fonts/ath/InterTight-Regular.woff2) format("woff2");font-weight:400}
+@font-face{font-family:"T";src:url(../fonts/ath/InterTight-Medium.woff2) format("woff2");font-weight:500}
+@font-face{font-family:"T";src:url(../fonts/ath/InterTight-Regular-ext.woff2) format("woff2");font-weight:400;unicode-range:U+0100-02AF,U+1E00-1EFF}
+@font-face{font-family:"T";src:url(../fonts/ath/InterTight-Medium-ext.woff2) format("woff2");font-weight:500;unicode-range:U+0100-02AF,U+1E00-1EFF}
+@font-face{font-family:"B";src:url(../fonts/ath/LibreBaskerville.woff2) format("woff2");font-style:normal}
+@font-face{font-family:"B";src:url(../fonts/ath/LibreBaskerville-Italic.woff2) format("woff2");font-style:italic}
+:root{--white:#FFFFFF;--ink:#1C1310;--burg:#6A0620;--peony:#FAD2E1;--cream:#F9EEE5;--petrol:#025054}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#ECE8E4;font-family:T,sans-serif;color:var(--ink);-webkit-font-smoothing:antialiased}
+
+/* ---------- design sheet (fits a 1400px page, slides shown whole) ---------- */
+.sheet{width:1400px;margin:0 auto;padding:56px 40px 80px}
+.sheet>h1{font:500 76px/1 T;letter-spacing:-.035em}.sheet>h1 em{font:italic 400 64px/1 B;color:var(--burg)}
+.lede{font:400 21px/1.45 T;max-width:1000px;margin:16px 0 34px;color:#4a3f3b}
+.sheet h2{font:500 14px/1 T;letter-spacing:.14em;text-transform:uppercase;color:var(--burg);margin:0 0 14px}
+table.ref{width:100%;border-collapse:collapse;background:#fff;border-radius:14px;overflow:hidden;margin-bottom:34px}
+table.ref th,table.ref td{font:400 14px/1.4 T;text-align:left;vertical-align:top;padding:11px 12px;border-bottom:1px solid #eee4dd}
+table.ref th{font-weight:500;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:#7a6c66;background:#faf6f3}
+table.ref td:first-child{font-weight:500;white-space:nowrap}
+.tok{display:grid;grid-template-columns:1.1fr 1fr 1fr;gap:16px;margin-bottom:40px}
+.tok>div{background:#fff;border-radius:14px;padding:18px 20px}
+.tok p{font:400 15px/1.5 T;color:#3b302d}
+.sw{display:flex;gap:6px;margin-bottom:10px}.sw span{flex:1;height:46px;border-radius:8px;border:1px solid rgba(0,0,0,.08);font:500 11px/1 T;display:flex;align-items:flex-end;padding:6px}
+.seq{display:grid;grid-template-columns:repeat(3,432px);gap:30px 22px;justify-content:center}
+.cell .cap{font:500 13px/1.3 T;letter-spacing:.06em;text-transform:uppercase;margin:0 0 8px;color:#5b4e49}
+.cell .cap b{color:var(--burg);font-weight:500}
+.cell .fr{width:432px;height:540px;overflow:hidden;border-radius:6px;box-shadow:0 10px 26px -18px rgba(0,0,0,.45)}
+.cell .fr>.s{transform:scale(.4);transform-origin:0 0}
+/* solo mode: used by the renderer, every slide at 1080 x 1350 */
+body.solo .sheet>:not(.seq){display:none}
+body.solo .cell .cap{display:none}
+body.solo .cell .fr{width:1080px;height:1350px;border-radius:0;box-shadow:none}
+body.solo .cell .fr>.s{transform:none}
+body.solo .seq{grid-template-columns:1080px}
+
+/* ---------- the style ---------- */
+.s{position:relative;width:1080px;height:1350px;overflow:hidden;background:var(--white);color:var(--ink)}
+.a{position:absolute}
+.c{position:absolute;font:500 24px/1 T;letter-spacing:-.005em;color:var(--ink);white-space:nowrap}
+.tl{left:72px;top:56px}.tr{right:72px;top:56px}.bl{left:72px;bottom:56px}.br{right:72px;bottom:56px}
+.br b{font-weight:500;color:var(--petrol)}
+/* giant type as the picture (refs 1, 2) */
+.giant{font:500 520px/.85 T;letter-spacing:-.07em;color:var(--ink);white-space:nowrap}
+/* headlines */
+.cover-h{font:500 116px/.96 T;letter-spacing:-.035em}
+.h{font:500 72px/1.04 T;letter-spacing:-.03em}
+.h i{font:italic 400 66px/1 B;letter-spacing:-.01em}
+.h u{text-decoration-thickness:4px;text-underline-offset:10px}
+.sub{font:400 32px/1.42 T}
+/* spec label (refs 1, 2): level Burgundy panel, LABEL: VALUE rows */
+.label{position:absolute;background:var(--burg);color:var(--cream);border-radius:0}
+.label .hd{display:flex;gap:22px;align-items:baseline;color:var(--peony);font:500 34px/1.05 T;letter-spacing:-.02em}
+.label .hd span:first-child{font-variant-numeric:tabular-nums;white-space:nowrap}
+.label dl{display:grid;grid-template-columns:auto 1fr;column-gap:26px}
+.label dt,.label dd{font:500 22px/1.32 T;letter-spacing:.08em;text-transform:uppercase}
+.label dt{color:var(--peony)}
+.label.cv{display:flex;flex-direction:column;justify-content:space-between}
+.label.cv dl{row-gap:6px}
+.label.big{display:flex;flex-direction:column}
+.label.big dl{flex:1;align-content:space-between}
+.label.big .hd{font-size:72px;line-height:1.02;letter-spacing:-.03em;gap:34px;margin-bottom:64px}
+.label.big dl{row-gap:30px;column-gap:44px}
+.label.big dt,.label.big dd{font-size:30px;letter-spacing:.06em}
+/* serif index with superscripts and slashes (ref 3) */
+.index{font:400 64px/1.32 B;letter-spacing:-.01em}
+.index sup{font:500 24px/0 T;letter-spacing:0;color:var(--petrol);vertical-align:top;position:relative;top:.62em;margin-left:5px}
+.index .it{white-space:nowrap}
+.index .sl{color:var(--ink);opacity:.35;margin:0 .18em}
+.paren{font:400 72px/1 B;letter-spacing:-.01em;white-space:nowrap}
+.smallcaps{font:500 20px/1.35 T;letter-spacing:.1em;text-transform:uppercase}
+/* serif statement (ref 5) */
+.stmt{font:400 72px/1.2 B;letter-spacing:-.01em}
+.stmt i{font-style:italic;color:var(--petrol)}
+/* checkbox options (ref 2) */
+.opt{display:flex;align-items:center;gap:28px;font:500 46px/1.1 T;letter-spacing:-.03em;padding:26px 0;border-top:2px solid rgba(28,19,16,.12)}
+.opt:last-child{border-bottom:2px solid rgba(28,19,16,.12)}
+.box{flex:none;width:34px;height:34px;border:3px solid var(--petrol)}
+.box.on{background:var(--petrol)}
+.opt.off{color:rgba(28,19,16,.5)}
+.opt.off s{text-decoration-thickness:3px}
+/* circled numerals (ref 4) */
+.step{display:flex;align-items:center;gap:28px;font:500 46px/1.1 T;letter-spacing:-.03em;padding:16px 0}
+.num{flex:none;width:56px;height:56px;border-radius:50%;border:3px solid var(--petrol);color:var(--petrol);font:500 26px/50px T;text-align:center;letter-spacing:0}
+/* artworks: whole, inside a rounded frame, credited under */
+.art{position:absolute;border-radius:24px;display:block}
+.credit{position:absolute;font:400 20px/1.3 T;color:var(--ink);white-space:nowrap}
+.credit i{font:italic 400 19px/1 B}
+</style></head><body>
+<div class="sheet">
+  <h1>Style 01 · <em>Specimen</em></h1>
+  <p class="lede">The Arts to Hearts Magazine, Issue 16 launch (10 slides, posting order) built from your five references inside the ATH Social guide. One White surface and one Petrol accent from start to finish, Inter Tight and Libre Baskerville only, the same four corners on every slide, the logo and monogram placed from the brand files. Each reference gives the carousel one device, and each device has its own job in the sequence.</p>
+
+  <h2>Reference analysis</h2>
+  <table class="ref">
+    <tr><th>Ref</th><th>Device</th><th>Structure</th><th>Type move</th><th>Colour move</th><th>Makes you</th><th>ATH translation</th><th>Dropped, and why</th></tr>
+    <tr><td>1, 2 Roasters</td><td>Giant letters as the picture + a spec label</td><td>Letters fill the page and bleed off the edge; a small label sits over them</td><td>Geometric sans at poster size; mono caps LABEL: VALUE rows; "001 /" header</td><td>Black on off-white, one periwinkle label</td><td>Stop, then read the facts like a product</td><td>Giant Inter Tight figures "16" and "100" (520 px, −7%) bleeding off the edge; level Burgundy label, Peony labels, Cream values, Inter Tight Medium caps 22 px tracked +8%</td><td>Rotation (nothing tilts in the guide), mono font, the periwinkle (accents are never a background)</td></tr>
+    <tr><td>2 Roasters</td><td>Checkbox options</td><td>■ WHOLE BEAN / □ FILTER in a side column</td><td>Small caps beside filled and empty squares</td><td>Ink only</td><td>See the choice at a glance</td><td>Who can apply as Petrol squares: filled = welcome, empty + struck = not eligible (AI work)</td><td>Vertical text column</td></tr>
+    <tr><td>3 Lola Lab</td><td>Serif index with superscript numbers</td><td>Items run on with slashes; big empty middle; "( name … Service )" footer</td><td>Serif at display size, tiny superscripts, big parentheses</td><td>Ink on one flat ground</td><td>Read the whole offer as one line</td><td>What fits (the call's own five kinds) and the past cover artists as Baskerville 56–70 px indexes; Petrol superscripts carry real numbers (issue numbers); footer "( Any … medium )"</td><td>Centred setting (guide: left), paper texture</td></tr>
+    <tr><td>4 Fiverr</td><td>Sans sentence with one serif-italic word, underlines, circled numerals, breadcrumb</td><td>Big left-set sentences, small footer row</td><td>Grotesk + one italic serif word; underlines on key words</td><td>Dark green on pale yellow, one colour</td><td>Feel spoken to, plainly</td><td>Slides 2 and 8: Inter Tight 76 px sentences with one Baskerville italic word and underlines; steps with Petrol circled numerals; breadcrumb becomes the top-left corner "Arts to Hearts Magazine → Issue 16"</td><td>Several italic words per paragraph (guide: one italic phrase)</td></tr>
+    <tr><td>5 Givers</td><td>Big serif statement, one contrasting word, small sans paragraph at the bottom</td><td>Statement top-left, empty middle, paragraph bottom-left</td><td>Serif headline + one script word</td><td>Flat ground, the one word in a second colour</td><td>Feel the idea before the details</td><td>The theme: "The Art of / Starting <i>Again.</i>" in Baskerville 72 px, the one word italic in Petrol; the call's own sentence at 32 px bottom-left; the artwork whole beside it</td><td>Script face (→ Baskerville italic), green ground (→ White)</td></tr>
+  </table>
+
+  <div class="tok">
+    <div><h2>Surface + accent</h2><div class="sw"><span style="background:#fff">White</span><span style="background:#1C1310;color:#fff">Ink</span><span style="background:#6A0620;color:#FAD2E1">Burgundy label</span><span style="background:#025054;color:#fff">Petrol</span></div><p>White on all 10 slides. Ink type. Burgundy only as the spec label (Peony labels, Cream values). Petrol is the one accent: superscripts, checkboxes, circled numerals, the one italic word, the keyword in the corner. No Pink, no Chilli, no second accent.</p></div>
+    <div><h2>Type (guide sizes)</h2><p><b>Inter Tight Medium</b>: giant figures 520 px (−7%), cover headline 116 px, slide sentences 76 px, list 46 px, label rows 22–30 px caps, corners 24 px.<br><b>Libre Baskerville</b>: theme statement and indexes 56–72 px, one italic word per slide, never in caps. Credits 20 px.</p></div>
+    <div><h2>Rhythm</h2><p>Art and type alternate: 1 cover (art) · 2 the number (type) · 3 theme (art) · 4 what fits (type) · 5 past covers (art) · 6 what you get (type) · 7 artwork in focus (art) · 8 who can apply (type) · 9 how to apply (art) · 10 end card. Slides 6 and 7 swap places from the playbook order so no two type slides touch.</p></div>
+  </div>
+
+  <h2>The carousel</h2>
+  <div class="seq">
+
+  <!-- 1 · Cover: identity hook + art in a frame + giant 16 + spec label -->
+  <div class="cell"><p class="cap"><b>1</b> · Cover · giant figure + spec label</p><div class="fr"><section class="s" id="s1">
+    <p class="c tl">Open call for artists</p>
+    <img class="a" src="../brand/monogram-ath-burgundy.svg" style="right:50px;top:4px;height:150px" alt="AtH">
+    <p class="a cover-h" style="left:72px;top:150px">Calling all<br>artists.</p>
+    <img class="art" src="../art/issue16/art-howis.jpg" style="left:72px;top:450px;width:520px" alt="Fiercely Fragile by Margarita Howis">
+    <p class="a giant" style="left:624px;top:422px">16</p>
+    <div class="label cv" style="left:624px;right:72px;top:772px;bottom:256px;padding:34px 32px 36px">
+      <p class="hd"><span>16 /</span><span>Issue 16</span></p>
+      <dl><dt>Selected:</dt><dd>100 artists</dd><dt>Award:</dt><dd>$500</dd><dt>Feature:</dt><dd>Two pages</dd><dt>Closes:</dt><dd>27 Dec 2026</dd><dt>Comment:</dt><dd style="color:#fff">ISSUE16</dd></dl>
+    </div>
+    <img class="a" src="../brand/logo-magazine-burgundy.svg" style="left:40px;bottom:30px;height:96px" alt="Arts to Hearts Magazine">
+    <p class="c br">Comment <b>ISSUE16</b> →</p>
+  </section></div></div>
+
+  <!-- 2 · The number (works as a cover) -->
+  <div class="cell"><p class="cap"><b>2</b> · The number · giant figure + sentence</p><div class="fr"><section class="s" id="s2">
+    <p class="c tl">Arts to Hearts Magazine → Issue 16</p><p class="c tr">Closes 27 Dec</p>
+    <p class="a giant" style="left:50px;top:150px">100</p>
+    <p class="a h" style="left:72px;width:936px;top:650px;font-size:76px">artists, <i style="font-size:70px">published</i> in Issue&nbsp;16.<br>One of them wins <u>$500</u>.</p>
+    <p class="a sub" style="left:72px;width:800px;top:1080px">Arts to Hearts Magazine, the 4th anniversary issue. Every selected artist gets a two&#8209;page feature.</p>
+    <p class="c bl">@artstoheartsproject</p><p class="c br">Comment <b>ISSUE16</b> →</p>
+  </section></div></div>
+
+  <!-- 3 · The theme: serif statement + artwork whole -->
+  <div class="cell"><p class="cap"><b>3</b> · The theme · serif statement</p><div class="fr"><section class="s" id="s3">
+    <p class="c tl">Arts to Hearts Magazine → Issue 16</p><p class="c tr">Closes 27 Dec</p>
+    <p class="a stmt" style="left:72px;top:150px">The Art of<br>Starting <i>Again.</i></p>
+    <img class="art" src="../art/issue16/art-lotito.jpg" style="right:72px;top:420px;width:520px" alt="Bloom, Anyway by Debbee Lotito">
+    <p class="credit" style="left:488px;top:1130px">Debbee Lotito, <i>Bloom, Anyway</i></p>
+    <p class="a sub" style="left:72px;width:372px;bottom:238px">Issue 16 is about what comes after an ending. Show us what starting again looks&nbsp;like in your&nbsp;work.</p>
+    <p class="c bl">@artstoheartsproject</p><p class="c br">Comment <b>ISSUE16</b> →</p>
+  </section></div></div>
+
+  <!-- 4 · What fits: serif index with superscripts -->
+  <div class="cell"><p class="cap"><b>4</b> · What fits · serif index</p><div class="fr"><section class="s" id="s4">
+    <p class="c tl">Arts to Hearts Magazine → Issue 16</p><p class="c tr">Closes 27 Dec</p>
+    <p class="a sub" style="left:72px;top:150px">Your work fits if it shows</p>
+    <p class="a index" style="left:72px;right:60px;top:224px;font-size:70px;line-height:1.3"><span class="it">A new chapter<sup>01</sup></span><span class="sl">/</span> <span class="it">A place<sup>02</sup></span><span class="sl">/</span> <span class="it">A memory<sup>03</sup></span><span class="sl">/</span> <span class="it">A change in perspective<sup>04</sup></span><span class="sl">/</span> <span class="it">Work you already made<sup>05</sup></span></p>
+    <p class="a paren" style="left:72px;top:1088px">( Any</p>
+    <p class="a smallcaps" style="left:330px;top:1094px">Original work only<br>No AI-generated work</p>
+    <p class="a paren" style="right:72px;top:1088px">medium )</p>
+    <p class="c bl">@artstoheartsproject</p><p class="c br">Comment <b>ISSUE16</b> →</p>
+  </section></div></div>
+
+  <!-- 5 · Proof: a past cover, whole, + the cover artists as an index -->
+  <div class="cell"><p class="cap"><b>5</b> · Proof · past cover + index</p><div class="fr"><section class="s" id="s5">
+    <p class="c tl">Arts to Hearts Magazine → Issue 16</p><p class="c tr">Closes 27 Dec</p>
+    <img class="art" src="../art/issue16/issue14.jpg" style="left:72px;top:140px;height:880px" alt="Arts to Hearts Magazine Issue 14 cover by John Sloane">
+    <p class="credit" style="left:72px;top:1036px">Arts to Hearts Magazine, Issue 14. Cover: John Sloane</p>
+    <p class="a index" style="left:72px;right:60px;top:1082px;font-size:56px;line-height:1.22"><span class="it">John Sloane<sup>14</sup></span><span class="sl">/</span> <span class="it">Troy Brooks<sup>13</sup></span><span class="sl">/</span> <span class="it">Celia Gallego<sup>12</sup></span><span class="sl">/</span> <span class="it">Rachel Deacon<sup>11</sup></span></p>
+    <p class="c bl">@artstoheartsproject</p><p class="c br">Comment <b>ISSUE16</b> →</p>
+  </section></div></div>
+
+  <!-- 6 · What you get: the spec label as the hero -->
+  <div class="cell"><p class="cap"><b>6</b> · What you get · spec label</p><div class="fr"><section class="s" id="s6">
+    <p class="c tl">Arts to Hearts Magazine → Issue 16</p><p class="c tr">Closes 27 Dec</p>
+    <div class="label big" style="left:72px;right:72px;top:150px;bottom:150px;padding:60px 56px">
+      <p class="hd"><span>16 /</span><span>What every selected artist&nbsp;gets</span></p>
+      <dl><dt>Feature:</dt><dd>Two pages in Issue 16</dd><dt>Inside:</dt><dd>Artwork / interview / biography</dd><dt>Certificate:</dt><dd>Official certificate</dd><dt>Sold on:</dt><dd>Amazon / Barnes &amp; Noble</dd><dt>Promotion:</dt><dd>100,000+ subscribers</dd><dt>Campaign:</dt><dd>Announcements / social / email</dd><dt>Award:</dt><dd><span style="color:#fff">$500 to one artist</span></dd><dt>Results:</dt><dd>About 3 weeks after 27 Dec</dd></dl>
+    </div>
+    <p class="c bl">@artstoheartsproject</p><p class="c br">Comment <b>ISSUE16</b> →</p>
+  </section></div></div>
+
+  <!-- 7 · Artwork in focus -->
+  <div class="cell"><p class="cap"><b>7</b> · Artwork in focus</p><div class="fr"><section class="s" id="s7">
+    <p class="c tl">Arts to Hearts Magazine → Issue 16</p><p class="c tr">Closes 27 Dec</p>
+    <img class="art" src="../art/issue16/art-alsharif.jpg" style="left:72px;top:140px;height:1040px" alt="Carry Me by Isabella Al-Sharif">
+    <p class="credit" style="left:72px;top:1198px">Isabella Al-Sharif, <i>Carry Me</i>. Published in Issue 13</p>
+    <p class="c bl">@artstoheartsproject</p><p class="c br">Comment <b>ISSUE16</b> →</p>
+  </section></div></div>
+
+  <!-- 8 · Who can apply: sentence + checkbox options -->
+  <div class="cell"><p class="cap"><b>8</b> · Who can apply · sentence + checkboxes</p><div class="fr"><section class="s" id="s8">
+    <p class="c tl">Arts to Hearts Magazine → Issue 16</p><p class="c tr">Closes 27 Dec</p>
+    <p class="a h" style="left:72px;width:936px;top:150px;font-size:76px">Open to <u>emerging</u> and <u>established</u> artists of all genders, nationalities and backgrounds, at <i>any</i> stage.</p>
+    <div class="a" style="left:72px;right:72px;top:620px" id="opts">
+      <p class="opt"><span class="box on"></span>Any medium, anywhere</p>
+      <p class="opt"><span class="box on"></span>Work you already made</p>
+      <p class="opt"><span class="box on"></span>No publication history needed</p>
+      <p class="opt off"><span class="box"></span><s>AI-generated work</s></p>
+    </div>
+    <p class="c bl">@artstoheartsproject</p><p class="c br">Comment <b>ISSUE16</b> →</p>
+  </section></div></div>
+
+  <!-- 9 · How to apply: artwork whole + circled steps -->
+  <div class="cell"><p class="cap"><b>9</b> · How to apply · circled steps</p><div class="fr"><section class="s" id="s9">
+    <p class="c tl">Arts to Hearts Magazine → Issue 16</p><p class="c tr">Closes 27 Dec</p>
+    <img class="art" src="../art/issue16/art-zavidina.jpg" style="left:72px;top:140px;width:936px" alt="Where We Sat by Alyona Zavidina">
+    <p class="credit" style="left:72px;top:814px">Alyona Zavidina, <i>Where We Sat</i>. Published in Issue 13</p>
+    <div class="a" style="left:72px;right:72px;top:888px">
+      <p class="step"><span class="num">1</span>Comment ISSUE16</p>
+      <p class="step"><span class="num">2</span>We send you the link</p>
+      <p class="step"><span class="num">3</span>Submit by 27 December</p>
+    </div>
+    <p class="c bl">@artstoheartsproject</p><p class="c br">Comment <b>ISSUE16</b> →</p>
+  </section></div></div>
+
+  <!-- 10 · End card -->
+  <div class="cell"><p class="cap"><b>10</b> · End card · keyword as giant word</p><div class="fr"><section class="s" id="s10">
+    <img class="a" src="../brand/monogram-ath-burgundy.svg" style="left:50%;top:4px;height:150px;transform:translateX(-50%)" alt="AtH">
+    <p class="a" style="left:0;right:0;top:300px;text-align:center;font:500 132px/1 T;letter-spacing:-.035em">Comment</p>
+    <p class="a giant" style="left:0;right:0;top:430px;text-align:center;font-size:250px;letter-spacing:-.06em">ISSUE16</p>
+    <p class="a" style="left:120px;right:120px;top:720px;text-align:center;font:400 56px/1.2 B">and we’ll send you <i>the link.</i></p>
+    <p class="a sub" style="left:72px;right:72px;top:900px;text-align:center">Closes 27 December 2026</p>
+    <img class="a" src="../brand/logo-magazine-burgundy.svg" style="left:50%;bottom:40px;height:150px;transform:translateX(-50%)" alt="Arts to Hearts Magazine">
+  </section></div></div>
+
+  </div>
+</div>
+</body></html>
