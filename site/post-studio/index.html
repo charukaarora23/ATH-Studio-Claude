@@ -263,6 +263,7 @@ img.bk-cv{width:100%;object-fit:contain;background:#FAD2E1}.bk-a img{width:100%;
 
 <main>
   <nav class="tabs" id="tabs" aria-label="Views">
+    <button type="button" data-view="callmgr">Call manager</button>
     <button type="button" data-view="calendar">Calendar</button>
     <button type="button" data-view="feed">Feed posts</button>
     <button type="button" data-view="storyplan">Stories plan</button>
@@ -313,7 +314,7 @@ const DEFAULTS = {
 const PRESETS = {
   'Garden Edition': {},
   'Artist of the Year 2026': {
-    style:'award', series:'Arts to Hearts', edition:'2026', editionLabel:'Hardcover collectible book', name:'Artist of the Year 2026', keyword:'NOMINATE', deadline:'2026-11-16', selected:'100',
+    style:'award', series:'Arts to Hearts', edition:'2026', editionLabel:'Hardcover collectible book', name:'Artist of the Year 2026', keyword:'NOMINATE', deadline:'2026-11-22', selected:'100',
     headline:'Call for artists', coverLine:'Get published in the Artist of the Year 2026 hardcover book. 100 artists.', colour:'#9A6A12',
     editions:'35+', seriesNoun:'books', published:'10,000+',
     quote:'No single subject, medium, or direction. The full range of what artists are making today.',
@@ -581,11 +582,11 @@ function wireSlots(){
 }
 // ---------- view tabs ----------
 let lastFeed = 'month';
-function viewOf(v){ return ['calendar', 'daily', 'interview', 'storyplan', 'storydays', 'stories', 'reels'].includes(v) ? v : 'feed'; }
+function viewOf(v){ return ['callmgr', 'calendar', 'daily', 'interview', 'storyplan', 'storydays', 'stories', 'reels'].includes(v) ? v : 'feed'; }
 function updateTabs(){ const v = viewOf($('ptype').value); if (v === 'feed') lastFeed = $('ptype').value || 'month';
   document.querySelectorAll('#tabs [data-view]').forEach(b => b.setAttribute('aria-current', b.dataset.view === v ? 'page' : 'false'));
   $('ptype').closest('.f').style.display = v === 'feed' ? '' : 'none';
-  const noExport = v === 'calendar' || v === 'storyplan'; $('go').style.display = noExport ? 'none' : ''; $('zip').style.display = noExport ? 'none' : ''; }
+  const noExport = v === 'calendar' || v === 'storyplan' || v === 'callmgr'; $('go').style.display = noExport ? 'none' : ''; $('zip').style.display = noExport ? 'none' : ''; }
 function setView(v){ $('ptype').value = v === 'feed' ? lastFeed : v; try { if (v !== 'interview') localStorage.setItem('athLastPtype', $('ptype').value); } catch {} render(); window.scrollTo({top:0}); }
 document.querySelectorAll('#tabs [data-view]').forEach(b => b.onclick = () => setView(b.dataset.view));
 document.addEventListener('click', e => { const g = e.target.closest('[data-goto]'); if (g) setView(g.dataset.goto); });
@@ -823,13 +824,16 @@ const isoD = d => d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '
 const DAYMS = 864e5;
 function callStates(){ return Object.keys(PRESETS).filter(n => !/blank/i.test(n)).map(n => { let d = null; try { d = JSON.parse(localStorage.getItem(DKEY(n)) || 'null'); } catch {}
   const s = n === $('preset').value ? state : {...DEFAULTS, ...PRESETS[n], ...(d || {})};
-  return {preset: n, name: s.name, kw: (s.keyword || '').toUpperCase(), colour: s.colour, dl: new Date(s.deadline + 'T00:00:00'), hidden: s.hidden || {}}; }); }
+  const sh = typeof SHAREDC !== 'undefined' && SHAREDC[n]; if (sh && sh.f && s !== state) CORE.forEach(k => { if (sh.f[k] !== undefined && sh.f[k] !== '') s[k] = sh.f[k]; });
+  return {preset: n, name: s.name, kw: (s.keyword || '').toUpperCase(), colour: s.colour, dl: new Date(s.deadline + 'T00:00:00'), len: typeof cmLen === 'function' ? cmLen(s) : 30, archived: !!(sh && sh.archived), hidden: s.hidden || {}}; }).filter(c => !c.archived); }
 function dayItems(date, calls){ const posts = monthPosts(), postDays = new Set(posts.map(p => p.left)), iso = isoD(date), out = [];
   calls.forEach(c => { if (c.preset === 'ATH') { const plan = WEEK_PLAN[date.getDay()] || {};
       SLOTS.forEach(s => { const post = Object.values(DPOSTS).find(p => p.date === iso && p.slot === s.id); const cat = post ? post.cat : plan[s.id]; if (!cat || cat === 'opencall') return;
-        out.push({c, type: (DCAT[cat] || {}).name || cat, title: post ? (post.f.name || post.f.title || post.f.book || 'Draft') : 'Not created yet', detail: `${s.ist} IST · ${s.pt}`, id: `ath|${iso}|${s.id}`, open: {daily: post ? post.id : `${iso}|${s.id}|${cat}`}}); }); return; } const left = Math.round((c.dl - date) / DAYMS); if (left < -1 || left > 30) return;
-    posts.forEach((p, i) => { if (p.left !== left || c.hidden['g|' + p.title]) return;
-      out.push({c, type: 'Feed post', title: p.title, detail: p.kind, id: `${c.preset}|${iso}|feed|${p.title}`, open: {preset: c.preset, ptype: String(i)}}); });
+        out.push({c, type: (DCAT[cat] || {}).name || cat, title: post ? (post.f.name || post.f.title || post.f.book || 'Draft') : 'Not created yet', detail: `${s.ist} IST · ${s.pt}`, id: `ath|${iso}|${s.id}`, open: {daily: post ? post.id : `${iso}|${s.id}|${cat}`}}); }); return; } const left = Math.round((c.dl - date) / DAYMS), L = Math.max(7, c.len || 30); if (left < -1 || left > Math.max(30, L)) return;
+    const plan = typeof callPlan === 'function' ? callPlan(L) : posts.map((p, i) => ({left: p.left, i, title: p.title, kind: p.kind}));
+    plan.forEach(x => { if (x.left !== left || c.hidden['g|' + x.title]) return;
+      out.push({c, type: x.s !== undefined ? 'Single graphic' : 'Feed post', title: x.title, detail: x.kind, id: `${c.preset}|${iso}|feed|${x.title}${x.s !== undefined ? '|' + left : ''}`, open: {preset: c.preset, ptype: x.s !== undefined ? 's' + x.s : String(x.i)}}); });
+    if (left > 30) return;
     const ids = storyDay(left, postDays);
     if (ids.length && !c.hidden['g|' + `${postDate(left)} · Stories`]) out.push({c, type: 'Stories', title: `${ids.length} frame${ids.length > 1 ? 's' : ''}`, detail: ids.map(x => STORY_T[x].name).join(' · '), id: `${c.preset}|${iso}|stories`, open: {preset: c.preset, ptype: 'storydays', find: `${postDate(left)} · Stories`}});
     const r = REEL_DAYS[left] && REELS.find(x => x.id === REEL_DAYS[left]);
@@ -1432,9 +1436,9 @@ function launch(){
 // ---------- caption ----------
 function caption(){
   const kw = (state.keyword || 'KEYWORD').toUpperCase();
-  return `What happens when ${state.selected} artists from around the world come together around a single idea?
+  return `Open call for artists: ${/^issue\s/i.test(state.name) ? `${state.series}, ${state.name}` : `${state.series}: ${state.name}`}. Submissions close ${dl().getDate()} ${MONTHS_L[dl().getMonth()]}.
 
-${state.series}: ${state.name} is now open for submissions. Edition ${state.edition} of a series that has published ${state.published} artists since ${state.since}.
+What happens when ${state.selected} artists from around the world come together around a single idea? ${/^issue\s/i.test(state.name) ? `${state.series}, ${state.name}` : `The ${state.name}`} is now open for submissions. ${state.edition ? `Edition ${state.edition} of a series` : `Part of a series`} that has published ${state.published} artists since ${state.since}.
 
 ${state.selected} artists will be selected by ${state.jury || 'the jury'} and published in a juried hardcover book, distributed through Amazon, Barnes & Noble and the ATH Shop, and introduced to collectors, galleries and curators.
 
@@ -1445,7 +1449,7 @@ Submissions close ${dl().getDate()} ${MONTHS_L[dl().getMonth()]}.
 
 Know an artist whose work belongs in this book? Send this to them.
 
-#ArtsToHeartsProject #OpenCall #CallForArtists #101ArtBook`;
+${tagsFor()}`;
 }
 const pinned = () => CMODE() ? `Apply via the link in bio, or comment "${(state.keyword || 'KEYWORD').toUpperCase()}" and we'll send you the link. Closes ${short()}.` : `DM "${(state.keyword || 'KEYWORD').toUpperCase()}" for the full brief and your submission link. Closes ${short()}.`;
 
@@ -1453,9 +1457,11 @@ const pinned = () => CMODE() ? `Apply via the link in bio, or comment "${(state.
 let RENDERED = [];
 const slideNode = s => `<div class="post" style="background:${s.bg};height:${s.h||1350}px">${s.html}</div>`;
 function verbFor(left){ if ((state.ctaMode || 'comment') === 'comment') return 'COMMENT'; const d = new Date(dl()); d.setDate(d.getDate() - left); const [y,m,dd] = String(state.commentFrom||'').split('-').map(Number); return (y && d >= new Date(y, m-1, dd)) ? 'COMMENT' : 'DM'; }
+// the day a month post goes out, on this call's real dates (Call manager: callPlan)
+function planLeft(i, p){ if (typeof callPlan !== 'function' || i < 0) return p.left; const x = callPlan(cmLen(state)).find(y => y.i === i); return x ? x.left : p.left; }
 function postDate(left){ const d = new Date(dl()); d.setDate(d.getDate() - left); return d.getDate() + ' ' + MONTHS[d.getMonth()]; }
 function buildPtype(){ const sel = $('ptype'), cur = sel.value;
-  sel.innerHTML = `<option value="month">Whole month (${monthPosts().length} feed posts)</option>` + monthPosts().map((p,i) => `<option value="${i}">${postDate(p.left)} · ${esc(p.title)} (${p.kind.split(' ·')[0]})</option>`).join('') + `<optgroup label="Single graphics (optional, outside the schedule)">${singlePosts().map((p,i) => `<option value="s${i}">${esc(p.title)}</option>`).join('')}</optgroup>` + '<optgroup label="Stories"><option value="storyplan">Stories plan: all calls, day by day</option><option value="storydays">Stories: this call, every day ready to post</option><option value="stories">Stories: template library</option></optgroup><option value="reels">Reels</option><option value="calendar">Calendar</option><option value="daily">Daily posts</option><option value="interview">Artist interviews</option>';
+  sel.innerHTML = `<option value="month">Whole month (${monthPosts().length} feed posts)</option>` + monthPosts().map((p,i) => `<option value="${i}">${postDate(planLeft(i, p))} · ${esc(p.title)} (${p.kind.split(' ·')[0]})</option>`).join('') + `<optgroup label="Single graphics (optional, outside the schedule)">${singlePosts().map((p,i) => `<option value="s${i}">${esc(p.title)}</option>`).join('')}</optgroup>` + '<optgroup label="Stories"><option value="storyplan">Stories plan: all calls, day by day</option><option value="storydays">Stories: this call, every day ready to post</option><option value="stories">Stories: template library</option></optgroup><option value="reels">Reels</option><option value="calendar">Calendar</option><option value="callmgr">Call manager</option><option value="daily">Daily posts</option><option value="interview">Artist interviews</option>';
   sel.value = cur || '0'; if (!sel.value) sel.value = '0'; }
 function render(){
   readForm(); scheduleDraft(); updateTabs();
@@ -1469,6 +1475,7 @@ function render(){
     else if (p && cat && DSLIDES[p.cat]) { const slides = DSLIDES[p.cat](p).map((s, j) => ({...s, title: p.cat + '-' + (j + 1)}));
       groups.push({title: `${p.date} · ${cat.name}`, meta: `${cat.marker || cat.name} · ${slides.length} slide${slides.length > 1 ? 's' : ''} · ${slotLabel(p.slot)}${cat.key || p.f.key ? ' · keyword “' + (p.f.key || cat.key) + '”' : ''}`, slides, cap: DCAPTION[p.cat](p), pin: (p.f.key || cat.key) ? `Comment '${p.f.key || cat.key}' and we'll send you the link.` : '', daily: true}); }
   } else if (pick === 'interview') { if (!dLoaded) loadDaily(); const p = ivCurrent(); if (p) DPACK[IVK](p).forEach(g => groups.push({...g, daily: true, pid: p.id}));
+  } else if (pick === 'callmgr') { renderPool(); RENDERED = []; $('out').innerHTML = callMgrHTML(); wireCallMgr(); return;
   } else if (pick === 'calendar') { renderPool(); RENDERED = []; $('out').innerHTML = calHTML(); wireCal(); if (!calLoaded) loadStatus(); if (!dLoaded) loadDaily(); return; }
   if (seg0 !== 'books' && seg0 !== 'fund' && pick === 'storyplan') { renderPool(); RENDERED = []; $('out').innerHTML = storyPlanHTML(); status('Stories plan for every call. Pick "Stories: this call, every day" to get the frames.'); return; }
   if (seg0 === 'books' || seg0 === 'fund' || pick === 'daily' || pick === 'interview') {
@@ -1494,7 +1501,7 @@ function render(){
     artPlan(); const isS = /^s\d+$/.test(pick); const all = isS ? singlePosts() : monthPosts(); const list = pick === 'month' ? all : [all[Number(isS ? pick.slice(1) : pick)]].filter(Boolean);
     list.forEach((p,pi) => { VERB = verbFor(p.left); CURLEFT = p.left;
       const slides = artFill(p, artBuild(p)).map(decorate); const cap = p.caption(); const pin = p.pin ? p.pin() : CMODE() ? pinned() : `${VERB === 'COMMENT' ? 'Comment' : 'DM us'} "${(state.keyword||'').toUpperCase()}" for the brief and your link. Closes ${short()}.`;
-      groups.push({title: isS ? `Single graphic · ${p.title}` : `${postDate(p.left)} · ${p.title}`, meta: `${p.kind} · ${slides.length} slide${slides.length>1?'s':''} · ${p.left === 0 ? 'deadline day' : p.left + ' days left'} · ${VERB} “${KW()}”`, slides: slides.map((s,j) => ({...s, title: s.title || (p.title.toLowerCase().replace(/[^a-z0-9]+/g,'-') + (slides.length>1 ? '-'+(j+1) : ''))})), cap, pin, left:p.left, idx:pi});
+      groups.push({title: isS ? `Single graphic · ${p.title}` : `${postDate(planLeft(monthPosts().findIndex(x => x.title === p.title), p))} · ${p.title}`, meta: `${p.kind} · ${slides.length} slide${slides.length>1?'s':''} · ${planLeft(monthPosts().findIndex(x => x.title === p.title), p) === 0 ? 'deadline day' : planLeft(monthPosts().findIndex(x => x.title === p.title), p) + ' days left'} · ${VERB} “${KW()}”`, slides: slides.map((s,j) => ({...s, title: s.title || (p.title.toLowerCase().replace(/[^a-z0-9]+/g,'-') + (slides.length>1 ? '-'+(j+1) : ''))})), cap, pin, left:p.left, idx:pi});
       VERB = verbFor(99); });
   }
   mergePostEdits(groups);
@@ -1625,11 +1632,12 @@ async function saveDraft(){ const n = $('preset').value; const files = {}, paths
 async function loadCall(n){ const p = PRESETS[n] || {}; let d = null; try { d = JSON.parse(localStorage.getItem(DKEY(n)) || 'null'); } catch {}
   let files = {}; if (d) { try { files = await idbGet('draft:' + n) || {}; } catch {} }
   state = d ? {...DEFAULTS, ...p, ...d, images: {...(d.images || {}), ...files}} : {...DEFAULTS, ...p, images: {...(p.images || DEFAULT_IMAGES)}};
+  if (typeof cmApply === 'function') cmApply(n);   // the team's keyword, dates and hashtags (Call manager) win over this browser's draft
   if (d && state.coverStyle === 'anniv' && !d.galTheme && typeof shiftLaunch === 'function') { shiftLaunch(4); state.galTheme = 1; }   // the theme slide went in at slide 5: saved edits move with their slides
   if (d && typeof magMigrate === 'function') { if (!d.magSlides) state.magSlides = 10; magMigrate(); Object.entries(p.images || {}).forEach(([k, v]) => { if (/^th\d$/.test(k) && !state.images[k]) state.images[k] = v; }); }   // calls saved before the theme slide: shift edits, add its artworks
   await restoreVideos(n); return !!d; }
 $('preset').onchange = async () => { restoring = true; const had = await loadCall($('preset').value); restoring = false; try { localStorage.setItem('athLastPreset', $('preset').value); } catch {}
-  fillForm(); buildPtype(); render(); if (had) status('Your edits to this call are back.'); };
+  fillForm(); if (typeof cmLockForm === 'function') cmLockForm(); buildPtype(); render(); if (had) status('Your edits to this call are back.'); };
 $('resetCall').onclick = async () => { const n = $('preset').value; if (!confirm('Start "' + n + '" fresh? Your edits, images and text changes for this call will be removed from this browser.')) return;
   try { localStorage.removeItem(DKEY(n)); await idbSet('draft:' + n, {}); } catch {} restoring = true; await loadCall(n); restoring = false; fillForm(); buildPtype(); render(); status('"' + n + '" is back to the original.'); };
 $('ptype').onchange = () => { try { localStorage.setItem('athLastPtype', $('ptype').value); } catch {} render(); };
@@ -1641,6 +1649,7 @@ $('ptype').onchange = () => { try { localStorage.setItem('athLastPtype', $('ptyp
   if (pt === 'interview') $('ptype').value = 'calendar';
   sizePreviews(); await document.fonts.ready; let seg = 'calls'; try { seg = localStorage.getItem('athSeg') || 'calls'; } catch {} setSeg(seg); if (had) status('Welcome back. Your edits are restored.'); })();
 </script>
+<script src="calls.js"></script>
 <script src="daily.js"></script>
 <script src="books.js"></script>
 <script src="fund.js"></script>

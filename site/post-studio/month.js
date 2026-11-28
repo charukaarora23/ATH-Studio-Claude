@@ -654,7 +654,7 @@ const CD = {
 };
 
 // ---------- the month: built on each other, from attention to urgency ----------
-const tags = '#ArtsToHeartsProject #OpenCall #CallForArtists #101ArtBook';
+const tags = {toString: () => typeof tagsFor === 'function' ? tagsFor() : '#ArtsToHeartsProject #OpenCall #CallForArtists'};   // per series, set in calls.js (Call manager)
 // calls to action. "comment" mode (DM automation off): link in bio first, comment the keyword for the link
 const CMODE = () => (state.ctaMode || 'comment') === 'comment';
 const ctaBtn = () => CMODE() ? 'Apply via link in bio' : `${VERB} “${KW()}” to apply`;
