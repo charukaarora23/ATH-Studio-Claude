@@ -1643,7 +1643,8 @@ async function saveDraft(){ const n = $('preset').value; const files = {}, paths
 async function loadCall(n){ const p = PRESETS[n] || {}; let d = null; try { d = JSON.parse(localStorage.getItem(DKEY(n)) || 'null'); } catch {}
   let files = {}; if (d) { try { files = await idbGet('draft:' + n) || {}; } catch {} }
   state = d ? {...DEFAULTS, ...p, ...d, images: {...(d.images || {}), ...files}} : {...DEFAULTS, ...p, images: {...(p.images || DEFAULT_IMAGES)}};
-  if (typeof cmApply === 'function') cmApply(n);   // the team's keyword, dates and hashtags (Call manager) win over this browser's draft
+  if (typeof cmApply === 'function') cmApply(n);
+  if (typeof cvMigrate === 'function') cvMigrate();   // new campaign covers: old cover text edits cleared once   // the team's keyword, dates and hashtags (Call manager) win over this browser's draft
   if (d && state.coverStyle === 'anniv' && !d.galTheme && typeof shiftLaunch === 'function') { shiftLaunch(4); state.galTheme = 1; }   // the theme slide went in at slide 5: saved edits move with their slides
   if (d && typeof magMigrate === 'function') { if (!d.magSlides) state.magSlides = 10; magMigrate(); Object.entries(p.images || {}).forEach(([k, v]) => { if (/^th\d$/.test(k) && !state.images[k]) state.images[k] = v; }); }   // calls saved before the theme slide: shift edits, add its artworks
   await restoreVideos(n); return !!d; }
@@ -1661,6 +1662,7 @@ $('ptype').onchange = () => { try { localStorage.setItem('athLastPtype', $('ptyp
   sizePreviews(); await document.fonts.ready; let seg = 'calls'; try { seg = localStorage.getItem('athSeg') || 'calls'; } catch {} setSeg(seg); if (had) status('Welcome back. Your edits are restored.'); })();
 </script>
 <script src="calls.js"></script>
+<script src="campaign.js"></script>
 <script src="daily.js"></script>
 <script src="books.js"></script>
 <script src="fund.js"></script>
