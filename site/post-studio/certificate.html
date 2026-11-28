@@ -40,7 +40,7 @@ html,body{margin:0;background:#EFE9E6;font-family:"ATH Tight",sans-serif;color:v
 .foot{position:absolute;left:0;right:0;bottom:18px;text-align:center;font-size:12px;letter-spacing:.04em;color:var(--burg)}
 
 /* design 2: a Burgundy panel with the grant, the certificate on white */
-.s2{background:#FFFFFF}body:not(.v2) .s2,body.v2 .s1{display:none}
+.s2{background:#FFFFFF}body:not([data-v='1']) .s1,body:not([data-v='2']) .s2,body:not([data-v='3']) .s3,body:not([data-v='4']) .s4{display:none}
 .s2 .panel{position:absolute;left:0;top:0;bottom:0;width:370px;background:var(--burg);color:#fff;text-align:center}
 .s2 .pcn{position:absolute;left:0;right:0;top:46px;font-family:"ATH Grotesk",sans-serif;font-weight:700;font-size:11px;letter-spacing:.28em;color:var(--pink)}
 .s2 .pmono{position:absolute;left:50%;top:104px;width:120px;transform:translateX(-50%)}
@@ -59,21 +59,51 @@ html,body{margin:0;background:#EFE9E6;font-family:"ATH Tight",sans-serif;color:v
 .s2 .logo2{position:absolute;right:70px;bottom:54px;width:250px}.s2 .logo2 img{width:100%;display:block}
 .s2 .foot2{position:absolute;left:440px;right:70px;bottom:20px;font-size:11px;letter-spacing:.04em;color:var(--burg);opacity:.8}
 .bar .ver{background:#fff;color:var(--burg);box-shadow:inset 0 0 0 1.5px var(--burg)}.bar .ver[aria-pressed=true]{background:var(--burg);color:#fff}
+
+/* design 3: the word Winner, set large on Pink */
+.s3{background:var(--pink)}
+.s3 .cn3{position:absolute;left:64px;top:46px;font-family:"ATH Grotesk",sans-serif;font-weight:700;font-size:12px;letter-spacing:.26em;color:var(--burg)}
+.s3 .mono3{position:absolute;right:60px;top:36px;width:90px}
+.s3 .big{position:absolute;left:52px;top:84px;font-weight:500;font-size:300px;line-height:.86;letter-spacing:-.065em;color:var(--burg)}
+.s3 .pill3{position:absolute;left:64px;top:372px}.s3 .pill3 span{display:inline-block;background:var(--burg);color:#fff;font-weight:500;font-size:19px;padding:11px 26px;border-radius:999px}
+.s3 .of3{position:absolute;left:350px;top:378px;font-family:"ATH Bask",serif;font-style:italic;font-size:26px;color:var(--burg)}
+.s3 .card3{position:absolute;left:52px;right:52px;top:452px;bottom:52px;background:#fff;border-radius:24px}
+.s3 .to3{position:absolute;left:60px;top:44px;font-family:"ATH Bask",serif;font-style:italic;font-size:19px}
+.s3 .name3{position:absolute;left:60px;right:60px;top:74px;font-weight:500;font-size:56px;line-height:1.1;letter-spacing:-.035em;white-space:nowrap;outline:none}
+.s3 .body3{position:absolute;left:60px;width:600px;top:156px;font-family:"ATH Bask",serif;font-size:16.5px;line-height:1.6;outline:none}.s3 .body3 b{font-weight:400;color:var(--burg);background:var(--pink);padding:0 .15em;border-radius:3px}
+.s3 .side3{position:absolute;right:60px;top:44px;width:270px;text-align:right}
+.s3 .side3 small{display:block;font-weight:500;font-size:11px;letter-spacing:.24em;color:var(--burg);margin-bottom:6px}.s3 .side3 .d{font-size:19px;padding-bottom:6px;border-bottom:1px solid rgba(28,19,16,.25);outline:none}
+.s3 .side3 .amt3{margin-top:26px;font-weight:500;font-size:54px;line-height:1;letter-spacing:-.04em;color:var(--burg)}.s3 .side3 .amt3 span{font-size:14px;letter-spacing:.3em;margin-left:6px}
+.s3 .logo3{position:absolute;right:56px;bottom:30px;width:220px}.s3 .logo3 img{width:100%;display:block}
+/* design 4: classic, centred, in a Burgundy frame */
+.s4{background:#FFFFFF}
+.s4 .fr{position:absolute;inset:26px;border:12px solid var(--burg)}.s4 .fr2{position:absolute;inset:46px;border:1.5px solid var(--rose)}
+.s4 .c4{position:absolute;left:0;right:0;text-align:center}
+.s4 .mono4{position:absolute;left:50%;top:76px;width:96px;transform:translateX(-50%)}
+.s4 .k4{top:150px;font-weight:500;font-size:14px;letter-spacing:.32em;color:var(--burg)}
+.s4 .t4{top:180px;font-weight:500;font-size:80px;line-height:1;letter-spacing:-.045em}.s4 .t4 i{font-family:"ATH Bask",serif;font-weight:400;font-size:52px;letter-spacing:-.01em;color:var(--burg)}
+.s4 .to4{top:292px;font-family:"ATH Bask",serif;font-style:italic;font-size:20px}
+.s4 .name4{top:324px;font-family:"ATH Bask",serif;font-size:56px;line-height:1.15;color:var(--burg);white-space:nowrap;outline:none}
+.s4 .rule4{position:absolute;left:330px;right:330px;top:408px;height:2px;background:var(--rose)}
+.s4 .body4{top:428px;left:220px;right:220px;font-family:"ATH Bask",serif;font-size:17px;line-height:1.6;outline:none}.s4 .body4 b{font-weight:400;color:var(--burg)}
+.s4 .date4{position:absolute;left:110px;bottom:92px;text-align:left}.s4 .date4 small{display:block;font-weight:500;font-size:11px;letter-spacing:.24em;color:var(--burg);margin-bottom:6px}.s4 .date4 div{font-size:18px;padding-bottom:6px;border-bottom:1px solid rgba(28,19,16,.25);min-width:200px;outline:none}
+.s4 .seal4{position:absolute;left:50%;bottom:70px;width:132px;height:132px;transform:translateX(-50%)}
+.s4 .logo4{position:absolute;right:104px;bottom:84px;width:210px}.s4 .logo4 img{width:100%;display:block}
 @media print{html,body{background:#fff}.bar{display:none}.sheet{margin:0;box-shadow:none}}
 </style></head><body>
-<div class="bar"><button type="button" class="ver" data-v="1" aria-pressed="true">Design 1</button><button type="button" class="ver" data-v="2" aria-pressed="false">Design 2</button><button type="button" onclick="window.print()">Save as PDF</button><span>Click the name, the date or the text to change it. In the print window choose "Save as PDF", landscape, no margins, and turn background graphics on.</span></div>
+<div class="bar"><button type="button" class="ver" data-v="1" aria-pressed="true">Design 1</button><button type="button" class="ver" data-v="2" aria-pressed="false">Design 2</button><button type="button" class="ver" data-v="3" aria-pressed="false">Design 3</button><button type="button" class="ver" data-v="4" aria-pressed="false">Design 4</button><button type="button" onclick="window.print()">Save as PDF</button><span>Click the name, the date or the text to change it. In the print window choose "Save as PDF", landscape, no margins, and turn background graphics on.</span></div>
 <div class="sheet s1">
-  <div class="tab t1">ATH Creative Fund</div><div class="tab t2">Winner</div><div class="tab t3" id="month">November 2026</div>
+  <div class="tab t1">ATH Creative Fund</div><div class="tab t2">Winner</div><div class="tab t3" id="month" data-f="month">November 2026</div>
   <div class="card">
     <div class="cn">Arts to Hearts Project</div>
     <img class="mono" src="brand/monogram-burgundy.svg" alt="ATH">
     <div class="c pill"><span>ATH Creative Fund</span></div>
     <div class="c title">Certificate <i>of award</i></div>
     <div class="c to">is proudly awarded to</div>
-    <div class="c name" id="name" contenteditable="true" spellcheck="false">Iryna Tymovchak</div>
+    <div class="c name" id="name" data-f="name" data-fit="62,860" contenteditable="true" spellcheck="false">Iryna Tymovchak</div>
     <div class="rule"></div>
     <div class="c body" id="body" contenteditable="true">In recognition of your work, you have been awarded the ATH Creative Fund: an unrestricted grant of <b>$500 USD</b> from the Arts To Hearts Project, to spend on whatever your practice needs. No receipts, no reports. Just room to make the work.</div>
-    <div class="date"><small>DATE</small><div id="date" contenteditable="true" spellcheck="false">November 28, 2026</div></div>
+    <div class="date"><small>DATE</small><div id="date" data-f="date" contenteditable="true" spellcheck="false">November 28, 2026</div></div>
     <div class="logo"><img src="brand/logo-heart.png" alt="Arts to Hearts Project"></div>
     <svg class="seal" viewBox="0 0 150 150" aria-label="$500 USD seal"><defs><path id="ring" d="M75 75 m-55 0 a55 55 0 1 1 110 0 a55 55 0 1 1 -110 0"/></defs>
       <circle cx="75" cy="75" r="72" fill="#6A0620"/><circle cx="75" cy="75" r="65" fill="none" stroke="#FFA1C2" stroke-width="1.2"/><circle cx="75" cy="75" r="44" fill="#FAD2E1"/>
@@ -89,30 +119,56 @@ html,body{margin:0;background:#EFE9E6;font-family:"ATH Tight",sans-serif;color:v
     <img class="pmono" src="brand/monogram-white.svg" alt="ATH">
     <div class="amt">$500</div><div class="usd">USD</div>
     <div class="ppill"><span>ATH Creative Fund</span></div>
-    <div class="pwin">Winner · <span id="month2">November 2026</span></div>
+    <div class="pwin">Winner · <span id="month2" data-f="month">November 2026</span></div>
     <div class="pline">No receipts. No reports.<br>Just room to make the work.</div>
   </div>
   <div class="r t">Certificate<i>of award</i></div>
   <div class="r rr"></div>
   <div class="r to2">is proudly awarded to</div>
-  <div class="r name2" id="name2" contenteditable="true" spellcheck="false">Iryna Tymovchak</div>
+  <div class="r name2" id="name2" data-f="name" data-fit="58,600" contenteditable="true" spellcheck="false">Iryna Tymovchak</div>
   <div class="r body2" id="body2" contenteditable="true">In recognition of your work, you have been awarded the ATH Creative Fund: an unrestricted grant of <b>$500 USD</b> from the Arts To Hearts Project, to spend on whatever your practice needs.</div>
-  <div class="date2"><small>DATE</small><div id="date2" contenteditable="true" spellcheck="false">November 28, 2026</div></div>
+  <div class="date2"><small>DATE</small><div id="date2" data-f="date" contenteditable="true" spellcheck="false">November 28, 2026</div></div>
   <div class="logo2"><img src="brand/logo-heart.png" alt="Arts to Hearts Project"></div>
   <div class="foot2">@artstoheartsproject · artstoheartsproject.com · #ATHCreativeFund</div>
 </div>
+<div class="sheet s3">
+  <div class="cn3">ARTS TO HEARTS PROJECT</div><img class="mono3" src="brand/monogram-burgundy.svg" alt="ATH">
+  <div class="big">Winner</div>
+  <div class="pill3"><span>ATH Creative Fund</span></div><div class="of3">Certificate of award · <span data-f="month">November 2026</span></div>
+  <div class="card3">
+    <div class="to3">is proudly awarded to</div>
+    <div class="name3" data-f="name" data-fit="56,600" contenteditable="true" spellcheck="false">Iryna Tymovchak</div>
+    <div class="body3" contenteditable="true">In recognition of your work, you have been awarded the ATH Creative Fund: an unrestricted grant of <b>$500 USD</b> from the Arts To Hearts Project, to spend on whatever your practice needs. No receipts, no reports. Just room to make the work.</div>
+    <div class="side3"><small>DATE</small><div class="d" data-f="date" contenteditable="true" spellcheck="false">November 28, 2026</div><div class="amt3">$500<span>USD</span></div></div>
+    <div class="logo3"><img src="brand/logo-heart.png" alt="Arts to Hearts Project"></div>
+  </div>
+</div>
+<div class="sheet s4">
+  <div class="fr"></div><div class="fr2"></div>
+  <img class="mono4" src="brand/monogram-burgundy.svg" alt="ATH">
+  <div class="c4 k4">ATH CREATIVE FUND · <span data-f="month" style="text-transform:uppercase">November 2026</span></div>
+  <div class="c4 t4">Certificate <i>of award</i></div>
+  <div class="c4 to4">is proudly awarded to</div>
+  <div class="c4 name4" data-f="name" data-fit="56,760" contenteditable="true" spellcheck="false">Iryna Tymovchak</div>
+  <div class="rule4"></div>
+  <div class="c4 body4" contenteditable="true">In recognition of your work, you have been awarded the ATH Creative Fund: an unrestricted grant of <b>$500 USD</b> from the Arts To Hearts Project, to spend on whatever your practice needs.</div>
+  <div class="date4"><small>DATE</small><div data-f="date" contenteditable="true" spellcheck="false">November 28, 2026</div></div>
+  <div class="seal4"><svg viewBox="0 0 150 150" aria-label="$500 USD seal"><defs><path id="ringX" d="M75 75 m-55 0 a55 55 0 1 1 110 0 a55 55 0 1 1 -110 0"/></defs><circle cx="75" cy="75" r="72" fill="#6A0620"/><circle cx="75" cy="75" r="65" fill="none" stroke="#FFA1C2" stroke-width="1.2"/><circle cx="75" cy="75" r="44" fill="#FAD2E1"/><text font-family="ATH Tight" font-weight="500" font-size="10.5" fill="#FAD2E1"><textPath href="#ringX" textLength="342" lengthAdjust="spacing">ATH CREATIVE FUND · WINNER · ARTS TO HEARTS · </textPath></text><text x="75" y="80" text-anchor="middle" font-family="ATH Tight" font-weight="500" font-size="30" letter-spacing="-1" fill="#6A0620">$500</text><text x="75" y="97" text-anchor="middle" font-family="ATH Tight" font-weight="500" font-size="10" letter-spacing="2.5" fill="#6A0620">USD</text></svg></div>
+  <div class="logo4"><img src="brand/logo-heart.png" alt="Arts to Hearts Project"></div>
+</div>
 <script>
 const q = new URLSearchParams(location.search), $ = id => document.getElementById(id);
-if (q.get('name')) $('name').textContent = $('name2').textContent = q.get('name');
-if (q.get('date')) $('date').textContent = $('date2').textContent = q.get('date');
-/* both designs share the name and the date: typing in one updates the other */
-[['name', 'name2'], ['date', 'date2']].forEach(([a, b]) => { $(a).addEventListener('input', () => { $(b).textContent = $(a).textContent; fit(); setMonth(); }); $(b).addEventListener('input', () => { $(a).textContent = $(b).textContent; fit(); setMonth(); }); });
-const setMonth = () => { const d = new Date($('date').textContent.trim()); if (!isNaN(d)) $('month').textContent = $('month2').textContent = d.toLocaleDateString('en-GB', {month: 'long', year: 'numeric'}); };
+const F = k => [...document.querySelectorAll('[data-f="' + k + '"]')];
+const setF = (k, v, except) => F(k).forEach(el => { if (el !== except) el.textContent = v; });
+if (q.get('name')) setF('name', q.get('name'));
+if (q.get('date')) setF('date', q.get('date'));
+/* every design shares the name and the date: typing in one updates the others */
+const setMonth = () => { const d = new Date(F('date')[0].textContent.trim()); if (!isNaN(d)) setF('month', d.toLocaleDateString('en-GB', {month: 'long', year: 'numeric'})); };
+['name', 'date'].forEach(k => F(k).forEach(el => el.addEventListener('input', () => { setF(k, el.textContent, el); setMonth(); fit(); })));
 setMonth();
-const setV = v => { document.body.classList.toggle('v2', v === '2'); document.querySelectorAll('.ver').forEach(x => x.setAttribute('aria-pressed', x.dataset.v === v)); fit(); };
-document.querySelectorAll('.ver').forEach(x => x.onclick = () => setV(x.dataset.v)); setV(q.get('v') === '2' ? '2' : '1');
-/* long names shrink to fit the line */
-function fit(){ [['name', 62, 860], ['name2', 58, 600]].forEach(([id, max, w]) => { const n = $(id); if (!n.offsetParent) return; n.style.fontSize = ''; const r = document.createRange(); r.selectNodeContents(n); let s = max; while (r.getBoundingClientRect().width > w && s > 28) { s -= 2; n.style.fontSize = s + 'px'; } }); }
-fit();
+/* long names shrink to fit their line */
+function fit(){ F('name').forEach(n => { if (!n.offsetParent) return; const [max, w] = n.dataset.fit.split(',').map(Number); n.style.fontSize = ''; const r = document.createRange(); r.selectNodeContents(n); let s = max; while (r.getBoundingClientRect().width > w && s > 26) { s -= 2; n.style.fontSize = s + 'px'; } }); }
+const setV = v => { document.body.dataset.v = v; document.querySelectorAll('.ver').forEach(x => x.setAttribute('aria-pressed', x.dataset.v === v)); fit(); };
+document.querySelectorAll('.ver').forEach(x => x.onclick = () => setV(x.dataset.v)); setV(['2', '3', '4'].includes(q.get('v')) ? q.get('v') : '1');
 document.title = 'ATH Creative Fund Certificate - ' + $('name').textContent;
 </script></body></html>
