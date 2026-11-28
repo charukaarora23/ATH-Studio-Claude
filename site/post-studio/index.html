@@ -217,7 +217,7 @@ img.bk-cv{width:100%;object-fit:contain;background:#FAD2E1}.bk-a img{width:100%;
       <div class="f"><label for="results">Results date</label><input id="results" placeholder="e.g. 10 Jan"></div>
       <div class="f"><label for="pub">Publication month</label><input id="pub" placeholder="e.g. March"></div>
     </div>
-    <div class="f"><label for="fee">Application fee wording</label><input id="fee" placeholder="e.g. applicable"></div>
+    <div class="f"><label for="fee">Application fee (for the team only, never shown in posts)</label><input id="fee" placeholder="e.g. applicable"></div>
     <div class="f"><label for="ctaMode">Call to action</label><select id="ctaMode"><option value="comment">Link in bio + comment the keyword (DM automation off)</option><option value="dm">DM the keyword, then comment from a date</option></select></div>
     <div class="f"><label for="commentFrom">If DM: switch to “COMMENT” on</label><input id="commentFrom" type="date"></div>
     <div class="f"><label for="elig">Eligibility line</label><input id="elig"></div>
@@ -1385,7 +1385,7 @@ function launch(){
       <div><p class="lab" style="color:${Tn}">${short()}</p><p class="sub" style="font-size:28px;margin-top:8px">Submissions close</p></div>
       <div style="border-left:2px solid rgba(255,255,255,.16);padding-left:30px"><p class="lab" style="color:${Tn}">${gap(state.results,'Date')}</p><p class="sub" style="font-size:28px;margin-top:8px">Results announced</p></div>
       <div style="border-left:2px solid rgba(255,255,255,.16);padding-left:30px"><p class="lab" style="color:${Tn}">${state.pub ? esc(state.pub) : 'After the results'}</p><p class="sub" style="font-size:28px;margin-top:8px">Book published</p></div></div>
-    <p class="a c sub" style="left:0;right:0;top:1080px;font-size:26px;opacity:.75;color:${WHITE}">Application fee ${gap(state.fee,'amount, or “applicable”')}</p>`});
+    <p class="a c sub" style="display:none;left:0;right:0;top:1080px;font-size:26px;opacity:.75;color:${WHITE}">Application fee</p>`});
 
   // 9 who can apply
   S.push({bg:CREAM, html:`${corners(INK, BURG, 'Who can apply')}
@@ -1466,6 +1466,7 @@ function buildPtype(){ const sel = $('ptype'), cur = sel.value;
 // open-call posts never go out with an empty photo box, a missing detail or a slide another post already has
 function autoWhyOf(g, s, j, seg0){ if (seg0 !== 'calls' || g.daily || g.story || g.reel) return '';
   if (s.auto === 'dup') return 'Hidden: another post already has this slide';
+  if (s.auto === 'fee') return 'Hidden: the fee is never shown in posts';
   return /class="(?:[^"]*\s)?(?:ph|gap)(?:\s[^"]*)?"/.test(s.html || '') && !state.images['ov|' + gid(g) + '|' + j] ? 'Hidden: needs a photo or a detail' : ''; }
 function render(){
   readForm(); scheduleDraft(); updateTabs();
