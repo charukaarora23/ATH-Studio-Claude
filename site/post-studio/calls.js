@@ -69,6 +69,13 @@ function tagsFor(s){ s = s || state; if (s.hashtags) return s.hashtags.trim();
   else set.push('#ArtistOpportunity', '#GetPublished');
   return set.join(' '); }
 
+// ---------- the same call already in the studio? ----------
+function cmClean(u){ try { const x = new URL(String(u || '').trim()); [...x.searchParams.keys()].filter(k => /^utm_|^fbclid$|^gclid$/i.test(k)).forEach(k => x.searchParams.delete(k)); x.hash = ''; return x.href.replace(/\?$/, ''); } catch { return String(u || '').trim(); } }
+const cmNorm = s => String(s || '').toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
+// every version of this call (e.g. Issue 16 and Issue 16 · Gallery): same series + name, or the same link
+function cmMatches(f){ const key = cmNorm(`${f.series} ${f.name}`), link = cmClean(f.link);
+  return cmAllCalls().filter(c => c.st.k !== 'arch' && (cmNorm(`${c.s.series} ${c.s.name}`) === key || (link && cmClean(c.s.link) === link))).map(c => c.id); }
+
 // ---------- reading a call page ----------
 const MONI = {jan: 0, feb: 1, mar: 2, apr: 3, may: 4, jun: 5, jul: 6, aug: 7, sep: 8, oct: 9, nov: 10, dec: 11};
 function cmDates(t){ const out = [], now = new Date(); const yr = (y, m, d) => { if (y) return +y; const c = new Date(now.getFullYear(), m, d); return c < new Date(now - 60 * DAYMS) ? now.getFullYear() + 1 : now.getFullYear(); };
@@ -170,7 +177,7 @@ function cmForm(s, id){ const v = k => esc(s[k] ?? '');
   return `<div class="cm-form" data-cm-form="${esc(id || '')}"><div class="cm-grid">${CMF.map(([k, l, ty]) => `<div class="f"><label>${l}</label>${ty === 'area' ? `<textarea data-cmf="${k}">${v(k)}</textarea>` : `<input data-cmf="${k}" ${ty === 'date' ? 'type="date"' : ''} value="${v(k)}"${k === 'hashtags' ? ` placeholder="${esc(tagsFor({...s, hashtags: ''}))}"` : ''}>`}</div>`).join('')}
     <div class="f"><label>Visual style</label><select data-cmf="style">${[['gallery', 'Gallery'], ['award', 'Award'], ['editorial', 'Editorial'], ['magazine', 'Magazine']].map(([k, l]) => `<option value="${k}" ${s.style === k ? 'selected' : ''}>${l}</option>`).join('')}</select></div></div>
     ${s._text ? `<details><summary>Page text that was read</summary><pre class="cm-pre">${esc(String(s._text).slice(0, 4000))}</pre></details>` : ''}
-    <div class="cm-btns"><button type="button" class="btn" data-cm-save="${esc(id || '')}">${id ? 'Save for the team' : 'Add this call'}</button><button type="button" class="btn ghost" data-cm-cancel>Cancel</button></div></div>`; }
+    <div class="cm-btns"><button type="button" class="btn" data-cm-save="${esc(id || '')}">${id ? 'Save for the team' : s._match && s._match.length ? 'Update ' + (s._match.length > 1 ? 'both versions' : 'this call') : 'Add this call'}</button><button type="button" class="btn ghost" data-cm-cancel>Cancel</button></div></div>`; }
 function cmReadForm(box){ const f = {}; box.querySelectorAll('[data-cmf]').forEach(el => f[el.dataset.cmf] = el.value.trim()); if (f.keyword) f.keyword = f.keyword.toUpperCase().replace(/[^A-Z0-9]/g, ''); return f; }
 async function cmSave(id, f, extra = {}){ let who = ''; try { who = localStorage.getItem('athWho') || ''; } catch {}
   const prev = SHAREDC[id] || {}; const call = {id, link: f.link || prev.link || '', f: {...(prev.f || {}), ...f}, archived: extra.archived ?? !!prev.archived, isNew: extra.isNew ?? !!prev.isNew, by: who};
@@ -184,9 +191,10 @@ async function cmImport(link, pasted){
   if (!pasted) { try { const r = await fetch('api/calls', {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({action: 'import', url: link})}); const j = await r.json(); if (!r.ok) throw new Error(j.error || 'Could not read the page.'); title = j.title; text = j.text; images = j.images || []; }
     catch (e) { CM_MSG = esc(e.message || String(e)) + ' Paste the page below instead.'; CM_DRAFT = null; render(); return; } }
   else title = text.split('\n').find(x => x.trim().length > 3) || '';
-  const f = cmParse(title, text, link); f._images = images.map(x => x.url); f._text = text;
+  const f = cmParse(title, text, cmClean(link)); f._images = images.map(x => x.url); f._text = text;
+  f._match = cmMatches(f); if (f._match.length) { const c0 = cmAllCalls().find(c => c.id === f._match[0]); if (c0 && c0.kw) f.keyword = c0.kw; }
   const miss = ['deadline', 'selected', 'fee', 'theme'].filter(k => !f[k]);
-  CM_MSG = `Read. Check the details below${miss.length ? `; not found on the page: ${miss.join(', ')}` : ''}. ${images.length ? images.length + ' pictures copied.' : ''}`; CM_DRAFT = f; render(); }
+  CM_MSG = `${f._match.length ? `This call is already in the studio (${f._match.map(esc).join(', ')}). Saving updates its link, dates and details; its slides, pictures and look stay as they are. ` : ''}Read. Check the details below${miss.length ? `; not found on the page: ${miss.join(', ')}` : ''}. ${images.length ? images.length + ' pictures copied.' : ''}`; CM_DRAFT = f; render(); }
 function wireCallMgr(){ const out = $('out');
   const go = $('cmImport'); if (go) go.onclick = () => { const u = $('cmUrl').value.trim(); if (!u) return; cmImport(u); };
   const pg = $('cmPasteGo'); if (pg) pg.onclick = () => { const t = $('cmPaste').value; if (t.trim().length < 50) return; cmImport(($('cmUrl').value || '').trim(), t); };
@@ -195,15 +203,20 @@ function wireCallMgr(){ const out = $('out');
   out.querySelectorAll('[data-cm-open]').forEach(b => b.onclick = async () => { $('preset').value = b.dataset.cmOpen; await $('preset').onchange(); $('ptype').value = '0'; render(); window.scrollTo({top: 0}); });
   out.querySelectorAll('[data-cm-arch]').forEach(b => b.onclick = async () => { const id = b.dataset.cmArch, c = cmAllCalls().find(x => x.id === id); const arch = !(SHAREDC[id] && SHAREDC[id].archived);
     const f = {}; CORE.forEach(k => { if (c && c.s[k] !== undefined) f[k] = c.s[k]; }); await cmSave(id, f, {archived: arch}); status(arch ? `"${id}" archived: off the calendar and the menu.` : `"${id}" is back.`); render(); });
-  out.querySelectorAll('[data-cm-save]').forEach(b => b.onclick = async () => { const box = b.closest('.cm-form'), id0 = b.dataset.cmSave; const f = cmReadForm(box);
+  out.querySelectorAll('[data-cm-save]').forEach(b => b.onclick = async () => { const box = b.closest('.cm-form'), id0 = b.dataset.cmSave; const f = cmReadForm(box); if (f.link) f.link = cmClean(f.link);
+    const match = !id0 && CM_DRAFT ? (CM_DRAFT._match || []).concat(cmMatches(f)).filter((x, i, a) => a.indexOf(x) === i) : [];
     if (!f.name || !f.deadline) { status('A call needs at least an edition name and a deadline.'); return; }
     if (!f.keyword) f.keyword = cmKeyword(f, id0);
-    const clash = cmAllCalls().find(c => c.id !== id0 && (c.st.k === 'open' || c.st.k === 'up') && c.kw === f.keyword); if (clash) { status(`The keyword “${f.keyword}” is already used by "${clash.id}". Pick another one.`); return; }
+    const clash = cmAllCalls().find(c => c.id !== id0 && !match.includes(c.id) && (c.st.k === 'open' || c.st.k === 'up') && c.kw === f.keyword); if (clash) { status(`The keyword “${f.keyword}” is already used by "${clash.id}". Pick another one.`); return; }
     if (id0) { await cmSave(id0, f); CM_EDIT = null; if ($('preset').value === id0) { await $('preset').onchange(); $('ptype').value = 'callmgr'; } status(`"${id0}" saved for the team.`); render(); return; }
+    if (match.length) { const facts = {...f}; delete facts.style; delete facts.colour;   // each version keeps its own look
+      for (const m of match) await cmSave(m, facts); CM_DRAFT = null; CM_MSG = '';
+      if (match.includes($('preset').value)) { await $('preset').onchange(); $('ptype').value = 'callmgr'; } status(`Updated ${match.join(' and ')}.`); render(); return; }
     const d = CM_DRAFT || {}; const id = `${f.series === 'Arts to Hearts' ? '' : f.series + ' '}${f.name}`.trim();
     const full = {...f, colour: d.colour || cmColour(f), edition: d.edition || '', themeIntro: f.themeLine || '', who: d.who || 'artists', benefits: d.benefits || undefined};
     if (!full.benefits) delete full.benefits;
     const imgs = (d._images || []).slice(0, 10); full.images = imgs.length ? Object.fromEntries([['imgCover', imgs[0]], ...imgs.slice(1).map((u, j) => ['pool' + (j + 1), u])]) : {};
+    if (PRESETS[id]) { status(`"${id}" already exists. Use Edit on it instead.`); return; }   // never overwrite a call's slides and pictures
     PRESETS[id] = {...cmBase(full), ...full}; await cmSave(id, full, {isNew: true}); CM_DRAFT = null; CM_MSG = ''; status(`"${id}" added. Open its posts to check the launch carousel.`); render(); }); }
 
 // ---------- styles ----------
