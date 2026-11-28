@@ -1,0 +1,153 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<title>Issue 16 Carousel</title>
+<style>
+/* same fonts and post classes as the dashboard (index.html) */
+@font-face{font-family:"ATH Grotesk";src:url(../../fonts/ath/HankenGrotesk.woff2) format("woff2");font-weight:100 900}
+@font-face{font-family:"ATH Serif";src:url(../../fonts/ath/Newsreader-Italic.woff2) format("woff2");font-style:italic;font-weight:200 800}
+@font-face{font-family:"ATH Script";src:url(../../fonts/InstrumentSerif-Italic.ttf) format("truetype");font-style:italic}
+body{margin:0;background:#EEE7E1;padding:40px;display:flex;flex-wrap:wrap;gap:40px}
+.post{position:relative;width:1080px;height:1350px;overflow:hidden;font-family:"ATH Grotesk","Hanken Grotesk",sans-serif;-webkit-font-smoothing:antialiased;color:#14090C;flex:none}
+.post *{margin:0;box-sizing:border-box}
+.post .a{position:absolute}.post .c{text-align:center}
+.post .img{background-size:cover;background-repeat:no-repeat}
+.post .cn{font-size:20px;font-weight:700;letter-spacing:.16em;text-transform:uppercase}
+.post .H{font-weight:600;letter-spacing:-.045em;line-height:1.02}
+.post .R{font-weight:400;letter-spacing:-.04em;line-height:1.1}
+.post .sub{color:inherit;font-size:32px;font-weight:500;line-height:1.38;letter-spacing:-.01em}
+.post .scr{font-family:"ATH Script",serif;font-style:italic;font-weight:400}
+.post .ser{font-family:"ATH Serif",serif;font-style:italic;font-weight:400}
+.post .lab{font-size:22px;font-weight:700;letter-spacing:.12em;text-transform:uppercase}
+.post .crd{font-size:17px;font-weight:500;line-height:1.3;opacity:.85}
+.post .crd i{font-family:"ATH Serif",serif;font-weight:400}
+.post figure{display:flex;flex-direction:column;min-height:0;min-width:0}
+.post figure img{display:block;width:100%;flex:1;min-height:0;object-fit:contain}
+</style></head><body>
+<div id="out" style="display:contents"></div>
+<script>
+const C = '#E8432B', T = '#FAD2E1', INK = '#14090C', CREAM = '#F9ECE5', MAROON = '#6A0620', W = '#FFFFFF';
+const KEY = 'ISSUE16', CLOSES = 'Closes 27 Dec';
+// brand line + label on top, comment + deadline at the bottom: identical to the dashboard
+const chrome = (label, ink, footInk) => `
+  <p class="a cn" style="left:52px;top:48px;color:${ink}">Arts to Hearts Project</p><p class="a cn" style="right:52px;top:48px;color:${ink}">${label}</p>
+  <p class="a cn" style="left:52px;bottom:48px;color:${footInk}">Link in bio · comment “${KEY}”</p><p class="a cn" style="right:52px;bottom:48px;color:${ink}">${CLOSES}</p>`;
+const credit = (title, artist, handle) => `<i>${title}</i> by ${artist} @${handle}`;
+const ART = {
+  howis:   ['img/art-howis.jpg', 'Fiercely Fragile', 'Margarita Howis', 'margarita.howis', 'United States'],
+  boisvert:['img/art-boisvert.jpg', 'A Quiet Companion', 'Nancy Boisvert', 'nancyboisvert_artist', 'Canada'],
+  furlan:  ['img/art-furlan.jpg', 'Joy in Full Bloom', 'Marjurye Furlan', 'marjuryefurlanart', 'United Kingdom'],
+  zavidina:['img/art-zavidina.jpg', 'Where We Sat', 'Alyona Zavidina', 'zavidinaart', 'Malta'],
+  alsharif:['img/art-alsharif.jpg', 'Carry Me', 'Isabella Al-Sharif', 'art_by_isabella_alsharif', 'United States'],
+  bailey:  ['img/art-bailey.jpg', 'Crybaby', 'Sara Bailey', 'sarabailey.artist', 'United States'],
+  amini:   ['img/art-amini.jpg', 'Waves Outside Home', 'Zahra Amini', 'zahra.illustration', 'United Kingdom'],
+  lotito:  ['img/art-lotito.jpg', 'Bloom, Anyway', 'Debbee Lotito', 'debbeelotito', 'United States'],
+};
+const COVERS = { 14:'John Sloane', 13:'Troy Brooks', 12:'Celia Gallego', 11:'Rachel Deacon' };
+const arrow = `<svg width="36" height="16" viewBox="0 0 46 20"><path d="M2 10h40M33 2l9 8-9 8" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+
+const S = [];
+// 1 · COVER: a magazine cover. Full artwork above, a solid call-colour band below, "16" across the seam
+{ const [src, t, a, h] = ART.howis; S.push({bg: C, html: `
+  <div class="a img" style="left:0;right:0;top:0;height:880px;background-image:url(${src});background-position:center 28%"></div>
+  <div class="a" style="left:0;right:0;top:0;height:160px;background:linear-gradient(180deg,rgba(20,14,12,.42),rgba(20,14,12,0))"></div>
+  <p class="a cn" style="left:52px;top:48px;color:${W}">Arts to Hearts Project</p><p class="a cn" style="right:52px;top:48px;color:${W}">Issue 16</p>
+  <p class="a cn" style="right:46px;top:150px;writing-mode:vertical-rl;color:${W};text-shadow:0 1px 8px rgba(0,0,0,.35)">Four years in print</p>
+  <p class="a crd" style="right:52px;top:838px;text-align:right;color:${W};text-shadow:0 1px 6px rgba(0,0,0,.6)">${credit(t, a, h)}</p>
+  <p class="a" style="left:30px;top:690px;font-size:430px;font-weight:600;letter-spacing:-.07em;line-height:.8;color:${W}">4<span style="font-size:150px;letter-spacing:-.04em;vertical-align:top;line-height:1;position:relative;top:10px;margin-left:12px">th</span></p>
+  <p class="a scr" style="left:52px;top:1060px;font-size:76px;line-height:.95;color:${T}">anniversary<br>issue</p>
+  <p class="a lab" style="left:560px;top:930px;color:${T}">Open call</p>
+  <p class="a" style="left:560px;right:52px;top:972px;font-size:96px;font-weight:700;letter-spacing:-.01em;line-height:.9;text-transform:uppercase;color:${W}">Call for<br>artists</p>
+  <p class="a sub" style="left:560px;right:40px;top:1158px;font-size:28px;line-height:1.3;color:${W}">Arts to Hearts Magazine, Issue 16. 100 artists, one $500 award.</p>
+  <p class="a cn" style="left:52px;bottom:48px;color:${W}">Link in bio · comment “${KEY}”</p><p class="a cn" style="right:52px;bottom:48px;color:${W}">${CLOSES}</p>`}); }
+
+// 2 · FOUR YEARS IN PRINT
+S.push({bg: CREAM, html: `${chrome('Four years', INK, MAROON)}
+  <p class="a R c" style="left:80px;right:80px;top:170px;font-size:84px;color:${INK}">Four years. 15 issues.<br>The <span style="color:${C};font-weight:600">sixteenth</span> is open.</p>
+  <div class="a" style="left:64px;right:64px;top:430px;height:520px;display:grid;grid-template-columns:repeat(3,1fr);gap:28px;align-items:center">
+    ${[11, 13, 14].map(n => `<figure style="height:100%;justify-content:center;gap:12px"><img src="img/issue${n}.jpg" alt="" style="flex:0 1 auto;max-height:470px"><figcaption class="crd c"><i>Issue ${n}</i></figcaption></figure>`).join('')}
+  </div>
+  <p class="a c sub" style="left:120px;right:120px;top:1040px;font-size:28px;opacity:.75">1,500+ artists published in Arts to Hearts Magazine.</p>`});
+
+// 3 · PAST COVER ARTISTS (2 x 2, like a set of covers)
+S.push({bg: INK, html: `${chrome('On the cover', W, T)}
+  <p class="a R c" style="left:80px;right:80px;top:130px;font-size:80px;color:${W}">Past cover artists</p>
+  <p class="a c sub" style="left:140px;right:140px;top:236px;font-size:28px;opacity:.75;color:${W}">Their work became the face of the magazine.</p>
+  <div class="a" style="left:90px;right:90px;top:320px;bottom:110px;display:grid;grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr;gap:28px 40px;color:${W}">
+    ${[14, 13, 12, 11].map(n => `<figure style="gap:10px;align-items:center"><img src="img/issue${n}.jpg" alt=""><figcaption class="c"><span style="font-size:24px;font-weight:600">${COVERS[n]}</span> <span class="ser" style="font-size:22px;opacity:.75">Issue ${n}</span></figcaption></figure>`).join('')}
+  </div>`});
+
+// 4 · PUBLISHED ARTISTS (Issue 13), call colour like the reference posters
+S.push({bg: C, html: `${chrome('From past issues', W, W)}
+  <p class="a R c" style="left:80px;right:80px;top:130px;font-size:80px;color:${W}">Published artists</p>
+  <p class="a c sub" style="left:120px;right:120px;top:236px;font-size:28px;opacity:.85;color:${W}">A few of the artists in Issue 13.</p>
+  <div class="a" style="left:56px;right:56px;top:320px;bottom:110px;display:grid;grid-template-columns:repeat(3,1fr);grid-template-rows:1fr 1fr;gap:26px 26px;color:${W}">
+    ${['boisvert', 'furlan', 'alsharif', 'zavidina', 'bailey', 'amini'].map(k => { const [src, t, a, h, c] = ART[k]; return `<figure style="gap:10px"><img src="${src}" alt="" style="object-position:center bottom"><figcaption><p style="font-size:24px;font-weight:600;line-height:1.15">${a}</p><p class="crd" style="margin-top:3px"><i>${t}</i> · @${h}</p></figcaption></figure>`; }).join('')}
+  </div>`});
+
+// 5 · THE THEME
+{ const [src, t, a, h] = ART.lotito; S.push({bg: C, html: `${chrome('The theme', W, W)}
+  <p class="a ser" style="left:52px;top:120px;width:560px;font-size:60px;line-height:1.08;letter-spacing:-.015em;color:${INK}">There is no single way to begin again.</p>
+  <figure class="a" style="left:300px;right:300px;top:330px;height:740px;gap:10px;color:${W}"><img src="${src}" alt=""><figcaption class="crd c">${credit(t, a, h)}</figcaption></figure>
+  <p class="a lab" style="left:52px;top:1110px;color:${W}">The Art of Starting Again</p>
+  <p class="a sub" style="left:52px;right:52px;top:1150px;font-size:28px;color:${W}">A new chapter, a place, a memory, a change in perspective. Any medium. Original work only, no AI.</p>`}); }
+
+// 6 · WHAT YOU RECEIVE (big text, keywords picked out)
+const k = s => `<span style="font-weight:600;color:${T}">${s}</span>`;
+S.push({bg: C, html: `${chrome('If selected', W, W)}
+  <p class="a R" style="left:52px;right:52px;top:140px;font-size:68px;line-height:1.08;color:${W}">Every selected artist gets ${k('a two&#8209;page feature')} in Issue 16, with an interview and biography. An ${k('official certificate')}. ${k('International distribution')} on Amazon and Barnes &amp; Noble. ${k('Promotion to 100,000+')} subscribers.</p>
+  <div class="a" style="left:538px;top:860px;width:4px;height:150px;background:${W}"></div>
+  <div class="a" style="left:525px;top:990px;width:30px;height:30px;border-right:4px solid ${W};border-bottom:4px solid ${W};transform:rotate(45deg)"></div>
+  <p class="a R c" style="left:52px;right:52px;top:1080px;font-size:56px;color:${W}">${k('Apply now')}, from $21.</p>`});
+
+// 7 · $500 (framed, like a magazine page)
+S.push({bg: INK, html: `
+  <div class="a" style="left:52px;right:52px;top:52px;bottom:52px;background:${CREAM}"></div>
+  <p class="a cn" style="left:92px;top:88px;color:${INK}">Arts to Hearts Project</p>
+  <p class="a cn" style="right:80px;top:88px;writing-mode:vertical-rl;color:${INK}">Issue 16 · 4th anniversary</p>
+  <figure class="a" style="left:92px;top:150px;width:430px;height:600px;gap:10px"><img src="img/issue14.jpg" alt="" style="object-position:left top"><figcaption class="crd"><i>Issue 14</i> · cover by John Sloane</figcaption></figure>
+  <div class="a" style="left:570px;top:150px;right:140px">
+    <p class="R" style="font-size:64px;color:${INK}">Three artists receive more.</p>
+    <p class="lab" style="margin-top:34px;color:${C}">Winner</p>
+    <p class="sub" style="font-size:28px;margin-top:8px">The cash award and recognition in the Issue 16 announcement and campaign.</p>
+    <p class="lab" style="margin-top:28px;color:${C}">Two runners-up</p>
+    <p class="sub" style="font-size:28px;margin-top:8px">Recognised in the campaign too.</p>
+  </div>
+  <p class="a" style="left:78px;top:800px;font-size:340px;font-weight:400;letter-spacing:-.07em;line-height:.85;color:${C}">$500</p>
+  <p class="a cn" style="left:92px;bottom:88px;color:${MAROON}">Link in bio · comment “${KEY}”</p><p class="a cn" style="right:92px;bottom:88px;color:${INK}">${CLOSES}</p>`});
+
+// 8 · 100 PLACES + DATES
+S.push({bg: INK, html: `${chrome('Selection', W, T)}
+  <p class="a R c" style="left:80px;right:80px;top:200px;font-size:80px;color:${W}">100 places, chosen by the jury.</p>
+  <div class="a" style="left:150px;right:150px;top:500px;display:grid;grid-template-columns:repeat(20,1fr);gap:10px">
+    ${Array.from({length: 100}, (_, i) => `<span style="aspect-ratio:1;border-radius:50%;${i === 99 ? `background:${C}` : `border:2px solid rgba(255,255,255,.35)`}"></span>`).join('')}
+  </div>
+  <p class="a ser" style="right:150px;top:750px;font-size:30px;color:${C}">← yours?</p>
+  <div class="a" style="left:80px;right:80px;top:900px;display:grid;grid-template-columns:repeat(3,1fr);border-top:2px solid rgba(255,255,255,.25);color:${W}">
+    <div style="padding:30px 20px 0 0"><p class="R" style="font-size:64px">27 Dec</p><p class="sub" style="font-size:26px;margin-top:8px;opacity:.8">Submissions close</p></div>
+    <div style="padding:30px 20px 0 28px;border-left:2px solid rgba(255,255,255,.25)"><p class="R" style="font-size:64px">3 weeks</p><p class="sub" style="font-size:26px;margin-top:8px;opacity:.8">Then results</p></div>
+    <div style="padding:30px 0 0 28px;border-left:2px solid rgba(255,255,255,.25)"><p class="R" style="font-size:64px">$21</p><p class="sub" style="font-size:26px;margin-top:8px;opacity:.8">To enter one artwork</p></div>
+  </div>`});
+
+// 9 · WHO CAN APPLY
+S.push({bg: CREAM, html: `${chrome('Who can apply', INK, MAROON)}
+  <p class="a R c" style="left:80px;right:80px;top:370px;font-size:100px;line-height:1.12;color:${INK}">Your work deserves<br>the <span style="display:inline-block;background:${INK};color:${CREAM};border-radius:999px;padding:0 .28em .06em;line-height:1.05">spotlight.</span></p>
+  <p class="a c sub" style="left:130px;right:130px;top:720px;color:${INK}">Emerging and established artists of all genders, nationalities, backgrounds and career stages.</p>
+  <p class="a c sub" style="left:150px;right:150px;top:910px;font-size:26px;opacity:.75;color:${INK}">No publication or gallery history needed.<br>AI-generated work is not eligible.</p>`});
+
+// 10 · END CARD
+S.push({bg: C, html: `${chrome('Submissions open', W, W)}
+  <img class="a" src="../../brand/monogram-white.svg" alt="" style="left:508px;top:110px;width:64px">
+  <p class="a H c" style="left:60px;right:60px;top:220px;font-size:108px;color:${W}">Take your place<br>in Issue 16.</p>
+  <div class="a" style="left:60px;right:60px;top:480px;height:250px;display:flex;align-items:flex-end;justify-content:center;gap:14px">
+    ${[3, 6, 9, 11, 13, 14].map(n => `<img src="img/issue${n}.jpg" alt="" style="height:190px;display:block">`).join('')}
+  </div>
+  <p class="a crd c" style="left:0;right:0;top:746px;color:${W}"><i>Past issues of Arts to Hearts Magazine</i></p>
+  <div class="a" style="left:110px;right:110px;top:880px;height:124px;border-radius:999px;background:${CREAM};color:${MAROON};display:flex;align-items:center;justify-content:space-between;padding:0 20px 0 56px">
+    <span style="font-size:44px;font-weight:700;letter-spacing:-.02em">Apply via link in bio</span>
+    <span style="width:88px;height:88px;border-radius:50%;background:${MAROON};color:${CREAM};display:inline-flex;align-items:center;justify-content:center">${arrow}</span></div>
+  <p class="a c" style="left:0;right:0;top:1050px;font-size:28px;opacity:.9;color:${W}">or comment “${KEY}” for the link</p>
+  <p class="a c" style="left:0;right:0;top:1100px;font-size:26px;opacity:.75;color:${W}">artstoheartsproject.com</p>`});
+
+document.getElementById('out').innerHTML = S.map((s, i) => `<section class="post" id="s${i + 1}" style="background:${s.bg}">${s.html}</section>`).join('');
+</script>
+</body></html>

@@ -29,7 +29,7 @@ Serve `site/post-studio` with `python3 -m http.server 8765`, drive it with Playw
 - Don't add unrequested details (open-call blurbs, extra labels). Keep it clean and consistent across tabs.
 
 ## What each tab does now
-- **Open calls**: 15 feed posts, all carousels of 6+ slides (no thin countdown posts, no pushy lines); countdowns and one-slide reminders are optional **Single graphics** (`singlePosts()` in month.js, own group in the Post menu); stories, reels; styles gallery/award/editorial; credits; drag-to-move text; click text to edit; click/drop image to replace.
+- **Open calls**: 15 feed posts, all carousels of 6+ slides (no thin countdown posts, no pushy lines); countdowns and one-slide reminders are optional **Single graphics** (`singlePosts()` in month.js, own group in the Post menu); stories, reels; styles gallery/award/editorial/magazine (magazine = Arts to Hearts Magazine calls: `magLaunch()` 10-slide launch, artwork above a call-colour band, month copy reworded by `magWords`; preset "Arts to Hearts Magazine Issue 16", images in `art/issue16/`, past artists from the "Magazine Issue 13" Drive sheet); credits; drag-to-move text; click text to edit; click/drop image to replace.
 - Article AI (`api/article.js`) runs on Sonnet 5.5, max 6000 tokens.
 - **Interviews**: carousel shows every artwork plus two cut-off answers.
 - **Interviews / Editorial / Heart List**: paste an article (Ctrl+A, Ctrl+C on the page, Ctrl+V into the box) — primary import; PDF upload and link import are fallbacks. Pictures save to Blob in the background. Paste again updates the open post.
