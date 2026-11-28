@@ -1384,7 +1384,7 @@ function launch(){
     <div class="a" style="left:80px;right:80px;top:820px;display:grid;grid-template-columns:repeat(3,1fr);border-top:2px solid rgba(255,255,255,.2);padding-top:30px;color:${WHITE}">
       <div><p class="lab" style="color:${Tn}">${short()}</p><p class="sub" style="font-size:28px;margin-top:8px">Submissions close</p></div>
       <div style="border-left:2px solid rgba(255,255,255,.16);padding-left:30px"><p class="lab" style="color:${Tn}">${gap(state.results,'Date')}</p><p class="sub" style="font-size:28px;margin-top:8px">Results announced</p></div>
-      <div style="border-left:2px solid rgba(255,255,255,.16);padding-left:30px"><p class="lab" style="color:${Tn}">${gap(state.pub,'Month')}</p><p class="sub" style="font-size:28px;margin-top:8px">Book published</p></div></div>
+      <div style="border-left:2px solid rgba(255,255,255,.16);padding-left:30px"><p class="lab" style="color:${Tn}">${state.pub ? esc(state.pub) : 'After the results'}</p><p class="sub" style="font-size:28px;margin-top:8px">Book published</p></div></div>
     <p class="a c sub" style="left:0;right:0;top:1080px;font-size:26px;opacity:.75;color:${WHITE}">Application fee ${gap(state.fee,'amount, or “applicable”')}</p>`});
 
   // 9 who can apply
@@ -1438,7 +1438,7 @@ function caption(){
   const kw = (state.keyword || 'KEYWORD').toUpperCase();
   return `Open call for artists: ${/^issue\s/i.test(state.name) ? `${state.series}, ${state.name}` : `${state.series}: ${state.name}`}. Submissions close ${dl().getDate()} ${MONTHS_L[dl().getMonth()]}.
 
-What happens when ${state.selected} artists from around the world come together around a single idea? ${/^issue\s/i.test(state.name) ? `${state.series}, ${state.name}` : `The ${state.name}`} is now open for submissions. ${state.edition ? `Edition ${state.edition} of a series` : `Part of a series`} that has published ${state.published} artists since ${state.since}.
+What happens when ${state.selected} artists from around the world come together around a single idea? ${/^issue\s/i.test(state.name) ? `${state.series}, ${state.name}` : `The ${state.name}`} is now open for submissions. ${/magazine/i.test(state.series || '') ? `The magazine has published` : state.edition ? `Edition ${state.edition} of a series that has published` : `Part of a series that has published`} ${state.published} artists since ${state.since}.
 
 ${state.selected} artists will be selected by ${state.jury || 'the jury'} and published in a juried hardcover book, distributed through Amazon, Barnes & Noble and the ATH Shop, and introduced to collectors, galleries and curators.
 
@@ -1447,7 +1447,7 @@ Open to individual artists 18+, worldwide, in any medium.
 ${kwLine()}
 Submissions close ${dl().getDate()} ${MONTHS_L[dl().getMonth()]}.
 
-Know an artist whose work belongs in this book? Send this to them.
+Know an artist whose work belongs in this ${/magazine/i.test(state.series || '') ? 'issue' : 'book'}? Send this to them.
 
 ${tagsFor()}`;
 }
@@ -1463,6 +1463,10 @@ function postDate(left){ const d = new Date(dl()); d.setDate(d.getDate() - left)
 function buildPtype(){ const sel = $('ptype'), cur = sel.value;
   sel.innerHTML = `<option value="month">Whole month (${monthPosts().length} feed posts)</option>` + monthPosts().map((p,i) => `<option value="${i}">${postDate(planLeft(i, p))} · ${esc(p.title)} (${p.kind.split(' ·')[0]})</option>`).join('') + `<optgroup label="Single graphics (optional, outside the schedule)">${singlePosts().map((p,i) => `<option value="s${i}">${esc(p.title)}</option>`).join('')}</optgroup>` + '<optgroup label="Stories"><option value="storyplan">Stories plan: all calls, day by day</option><option value="storydays">Stories: this call, every day ready to post</option><option value="stories">Stories: template library</option></optgroup><option value="reels">Reels</option><option value="calendar">Calendar</option><option value="callmgr">Call manager</option><option value="daily">Daily posts</option><option value="interview">Artist interviews</option>';
   sel.value = cur || '0'; if (!sel.value) sel.value = '0'; }
+// open-call posts never go out with an empty photo box, a missing detail or a slide another post already has
+function autoWhyOf(g, s, j, seg0){ if (seg0 !== 'calls' || g.daily || g.story || g.reel) return '';
+  if (s.auto === 'dup') return 'Hidden: another post already has this slide';
+  return /class="(?:[^"]*\s)?(?:ph|gap)(?:\s[^"]*)?"/.test(s.html || '') && !state.images['ov|' + gid(g) + '|' + j] ? 'Hidden: needs a photo or a detail' : ''; }
 function render(){
   readForm(); scheduleDraft(); updateTabs();
   const seg0 = document.body.dataset.seg || 'calls'; const base = (seg0 !== 'calls' && $('ptype').value === 'interview' && SECTIONS[IVK] ? 'ath-' + SECTIONS[IVK].title : (state.name || 'call')).toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g, '');
@@ -1500,7 +1504,7 @@ function render(){
   } else {
     artPlan(); const isS = /^s\d+$/.test(pick); const all = isS ? singlePosts() : monthPosts(); const list = pick === 'month' ? all : [all[Number(isS ? pick.slice(1) : pick)]].filter(Boolean);
     list.forEach((p,pi) => { VERB = verbFor(p.left); CURLEFT = p.left;
-      const slides = artFill(p, artBuild(p)).map(decorate); const cap = p.caption(); const pin = p.pin ? p.pin() : CMODE() ? pinned() : `${VERB === 'COMMENT' ? 'Comment' : 'DM us'} "${(state.keyword||'').toUpperCase()}" for the brief and your link. Closes ${short()}.`;
+      const slides = artFill(p, artBuild(p)).map(decorate); const cap = withCallLine(p.caption()); const pin = p.pin ? p.pin() : CMODE() ? pinned() : `${VERB === 'COMMENT' ? 'Comment' : 'DM us'} "${(state.keyword||'').toUpperCase()}" for the brief and your link. Closes ${short()}.`;
       groups.push({title: isS ? `Single graphic · ${p.title}` : `${postDate(planLeft(monthPosts().findIndex(x => x.title === p.title), p))} · ${p.title}`, meta: `${p.kind} · ${slides.length} slide${slides.length>1?'s':''} · ${planLeft(monthPosts().findIndex(x => x.title === p.title), p) === 0 ? 'deadline day' : planLeft(monthPosts().findIndex(x => x.title === p.title), p) + ' days left'} · ${VERB} “${KW()}”`, slides: slides.map((s,j) => ({...s, title: s.title || (p.title.toLowerCase().replace(/[^a-z0-9]+/g,'-') + (slides.length>1 ? '-'+(j+1) : ''))})), cap, pin, left:p.left, idx:pi});
       VERB = verbFor(99); });
   }
@@ -1513,9 +1517,15 @@ function render(){
   renderPool();
   RENDERED = [];
   $('out').innerHTML = groups.map((g,gi) => {
-    const gk = 'g|' + gid(g), gHidden = !!HID()[gk];
-    if (gHidden) return `<section class="group hiddenpost"><h2>${esc(g.title)}</h2><p class="meta">Hidden for now · not in Save all as ZIP</p><button type="button" class="btn ghost" data-unhide="${esc(gk)}">Restore this ${g.reel ? 'reel' : g.story ? 'day' : 'post'}</button></section>`;
-    const cells = g.slides.map((s,j) => { const hk = 'h|' + gid(g) + '|' + j; if (HID()[hk]) return `<div class="cell hiddencell"><div class="frame${s.h ? ' tall' : ''}">${slideNode(s)}<div class="hidmask">Hidden</div></div><div class="act"><span>${s.label ? esc(s.label) : 'Slide ' + (j+1)}</span><span class="acts"><button type="button" data-unhide="${esc(hk)}">Restore</button></span></div></div>`;
+    const gk = 'g|' + gid(g); let gHidden = !!HID()[gk], gWhy = '';
+    // a carousel left with fewer than 4 slides once empty boxes are held back is not ready to post
+    if (HID()[gk] === undefined && seg0 === 'calls' && !g.daily && !g.story && !g.reel && g.slides.length >= 4) { const out = g.slides.filter((s, j) => { const hv = HID()['h|' + gid(g) + '|' + j]; return hv === undefined ? !autoWhyOf(g, s, j, seg0) : !hv; }).length;
+      if (out < 4) { gHidden = true; gWhy = `Not ready to post: ${g.slides.length - out} of its ${g.slides.length} slides need real photos or details. Show the slides to drop photos on them.`; } }
+    if (gHidden) return `<section class="group hiddenpost"><h2>${esc(g.title)}</h2><p class="meta">${gWhy || 'Hidden for now · not in Save all as ZIP'}</p><button type="button" class="btn ghost" data-unhide="${esc(gk)}">${gWhy ? 'Show the slides' : `Restore this ${g.reel ? 'reel' : g.story ? 'day' : 'post'}`}</button></section>`;
+    const cells = g.slides.map((s,j) => { const hk = 'h|' + gid(g) + '|' + j;
+      // open-call posts never go out with an empty photo box, a missing detail or a slide another post already has: hidden until filled or restored
+      const autoWhy = autoWhyOf(g, s, j, seg0);
+      const hv = HID()[hk]; if (hv === undefined ? !!autoWhy : !!hv) return `<div class="cell hiddencell"><div class="frame${s.h ? ' tall' : ''}">${slideNode(s)}<div class="hidmask">${hv === undefined && autoWhy ? autoWhy : 'Hidden'}</div></div><div class="act"><span>${s.label ? esc(s.label) : 'Slide ' + (j+1)}</span><span class="acts"><button type="button" data-unhide="${esc(hk)}">Restore</button></span></div></div>`;
       const i = RENDERED.push({ s, name: `${base}-${g.left !== undefined ? String(g.idx+1).padStart(2,'0')+'-' : g.story ? 'story-' : ''}${String(j+1).padStart(2,'0')}-${s.title}.png` }) - 1;
        const okey = 'ov|' + gid(g) + '|' + j; const has = !!state.images[okey];
       const vmeta = s.photoKey && (state.vids || {})[s.photoKey]; const dkey = s.photoKey || 'end';
@@ -1569,7 +1579,7 @@ function render(){
   $('out').querySelectorAll('[data-hide]').forEach(b => b.onclick = () => { HID()[b.dataset.hide] = 1; render(); status('Hidden for now. It is left out of Save all as ZIP. Restore it any time.'); });
   $('out').querySelectorAll('[data-txr]').forEach(b => b.onclick = () => { Object.keys(TXT()).forEach(k => { if (k.startsWith(b.dataset.txr) && TXT()[k] === '\u200b') delete TXT()[k]; }); render(); status('Removed text is back.'); });
   $('out').querySelectorAll('[data-bg]').forEach(sel => sel.onchange = () => { state.bgs = state.bgs || {}; if (sel.value) state.bgs[sel.dataset.bg] = sel.value; else delete state.bgs[sel.dataset.bg]; render(); status(sel.value ? 'Slide colour changed. It shows wherever the slide has no picture of its own.' : 'Slide colour back to the template.'); });
-  $('out').querySelectorAll('[data-unhide]').forEach(b => b.onclick = () => { delete HID()[b.dataset.unhide]; render(); status('Restored.'); });
+  $('out').querySelectorAll('[data-unhide]').forEach(b => b.onclick = () => { HID()[b.dataset.unhide] = 0; render(); status('Restored.'); });   // 0, not deleted: a slide hidden automatically stays shown once restored
   $('out').querySelectorAll('[data-ph]').forEach(b => b.onclick = () => { const inp = document.createElement('input'); inp.type = 'file'; inp.accept = 'image/*';
     inp.onchange = () => { const file = inp.files[0]; if (!file) return; shrink(file).then(url => { state.images[b.dataset.ph] = url; render(); status('Photo changed. Press "Save call" to keep it.'); }); }; inp.click(); });
   wireSlots();
