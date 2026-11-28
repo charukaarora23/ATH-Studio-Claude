@@ -678,9 +678,14 @@ const prepWork = () => state.themeWork === 'best work' ? 'best' : longTheme() ? 
 // one line with the facts artists search for and decide on, in every open-call caption
 function callLine(){ const full = /magazine/i.test(S()) ? `${S()}, ${N()}` : S() && !/^arts to hearts$/i.test(S()) ? `${S()}: ${N()}` : N();
   const fee = state.fee && !/applicable/i.test(state.fee) ? (/free/i.test(state.fee) ? 'free to apply' : `${state.fee} to apply`) : '';
-  return ['Open call for artists', full, state.theme && !/^open$/i.test(state.theme) ? `Theme: ${state.theme}` : '', state.prize ? `${state.prize} award` : '', fee, `closes ${dateLong()}`].filter(Boolean).join(' · '); }
+  return ['Open call for artists', full, state.theme && !/^open$/i.test(state.theme) ? `Theme: ${state.theme}` : '', state.prize ? `${state.prize} award` : '', `closes ${dateLong()}`].filter(Boolean).join(' · '); }
 function withCallLine(cap){ if (!cap || /^Open call for artists ·/m.test(cap)) return cap; cap = cap.split('\n').filter((l, i) => i === 0 || !/^Submissions close \d+ \w+\.$/.test(l.trim())).join('\n');   /* the facts line carries the deadline */ const lines = cap.split('\n'); const at = lines.findIndex(l => /link in bio|comment ["“]/i.test(l));
-  if (at < 0) return cap; if (/^\s*\d+\./.test(lines[at])) { let i = at; while (i > 0 && lines[i - 1].trim()) i--; lines.splice(i, 0, callLine(), ''); } else lines.splice(at, 0, callLine()); return lines.join('\n'); }
+  if (at < 0) return cap;
+  // the keyword goes in line 2 of every caption (data, Nov 2026: in line 1-2 on 1 of 31 posts); the later call to action keeps only the link in bio
+  const kw = (state.keyword || '').toUpperCase(); if (kw && CMODE()) { const k = lines.findIndex(l => l === kwLine()); if (k >= 0 && !/^\s*\d+\./.test(lines[k])) lines[k] = 'Or apply via the link in bio.'; lines.splice(1, 0, `Comment “${kw}” and we’ll send you the link.`); }
+  const at2 = lines.findIndex((l, i) => i > 1 && /link in bio|comment ["“]/i.test(l)); if (at2 < 0) { lines.push('', callLine()); return lines.join('\n'); }
+  return insertCallLine(lines, at2); }
+function insertCallLine(lines, at){ if (/^\s*\d+\./.test(lines[at])) { let i = at; while (i > 0 && lines[i - 1].trim()) i--; lines.splice(i, 0, callLine(), ''); } else lines.splice(at, 0, callLine()); return lines.join('\n'); }
 const theN = () => /^issue\s/i.test(N()) ? `${S()}, ${N()}` : 'The ' + N();
 const pastNames = () => String(state.artists || '').split('\n').map(l => l.split('|')[0].trim()).filter(Boolean);
 const distrib = () => esc(state.distribution || 'Amazon, Barnes & Noble and the ATH Shop');
