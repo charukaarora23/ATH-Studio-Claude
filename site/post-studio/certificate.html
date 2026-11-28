@@ -38,10 +38,31 @@ html,body{margin:0;background:#EFE9E6;font-family:"ATH Tight",sans-serif;color:v
 .logo p{margin:-16px 0 0;font-family:"ATH Grotesk",sans-serif;font-weight:700;font-size:11px;letter-spacing:.34em;color:var(--burg)}
 .seal{position:absolute;right:58px;bottom:34px;width:150px;height:150px}
 .foot{position:absolute;left:0;right:0;bottom:18px;text-align:center;font-size:12px;letter-spacing:.04em;color:var(--burg)}
+
+/* design 2: a Burgundy panel with the grant, the certificate on white */
+.s2{background:#FFFFFF}body:not(.v2) .s2,body.v2 .s1{display:none}
+.s2 .panel{position:absolute;left:0;top:0;bottom:0;width:370px;background:var(--burg);color:#fff;text-align:center}
+.s2 .pcn{position:absolute;left:0;right:0;top:46px;font-family:"ATH Grotesk",sans-serif;font-weight:700;font-size:11px;letter-spacing:.28em;color:var(--pink)}
+.s2 .pmono{position:absolute;left:50%;top:104px;width:120px;transform:translateX(-50%)}
+.s2 .amt{position:absolute;left:0;right:0;top:250px;font-weight:500;font-size:124px;line-height:1;letter-spacing:-.05em;color:var(--pink)}
+.s2 .usd{position:absolute;left:0;right:0;top:384px;font-weight:500;font-size:15px;letter-spacing:.34em;color:var(--rose)}
+.s2 .ppill{position:absolute;left:0;right:0;top:448px}.s2 .ppill span{display:inline-block;background:var(--pink);color:var(--burg);font-weight:500;font-size:19px;padding:11px 26px;border-radius:999px}
+.s2 .pwin{position:absolute;left:0;right:0;top:516px;font-weight:500;font-size:13px;letter-spacing:.24em;text-transform:uppercase;color:#fff}
+.s2 .pline{position:absolute;left:40px;right:40px;bottom:58px;font-family:"ATH Bask",serif;font-style:italic;font-size:19px;line-height:1.45;color:var(--pink)}
+.s2 .r{position:absolute;left:440px;right:70px}
+.s2 .t{top:92px;font-weight:500;font-size:88px;line-height:.95;letter-spacing:-.045em;color:var(--ink)}.s2 .t i{display:block;font-family:"ATH Bask",serif;font-weight:400;font-size:58px;letter-spacing:-.01em;color:var(--burg);margin-top:6px}
+.s2 .rr{top:284px;width:90px;right:auto;height:3px;border-radius:3px;background:var(--rose)}
+.s2 .to2{top:312px;font-family:"ATH Bask",serif;font-style:italic;font-size:20px}
+.s2 .name2{top:346px;font-weight:500;font-size:58px;line-height:1.1;letter-spacing:-.035em;white-space:nowrap;outline:none}
+.s2 .body2{top:440px;font-family:"ATH Bask",serif;font-size:17.5px;line-height:1.65;outline:none}.s2 .body2 b{font-weight:400;color:var(--burg);background:var(--pink);padding:0 .15em;border-radius:3px}
+.s2 .date2{position:absolute;left:440px;bottom:62px}.s2 .date2 small{display:block;font-weight:500;font-size:11px;letter-spacing:.24em;color:var(--burg);margin-bottom:8px}.s2 .date2 div{font-size:19px;padding-bottom:6px;border-bottom:1px solid rgba(28,19,16,.25);min-width:220px;outline:none}
+.s2 .logo2{position:absolute;right:70px;bottom:54px;width:250px}.s2 .logo2 img{width:100%;display:block}
+.s2 .foot2{position:absolute;left:440px;right:70px;bottom:20px;font-size:11px;letter-spacing:.04em;color:var(--burg);opacity:.8}
+.bar .ver{background:#fff;color:var(--burg);box-shadow:inset 0 0 0 1.5px var(--burg)}.bar .ver[aria-pressed=true]{background:var(--burg);color:#fff}
 @media print{html,body{background:#fff}.bar{display:none}.sheet{margin:0;box-shadow:none}}
 </style></head><body>
-<div class="bar"><button type="button" onclick="window.print()">Save as PDF</button><span>Click the name, the date or the text to change it. In the print window choose "Save as PDF", landscape, no margins, and turn background graphics on.</span></div>
-<div class="sheet">
+<div class="bar"><button type="button" class="ver" data-v="1" aria-pressed="true">Design 1</button><button type="button" class="ver" data-v="2" aria-pressed="false">Design 2</button><button type="button" onclick="window.print()">Save as PDF</button><span>Click the name, the date or the text to change it. In the print window choose "Save as PDF", landscape, no margins, and turn background graphics on.</span></div>
+<div class="sheet s1">
   <div class="tab t1">ATH Creative Fund</div><div class="tab t2">Winner</div><div class="tab t3" id="month">November 2026</div>
   <div class="card">
     <div class="cn">Arts to Hearts Project</div>
@@ -62,14 +83,36 @@ html,body{margin:0;background:#EFE9E6;font-family:"ATH Tight",sans-serif;color:v
   </div>
   <div class="foot">@artstoheartsproject · artstoheartsproject.com · #ATHCreativeFund</div>
 </div>
+<div class="sheet s2">
+  <div class="panel">
+    <div class="pcn">ARTS TO HEARTS PROJECT</div>
+    <img class="pmono" src="brand/monogram-white.svg" alt="ATH">
+    <div class="amt">$500</div><div class="usd">USD</div>
+    <div class="ppill"><span>ATH Creative Fund</span></div>
+    <div class="pwin">Winner · <span id="month2">November 2026</span></div>
+    <div class="pline">No receipts. No reports.<br>Just room to make the work.</div>
+  </div>
+  <div class="r t">Certificate<i>of award</i></div>
+  <div class="r rr"></div>
+  <div class="r to2">is proudly awarded to</div>
+  <div class="r name2" id="name2" contenteditable="true" spellcheck="false">Iryna Tymovchak</div>
+  <div class="r body2" id="body2" contenteditable="true">In recognition of your work, you have been awarded the ATH Creative Fund: an unrestricted grant of <b>$500 USD</b> from the Arts To Hearts Project, to spend on whatever your practice needs.</div>
+  <div class="date2"><small>DATE</small><div id="date2" contenteditable="true" spellcheck="false">November 28, 2026</div></div>
+  <div class="logo2"><img src="brand/logo-heart.png" alt="Arts to Hearts Project"></div>
+  <div class="foot2">@artstoheartsproject · artstoheartsproject.com · #ATHCreativeFund</div>
+</div>
 <script>
 const q = new URLSearchParams(location.search), $ = id => document.getElementById(id);
-if (q.get('name')) $('name').textContent = q.get('name');
-if (q.get('date')) $('date').textContent = q.get('date');
-const setMonth = () => { const d = new Date($('date').textContent.trim()); if (!isNaN(d)) $('month').textContent = d.toLocaleDateString('en-GB', {month: 'long', year: 'numeric'}); };
-setMonth(); $('date').addEventListener('input', setMonth);
+if (q.get('name')) $('name').textContent = $('name2').textContent = q.get('name');
+if (q.get('date')) $('date').textContent = $('date2').textContent = q.get('date');
+/* both designs share the name and the date: typing in one updates the other */
+[['name', 'name2'], ['date', 'date2']].forEach(([a, b]) => { $(a).addEventListener('input', () => { $(b).textContent = $(a).textContent; fit(); setMonth(); }); $(b).addEventListener('input', () => { $(a).textContent = $(b).textContent; fit(); setMonth(); }); });
+const setMonth = () => { const d = new Date($('date').textContent.trim()); if (!isNaN(d)) $('month').textContent = $('month2').textContent = d.toLocaleDateString('en-GB', {month: 'long', year: 'numeric'}); };
+setMonth();
+const setV = v => { document.body.classList.toggle('v2', v === '2'); document.querySelectorAll('.ver').forEach(x => x.setAttribute('aria-pressed', x.dataset.v === v)); fit(); };
+document.querySelectorAll('.ver').forEach(x => x.onclick = () => setV(x.dataset.v)); setV(q.get('v') === '2' ? '2' : '1');
 /* long names shrink to fit the line */
-const fit = () => { const n = $('name'); n.style.fontSize = ''; const r = document.createRange(); r.selectNodeContents(n); let s = 62; while (r.getBoundingClientRect().width > 860 && s > 30) { s -= 2; n.style.fontSize = s + 'px'; } };
-fit(); $('name').addEventListener('input', fit);
+function fit(){ [['name', 62, 860], ['name2', 58, 600]].forEach(([id, max, w]) => { const n = $(id); if (!n.offsetParent) return; n.style.fontSize = ''; const r = document.createRange(); r.selectNodeContents(n); let s = max; while (r.getBoundingClientRect().width > w && s > 28) { s -= 2; n.style.fontSize = s + 'px'; } }); }
+fit();
 document.title = 'ATH Creative Fund Certificate - ' + $('name').textContent;
 </script></body></html>
