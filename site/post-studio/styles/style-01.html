@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Style 01 · Specimen</title>
+<style>
+@font-face{font-family:"T";src:url(../fonts/ath/InterTight-Regular.woff2) format("woff2");font-weight:400}
+@font-face{font-family:"T";src:url(../fonts/ath/InterTight-Medium.woff2) format("woff2");font-weight:500 700}
+@font-face{font-family:"IS";src:url(../fonts/InstrumentSerif-Regular.ttf)}
+@font-face{font-family:"IS";font-style:italic;src:url(../fonts/InstrumentSerif-Italic.ttf)}
+@font-face{font-family:"M";src:url(../fonts/ath/DMMono.woff2) format("woff2");font-weight:400}
+@font-face{font-family:"M";src:url(../fonts/ath/DMMono-Medium.woff2) format("woff2");font-weight:500}
+:root{--paper:#FBF8F4;--ink:#1C1310;--burg:#6A0620;--pink:#FAD2E1;--rose:#FFA1C2;--cream:#F9EEE5}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#E9E4DF;font-family:T,sans-serif;color:var(--ink);-webkit-font-smoothing:antialiased}
+.sheet{max-width:2240px;margin:0 auto;padding:64px 40px 90px}
+.sheet>h1{font:500 88px/1 T;letter-spacing:-.04em}.sheet>h1 em{font:italic 400 96px/1 IS}
+.lede{font:400 26px/1.4 T;max-width:1100px;margin:18px 0 44px;color:#4a3f3b}
+.rules{display:grid;grid-template-columns:repeat(4,1fr);gap:18px;margin-bottom:56px}
+.rule{background:var(--paper);border-radius:16px;padding:22px 24px}
+.rule h3{font:500 15px/1 M;letter-spacing:.12em;text-transform:uppercase;color:var(--burg);margin-bottom:14px}
+.rule p{font:400 19px/1.45 T;color:#3b302d}
+.sw{display:flex;gap:10px;margin-top:4px}.sw span{flex:1;height:58px;border-radius:10px;border:1px solid rgba(0,0,0,.08);font:500 12px/1 M;display:flex;align-items:flex-end;padding:7px}
+.grid{display:grid;grid-template-columns:repeat(2,1080px);gap:40px;justify-content:center}
+.cap{font:500 16px/1 M;letter-spacing:.1em;text-transform:uppercase;margin:0 0 12px;color:#5b4e49}
+
+/* ---------- the style ---------- */
+.s{position:relative;width:1080px;height:1350px;overflow:hidden;background:var(--paper)}
+.a{position:absolute}
+.giant{font:500 1px/0.8 T;letter-spacing:-.05em;color:var(--ink);white-space:nowrap}
+/* the spec label: a tilted Rose ticket, mono, label : value */
+.tag{position:absolute;background:var(--rose);color:var(--ink);padding:30px 38px 32px;font:500 30px/1.32 M;text-transform:uppercase;letter-spacing:.01em;box-shadow:0 18px 40px -26px rgba(28,19,16,.55)}
+.tag .h{font:500 46px/1 M;display:flex;gap:26px;margin-bottom:18px;letter-spacing:-.01em;white-space:nowrap}
+.tag table{border-collapse:collapse}.tag td{padding:0 34px 0 0;vertical-align:top;white-space:nowrap}
+.mono{font:500 24px/1.35 M;text-transform:uppercase}
+.ser{font-family:IS,serif;font-weight:400;letter-spacing:-.01em}
+.ser i{font-style:italic}
+.u{text-decoration:underline;text-decoration-thickness:4px;text-underline-offset:10px}
+.par{font:400 1px/1 IS}
+.circ{display:inline-flex;align-items:center;justify-content:center;width:46px;height:46px;border:2.5px solid currentColor;border-radius:50%;font:500 24px/1 T;vertical-align:middle;margin-bottom:10px}
+sup{font:500 22px/1 M;vertical-align:2.1em;margin-left:4px;letter-spacing:0}
+.brandline{font:700 20px/1 "T";letter-spacing:.16em;text-transform:uppercase}
+</style></head><body>
+<div class="sheet">
+  <h1>Style 01 · <em>Specimen</em></h1>
+  <p class="lede">From the five references: type used as the picture, a tilted spec label that carries the facts, a serif index with small numbers, editorial sentences with one serif italic word and an underline, circled steps, and a serif headline with one italic word in a second colour. ATH colours only.</p>
+  <div class="rules">
+    <div class="rule"><h3>Colour</h3><div class="sw"><span style="background:#FBF8F4">Paper</span><span style="background:#1C1310;color:#F9EEE5">Ink</span><span style="background:#6A0620;color:#FAD2E1">Burgundy</span><span style="background:#FFA1C2">Rose</span><span style="background:#FAD2E1">Pink</span></div><p style="margin-top:12px">Paper ground, Ink type. Rose only for the label. Burgundy for statement slides.</p></div>
+    <div class="rule"><h3>Type</h3><p><b>Inter Tight Medium</b>: giant letters and sentences.<br><span style="font:italic 26px IS">Instrument Serif</span>: index, headlines, one italic word.<br><span style="font:500 17px M">DM MONO</span>: the label and small facts.</p></div>
+    <div class="rule"><h3>Devices</h3><p>1 Giant type as the picture. 2 The spec label (all the facts). 3 Serif index with small numbers. 4 Sentence with one italic word and one underline. 5 Circled steps. 6 Parenthesis footer.</p></div>
+    <div class="rule"><h3>Rules</h3><p>One device per slide. The keyword always on the label or in the steps. Artworks whole, in a plain frame, never under the label. No gradients, no circles on artworks, no fee.</p></div>
+  </div>
+
+  <div class="grid">
+  <!-- 1 Launch cover: giant type + the label -->
+  <div><p class="cap">Cover · giant type + spec label</p>
+  <section class="s">
+    <p class="a brandline" style="left:56px;top:52px">Arts to Hearts Project</p><p class="a mono" style="right:56px;top:48px;font-size:20px">( Open call for artists )</p>
+    <p class="a giant" style="left:34px;top:130px;font-size:440px">OPEN</p>
+    <p class="a giant" style="left:34px;top:520px;font-size:440px">CALL</p>
+    <p class="a giant" style="left:34px;top:1010px;font-size:250px;letter-spacing:-.04em">Issue 16</p>
+    <div class="tag" style="left:150px;top:420px;transform:rotate(-8deg)">
+      <div class="h"><span>016 /</span><span>Arts to Hearts Magazine</span></div>
+      <table><tr><td>Theme:</td><td>The Art of Starting Again</td></tr><tr><td>Selected:</td><td>100 artists, published</td></tr><tr><td>Award:</td><td>$500 to one artist</td></tr><tr><td>Closes:</td><td>27 December 2026</td></tr><tr><td>To apply:</td><td>Comment ISSUE16</td></tr></table>
+    </div>
+  </section></div>
+
+  <!-- 2 Countdown: one giant number, vertical facts, checkboxes -->
+  <div><p class="cap">Countdown · giant number + checklist</p>
+  <section class="s">
+    <p class="a brandline" style="left:56px;top:52px">Arts to Hearts Project</p><p class="a mono" style="right:56px;top:48px;font-size:20px">( Deadline )</p>
+    <p class="a giant" style="left:-10px;top:60px;font-size:1180px;letter-spacing:-.08em">7</p>
+    <div class="a" style="right:64px;top:140px;width:420px">
+      <p class="mono" style="font-size:40px;line-height:1.1">Days left /</p>
+      <p class="mono" style="font-size:22px;margin-top:22px;text-transform:none;font-weight:400;line-height:1.5">to get your work into Arts to Hearts Magazine, Issue 16. One hundred artists will be published, and one of them wins $500.</p>
+      <p class="mono" style="font-size:30px;margin-top:40px">■ Comment ISSUE16</p><p class="mono" style="font-size:30px;margin-top:10px">□ Link in bio</p>
+    </div>
+    <div class="tag" style="left:330px;top:900px;transform:rotate(-8deg);font-size:28px">
+      <div class="h" style="font-size:44px"><span>Closes /</span><span>27 Dec</span></div>
+      <table><tr><td>Places:</td><td>100</td></tr><tr><td>Theme:</td><td>The Art of Starting Again</td></tr></table>
+    </div>
+  </section></div>
+
+  <!-- 3 Index: what you can submit -->
+  <div><p class="cap">Index · serif list with small numbers</p>
+  <section class="s" style="background:#EEF1F4">
+    <p class="a ser" style="left:56px;right:56px;top:70px;font-size:104px;line-height:1.08;text-align:center">A new chapter<sup>01</sup> / A place<sup>02</sup> / A memory<sup>03</sup> / A change in perspective<sup>04</sup> / Work you <i>already</i> made<sup>05</sup></p>
+    <p class="a mono" style="left:56px;right:56px;top:880px;text-align:center;font-size:22px;line-height:1.5">What you can submit to Issue 16<br>Any medium · original work only · comment ISSUE16</p>
+    <p class="a ser" style="left:44px;bottom:70px;font-size:120px;line-height:1">( Issue 16</p>
+    <p class="a" style="left:0;right:0;bottom:104px;text-align:center;font:700 17px/1.35 T;letter-spacing:.06em;text-transform:uppercase">The art of<br>starting again</p>
+    <p class="a ser" style="right:44px;bottom:70px;font-size:120px;line-height:1">Open )</p>
+  </section></div>
+
+  <!-- 4 Sentence: editorial voice, italic + underline, circled steps -->
+  <div><p class="cap">Sentence · italic word, underline, circled steps</p>
+  <section class="s" style="background:#F6F1DF">
+    <p class="a" style="left:60px;top:60px;font:500 22px/1 T">Open call <span style="font-weight:400">→ Issue 16 → Your questions</span></p>
+    <p class="a" style="left:60px;right:60px;top:150px;font:400 84px/1.08 T;letter-spacing:-.035em">You don’t need a gallery, a degree or a <span class="u">big following</span>.<br><br>You need <span class="ser" style="font-style:italic;font-size:1.1em">one</span> work you believe in.</p>
+    <div class="a" style="left:60px;right:60px;bottom:80px;display:flex;gap:56px;font:500 26px/1.35 T">
+      <p><span class="circ">1</span><br>Comment<br><span style="font-weight:400">ISSUE16</span></p><p><span class="circ">2</span><br>Choose<br><span style="font-weight:400">your work</span></p><p><span class="circ">3</span><br>Submit<br><span style="font-weight:400">by 27 December</span></p>
+    </div>
+  </section></div>
+
+  <!-- 5 Statement: serif headline, one italic word in Rose -->
+  <div><p class="cap">Statement · serif headline, one word in a second colour</p>
+  <section class="s" style="background:var(--burg)">
+    <p class="a brandline" style="left:56px;top:52px;color:var(--pink)">Arts to Hearts Project</p>
+    <p class="a ser" style="left:52px;right:60px;top:120px;font-size:200px;line-height:.92;color:var(--pink)">Start your next chapter <i style="color:var(--cream)">in print.</i></p>
+    <p class="a" style="left:60px;right:120px;bottom:90px;font:400 34px/1.35 T;color:var(--cream)">Arts to Hearts Magazine, Issue 16 is about what comes after an ending. One hundred artists will be published. Comment ISSUE16 and we’ll send you the link.</p>
+  </section></div>
+
+  <!-- 6 Artwork: whole work in a plain frame, the label as the credit (never on the work) -->
+  <div><p class="cap">Artwork · the work whole, the label as credit</p>
+  <section class="s">
+    <p class="a brandline" style="left:56px;top:52px">Arts to Hearts Project</p><p class="a mono" style="right:56px;top:48px;font-size:20px">( From past issues )</p>
+    <div class="a" style="left:110px;right:110px;top:130px;height:820px;background:url(../art/issue16/art-howis.jpg) center/contain no-repeat"></div>
+    <div class="tag" style="left:200px;top:1000px;transform:rotate(-4deg);font-size:26px">
+      <div class="h" style="font-size:40px"><span>Work /</span><span>Fiercely Fragile</span></div>
+      <table><tr><td>Artist:</td><td>Margarita Howis</td></tr><tr><td>Your work:</td><td>Comment ISSUE16</td></tr></table>
+    </div>
+  </section></div>
+  </div>
+</div>
+</body></html>
